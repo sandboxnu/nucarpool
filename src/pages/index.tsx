@@ -78,6 +78,7 @@ const Home: NextPage<any> = () => {
       >
         <RiFocus3Line />
       </button>
+      {/* This is where the Mapbox puts its stuff */}
       <div id="map" className="h-screen"></div>
     </>
   );

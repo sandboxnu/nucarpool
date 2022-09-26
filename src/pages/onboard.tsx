@@ -60,6 +60,7 @@ const Onboard: NextPage = () => {
   const [suggestions, setSuggestions] = useState<Feature[]>([]);
   const [selected, setSelected] = useState({ place_name: "" });
 
+  /*
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
       const results: FeatureCollection = await axios
@@ -75,6 +76,25 @@ const Onboard: NextPage = () => {
     } catch (error) {
       toast.error(`Something went wrong: ${error}`);
     }
+  };
+  */
+
+  // TODO: Document this function
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    trpc.useQuery(["mapbox.search", {
+      value: e.target.value,
+      types: "address%2Cpostcode",
+      proximity: "ip",
+      country: "us",
+      autocomplete: true,
+    }], {
+      onSuccess: (data) => {
+        setSuggestions(data?.features || []);
+      },
+      onError: (error) => {
+        toast.error(`Something went wrong: ${error}`);
+      }
+    });
   };
 
   const [startLocationsuggestions, setStartLocationSuggestions] = useState<
