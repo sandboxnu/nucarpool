@@ -1,6 +1,5 @@
 import { Combobox, Transition } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import { Feature, FeatureCollection } from "geojson";
 import { debounce } from "lodash";
 import { GetServerSidePropsContext, NextPage } from "next";
@@ -18,6 +17,8 @@ import { trpc } from "../utils/trpc";
 import { Role, Status } from "@prisma/client";
 import { TextField } from "../components/TextField";
 import Radio from "../components/Radio";
+import handleSearch from "../utils/search";
+
 
 type OnboardingFormInputs = {
   role: Role;
@@ -59,6 +60,12 @@ const Onboard: NextPage = () => {
 
   const [suggestions, setSuggestions] = useState<Feature[]>([]);
   const [selected, setSelected] = useState({ place_name: "" });
+  const [startLocationsuggestions, setStartLocationSuggestions] = useState<
+    Feature[]
+  >([]);
+  const [startLocationSelected, setStartLocationSelected] = useState({
+    place_name: "",
+  });
 
   /*
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,32 +84,6 @@ const Onboard: NextPage = () => {
       toast.error(`Something went wrong: ${error}`);
     }
   };
-  */
-
-  // TODO: Document this function
-  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    trpc.useQuery(["mapbox.search", {
-      value: e.target.value,
-      types: "address%2Cpostcode",
-      proximity: "ip",
-      country: "us",
-      autocomplete: true,
-    }], {
-      onSuccess: (data) => {
-        setSuggestions(data?.features || []);
-      },
-      onError: (error) => {
-        toast.error(`Something went wrong: ${error}`);
-      }
-    });
-  };
-
-  const [startLocationsuggestions, setStartLocationSuggestions] = useState<
-    Feature[]
-  >([]);
-  const [startLocationSelected, setStartLocationSelected] = useState({
-    place_name: "",
-  });
 
   const handleStartLocationChange = async (
     e: React.ChangeEvent<HTMLInputElement>
@@ -121,7 +102,17 @@ const Onboard: NextPage = () => {
     } catch (error) {
       toast.error(`Something went wrong: ${error}`);
     }
-  };
+  };*/
+
+  const handleChange = handleSearch({
+    type: "address%2Cpostcode", 
+    setFunc: setSuggestions
+  });
+
+  const handleStartLocationChange = handleSearch({
+    type: "neighborhood%2Cplace", 
+    setFunc: setStartLocationSuggestions
+  });
 
   const editUserMutation = trpc.useMutation("user.edit", {
     onSuccess: () => {

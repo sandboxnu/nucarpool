@@ -1,7 +1,6 @@
 import { Combobox, Transition } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Role, Status } from "@prisma/client";
-import axios from "axios";
 import { Feature, FeatureCollection } from "geojson";
 import { debounce } from "lodash";
 import { GetServerSidePropsContext, NextPage } from "next";
@@ -19,6 +18,7 @@ import { authOptions } from "./api/auth/[...nextauth]";
 import { User } from "../utils/types";
 import Spinner from "../components/Spinner";
 import Radio from "../components/Radio";
+import handleSearch from "../utils/search";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getServerSession(context.req, context.res, authOptions);
@@ -108,41 +108,15 @@ function UserEditForm({ user }: { user: User }) {
     resolver: zodResolver(onboardSchema),
   });
 
-  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      const results: FeatureCollection = await axios
-        .post("/api/geocoding", {
-          value: e.target.value,
-          types: "address%2Cpostcode",
-          proximity: "ip",
-          country: "us",
-          autocomplete: "true",
-        })
-        .then((res) => res.data);
-      setSuggestions(results.features);
-    } catch (error) {
-      toast.error(`Something went wrong: ${error}`);
-    }
-  };
+  const handleChange = handleSearch({
+    type: "address%2Cpostcode", 
+    setFunc: setSuggestions
+  });
 
-  const handleStartLocationChange = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    try {
-      const results: FeatureCollection = await axios
-        .post("/api/geocoding", {
-          value: e.target.value,
-          types: "neighborhood%2Cplace",
-          proximity: "ip",
-          country: "us",
-          autocomplete: "true",
-        })
-        .then((res) => res.data);
-      setStartLocationSuggestions(results.features);
-    } catch (error) {
-      toast.error(`Something went wrong: ${error}`);
-    }
-  };
+  const handleStartLocationChange = handleSearch({
+    type: "neighborhood%2Cplace", 
+    setFunc: setStartLocationSuggestions
+  });
 
   const onSubmit = async (values: SettingsFormInputs) => {
     const coord: number[] = (selected as any).center;
