@@ -6,7 +6,9 @@ import { Role } from "@prisma/client";
 import { Status } from "@prisma/client";
 import { Feature, FeatureCollection } from "geojson";
 
+// user router to get information about or edit users 
 export const userRouter = createProtectedRouter()
+  // query for information about current user 
   .query("me", {
     async resolve({ ctx }) {
       const id = ctx.session.user?.id;
@@ -28,6 +30,7 @@ export const userRouter = createProtectedRouter()
         },
       });
 
+      // throws TRPCError if no user with ID exists 
       if (!user) {
         throw new TRPCError({
           code: "NOT_FOUND",
@@ -38,6 +41,7 @@ export const userRouter = createProtectedRouter()
       return user;
     },
   })
+  // edits a user
   .mutation("edit", {
     input: z.object({
       role: z.nativeEnum(Role),
@@ -68,54 +72,5 @@ export const userRouter = createProtectedRouter()
       });
 
       return user;
-    },
-  })
-  .query("geoJsonUsersList", {
-    async resolve({ ctx }) {
-      const id = ctx.session.user?.id;
-      const users = await ctx.prisma.user.findMany({
-        where: {
-          id: {
-            not: id, // doesn't include the current user
-          },
-          isOnboarded: true, // only include user that have finished onboarding
-          status: Status.ACTIVE, // only include active users
-        },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          image: true,
-          role: true,
-          status: true,
-          seatAvail: true,
-          companyName: true,
-          companyAddress: true,
-          companyCoordLng: true,
-          companyCoordLat: true,
-          startLocation: true,
-        },
-      });
-
-      const features: Feature[] = users.map((u) => {
-        const feat = {
-          type: "Feature" as "Feature",
-          geometry: {
-            type: "Point" as "Point",
-            coordinates: [u.companyCoordLng, u.companyCoordLat],
-          },
-          properties: {
-            ...u,
-          },
-        };
-        return feat;
-      });
-
-      const featureCollection: FeatureCollection = {
-        type: "FeatureCollection" as "FeatureCollection",
-        features,
-      };
-
-      return featureCollection;
     },
   });
