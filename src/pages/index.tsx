@@ -12,32 +12,33 @@ import Head from "next/head";
 import { trpc } from "../utils/trpc";
 import DropDownMenu from "../components/DropDownMenu";
 import { browserEnv } from "../utils/env/browser";
+import protectedPage from "../utils/auth";
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await getServerSession(context.req, context.res, authOptions);
+// export async function getServerSideProps(context: GetServerSidePropsContext) {
+//   const session = await getServerSession(context.req, context.res, authOptions);
 
-  if (session?.user) {
-    if (!session.user.isOnboarded) {
-      return {
-        redirect: {
-          destination: "/onboard",
-          permanent: false,
-        },
-      };
-    }
-  } else {
-    return {
-      redirect: {
-        destination: "/sign-in",
-        permanent: false,
-      },
-    };
-  }
+//   if (session?.user) {
+//     if (!session.user.isOnboarded) {
+//       return {
+//         redirect: {
+//           destination: "/onboard",
+//           permanent: false,
+//         },
+//       };
+//     }
+//   } else {
+//     return {
+//       redirect: {
+//         destination: "/sign-in",
+//         permanent: false,
+//       },
+//     };
+//   }
 
-  return {
-    props: {},
-  };
-}
+//   return {
+//     props: {},
+//   };
+// }
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -83,4 +84,4 @@ const Home: NextPage<any> = () => {
   );
 };
 
-export default Home;
+export default protectedPage(Home);
