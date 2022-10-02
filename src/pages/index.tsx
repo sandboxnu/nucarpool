@@ -43,7 +43,7 @@ mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
 const Home: NextPage<any> = () => {
   const { data: geoJsonUsers, isLoading: isLoadingGeoJsonUsers } =
-    trpc.useQuery(["user.geoJsonUsersList"]);
+    trpc.useQuery(["mapbox.geoJsonUsersList"]);
   const { data: user, isLoading: isLoadingUser } = trpc.useQuery(["user.me"]);
   const [isMap, setMap] = useState<boolean>(false);
 
