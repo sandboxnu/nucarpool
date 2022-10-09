@@ -2,14 +2,15 @@ version: "3"
 
 services:
   mysql:
+    container_name: mysql-on-docker
     image: mysql:5.7
     ports:
-      - "8080:8080"
+      - "${MYSQL_PORT}:3306"
+    expose:
+      - "3306"
     environment:
-      MYSQL_ROOT_PASSWORD: nucarpool
-      MYSQL_DATABASE: dev
-      MYSQL_USER: mysql
-      MYSQL_PASSWORD: nucarpool
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
     volumes:
       - ./nucarpool-db-data:/var/lib/mysql
 
