@@ -1,7 +1,7 @@
 import { Combobox, Transition } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Role, Status } from "@prisma/client";
-import { Feature, FeatureCollection } from "geojson";
+import { Feature } from "geojson";
 import { debounce } from "lodash";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { unstable_getServerSession as getServerSession } from "next-auth";
@@ -18,7 +18,7 @@ import { authOptions } from "./api/auth/[...nextauth]";
 import { User } from "../utils/types";
 import Spinner from "../components/Spinner";
 import Radio from "../components/Radio";
-import handleSearch from "../utils/search";
+import useSearch from "../utils/search";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getServerSession(context.req, context.res, authOptions);
@@ -73,6 +73,10 @@ function UserEditForm({ user }: { user: User }) {
   const [selected, setSelected] = useState({
     place_name: user.companyAddress,
   });
+  const [companyAddress, setCompanyAddress] = useState("")
+  const updateCompanyAddress = debounce(setCompanyAddress, 1000)
+  const [startingAddress, setStartingAddress] = useState("")
+  const updateStartingAddress = debounce(setStartingAddress, 1000)
 
   const [startLocationsuggestions, setStartLocationSuggestions] = useState<
     Feature[]
@@ -108,14 +112,16 @@ function UserEditForm({ user }: { user: User }) {
     resolver: zodResolver(onboardSchema),
   });
 
-  const handleChange = handleSearch({
+  useSearch({
+    value: companyAddress,
     type: "address%2Cpostcode", 
-    setFunc: setSuggestions
+    setFunc: setSuggestions,
   });
 
-  const handleStartLocationChange = handleSearch({
+  useSearch({
+    value: startingAddress,
     type: "neighborhood%2Cplace", 
-    setFunc: setStartLocationSuggestions
+    setFunc: setStartLocationSuggestions,
   });
 
   const onSubmit = async (values: SettingsFormInputs) => {
@@ -229,7 +235,7 @@ function UserEditForm({ user }: { user: User }) {
                   }
                   type="text"
                   {...register("companyAddress")}
-                  onChange={debounce(handleChange, 500)}
+                  onChange={(e) => updateCompanyAddress(e.target.value)}
                 />
                 <Transition
                   as={Fragment}
@@ -293,7 +299,7 @@ function UserEditForm({ user }: { user: User }) {
                   }
                   type="text"
                   {...register("startLocation")}
-                  onChange={debounce(handleStartLocationChange, 500)}
+                  onChange={(e) => setStartingAddress(e.target.value)}
                 />
                 <Transition
                   as={Fragment}

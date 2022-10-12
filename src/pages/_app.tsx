@@ -4,9 +4,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { withTRPC } from "@trpc/next";
 import { AppRouter } from "../server/router";
-import { SessionProvider, signIn, useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { SessionProvider } from "next-auth/react";
 import superjson from "superjson";
 import { loggerLink } from "@trpc/client/links/loggerLink";
 import { httpBatchLink } from "@trpc/client/links/httpBatchLink";
@@ -57,6 +55,8 @@ export default withTRPC<AppRouter>({
               }
               return false;
             },
+            refetchOnMount: false,
+            refetchOnWindowFocus: false,
           },
         },
       },
