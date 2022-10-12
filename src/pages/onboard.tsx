@@ -4,7 +4,7 @@ import { Feature } from "geojson";
 import _, { debounce } from "lodash";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
-import { Fragment, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Header from "../components/Header";
@@ -66,9 +66,9 @@ const Onboard: NextPage = () => {
     place_name: "",
   });
   const [companyAddress, setCompanyAddress] = useState("")
-  const updateCompanyAddress = debounce(setCompanyAddress, 1000)
+  const updateCompanyAddress = useMemo(() => debounce(setCompanyAddress, 1000), [])
   const [startingAddress, setStartingAddress] = useState("")
-  const updateStartingAddress = debounce(setStartingAddress, 1000)
+  const updateStartingAddress = useMemo(() => debounce(setStartingAddress, 1000), [])
   
   useSearch({
     value: companyAddress,

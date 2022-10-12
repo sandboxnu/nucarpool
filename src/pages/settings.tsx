@@ -7,7 +7,7 @@ import { GetServerSidePropsContext, NextPage } from "next";
 import { unstable_getServerSession as getServerSession } from "next-auth";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { Fragment, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
@@ -74,9 +74,9 @@ function UserEditForm({ user }: { user: User }) {
     place_name: user.companyAddress,
   });
   const [companyAddress, setCompanyAddress] = useState("")
-  const updateCompanyAddress = debounce(setCompanyAddress, 1000)
+  const updateCompanyAddress = useMemo(() => debounce(setCompanyAddress, 1000), [])
   const [startingAddress, setStartingAddress] = useState("")
-  const updateStartingAddress = debounce(setStartingAddress, 1000)
+  const updateStartingAddress = useMemo(() => debounce(setStartingAddress, 1000), [])
 
   const [startLocationsuggestions, setStartLocationSuggestions] = useState<
     Feature[]
@@ -299,7 +299,7 @@ function UserEditForm({ user }: { user: User }) {
                   }
                   type="text"
                   {...register("startLocation")}
-                  onChange={(e) => setStartingAddress(e.target.value)}
+                  onChange={(e) => updateStartingAddress(e.target.value)}
                 />
                 <Transition
                   as={Fragment}
