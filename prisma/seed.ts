@@ -7,12 +7,12 @@ type GenerateUserInput = {
   companyCoordLat: number,
   startCoordLng: number,
   startCoordLat: number,
-  daysWorking: string
+  daysWorking: string, // Format: S,M,T,W,R,F,S
   startTime: string,
   endTime: string
 } & ({
   role: "RIDER"
-  seatAvail: undefined
+  seatAvail?: undefined
 } | {
   role: "DRIVER",
   seatAvail: number
@@ -21,7 +21,7 @@ type GenerateUserInput = {
 const generateUser = ({
   id,
   role,
-  seatAvail,
+  seatAvail = undefined,
   companyCoordLng,
   companyCoordLat,
   startCoordLng,
@@ -30,6 +30,9 @@ const generateUser = ({
   startTime,
   endTime
 }: GenerateUserInput & {id: string}): Prisma.UserUpsertArgs => {
+  if (daysWorking.length != 13) {
+    throw new Error("Given an invalid string for daysWorking");
+  }
   return {
     where: {id: id},
     update: {},
@@ -70,8 +73,49 @@ const createUserData = async () => {
       endTime: "16:30",
       companyCoordLat: 42.355625,
       companyCoordLng: -71.060752,
-      daysWorking: "1,2,3,4,5"
+      daysWorking: "0,1,1,1,1,1,0"
     },
+    {
+      role: "RIDER",
+      startTime: "09:00",
+      startCoordLat: 42.15,
+      startCoordLng: -71.30,
+      endTime: "17:00",
+      companyCoordLat: 42.38,
+      companyCoordLng: -71,
+      daysWorking: "0,0,1,1,0,1,0"
+    },
+    {
+      role: "RIDER",
+      startTime: "09:00",
+      startCoordLat: 42.17,
+      startCoordLng: -71.34,
+      endTime: "17:00",
+      companyCoordLat: 42.31,
+      companyCoordLng: -71.12,
+      daysWorking: "0,1,1,1,1,1,0"
+    }, 
+    {
+      role: "RIDER",
+      startTime: "09:00",
+      startCoordLat: 42.2,
+      startCoordLng: -71,
+      endTime: "17:00",
+      companyCoordLat: 42.32,
+      companyCoordLng: -71,
+      daysWorking: "0,0,1,0,1,1,0"
+    },
+    {
+      role: "DRIVER",
+      seatAvail: 3,
+      startTime: "09:00",
+      startCoordLat: 42.1,
+      startCoordLng: -70.9,
+      endTime: "17:30",
+      companyCoordLat: 42.3,
+      companyCoordLng: -71.5,
+      daysWorking: "0,0,1,0,1,1,0"
+    }    
   ]
 
   return Promise.all(users.map((user, index) => {
