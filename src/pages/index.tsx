@@ -85,4 +85,4 @@ const Home: NextPage<any> = () => {
   );
 };
 
-export default protectedPage(Home);
+export default () => protectedPage(Home);
