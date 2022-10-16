@@ -1,6 +1,8 @@
 import { NextPage } from "next";
 import { useSession, getSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import Spinner from "../components/Spinner";
+
 
 /**
  * Returns either the input page, a loading screen, or redirects to a login page,
@@ -11,13 +13,15 @@ import Spinner from "../components/Spinner";
  */
 export default function protectedPage(page: NextPage) {
   const { data: session, status } = useSession();
+  const router = useRouter();
 
   if (status === "loading") {
     return <Spinner />;
   }
 
   if (status === "unauthenticated") {
-    return <p>Just get authenticated</p>;
+    router.push("/sign-in");
+    return <Spinner />;
   }
 
   return page;
