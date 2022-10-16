@@ -11,19 +11,21 @@ import Spinner from "../components/Spinner";
  * @param page The page the user is trying to reach
  * @returns the appropriate page for the user given the current session
  */
-export default function protectedPage(page: NextPage) {
+export default function ProtectedPage(page: NextPage) { 
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  if (status === "loading") {
-    return <Spinner />;
-  }
+ 
+    if (status === "loading") {
+      return <Spinner />;
+    }
 
-  if (status === "unauthenticated") {
-    router.push("/sign-in");
-    return <Spinner />;
-  }
+    if (status === "unauthenticated") {
+      router.push("/sign-in");
+      return <Spinner />;
+    }
 
-  return page;
+    return page;
+
 }
 
