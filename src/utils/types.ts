@@ -11,4 +11,4 @@ export type ProfileFormInputs = {
 };
 
 export type User = inferQueryOutput<"user.me">;
-export type GeoJsonUsers = inferQueryOutput<"user.geoJsonUsersList">;
+export type GeoJsonUsers = inferQueryOutput<"mapbox.geoJsonUsersList">;

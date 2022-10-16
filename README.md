@@ -30,6 +30,12 @@ NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=
 
 Then do `yarn` and `yarn dev` to get the project running.
 
+## Running Docker/Prisma/MySQL
+
+To start the database locally, start Docker Engine on your computer and then run `yarn db:start`. Once you're done, make sure to run `yarn db:stop` for cleanup. To persist database information, a new folder will be created locally named `nucarpool-db-data`, but this will not be included in git. 
+
+When the [schema](./prisma/schema.prisma) is updated, you will need to run `yarn db:schema` to update the MySQL database running under the hood. When prompted for a name, provide a short, informative name about the updates to the database, with underscores between words (snake_case). This command will also automatically update the client object used in the frontend.
+
 ## Tech Stack
 
 - Framework: NextJS + Typescript

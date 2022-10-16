@@ -44,7 +44,7 @@ mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
 const Home: NextPage<any> = () => {
   const { data: geoJsonUsers, isLoading: isLoadingGeoJsonUsers } =
-    trpc.useQuery(["user.geoJsonUsersList"]);
+    trpc.useQuery(["mapbox.geoJsonUsersList"]);
   const { data: user, isLoading: isLoadingUser } = trpc.useQuery(["user.me"]);
   const [isMap, setMap] = useState<boolean>(false);
 
@@ -79,6 +79,7 @@ const Home: NextPage<any> = () => {
       >
         <RiFocus3Line />
       </button>
+      {/* This is where the Mapbox puts its stuff */}
       <div id="map" className="h-screen"></div>
     </>
   );

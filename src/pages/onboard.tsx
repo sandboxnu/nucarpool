@@ -1,15 +1,13 @@
 import { Combobox, Transition } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
-import { Feature, FeatureCollection } from "geojson";
-import { debounce } from "lodash";
+import { Feature } from "geojson";
+import _, { debounce } from "lodash";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
-import { Fragment, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Header from "../components/Header";
-import Spinner from "../components/Spinner";
 import { unstable_getServerSession as getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]";
 import Head from "next/head";
@@ -18,6 +16,8 @@ import { trpc } from "../utils/trpc";
 import { Role, Status } from "@prisma/client";
 import { TextField } from "../components/TextField";
 import Radio from "../components/Radio";
+import useSearch from "../utils/search";
+
 
 type OnboardingFormInputs = {
   role: Role;
@@ -59,49 +59,28 @@ const Onboard: NextPage = () => {
 
   const [suggestions, setSuggestions] = useState<Feature[]>([]);
   const [selected, setSelected] = useState({ place_name: "" });
-
-  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      const results: FeatureCollection = await axios
-        .post("/api/geocoding", {
-          value: e.target.value,
-          types: "address%2Cpostcode",
-          proximity: "ip",
-          country: "us",
-          autocomplete: "true",
-        })
-        .then((res) => res.data);
-      setSuggestions(results.features);
-    } catch (error) {
-      toast.error(`Something went wrong: ${error}`);
-    }
-  };
-
   const [startLocationsuggestions, setStartLocationSuggestions] = useState<
     Feature[]
   >([]);
   const [startLocationSelected, setStartLocationSelected] = useState({
     place_name: "",
   });
+  const [companyAddress, setCompanyAddress] = useState("")
+  const updateCompanyAddress = useMemo(() => debounce(setCompanyAddress, 1000), [])
+  const [startingAddress, setStartingAddress] = useState("")
+  const updateStartingAddress = useMemo(() => debounce(setStartingAddress, 1000), [])
+  
+  useSearch({
+    value: companyAddress,
+    type: "address%2Cpostcode", 
+    setFunc: setSuggestions,
+  });
 
-  const handleStartLocationChange = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    try {
-      const results: FeatureCollection = await axios
-        .post("/api/geocoding", {
-          value: e.target.value,
-          types: "neighborhood%2Cplace",
-          proximity: "ip",
-          country: "us",
-          autocomplete: "true",
-        })
-        .then((res) => res.data);
-      setStartLocationSuggestions(results.features);
-    } catch (error) {
-      toast.error(`Something went wrong: ${error}`);
-    }
-  };
+  useSearch({
+    value: startingAddress,
+    type: "neighborhood%2Cplace", 
+    setFunc: setStartLocationSuggestions,
+  });
 
   const editUserMutation = trpc.useMutation("user.edit", {
     onSuccess: () => {
@@ -206,7 +185,7 @@ const Onboard: NextPage = () => {
                   }
                   type="text"
                   {...register("companyAddress")}
-                  onChange={debounce(handleChange, 500)}
+                  onChange={(e) => updateCompanyAddress(e.target.value)}
                 />
                 <Transition
                   as={Fragment}
@@ -270,7 +249,7 @@ const Onboard: NextPage = () => {
                   }
                   type="text"
                   {...register("startLocation")}
-                  onChange={debounce(handleStartLocationChange, 500)}
+                  onChange={(e) => updateStartingAddress(e.target.value)}
                 />
                 <Transition
                   as={Fragment}

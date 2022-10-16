@@ -1,15 +1,15 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["referentialIntegrity"]
-}
-
 datasource db {
   provider             = "mysql"
   url                  = env("DATABASE_URL")
   referentialIntegrity = "prisma"
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
 }
 
 enum Role {
@@ -24,10 +24,10 @@ enum Status {
 
 model Account {
   id                String  @id @default(cuid())
-  userId            String
+  userId            String @map(name: "user_id")
   type              String
   provider          String
-  providerAccountId String
+  providerAccountId String @map(name: "provider_account_id")
   refresh_token     String? @db.Text
   access_token      String? @db.Text
   expires_at        Int?
@@ -39,21 +39,25 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+
+  @@map(name: "account")
 }
 
 model Session {
   id           String   @id @default(cuid())
-  sessionToken String   @unique
+  sessionToken String   @unique @map(name: "session_token")
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map(name: "session")
 }
 
 model User {
   id              String    @id @default(cuid())
   name            String?
   email           String?   @unique
-  emailVerified   DateTime?
+  emailVerified   DateTime? @map(name: "email_verified")
   image           String?
   accounts        Account[]
   sessions        Session[]
@@ -66,6 +70,8 @@ model User {
   companyCoordLat Float     @default(0) @map("company_coord_lat")
   startLocation   String    @default("") @map("start_location")
   isOnboarded     Boolean   @default(false) @map("is_onboarded")
+
+  @@map(name: "user")
 }
 
 model VerificationToken {
@@ -74,4 +80,6 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+
+  @@map(name: "verification_token")
 }

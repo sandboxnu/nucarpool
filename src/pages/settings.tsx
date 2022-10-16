@@ -1,14 +1,13 @@
 import { Combobox, Transition } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Role, Status } from "@prisma/client";
-import axios from "axios";
-import { Feature, FeatureCollection } from "geojson";
+import { Feature } from "geojson";
 import { debounce } from "lodash";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { unstable_getServerSession as getServerSession } from "next-auth";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { Fragment, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
@@ -19,6 +18,7 @@ import { authOptions } from "./api/auth/[...nextauth]";
 import { User } from "../utils/types";
 import Spinner from "../components/Spinner";
 import Radio from "../components/Radio";
+import useSearch from "../utils/search";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getServerSession(context.req, context.res, authOptions);
@@ -73,6 +73,10 @@ function UserEditForm({ user }: { user: User }) {
   const [selected, setSelected] = useState({
     place_name: user.companyAddress,
   });
+  const [companyAddress, setCompanyAddress] = useState("")
+  const updateCompanyAddress = useMemo(() => debounce(setCompanyAddress, 1000), [])
+  const [startingAddress, setStartingAddress] = useState("")
+  const updateStartingAddress = useMemo(() => debounce(setStartingAddress, 1000), [])
 
   const [startLocationsuggestions, setStartLocationSuggestions] = useState<
     Feature[]
@@ -108,41 +112,17 @@ function UserEditForm({ user }: { user: User }) {
     resolver: zodResolver(onboardSchema),
   });
 
-  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      const results: FeatureCollection = await axios
-        .post("/api/geocoding", {
-          value: e.target.value,
-          types: "address%2Cpostcode",
-          proximity: "ip",
-          country: "us",
-          autocomplete: "true",
-        })
-        .then((res) => res.data);
-      setSuggestions(results.features);
-    } catch (error) {
-      toast.error(`Something went wrong: ${error}`);
-    }
-  };
+  useSearch({
+    value: companyAddress,
+    type: "address%2Cpostcode", 
+    setFunc: setSuggestions,
+  });
 
-  const handleStartLocationChange = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    try {
-      const results: FeatureCollection = await axios
-        .post("/api/geocoding", {
-          value: e.target.value,
-          types: "neighborhood%2Cplace",
-          proximity: "ip",
-          country: "us",
-          autocomplete: "true",
-        })
-        .then((res) => res.data);
-      setStartLocationSuggestions(results.features);
-    } catch (error) {
-      toast.error(`Something went wrong: ${error}`);
-    }
-  };
+  useSearch({
+    value: startingAddress,
+    type: "neighborhood%2Cplace", 
+    setFunc: setStartLocationSuggestions,
+  });
 
   const onSubmit = async (values: SettingsFormInputs) => {
     const coord: number[] = (selected as any).center;
@@ -255,7 +235,7 @@ function UserEditForm({ user }: { user: User }) {
                   }
                   type="text"
                   {...register("companyAddress")}
-                  onChange={debounce(handleChange, 500)}
+                  onChange={(e) => updateCompanyAddress(e.target.value)}
                 />
                 <Transition
                   as={Fragment}
@@ -319,7 +299,7 @@ function UserEditForm({ user }: { user: User }) {
                   }
                   type="text"
                   {...register("startLocation")}
-                  onChange={debounce(handleStartLocationChange, 500)}
+                  onChange={(e) => updateStartingAddress(e.target.value)}
                 />
                 <Transition
                   as={Fragment}
