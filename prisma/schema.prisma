@@ -59,6 +59,8 @@ model User {
   email           String?   @unique
   emailVerified   DateTime? @map(name: "email_verified")
   image           String?
+  bio             String    @default("")
+  pronouns        String    @default("")
   accounts        Account[]
   sessions        Session[]
   role            Role      @default(RIDER)
@@ -69,7 +71,12 @@ model User {
   companyCoordLng Float     @default(0) @map("company_coord_lng")
   companyCoordLat Float     @default(0) @map("company_coord_lat")
   startLocation   String    @default("") @map("start_location")
+  startCoordLng   Float     @default(0) @map("start_coord_lng")
+  startCoordLat   Float     @default(0) @map("start_coord_lat")
   isOnboarded     Boolean   @default(false) @map("is_onboarded")
+  daysWorking     String    @default("") @map("days_working")
+  startTime       DateTime?  @db.Time(0) @map("start_time")
+  endTime         DateTime?  @db.Time(0) @map("end_time")
 
   @@map(name: "user")
 }
