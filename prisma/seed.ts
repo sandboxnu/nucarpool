@@ -118,8 +118,8 @@ const createUserData = async () => {
     }    
   ]
 
-  return Promise.all(users.map((user, index) => {
-    prisma.user.upsert(generateUser({id: index.toString(), ...user}))
+  await Promise.all(users.map(async (user, index) => {
+    await prisma.user.upsert(generateUser({id: index.toString(), ...user}))
   }))
 }
 
