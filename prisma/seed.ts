@@ -115,7 +115,18 @@ const createUserData = async () => {
       companyCoordLat: 42.3,
       companyCoordLng: -71.5,
       daysWorking: "0,0,1,0,1,1,0"
-    }    
+    },
+    {
+      role: "DRIVER",
+      seatAvail: 1,
+      startTime: "08:45",
+      startCoordLat: 41.6,
+      startCoordLng: -70.3,
+      endTime: "17:15",
+      companyCoordLat: 42.3,
+      companyCoordLng: -71,
+      daysWorking: "0,0,1,0,1,1,0"
+    }, 
   ]
 
   await Promise.all(users.map(async (user, index) => {
