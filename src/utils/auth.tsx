@@ -6,12 +6,16 @@ import Spinner from "../components/Spinner";
 
 /**
  * Returns either the input page, a loading screen, or redirects to a login page,
- * all based on the status of the session
+ * all based on the status of the session. 
+ * 
+ * () => notation is necessary before export default [PageName] so function can be 
+ * called multiple times. 
  * 
  * @param page The page the user is trying to reach
  * @returns the appropriate page for the user given the current session
  */
-export default function ProtectedPage(page: NextPage) { 
+export default function ProtectedPage(Page: NextPage) { 
+  return () => {
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -25,7 +29,7 @@ export default function ProtectedPage(page: NextPage) {
       return <Spinner />;
     }
 
-    return page;
-
+    return <Page />;
+  }
 }
 

@@ -17,6 +17,7 @@ import { Role, Status } from "@prisma/client";
 import { TextField } from "../components/TextField";
 import Radio from "../components/Radio";
 import useSearch from "../utils/search";
+import ProtectedPage from "../utils/auth";
 
 
 type OnboardingFormInputs = {
@@ -302,30 +303,5 @@ const Onboard: NextPage = () => {
   );
 };
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await getServerSession(context.req, context.res, authOptions);
 
-  if (session?.user) {
-    if (session.user.isOnboarded) {
-      return {
-        redirect: {
-          destination: "/",
-          permanent: false,
-        },
-      };
-    }
-  } else {
-    return {
-      redirect: {
-        destination: "/sign-in",
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: {},
-  };
-}
-
-export default Onboard;
+export default ProtectedPage(Onboard);
