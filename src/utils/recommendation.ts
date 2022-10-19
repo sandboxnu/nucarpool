@@ -8,6 +8,14 @@ type Recommendation = {
   score: number
 }
 
+const cutoffs = {
+  startDistanceMiles: 4,
+  companyDistanceMiles: 4,
+  daysDifference: 3,
+  hoursDifference: 1,
+}
+
+
 const startDistWeight = 10
 const companyDistWeight = 20
 const daysWeight = 1
