@@ -15,7 +15,7 @@ import Spinner from "../components/Spinner";
  * @returns the appropriate page for the user given the current session
  */
 export default function ProtectedPage(Page: NextPage) { 
-  return () => {
+  const Callback = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -31,5 +31,7 @@ export default function ProtectedPage(Page: NextPage) {
 
     return <Page />;
   }
+  Callback.displayName = Page.displayName;
+  return Callback;
 }
 
