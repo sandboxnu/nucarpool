@@ -8,8 +8,8 @@ import Spinner from "../components/Spinner";
  * Returns either the input page, a loading screen, or redirects to a login page,
  * all based on the status of the session. 
  * 
- * () => notation is necessary before export default [PageName] so function can be 
- * called multiple times. 
+ * Usage: wrap page element with this function when exporting, e.g. 
+ * `export default ProtectedPage(Home);`
  * 
  * @param page The page the user is trying to reach
  * @returns the appropriate page for the user given the current session
