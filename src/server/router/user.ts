@@ -6,9 +6,9 @@ import { Role } from "@prisma/client";
 import { Status } from "@prisma/client";
 import { Feature, FeatureCollection } from "geojson";
 
-// user router to get information about or edit users 
+// user router to get information about or edit users
 export const userRouter = createProtectedRouter()
-  // query for information about current user 
+  // query for information about current user
   .query("me", {
     async resolve({ ctx }) {
       const id = ctx.session.user?.id;
@@ -30,7 +30,7 @@ export const userRouter = createProtectedRouter()
         },
       });
 
-      // throws TRPCError if no user with ID exists 
+      // throws TRPCError if no user with ID exists
       if (!user) {
         throw new TRPCError({
           code: "NOT_FOUND",

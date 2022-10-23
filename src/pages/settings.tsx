@@ -74,10 +74,16 @@ function UserEditForm({ user }: { user: User }) {
   const [selected, setSelected] = useState({
     place_name: user.companyAddress,
   });
-  const [companyAddress, setCompanyAddress] = useState("")
-  const updateCompanyAddress = useMemo(() => debounce(setCompanyAddress, 1000), [])
-  const [startingAddress, setStartingAddress] = useState("")
-  const updateStartingAddress = useMemo(() => debounce(setStartingAddress, 1000), [])
+  const [companyAddress, setCompanyAddress] = useState("");
+  const updateCompanyAddress = useMemo(
+    () => debounce(setCompanyAddress, 1000),
+    []
+  );
+  const [startingAddress, setStartingAddress] = useState("");
+  const updateStartingAddress = useMemo(
+    () => debounce(setStartingAddress, 1000),
+    []
+  );
 
   const [startLocationsuggestions, setStartLocationSuggestions] = useState<
     Feature[]
@@ -115,13 +121,13 @@ function UserEditForm({ user }: { user: User }) {
 
   useSearch({
     value: companyAddress,
-    type: "address%2Cpostcode", 
+    type: "address%2Cpostcode",
     setFunc: setSuggestions,
   });
 
   useSearch({
     value: startingAddress,
-    type: "neighborhood%2Cplace", 
+    type: "neighborhood%2Cplace",
     setFunc: setStartLocationSuggestions,
   });
 
