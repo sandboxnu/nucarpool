@@ -23,7 +23,7 @@ const weights = {
   days: 0.20
 }
 
-const coordToMile = (dist: number) => dist / 88
+const coordToMile = (dist: number) => dist * 88
 
 // TODO: Add documentation
 const calculateScore = (currentUser: User): ((user: User) => Recommendation | undefined) => {
@@ -38,7 +38,7 @@ const calculateScore = (currentUser: User): ((user: User) => Recommendation | un
       Math.sqrt(
       Math.pow(currentUser.startCoordLat - user.startCoordLat, 2) + 
       Math.pow(currentUser.startCoordLng - user.startCoordLng, 2)
-    ))
+    ));
 
     const endDistance = coordToMile(
       Math.sqrt(
