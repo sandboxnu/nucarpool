@@ -1,71 +1,87 @@
 import { User } from "@prisma/client"
-import { isInteger } from "lodash"
 import dayConversion from "./dayConversion"
 
 
-type Recommendation = {
+export type Recommendation = {
   id: string,
   score: number
 }
 
 const cutoffs = {
-  startDistanceMiles: 4,
-  companyDistanceMiles: 4,
-  daysDifference: 3,
-  hoursDifference: 1,
+  startDistance: 4,
+  endDistance: 4,
+  startTime: 1,
+  endTime: 1,
+  days: 3,
 }
 
+const weights = {
+  startDistance: 0.20,
+  endDistance: 0.30,
+  startTime: 0.15,
+  endTime: 0.15,
+  days: 0.20
+}
 
-const startDistWeight = 10
-const companyDistWeight = 20
-const daysWeight = 1
-const timeWeight = 5
-
-const weightSum = startDistWeight + companyDistWeight + daysWeight + timeWeight
+const coordToMile = (dist: number) => dist / 88
 
 // TODO: Add documentation
-const calculateScore = (currentUser: User): ((user: User) => Recommendation) => {
+const calculateScore = (currentUser: User): ((user: User) => Recommendation | undefined) => {
   const currentUserDays = dayConversion(currentUser)
 
   return (user: User) => {
-    const startDistDiff = Math.sqrt(
-      Math.pow(currentUser.startCoordLat - user.startCoordLat, 2) + 
-      Math.pow(currentUser.startCoordLng - user.startCoordLng, 2)
-    )
-
-    const companyDistDiff = Math.sqrt(
-      Math.pow(currentUser.companyCoordLat - user.companyCoordLat, 2) + 
-      Math.pow(currentUser.companyCoordLng - user.companyCoordLng, 2)
-    )
-
-    const userDays = dayConversion(user)
-    const daysScore = currentUserDays
-      .map((day, index) => day && !userDays[index])
-      .reduce((prev, curr) => curr ? prev + 1 : prev, 0)
-
-    let timeScore: number | undefined
-    if (currentUser.startTime && currentUser.endTime && user.startTime && user.endTime) {
-      timeScore = Math.max(0, Math.abs(currentUser.startTime.getHours() - user.startTime.getHours()) - 0.5) + 
-        Math.max(0, Math.abs(currentUser.endTime.getHours() - user.endTime.getHours()) - 0.5)
+    if (currentUser.role === "RIDER" && (user.role === "RIDER" || user.seatAvail === 0)) {
+      return undefined;
     }
 
-    const deprioritizationFactor = currentUser.role === "DRIVER" && user.role === "DRIVER" ? 2 : 1
+    const startDistance = coordToMile(
+      Math.sqrt(
+      Math.pow(currentUser.startCoordLat - user.startCoordLat, 2) + 
+      Math.pow(currentUser.startCoordLng - user.startCoordLng, 2)
+    ))
 
-    let finalScore = startDistDiff * startDistWeight + 
-      companyDistDiff * companyDistWeight +
-      daysScore * daysWeight + 
+    const endDistance = coordToMile(
+      Math.sqrt(
+      Math.pow(currentUser.companyCoordLat - user.companyCoordLat, 2) + 
+      Math.pow(currentUser.companyCoordLng - user.companyCoordLng, 2)
+    ));
+
+    const userDays = dayConversion(user);
+    const days = currentUserDays
+      .map((day, index) => day && !userDays[index])
+      .reduce((prev, curr) => curr ? prev + 1 : prev, 0);
+
+    let startTime: number | undefined;
+    let endTime: number | undefined;
+    if (currentUser.startTime && currentUser.endTime && user.startTime && user.endTime) {
+      startTime = Math.abs(currentUser.startTime.getHours() - user.startTime.getHours());
+      endTime = Math.abs(currentUser.endTime.getHours() - user.endTime.getHours());
+      if (startTime > cutoffs.startTime || endTime > cutoffs.endTime) {
+        return undefined
+      }
+    }
+
+    if (startDistance > cutoffs.startDistance || endDistance > cutoffs.endDistance || days > cutoffs.days) {
+      return undefined
+    }
+
+    const deprioritizationFactor = currentUser.role === "DRIVER" && user.role === "DRIVER" ? 2 : 1;
+
+    let finalScore = startDistance * weights.startDistance + 
+      endDistance * weights.endDistance +
+      days * weights.days + 
       deprioritizationFactor;
     
-    if (timeScore) {
-      finalScore += timeScore + timeWeight;
+    if (startTime !== undefined && endTime !== undefined) {
+      finalScore += startTime * weights.startTime + endTime * weights.endTime;
     } else {
-      finalScore *= (weightSum / (weightSum - timeWeight));
+      finalScore *= 1 / (weights.startTime + weights.endTime);
     }
 
     return {
       id: user.id,
-      score: finalScore
-    }
+      score: finalScore,
+    };
   }
 };
 
