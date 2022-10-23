@@ -53,6 +53,9 @@ type SettingsFormInputs = {
   companyName: string;
   companyAddress: string;
   startLocation: string;
+  daysWorking: string;
+  startTime: string
+  endTime: string; 
 };
 
 export const onboardSchema = z.object({
@@ -108,6 +111,9 @@ function UserEditForm({ user }: { user: User }) {
       companyName: user.companyName,
       companyAddress: user.companyAddress,
       startLocation: user.startLocation,
+      daysWorking: user.daysWorking, 
+      startTime: user.startTime?.toTimeString(),
+      endTime: user.endTime?.toTimeString()
     },
     resolver: zodResolver(onboardSchema),
   });
@@ -143,6 +149,9 @@ function UserEditForm({ user }: { user: User }) {
       companyCoordLat: userInfo.companyCoordLat!,
       startLocation: userInfo.startLocation,
       isOnboarded: true,
+      daysWorking: userInfo.daysWorking, 
+      startTime: userInfo.startTime, 
+      endTime: userInfo.endTime
     });
   };
 

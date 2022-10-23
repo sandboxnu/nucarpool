@@ -27,6 +27,9 @@ export const userRouter = createProtectedRouter()
           companyCoordLng: true,
           companyCoordLat: true,
           startLocation: true,
+          daysWorking: true, 
+          startTime: true, 
+          endTime: true
         },
       });
 
@@ -53,6 +56,9 @@ export const userRouter = createProtectedRouter()
       companyCoordLat: z.number(),
       startLocation: z.string().min(1),
       isOnboarded: z.boolean(),
+      daysWorking: z.string(),
+      startTime: z.string(),
+      endTime: z.string(), 
     }),
     async resolve({ ctx, input }) {
       const id = ctx.session.user?.id;
@@ -68,6 +74,9 @@ export const userRouter = createProtectedRouter()
           companyCoordLat: input.companyCoordLat,
           startLocation: input.startLocation,
           isOnboarded: input.isOnboarded,
+          daysWorking: input.daysWorking, 
+          startTime: input.startTime, 
+          endTime: input.endTime
         },
       });
 

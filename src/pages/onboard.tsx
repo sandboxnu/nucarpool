@@ -25,7 +25,7 @@ type OnboardingFormInputs = {
   companyName: string;
   companyAddress: string;
   startLocation: string;
-  commuteSchedule: string;
+  daysWorking: string;
   startTime: string, 
   endTime: string, 
   timeDiffers: boolean,
@@ -40,6 +40,9 @@ export const onboardSchema = z.object({
   companyName: z.string().min(1, "Cannot be empty"),
   companyAddress: z.string().min(1, "Cannot be empty"),
   startLocation: z.string().min(1, "Cannot be empty"),
+  daysWorking: z.string().length(13, "Must be 13 character comma separated string"),
+  startTime: z.string(), 
+  endTime: z.string()
   // TODO update to validate new fields
 });
 
@@ -58,7 +61,7 @@ const Onboard: NextPage = () => {
       companyName: "",
       companyAddress: "",
       startLocation: "",
-      commuteSchedule: "",
+      daysWorking: "",
       startTime: "",
       endTime: "",
       timeDiffers: false,
@@ -119,6 +122,9 @@ const Onboard: NextPage = () => {
       companyCoordLat: userInfo.companyCoordLat!,
       startLocation: userInfo.startLocation,
       isOnboarded: true,
+      daysWorking: userInfo.daysWorking, 
+      startTime: userInfo.startTime, 
+      endTime: userInfo.endTime
     });
   };
 
