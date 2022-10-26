@@ -1,4 +1,5 @@
 import { PrismaClient, Role, Prisma } from "@prisma/client";
+import Random from "random-seed"
 
 const prisma = new PrismaClient();
 
@@ -181,6 +182,7 @@ const genRandomUsers = ({
   startCoordLng,
   endCoordLat,
   endCoordLng,
+  coordOffset = 0.03,
   count,
   seed
 } : {
@@ -188,11 +190,14 @@ const genRandomUsers = ({
   startCoordLng: number,
   endCoordLat: number,
   endCoordLng: number,
+  coordOffset?: number,
   count: number,
   seed: string
-}) => {
+}): GenerateUserInput[] => {
+  const random = Random.create(seed)
+  const doubleOffset = coordOffset * 2;
   // rand(num): When given a number, returns a random number in the range [0-num]
-  const rand = (max: number) => max * Math.random();
+  const rand = (max: number) => max * random.random();
   return new Array(count).fill(undefined).map((_, index) => {
     const startMin = (15 * Math.floor(rand(3.9)));
     const endMin = (15 * Math.floor(rand(3.9)));
@@ -200,12 +205,12 @@ const genRandomUsers = ({
       role: "RIDER",
       // Generates a start time between 8:00 - 11:45
       startTime: (8 + Math.floor(rand(3))) + ":" + ((startMin == 0) ? "00" : startMin),
-      startCoordLat: startCoordLat - 1 + rand(2),
-      startCoordLng: startCoordLng - 1 + rand(2),
+      startCoordLat: startCoordLat - coordOffset + rand(doubleOffset),
+      startCoordLng: startCoordLng - coordOffset + rand(doubleOffset),
       // Generates an end time between 16:00 - 19:45
       endTime: (16 + Math.floor(rand(3))) + ":" + ((endMin == 0) ? "00" : endMin),
-      companyCoordLat: endCoordLat - 1 + rand(2),
-      companyCoordLng: endCoordLng - 1 + rand(2),
+      companyCoordLat: endCoordLat - coordOffset + rand(doubleOffset),
+      companyCoordLng: endCoordLng - coordOffset + rand(doubleOffset),
       daysWorking: new Array(7)
         .fill(undefined)
         .map((_, ind) => (rand(1) < 0.5) ? "0" : "1")
