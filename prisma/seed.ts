@@ -196,13 +196,15 @@ const genRandomUsers = ({
   const rand = () => Math.random() * (max - min) + min;
   const avg = (min + max) / 2;
   return new Array(count).fill(undefined).map((_, index) => {
+    const startMin = (15 * Math.floor(4/max * rand()));
+    const endMin = (15 * Math.floor(4/max * rand()));
     const output: GenerateUserInput = {
       role: "DRIVER",
       seatAvail: Math.ceil(3/max * rand()),
-      startTime: (8 + Math.floor(3/max * rand())) + ":" + (15 * Math.floor(4/max * rand())),
+      startTime: (8 + Math.floor(3/max * rand())) + ":" + ((startMin == 0) ? "00" : startMin),
       startCoordLat: startCoordLat - 1 + rand()*2/max,
       startCoordLng: startCoordLng - 1 + rand()*2/max,
-      endTime: (16 + Math.floor(3/max * rand())) + ":" + (15 * Math.floor(4/max * rand())),
+      endTime: (16 + Math.floor(3/max * rand())) + ":" + ((endMin == 0) ? "00" : endMin),
       companyCoordLat: endCoordLat - 1 + rand()*2/max,
       companyCoordLng: endCoordLng - 1 + rand()*2/max,
       daysWorking: new Array(7)
