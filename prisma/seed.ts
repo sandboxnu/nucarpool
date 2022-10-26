@@ -176,6 +176,56 @@ const createUserData = async () => {
   }))
 }
 
+const genRandomUsers = ({
+  startCoordLat,
+  startCoordLng,
+  endCoordLat,
+  endCoordLng,
+  count,
+  seed // NOT YET USED
+} : {
+  startCoordLat: number,
+  startCoordLng: number,
+  endCoordLat: number,
+  endCoordLng: number,
+  count: number,
+  seed: string
+}) => {
+  const min = 0; // UPDATE
+  const max = 3; // THESE?
+  const rand = () => Math.random() * (max - min) + min;
+  const avg = (min + max) / 2;
+  return new Array(count).fill(undefined).map((_, index) => {
+    const output: GenerateUserInput = {
+      role: "DRIVER",
+      seatAvail: Math.ceil(3/max * rand()),
+      startTime: (8 + Math.floor(3/max * rand())) + ":" + (15 * Math.floor(4/max * rand())),
+      startCoordLat: startCoordLat - 1 + rand()*2/max,
+      startCoordLng: startCoordLng - 1 + rand()*2/max,
+      endTime: (16 + Math.floor(3/max * rand())) + ":" + (15 * Math.floor(4/max * rand())),
+      companyCoordLat: endCoordLat - 1 + rand()*2/max,
+      companyCoordLng: endCoordLng - 1 + rand()*2/max,
+      daysWorking: new Array(7)
+        .fill(undefined)
+        .map((_, ind) => (ind == 0 || ind == 6 || rand() < avg) ? "0" : "1")
+        .join(",")
+    };
+    if (rand() < avg) {
+      return {
+        role: "RIDER",
+        startTime: output.startTime,
+        startCoordLat: output.startCoordLat,
+        startCoordLng: output.startCoordLng,
+        endTime: output.endTime,
+        companyCoordLat: output.companyCoordLat,
+        companyCoordLng: output.companyCoordLng,
+        daysWorking: output.daysWorking
+      };
+    }
+    return output;
+  });
+};
+
 const main = async () => {
   await createUserData();
 }
