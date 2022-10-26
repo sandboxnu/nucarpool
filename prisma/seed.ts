@@ -182,7 +182,7 @@ const genRandomUsers = ({
   endCoordLat,
   endCoordLng,
   count,
-  seed // NOT YET USED
+  seed
 } : {
   startCoordLat: number,
   startCoordLng: number,
@@ -191,37 +191,31 @@ const genRandomUsers = ({
   count: number,
   seed: string
 }) => {
-  const min = 0; // UPDATE
-  const max = 3; // THESE?
-  const rand = () => Math.random() * (max - min) + min;
-  const avg = (min + max) / 2;
+  // rand(num): When given a number, returns a random number in the range [0-num]
+  const rand = (max: number) => max * Math.random();
   return new Array(count).fill(undefined).map((_, index) => {
-    const startMin = (15 * Math.floor(4/max * rand()));
-    const endMin = (15 * Math.floor(4/max * rand()));
+    const startMin = (15 * Math.floor(rand(3.9)));
+    const endMin = (15 * Math.floor(rand(3.9)));
     const output: GenerateUserInput = {
-      role: "DRIVER",
-      seatAvail: Math.ceil(3/max * rand()),
-      startTime: (8 + Math.floor(3/max * rand())) + ":" + ((startMin == 0) ? "00" : startMin),
-      startCoordLat: startCoordLat - 1 + rand()*2/max,
-      startCoordLng: startCoordLng - 1 + rand()*2/max,
-      endTime: (16 + Math.floor(3/max * rand())) + ":" + ((endMin == 0) ? "00" : endMin),
-      companyCoordLat: endCoordLat - 1 + rand()*2/max,
-      companyCoordLng: endCoordLng - 1 + rand()*2/max,
+      role: "RIDER",
+      // Generates a start time between 8:00 - 11:45
+      startTime: (8 + Math.floor(rand(3))) + ":" + ((startMin == 0) ? "00" : startMin),
+      startCoordLat: startCoordLat - 1 + rand(2),
+      startCoordLng: startCoordLng - 1 + rand(2),
+      // Generates an end time between 16:00 - 19:45
+      endTime: (16 + Math.floor(rand(3))) + ":" + ((endMin == 0) ? "00" : endMin),
+      companyCoordLat: endCoordLat - 1 + rand(2),
+      companyCoordLng: endCoordLng - 1 + rand(2),
       daysWorking: new Array(7)
         .fill(undefined)
-        .map((_, ind) => (ind == 0 || ind == 6 || rand() < avg) ? "0" : "1")
+        .map((_, ind) => (rand(1) < 0.5) ? "0" : "1")
         .join(",")
     };
-    if (rand() < avg) {
+    if (rand(1) < 0.5) {
       return {
-        role: "RIDER",
-        startTime: output.startTime,
-        startCoordLat: output.startCoordLat,
-        startCoordLng: output.startCoordLng,
-        endTime: output.endTime,
-        companyCoordLat: output.companyCoordLat,
-        companyCoordLng: output.companyCoordLng,
-        daysWorking: output.daysWorking
+        ...output,
+        role: "DRIVER",
+        seatAvail: Math.ceil(rand(3))
       };
     }
     return output;
