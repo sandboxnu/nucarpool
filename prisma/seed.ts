@@ -34,142 +34,63 @@ const generateUser = ({
   if (daysWorking.length != 13) {
     throw new Error("Given an invalid string for daysWorking");
   }
+
+  const updated_obj: Prisma.UserCreateInput = {
+    id: id,
+    name: `User ${id}`,
+    email: `user${id}@hotmail.com`,
+    emailVerified: new Date("2022-10-14 19:26:21"),
+    image: null,
+    bio: `My name is User ${id}. I like to drive`,
+    pronouns: "they/them",
+    role: role,
+    status: 'ACTIVE',
+    seatAvail: seatAvail,
+    companyName: "Sandbox Inc.",
+    companyAddress: "360 Huntington Ave",
+    companyCoordLng: companyCoordLng,
+    companyCoordLat: companyCoordLat,
+    startLocation: "Roxbury",
+    startCoordLng: startCoordLng,
+    startCoordLat: startCoordLat,
+    isOnboarded: true,
+    daysWorking: daysWorking,
+    startTime: new Date(startTime),
+    endTime: new Date(endTime)
+  };
   return {
     where: {id: id},
-    update: {},
-    create: {
-      id: id,
-      name: `User ${id}`,
-      email: `user${id}@hotmail.com`,
-      emailVerified: new Date("2022-10-14 19:26:21"),
-      image: null,
-      bio: `My name is User ${id}. I like to drive`,
-      pronouns: "they/them",
-      role: role,
-      status: 'ACTIVE',
-      seatAvail: seatAvail,
-      companyName: "Sandbox Inc.",
-      companyAddress: "360 Huntington Ave",
-      companyCoordLng: companyCoordLng,
-      companyCoordLat: companyCoordLat,
-      startLocation: "Roxbury",
-      startCoordLng: startCoordLng,
-      startCoordLat: startCoordLat,
-      isOnboarded: true,
-      daysWorking: daysWorking,
-      startTime: new Date(startTime),
-      endTime: new Date(endTime)
-    }
-  };
+    update: updated_obj,
+    create: updated_obj
+  }
 };
 
 const createUserData = async () => {
   const users: GenerateUserInput[] = [
-    {
-      role: "DRIVER",
-      seatAvail: 2,
-      startTime: "09:30",
-      startCoordLat: 42.30,
-      startCoordLng: -71.15,
-      endTime: "16:30",
-      companyCoordLat: 42.355625,
-      companyCoordLng: -71.060752,
-      daysWorking: "0,1,1,1,1,1,0"
-    },
-    {
-      role: "RIDER",
-      startTime: "09:00",
-      startCoordLat: 42.15,
-      startCoordLng: -71.30,
-      endTime: "17:00",
-      companyCoordLat: 42.38,
-      companyCoordLng: -71,
-      daysWorking: "0,0,1,1,0,1,0"
-    },
-    {
-      role: "RIDER",
-      startTime: "09:00",
-      startCoordLat: 42.17,
-      startCoordLng: -71.34,
-      endTime: "17:00",
-      companyCoordLat: 42.31,
-      companyCoordLng: -71.12,
-      daysWorking: "0,1,1,1,1,1,0"
-    }, 
-    {
-      role: "RIDER",
-      startTime: "09:00",
-      startCoordLat: 42.2,
-      startCoordLng: -71,
-      endTime: "17:00",
-      companyCoordLat: 42.32,
-      companyCoordLng: -71,
-      daysWorking: "0,0,1,0,1,1,0"
-    },
-    {
-      role: "DRIVER",
-      seatAvail: 3,
-      startTime: "09:00",
-      startCoordLat: 42.1,
-      startCoordLng: -70.9,
-      endTime: "17:30",
-      companyCoordLat: 42.3,
-      companyCoordLng: -71.5,
-      daysWorking: "0,0,1,0,1,1,0"
-    },
-    {
-      role: "DRIVER",
-      seatAvail: 1,
-      startTime: "08:45",
-      startCoordLat: 41.6,
-      startCoordLng: -70.3,
-      endTime: "17:15",
-      companyCoordLat: 42.3,
-      companyCoordLng: -71,
-      daysWorking: "0,0,1,0,1,1,0"
-    }, 
-    {
-      role: "RIDER",
-      startTime: "08:00",
-      startCoordLat: 41.2,
-      startCoordLng: -70.4,
-      endTime: "16:00",
-      companyCoordLat: 42.5,
-      companyCoordLng: -71,
-      daysWorking: "0,0,1,0,1,1,0"
-    }, 
-    {
-      role: "RIDER",
-      startTime: "08:15",
-      startCoordLat: 41.25,
-      startCoordLng: -70.42,
-      endTime: "16:30",
-      companyCoordLat: 42.5,
-      companyCoordLng: -71,
-      daysWorking: "0,0,1,1,1,1,0"
-    }, 
-    {
-      role: "DRIVER",
-      seatAvail: 6,
-      startTime: "08:45",
-      startCoordLat: 41,
-      startCoordLng: -70.37,
-      endTime: "17:00",
-      companyCoordLat: 42.5,
-      companyCoordLng: -71,
-      daysWorking: "0,1,1,1,1,1,0"
-    }, 
-    {
-      role: "DRIVER",
-      seatAvail: 0,
-      startTime: "08:00",
-      startCoordLat: 41.2,
-      startCoordLng: -70.4,
-      endTime: "16:00",
-      companyCoordLat: 42.5,
-      companyCoordLng: -71,
-      daysWorking: "0,0,1,0,1,1,0"
-    }, 
+    ...genRandomUsers({
+      startCoordLat: 42.33,
+      startCoordLng: -71.10,
+      companyCoordLat: 42.35,
+      companyCoordLng: -71.06,
+      count: 30,
+      seed: "sjafdlsdjfjadljflasjkfdl;"
+    }),
+    ...genRandomUsers({
+      startCoordLat: 42.34,
+      startCoordLng: -71.09,
+      companyCoordLat: 42.40,
+      companyCoordLng: -71.26,
+      count: 10,
+      seed: "kajshdkfjhasdkjfhla"
+    }),
+    ...genRandomUsers({
+      startCoordLat: 42.32,
+      startCoordLng: -71.095,
+      companyCoordLat: 42.37,
+      companyCoordLng: -71.10,
+      count: 15,
+      seed: "asjfwieoiroqweiaof"
+    })
   ]
 
   await Promise.all(users.map(async (user, index) => {
@@ -180,19 +101,19 @@ const createUserData = async () => {
 const genRandomUsers = ({
   startCoordLat,
   startCoordLng,
-  endCoordLat,
-  endCoordLng,
+  companyCoordLat,
+  companyCoordLng,
   coordOffset = 0.03,
   count,
   seed
 } : {
   startCoordLat: number,
   startCoordLng: number,
-  endCoordLat: number,
-  endCoordLng: number,
+  companyCoordLat: number,
+  companyCoordLng: number,
   coordOffset?: number,
   count: number,
-  seed: string
+  seed?: string
 }): GenerateUserInput[] => {
   const random = Random.create(seed)
   const doubleOffset = coordOffset * 2;
@@ -209,8 +130,8 @@ const genRandomUsers = ({
       startCoordLng: startCoordLng - coordOffset + rand(doubleOffset),
       // Generates an end time between 16:00 - 19:45
       endTime: (16 + Math.floor(rand(3))) + ":" + ((endMin == 0) ? "00" : endMin),
-      companyCoordLat: endCoordLat - coordOffset + rand(doubleOffset),
-      companyCoordLng: endCoordLng - coordOffset + rand(doubleOffset),
+      companyCoordLat: companyCoordLat - coordOffset + rand(doubleOffset),
+      companyCoordLng: companyCoordLng - coordOffset + rand(doubleOffset),
       daysWorking: new Array(7)
         .fill(undefined)
         .map((_, ind) => (rand(1) < 0.5) ? "0" : "1")
