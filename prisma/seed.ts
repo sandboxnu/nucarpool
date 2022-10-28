@@ -19,6 +19,12 @@ type GenerateUserInput = {
   seatAvail: number
 })
 
+/**
+ * Creates a full user object from a skeleton of critical user information
+ * 
+ * @param userInfo an object containing user info that we want to switch up between users
+ * @returns a full user object to insert into the database, with some fields hardcoded due to lack of significance
+ */
 const generateUser = ({
   id,
   role,
@@ -65,6 +71,9 @@ const generateUser = ({
   }
 };
 
+/**
+ * Creates users and adds them to the database
+ */
 const createUserData = async () => {
   const users: GenerateUserInput[] = [
     ...genRandomUsers({
@@ -90,6 +99,14 @@ const createUserData = async () => {
       companyCoordLng: -71.10,
       count: 15,
       seed: "asjfwieoiroqweiaof"
+    }),
+    ...genRandomUsers({
+      startCoordLat: 42.346,
+      startCoordLng: -71.127,
+      companyCoordLat: 42.344,
+      companyCoordLng: -71.10,
+      count: 15,
+      seed: "dfsiuyisryrklewuoiadusruasi"
     })
   ]
 
@@ -148,6 +165,9 @@ const genRandomUsers = ({
   });
 };
 
+/**
+ * Runs the database seeding functions
+ */
 const main = async () => {
   await createUserData();
 }
