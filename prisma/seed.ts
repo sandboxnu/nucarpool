@@ -76,7 +76,7 @@ const generateUser = ({
  */
 const createUserData = async () => {
   const users: GenerateUserInput[] = [
-    ...genRandomUsers({
+    ...genRandomUsers({     // MISSION HILL => DOWNTOWN
       startCoordLat: 42.33,
       startCoordLng: -71.10,
       companyCoordLat: 42.35,
@@ -84,7 +84,7 @@ const createUserData = async () => {
       count: 30,
       seed: "sjafdlsdjfjadljflasjkfdl;"
     }),
-    ...genRandomUsers({
+    ...genRandomUsers({     // CAMPUS => WALTHAM GANGG 💪
       startCoordLat: 42.34,
       startCoordLng: -71.09,
       companyCoordLat: 42.40,
@@ -92,7 +92,7 @@ const createUserData = async () => {
       count: 10,
       seed: "kajshdkfjhasdkjfhla"
     }),
-    ...genRandomUsers({
+    ...genRandomUsers({     // MISSION HILL => CAMBRIDGE
       startCoordLat: 42.32,
       startCoordLng: -71.095,
       companyCoordLat: 42.37,
@@ -100,7 +100,7 @@ const createUserData = async () => {
       count: 15,
       seed: "asjfwieoiroqweiaof"
     }),
-    ...genRandomUsers({
+    ...genRandomUsers({     // BROOKLINE => FENWAY
       startCoordLat: 42.346,
       startCoordLng: -71.127,
       companyCoordLat: 42.344,
