@@ -84,7 +84,7 @@ const createUserData = async () => {
       count: 30,
       seed: "sjafdlsdjfjadljflasjkfdl;"
     }),
-    ...genRandomUsers({     // CAMPUS => WALTHAM GANGG 💪
+    ...genRandomUsers({     // CAMPUS => WALTHAM
       startCoordLat: 42.34,
       startCoordLng: -71.09,
       companyCoordLat: 42.40,
@@ -115,6 +115,15 @@ const createUserData = async () => {
   }))
 }
 
+/**
+ * Creates randomized users that can be deployed and used for testing the app.
+ * 
+ * @param param0 An object specifying the options of the randomization,
+ *               including the start/end coordinates to congregate data
+ *               around, the offset of that congregation (how spread should
+ *               the points be), the num of outputs, and a random seed.
+ * @returns An array of size "count" with GenerateUserInput examples.
+ */
 const genRandomUsers = ({
   startCoordLat,
   startCoordLng,
@@ -136,6 +145,7 @@ const genRandomUsers = ({
   const doubleOffset = coordOffset * 2;
   // rand(num): When given a number, returns a random number in the range [0-num]
   const rand = (max: number) => max * random.random();
+  // To each item in the array, generates a random user
   return new Array(count).fill(undefined).map((_, index) => {
     const startMin = (15 * Math.floor(rand(3.9)));
     const endMin = (15 * Math.floor(rand(3.9)));
