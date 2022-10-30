@@ -19,6 +19,7 @@ import { User } from "../utils/types";
 import Spinner from "../components/Spinner";
 import Radio from "../components/Radio";
 import useSearch from "../utils/search";
+import ProtectedPage from "../utils/auth";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getServerSession(context.req, context.res, authOptions);
@@ -76,10 +77,16 @@ function UserEditForm({ user }: { user: User }) {
   const [selected, setSelected] = useState({
     place_name: user.companyAddress,
   });
-  const [companyAddress, setCompanyAddress] = useState("")
-  const updateCompanyAddress = useMemo(() => debounce(setCompanyAddress, 1000), [])
-  const [startingAddress, setStartingAddress] = useState("")
-  const updateStartingAddress = useMemo(() => debounce(setStartingAddress, 1000), [])
+  const [companyAddress, setCompanyAddress] = useState("");
+  const updateCompanyAddress = useMemo(
+    () => debounce(setCompanyAddress, 1000),
+    []
+  );
+  const [startingAddress, setStartingAddress] = useState("");
+  const updateStartingAddress = useMemo(
+    () => debounce(setStartingAddress, 1000),
+    []
+  );
 
   const [startLocationsuggestions, setStartLocationSuggestions] = useState<
     Feature[]
@@ -120,13 +127,13 @@ function UserEditForm({ user }: { user: User }) {
 
   useSearch({
     value: companyAddress,
-    type: "address%2Cpostcode", 
+    type: "address%2Cpostcode",
     setFunc: setSuggestions,
   });
 
   useSearch({
     value: startingAddress,
-    type: "neighborhood%2Cplace", 
+    type: "neighborhood%2Cplace",
     setFunc: setStartLocationSuggestions,
   });
 
@@ -384,4 +391,4 @@ const Settings: NextPage = () => {
   );
 };
 
-export default Settings;
+export default ProtectedPage(Settings);
