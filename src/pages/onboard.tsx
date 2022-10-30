@@ -17,13 +17,8 @@ import { Role, Status } from "@prisma/client";
 import { TextField } from "../components/TextField";
 import Radio from "../components/Radio";
 import useSearch from "../utils/search";
-<<<<<<< HEAD
-
-// Inputs to the onboarding form.
-=======
 import ProtectedPage from "../utils/auth";
-
->>>>>>> 187058419f01e5482b494c65d29659bfbe4dfe9a
+// Inputs to the onboarding form.
 type OnboardingFormInputs = {
   role: Role;
   seatAvail: number;
@@ -346,6 +341,7 @@ const Onboard: NextPage = () => {
                 {...register("seatAvail", { valueAsNumber: true })}
               />
             )}
+
             <TextField
               label="Company Name"
               id="companyName"
@@ -375,34 +371,4 @@ const Onboard: NextPage = () => {
   );
 };
 
-<<<<<<< HEAD
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await getServerSession(context.req, context.res, authOptions);
-
-  if (session?.user) {
-    if (session.user.isOnboarded) {
-      return {
-        redirect: {
-          destination: "/",
-          permanent: false,
-        },
-      };
-    }
-  } else {
-    return {
-      redirect: {
-        destination: "/sign-in",
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: {},
-  };
-}
-
-export default Onboard; 
-=======
 export default ProtectedPage(Onboard);
->>>>>>> 187058419f01e5482b494c65d29659bfbe4dfe9a
