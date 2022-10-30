@@ -19,6 +19,7 @@ import { User } from "../utils/types";
 import Spinner from "../components/Spinner";
 import Radio from "../components/Radio";
 import useSearch from "../utils/search";
+import ProtectedPage from "../utils/auth";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getServerSession(context.req, context.res, authOptions);
@@ -381,4 +382,4 @@ const Settings: NextPage = () => {
   );
 };
 
-export default Settings;
+export default ProtectedPage(Settings);

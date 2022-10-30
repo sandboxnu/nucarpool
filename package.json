@@ -10,7 +10,8 @@
     "db:start": "docker-compose -f docker-compose.yml up -d",
     "db:stop": "docker-compose -f docker-compose.yml down",
     "db:schema": "prisma migrate dev && prisma generate",
-    "seed": "yarn prisma db seed"
+    "seed": "yarn prisma db seed",
+    "prepare": "husky install"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
@@ -51,6 +52,7 @@
     "autoprefixer": "^10.4.7",
     "eslint": "8.18.0",
     "eslint-config-next": "12.1.6",
+    "husky": "^8.0.0",
     "postcss": "^8.4.14",
     "prettier": "^2.7.1",
     "pretty-quick": "^3.1.3",
