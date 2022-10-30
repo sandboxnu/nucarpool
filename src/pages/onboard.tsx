@@ -18,7 +18,7 @@ import { TextField } from "../components/TextField";
 import Radio from "../components/Radio";
 import useSearch from "../utils/search";
 
-
+// Inputs to the onboarding form.
 type OnboardingFormInputs = {
   role: Role;
   seatAvail: number;
@@ -31,6 +31,7 @@ type OnboardingFormInputs = {
   timeDiffers: boolean,
 };
 
+// Zod object for validation. 
 export const onboardSchema = z.object({
   role: z.nativeEnum(Role),
   seatAvail: z
@@ -40,10 +41,9 @@ export const onboardSchema = z.object({
   companyName: z.string().min(1, "Cannot be empty"),
   companyAddress: z.string().min(1, "Cannot be empty"),
   startLocation: z.string().min(1, "Cannot be empty"),
-  daysWorking: z.string().length(13, "Must be 13 character comma separated string"),
-  startTime: z.string(), 
-  endTime: z.string()
-  // TODO update to validate new fields
+  daysWorking: z.string().length(13, "Must be 13 character comma separated string"), // Make this regex.
+  startTime: z.string(), // Somehow make sure this is a valid time.
+  endTime: z.string() // Somehow make sure this is a valid time.
 });
 
 const Onboard: NextPage = () => {
@@ -61,9 +61,9 @@ const Onboard: NextPage = () => {
       companyName: "",
       companyAddress: "",
       startLocation: "",
-      daysWorking: "",
-      startTime: "",
-      endTime: "",
+      daysWorking: "1,1,1,1,1,1,1",
+      startTime: "05:10:30",
+      endTime: "05:10:30",
       timeDiffers: false,
     },
     resolver: zodResolver(onboardSchema),
@@ -104,6 +104,7 @@ const Onboard: NextPage = () => {
   });
 
   const onSubmit = async (values: OnboardingFormInputs) => {
+    console.log("KABOOM");
     const coord: number[] = (selected as any).center;
     const userInfo = {
       ...values,
@@ -304,6 +305,52 @@ const Onboard: NextPage = () => {
               )}
             </div>
 
+
+            <div className="flex flex-col space-y-2">
+              <h1 className="font-medium text-sm">Role</h1>
+              <div className="flex space-x-4">
+                <Radio
+                  label="Rider"
+                  id="rider"
+                  error={errors.role}
+                  value={Role.RIDER}
+                  {...register("role")}
+                />
+                <Radio
+                  label="Driver"
+                  id="driver"
+                  error={errors.role}
+                  value={Role.DRIVER}
+                  {...register("role")}
+                />
+              </div>
+            </div>
+
+            {watch("role") == Role.DRIVER && (
+              <TextField
+                label="Seat Availability"
+                id="seatAvail"
+                error={errors.seatAvail}
+                type="number"
+                {...register("seatAvail", { valueAsNumber: true })}
+              />
+            )}
+            <TextField
+              label="Company Name"
+              id="companyName"
+              error={errors.companyName}
+              type="text"
+              {...register("companyName")}
+            />
+
+            <TextField
+              label="Company Name"
+              id="companyName"
+              error={errors.companyName}
+              type="text"
+              {...register("companyName")}
+            />
+
             <button
               type="submit"
               className="w-full bg-northeastern-red hover:bg-red-800 rounded-md text-white px-3 py-2 shadow"
@@ -343,4 +390,4 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   };
 }
 
-export default Onboard;
+export default Onboard; 
