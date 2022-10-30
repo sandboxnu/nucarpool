@@ -18,6 +18,12 @@ import { TextField } from "../components/TextField";
 import Radio from "../components/Radio";
 import useSearch from "../utils/search";
 import ProtectedPage from "../utils/auth";
+import newOnboard from "../pages/newOnboard";
+import ControlledTextbox from "../components/ControlledTextbox";
+import ControlledCheckbox from "../components/ControlledTextbox";
+import Checkbox from "@mui/material/Checkbox";
+import { time } from "console";
+
 // Inputs to the onboarding form.
 type OnboardingFormInputs = {
   role: Role;
@@ -26,12 +32,12 @@ type OnboardingFormInputs = {
   companyAddress: string;
   startLocation: string;
   daysWorking: string;
-  startTime: string, 
-  endTime: string, 
-  timeDiffers: boolean,
+  startTime: string;
+  endTime: string;
+  timeDiffers: boolean;
 };
 
-// Zod object for validation. 
+// Zod object for validation.
 export const onboardSchema = z.object({
   role: z.nativeEnum(Role),
   seatAvail: z
@@ -41,9 +47,11 @@ export const onboardSchema = z.object({
   companyName: z.string().min(1, "Cannot be empty"),
   companyAddress: z.string().min(1, "Cannot be empty"),
   startLocation: z.string().min(1, "Cannot be empty"),
-  daysWorking: z.string().length(13, "Must be 13 character comma separated string"), // Make this regex.
+  daysWorking: z
+    .string()
+    .length(13, "Must be 13 character comma separated string"), // Make this regex.
   startTime: z.string(), // Somehow make sure this is a valid time.
-  endTime: z.string() // Somehow make sure this is a valid time.
+  endTime: z.string(), // Somehow make sure this is a valid time.
 });
 
 const Onboard: NextPage = () => {
@@ -88,6 +96,12 @@ const Onboard: NextPage = () => {
     []
   );
 
+  const [timeDiffers, setCheckedOne] = useState(false);
+
+  const handleChangeOne = () => {
+    setCheckedOne(!timeDiffers);
+  };
+
   useSearch({
     value: companyAddress,
     type: "address%2Cpostcode",
@@ -129,9 +143,9 @@ const Onboard: NextPage = () => {
       companyCoordLat: userInfo.companyCoordLat!,
       startLocation: userInfo.startLocation,
       isOnboarded: true,
-      daysWorking: userInfo.daysWorking, 
-      startTime: userInfo.startTime, 
-      endTime: userInfo.endTime
+      daysWorking: userInfo.daysWorking,
+      startTime: userInfo.startTime,
+      endTime: userInfo.endTime,
     });
   };
 
@@ -311,52 +325,33 @@ const Onboard: NextPage = () => {
               )}
             </div>
 
-
             <div className="flex flex-col space-y-2">
-              <h1 className="font-medium text-sm">Role</h1>
+              <h1 className="font-medium text-sm">
+                My start/end time is different each day
+              </h1>
               <div className="flex space-x-4">
-                <Radio
-                  label="Rider"
-                  id="rider"
-                  error={errors.role}
-                  value={Role.RIDER}
-                  {...register("role")}
-                />
-                <Radio
-                  label="Driver"
-                  id="driver"
-                  error={errors.role}
-                  value={Role.DRIVER}
-                  {...register("role")}
-                />
+                <Checkbox value={timeDiffers} onChange={handleChangeOne} />
               </div>
             </div>
 
-            {watch("role") == Role.DRIVER && (
-              <TextField
-                label="Seat Availability"
-                id="seatAvail"
-                error={errors.seatAvail}
-                type="number"
-                {...register("seatAvail", { valueAsNumber: true })}
-              />
+            {watch("timeDiffers") == true && (
+              <div>
+                <TextField
+                  label="Start Time"
+                  id="companyName"
+                  error={errors.timeDiffers}
+                  type="text"
+                  {...register("startTime")}
+                />
+                <TextField
+                  label="End Time"
+                  id="companyName"
+                  error={errors.timeDiffers}
+                  type="text"
+                  {...register("endTime")}
+                />
+              </div>
             )}
-
-            <TextField
-              label="Company Name"
-              id="companyName"
-              error={errors.companyName}
-              type="text"
-              {...register("companyName")}
-            />
-
-            <TextField
-              label="Company Name"
-              id="companyName"
-              error={errors.companyName}
-              type="text"
-              {...register("companyName")}
-            />
 
             <button
               type="submit"
