@@ -46,20 +46,24 @@ const fooRouter = createRouter()
 
 These endpoints are then accessed in the frontend in the following structure:
 
-
 ```typescript
-trpc.useQuery(["endpoint.name", {
-    // input object
-    userId: 100
-  }], {
+trpc.useQuery(
+  [
+    "endpoint.name",
+    {
+      // input object
+      userId: 100,
+    },
+  ],
+  {
     // what to do if the request is successful
     onSuccess: (data) => {
-      console.log(data.name)
+      console.log(data.name);
     },
     // what to do if the request throws an error
     onError: (error) => {
       toast.error(`Something went wrong: ${error}`);
-    }
+    },
   }
-)
+);
 ```

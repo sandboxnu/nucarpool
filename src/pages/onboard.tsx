@@ -17,8 +17,13 @@ import { Role, Status } from "@prisma/client";
 import { TextField } from "../components/TextField";
 import Radio from "../components/Radio";
 import useSearch from "../utils/search";
+<<<<<<< HEAD
 
 // Inputs to the onboarding form.
+=======
+import ProtectedPage from "../utils/auth";
+
+>>>>>>> 187058419f01e5482b494c65d29659bfbe4dfe9a
 type OnboardingFormInputs = {
   role: Role;
   seatAvail: number;
@@ -77,20 +82,26 @@ const Onboard: NextPage = () => {
   const [startLocationSelected, setStartLocationSelected] = useState({
     place_name: "",
   });
-  const [companyAddress, setCompanyAddress] = useState("")
-  const updateCompanyAddress = useMemo(() => debounce(setCompanyAddress, 1000), [])
-  const [startingAddress, setStartingAddress] = useState("")
-  const updateStartingAddress = useMemo(() => debounce(setStartingAddress, 1000), [])
-  
+  const [companyAddress, setCompanyAddress] = useState("");
+  const updateCompanyAddress = useMemo(
+    () => debounce(setCompanyAddress, 1000),
+    []
+  );
+  const [startingAddress, setStartingAddress] = useState("");
+  const updateStartingAddress = useMemo(
+    () => debounce(setStartingAddress, 1000),
+    []
+  );
+
   useSearch({
     value: companyAddress,
-    type: "address%2Cpostcode", 
+    type: "address%2Cpostcode",
     setFunc: setSuggestions,
   });
 
   useSearch({
     value: startingAddress,
-    type: "neighborhood%2Cplace", 
+    type: "neighborhood%2Cplace",
     setFunc: setStartLocationSuggestions,
   });
 
@@ -364,6 +375,7 @@ const Onboard: NextPage = () => {
   );
 };
 
+<<<<<<< HEAD
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getServerSession(context.req, context.res, authOptions);
 
@@ -391,3 +403,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 
 export default Onboard; 
+=======
+export default ProtectedPage(Onboard);
+>>>>>>> 187058419f01e5482b494c65d29659bfbe4dfe9a
