@@ -28,7 +28,7 @@ type GenerateUserInput = {
  * @param userInfo an object containing user info that we want to switch up between users
  * @returns a full user object to insert into the database, with some fields hardcoded due to lack of significance
  */
-const generateUser = ({
+export const generateUser = ({
   id,
   role,
   seatAvail = undefined,

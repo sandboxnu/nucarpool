@@ -21,6 +21,7 @@ const Home: NextPage<any> = () => {
     trpc.useQuery(["mapbox.geoJsonUsersList"]);
   const { data: user, isLoading: isLoadingUser } = trpc.useQuery(["user.me"]);
   const [isMap, setMap] = useState<boolean>(false);
+  const { data: recommendations } = trpc.useQuery(["user.recommendations"]);
 
   useEffect(() => {
     if (!isMap && user && geoJsonUsers) {
