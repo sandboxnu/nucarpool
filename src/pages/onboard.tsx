@@ -17,7 +17,7 @@ import { Role, Status } from "@prisma/client";
 import { TextField } from "../components/TextField";
 import Radio from "../components/Radio";
 import useSearch from "../utils/search";
-
+import ProtectedPage from "../utils/auth";
 
 type OnboardingFormInputs = {
   role: Role;
@@ -65,20 +65,26 @@ const Onboard: NextPage = () => {
   const [startLocationSelected, setStartLocationSelected] = useState({
     place_name: "",
   });
-  const [companyAddress, setCompanyAddress] = useState("")
-  const updateCompanyAddress = useMemo(() => debounce(setCompanyAddress, 1000), [])
-  const [startingAddress, setStartingAddress] = useState("")
-  const updateStartingAddress = useMemo(() => debounce(setStartingAddress, 1000), [])
-  
+  const [companyAddress, setCompanyAddress] = useState("");
+  const updateCompanyAddress = useMemo(
+    () => debounce(setCompanyAddress, 1000),
+    []
+  );
+  const [startingAddress, setStartingAddress] = useState("");
+  const updateStartingAddress = useMemo(
+    () => debounce(setStartingAddress, 1000),
+    []
+  );
+
   useSearch({
     value: companyAddress,
-    type: "address%2Cpostcode", 
+    type: "address%2Cpostcode",
     setFunc: setSuggestions,
   });
 
   useSearch({
     value: startingAddress,
-    type: "neighborhood%2Cplace", 
+    type: "neighborhood%2Cplace",
     setFunc: setStartLocationSuggestions,
   });
 
@@ -302,30 +308,4 @@ const Onboard: NextPage = () => {
   );
 };
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await getServerSession(context.req, context.res, authOptions);
-
-  if (session?.user) {
-    if (session.user.isOnboarded) {
-      return {
-        redirect: {
-          destination: "/",
-          permanent: false,
-        },
-      };
-    }
-  } else {
-    return {
-      redirect: {
-        destination: "/sign-in",
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: {},
-  };
-}
-
-export default Onboard;
+export default ProtectedPage(Onboard);

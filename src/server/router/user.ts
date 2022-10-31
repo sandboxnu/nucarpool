@@ -8,9 +8,9 @@ import { Feature, FeatureCollection } from "geojson";
 import calculateScore, { Recommendation } from "../../utils/recommendation";
 import _ from "lodash";
 
-// user router to get information about or edit users 
+// user router to get information about or edit users
 export const userRouter = createProtectedRouter()
-  // query for information about current user 
+  // query for information about current user
   .query("me", {
     async resolve({ ctx }) {
       const id = ctx.session.user?.id;
@@ -32,7 +32,7 @@ export const userRouter = createProtectedRouter()
         },
       });
 
-      // throws TRPCError if no user with ID exists 
+      // throws TRPCError if no user with ID exists
       if (!user) {
         throw new TRPCError({
           code: "NOT_FOUND",
@@ -78,18 +78,18 @@ export const userRouter = createProtectedRouter()
   })
   // Generates a list of recommendations for the current user
   .query("recommendations", {
-    resolve: async ({ctx}) => {
-      const id = ctx.session.user?.id
+    resolve: async ({ ctx }) => {
+      const id = ctx.session.user?.id;
       const currentUser = await ctx.prisma.user.findUnique({
         where: {
-          id: id
-        }
-      })
+          id: id,
+        },
+      });
       if (!currentUser) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: `No user with id ${id}.`
-        })
+          message: `No user with id ${id}.`,
+        });
       }
       const users = await ctx.prisma.user.findMany({
         where: {
@@ -98,10 +98,10 @@ export const userRouter = createProtectedRouter()
           },
           isOnboarded: true, // only include user that have finished onboarding
           status: Status.ACTIVE, // only include active users
-        }
-      })
-      const recs = _.compact(users.map(calculateScore(currentUser)))
-      recs.sort((a, b) => a.score - b.score)
-      return recs
-    }
+        },
+      });
+      const recs = _.compact(users.map(calculateScore(currentUser)));
+      recs.sort((a, b) => a.score - b.score);
+      return recs;
+    },
   });
