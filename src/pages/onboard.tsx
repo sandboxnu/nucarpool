@@ -23,6 +23,7 @@ import ControlledTextbox from "../components/ControlledTextbox";
 import ControlledCheckbox from "../components/ControlledTextbox";
 import Checkbox from "@mui/material/Checkbox";
 import { time } from "console";
+import DayBox from "../components/DayBox";
 
 // Inputs to the onboarding form.
 type OnboardingFormInputs = {
@@ -70,8 +71,8 @@ const Onboard: NextPage = () => {
       companyAddress: "",
       startLocation: "",
       daysWorking: "1,1,1,1,1,1,1",
-      startTime: "05:10:30",
-      endTime: "05:10:30",
+      startTime: "09:00:00",
+      endTime: "05:00:00",
       timeDiffers: false,
     },
     resolver: zodResolver(onboardSchema),
@@ -96,11 +97,17 @@ const Onboard: NextPage = () => {
     []
   );
 
-  const [timeDiffers, setCheckedOne] = useState(false);
+  const daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"];
 
-  const handleChangeOne = () => {
-    setCheckedOne(!timeDiffers);
-  };
+  const [daysChecked, setDaysChecked] = useState([
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ]);
 
   useSearch({
     value: companyAddress,
@@ -124,7 +131,6 @@ const Onboard: NextPage = () => {
   });
 
   const onSubmit = async (values: OnboardingFormInputs) => {
-    console.log("KABOOM");
     const coord: number[] = (selected as any).center;
     const userInfo = {
       ...values,
@@ -325,16 +331,41 @@ const Onboard: NextPage = () => {
               )}
             </div>
 
+            <div>
+              {daysOfWeek.map((day, index) => (
+                <Checkbox
+                  key={day + index.toString()}
+                  sx={{
+                    input: { width: 1, height: 1 },
+                    padding: 0,
+                  }}
+                  value={daysChecked[index]}
+                  onChange={(e) =>
+                    setDaysChecked([
+                      ...daysChecked.slice(0, index - 1),
+                      e.target.checked,
+                      ...daysChecked.slice(index + 1),
+                    ])
+                  }
+                  checkedIcon={<DayBox day={day} isSelected={true} />}
+                  icon={<DayBox day={day} isSelected={false} />}
+                  defaultChecked={false}
+                />
+              ))}
+            </div>
+
+            {/* Start/End Time Fields  */}
+
             <div className="flex flex-col space-y-2">
               <h1 className="font-medium text-sm">
                 My start/end time is different each day
               </h1>
               <div className="flex space-x-4">
-                <Checkbox value={timeDiffers} onChange={handleChangeOne} />
+                <Checkbox {...register("timeDiffers")} />
               </div>
             </div>
 
-            {watch("timeDiffers") == true && (
+            {watch("timeDiffers") == false && (
               <div>
                 <TextField
                   label="Start Time"
