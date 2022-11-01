@@ -1,78 +1,8 @@
-import { PrismaClient, Role, Prisma } from "@prisma/client";
+import { PrismaClient, Role, Prisma, Status } from "@prisma/client";
 import Random from "random-seed";
+import { generateUser, GenerateUserInput } from "../src/utils/recommendation";
 
 const prisma = new PrismaClient();
-
-type GenerateUserInput = {
-  companyCoordLng: number;
-  companyCoordLat: number;
-  startCoordLng: number;
-  startCoordLat: number;
-  daysWorking: string; // Format: S,M,T,W,R,F,S
-  startTime: string;
-  endTime: string;
-} & (
-  | {
-      role: "RIDER";
-      seatAvail?: undefined;
-    }
-  | {
-      role: "DRIVER";
-      seatAvail: number;
-    }
-);
-
-/**
- * Creates a full user object from a skeleton of critical user information
- *
- * @param userInfo an object containing user info that we want to switch up between users
- * @returns a full user object to insert into the database, with some fields hardcoded due to lack of significance
- */
-export const generateUser = ({
-  id,
-  role,
-  seatAvail = undefined,
-  companyCoordLng,
-  companyCoordLat,
-  startCoordLng,
-  startCoordLat,
-  daysWorking,
-  startTime,
-  endTime,
-}: GenerateUserInput & { id: string }): Prisma.UserUpsertArgs => {
-  if (daysWorking.length != 13) {
-    throw new Error("Given an invalid string for daysWorking");
-  }
-
-  const updated_obj: Prisma.UserCreateInput = {
-    id: id,
-    name: `User ${id}`,
-    email: `user${id}@hotmail.com`,
-    emailVerified: new Date("2022-10-14 19:26:21"),
-    image: null,
-    bio: `My name is User ${id}. I like to drive`,
-    pronouns: "they/them",
-    role: role,
-    status: "ACTIVE",
-    seatAvail: seatAvail,
-    companyName: "Sandbox Inc.",
-    companyAddress: "360 Huntington Ave",
-    companyCoordLng: companyCoordLng,
-    companyCoordLat: companyCoordLat,
-    startLocation: "Roxbury",
-    startCoordLng: startCoordLng,
-    startCoordLat: startCoordLat,
-    isOnboarded: true,
-    daysWorking: daysWorking,
-    startTime: new Date(startTime),
-    endTime: new Date(endTime),
-  };
-  return {
-    where: { id: id },
-    update: updated_obj,
-    create: updated_obj,
-  };
-};
 
 /**
  * Creates users and adds them to the database
