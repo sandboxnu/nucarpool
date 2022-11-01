@@ -51,8 +51,8 @@ export const onboardSchema = z.object({
   daysWorking: z
     .string()
     .length(13, "Must be 13 character comma separated string"), // Make this regex.
-  startTime: z.string(), // Somehow make sure this is a valid time.
-  endTime: z.string(), // Somehow make sure this is a valid time.
+  startTime: z.string().length(5), // Somehow make sure this is a valid time.
+  endTime: z.string().length(5), // Somehow make sure this is a valid time.
 });
 
 const Onboard: NextPage = () => {
@@ -71,8 +71,8 @@ const Onboard: NextPage = () => {
       companyAddress: "",
       startLocation: "",
       daysWorking: "1,1,1,1,1,1,1",
-      startTime: "09:00:00",
-      endTime: "05:00:00",
+      startTime: "09:00",
+      endTime: "05:00",
       timeDiffers: false,
     },
     resolver: zodResolver(onboardSchema),
@@ -139,6 +139,16 @@ const Onboard: NextPage = () => {
       seatAvail: values.role === Role.RIDER ? 0 : values.seatAvail,
     };
 
+    const daysWorkingParsed: string = daysChecked
+      .map((val: boolean) => {
+        if (val == true) {
+          return "1";
+        } else {
+          return "0";
+        }
+      })
+      .join(",");
+
     editUserMutation.mutate({
       role: userInfo.role,
       status: Status.ACTIVE,
@@ -149,7 +159,7 @@ const Onboard: NextPage = () => {
       companyCoordLat: userInfo.companyCoordLat!,
       startLocation: userInfo.startLocation,
       isOnboarded: true,
-      daysWorking: userInfo.daysWorking,
+      daysWorking: daysWorkingParsed,
       startTime: userInfo.startTime,
       endTime: userInfo.endTime,
     });
