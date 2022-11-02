@@ -10,10 +10,10 @@ export type Recommendation = {
 
 /** Maximum cutoffs for recommendation calculations */
 const cutoffs = {
-  startDistance: 4,
-  endDistance: 4,
-  startTime: 1,
-  endTime: 1,
+  startDistance: 4, // miles
+  endDistance: 4, // miles
+  startTime: 60, // minutes
+  endTime: 60, // minutes
   days: 3,
 };
 
@@ -78,18 +78,17 @@ const calculateScore = (
       user.endTime
     ) {
       startTime = Math.abs(
-        currentUser.startTime.getHours() - user.startTime.getHours()
+        (currentUser.startTime.getHours() - user.startTime.getHours()) * 60 +
+          (currentUser.startTime.getMinutes() - user.startTime.getMinutes())
       );
       endTime = Math.abs(
-        currentUser.endTime.getHours() - user.endTime.getHours()
+        (currentUser.endTime.getHours() - user.endTime.getHours()) * 60 +
+          (currentUser.endTime.getMinutes() - user.endTime.getMinutes())
       );
       if (startTime > cutoffs.startTime || endTime > cutoffs.endTime) {
         return undefined;
       }
     }
-
-    console.log(startTime);
-    console.log(currentUser.startTime);
 
     if (
       startDistance > cutoffs.startDistance ||
@@ -162,13 +161,21 @@ export const generateUser = ({
   const [startHours, startMinutes] = startTime
     .split(":")
     .map((s) => _.toInteger(s));
-  const startDate = new Date();
-  startDate.setHours(startHours);
-  startDate.setMinutes(startMinutes);
+  const startDate = new Date(
+    Date.parse(
+      `2022-11-01T${startHours.toString().padStart(2, "0")}:${startMinutes
+        .toString()
+        .padStart(2, "0")}:00Z`
+    )
+  );
   const [endHours, endMinutes] = endTime.split(":").map((s) => _.toInteger(s));
-  const endDate = new Date();
-  endDate.setHours(endHours);
-  endDate.setMinutes(endMinutes);
+  const endDate = new Date(
+    Date.parse(
+      `2022-11-01T${endHours.toString().padStart(2, "0")}:${endMinutes
+        .toString()
+        .padStart(2, "0")}:00Z`
+    )
+  );
 
   const updated_obj = {
     id: id,
