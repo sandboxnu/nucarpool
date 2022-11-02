@@ -63,19 +63,15 @@ export const userRouter = createProtectedRouter()
 
     async resolve({ ctx, input }) {
       const [startHour, startMinute] = input.startTime.split(":");
-      console.log(startHour);
-      console.log(startMinute);
       const startTimeDate = new Date();
       startTimeDate.setHours(Number(startHour));
       startTimeDate.setMinutes(Number(startMinute));
 
       const [endHour, endMinute] = input.endTime.split(":");
-      console.log(endHour);
-      console.log(endMinute);
       const endTimeDate = new Date();
       endTimeDate.setHours(Number(endHour));
       endTimeDate.setMinutes(Number(endMinute));
-      console.log(endTimeDate.getHours());
+
       const id = ctx.session.user?.id;
       const user = await ctx.prisma.user.update({
         where: { id },

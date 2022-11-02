@@ -32,7 +32,7 @@ type OnboardingFormInputs = {
   companyName: string;
   companyAddress: string;
   startLocation: string;
-  daysWorking: string;
+  daysWorking: boolean[];
   startTime: string;
   endTime: string;
   timeDiffers: boolean;
@@ -48,12 +48,12 @@ export const onboardSchema = z.object({
   companyName: z.string().min(1, "Cannot be empty"),
   companyAddress: z.string().min(1, "Cannot be empty"),
   startLocation: z.string().min(1, "Cannot be empty"),
-  daysWorking: z
-    .string()
-    .length(13, "Must be 13 character comma separated string"), // Make this regex.
+  daysWorking: z.array(z.boolean()).length(7, "Must be an array of booleans."), // Make this regex.
   startTime: z.string().length(5), // Somehow make sure this is a valid time.
   endTime: z.string().length(5), // Somehow make sure this is a valid time.
 });
+
+const daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"];
 
 const Onboard: NextPage = () => {
   const router = useRouter();
@@ -70,9 +70,9 @@ const Onboard: NextPage = () => {
       companyName: "",
       companyAddress: "",
       startLocation: "",
-      daysWorking: "1,1,1,1,1,1,1",
-      startTime: "09:00",
-      endTime: "05:00",
+      daysWorking: [false, false, false, false, false, false, false],
+      startTime: undefined,
+      endTime: undefined,
       timeDiffers: false,
     },
     resolver: zodResolver(onboardSchema),
@@ -96,18 +96,6 @@ const Onboard: NextPage = () => {
     () => debounce(setStartingAddress, 1000),
     []
   );
-
-  const daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"];
-
-  const [daysChecked, setDaysChecked] = useState([
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ]);
 
   useSearch({
     value: companyAddress,
@@ -139,9 +127,11 @@ const Onboard: NextPage = () => {
       seatAvail: values.role === Role.RIDER ? 0 : values.seatAvail,
     };
 
-    const daysWorkingParsed: string = daysChecked
+    // console.log(daysChecked);
+
+    const daysWorkingParsed: string = userInfo.daysWorking
       .map((val: boolean) => {
-        if (val == true) {
+        if (val) {
           return "1";
         } else {
           return "0";
@@ -165,6 +155,7 @@ const Onboard: NextPage = () => {
     });
   };
 
+  console.log(errors.daysWorking);
   return (
     <>
       <Head>
@@ -349,14 +340,7 @@ const Onboard: NextPage = () => {
                     input: { width: 1, height: 1 },
                     padding: 0,
                   }}
-                  value={daysChecked[index]}
-                  onChange={(e) =>
-                    setDaysChecked([
-                      ...daysChecked.slice(0, index - 1),
-                      e.target.checked,
-                      ...daysChecked.slice(index + 1),
-                    ])
-                  }
+                  {...register(`daysWorking.${index}`)}
                   checkedIcon={<DayBox day={day} isSelected={true} />}
                   icon={<DayBox day={day} isSelected={false} />}
                   defaultChecked={false}
@@ -375,7 +359,7 @@ const Onboard: NextPage = () => {
               </div>
             </div>
 
-            {watch("timeDiffers") == false && (
+            {!watch("timeDiffers") && (
               <div>
                 <TextField
                   label="Start Time"
