@@ -19,7 +19,7 @@ const relativeOrderBaseUser: User = generateUser({
 const usersToBeCutoff: User[] = [
   {
     ...relativeOrderBaseUser,
-    daysWorking: "1,1,0,0,0,1,1",
+    daysWorking: "1,1,0,0,0,0,1",
   },
   {
     ...relativeOrderBaseUser,
@@ -51,10 +51,6 @@ test("Test cutoffs for user 0", () => {
   const calcScoreForUser1 = calculateScore(relativeOrderBaseUser);
   const recs = _.compact(usersToBeCutoff.map(calcScoreForUser1));
   expect(recs.length).toEqual(0);
-  // recs.sort((a, b) => a.score - b.score);
-  // expect(recs.length).toBe(0); //change me
-  // expect(recs).not.toContain(users[0]); // change me
-  // expect(recs).toContain(users[0]); // change
 });
 
 test("Testing the cutoffs for user x", () => {});
