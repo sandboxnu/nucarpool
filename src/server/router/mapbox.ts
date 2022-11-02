@@ -61,6 +61,8 @@ export const mapboxRouter = createProtectedRouter()
           companyAddress: true,
           companyCoordLng: true,
           companyCoordLat: true,
+          startCoordLng: true,
+          startCoordLat: true,
           startLocation: true,
         },
       });

@@ -3,21 +3,6 @@ import { expect, jest, test } from "@jest/globals";
 import { Prisma, User } from "@prisma/client";
 import _ from "lodash";
 
-let users: User[];
-
-let testUser: User;
-
-test("Test cutoffs for user 0", () => {
-  const calcScoreForUser1 = calculateScore(testUser);
-  const recs = _.compact(users.map(calcScoreForUser1));
-  recs.sort((a, b) => a.score - b.score);
-  expect(recs.length).toBe(0); //change me
-  expect(recs).not.toContain(users[0]); // change me
-  expect(recs).toContain(users[0]); // change
-});
-
-test("Testing the cutoffs for user x", () => {});
-
 const relativeOrderBaseUser: User = generateUser({
   id: "0",
   role: "DRIVER",
@@ -30,6 +15,49 @@ const relativeOrderBaseUser: User = generateUser({
   startTime: "9:00",
   endTime: "17:00",
 }).create;
+
+const usersToBeCutoff: User[] = [
+  {
+    ...relativeOrderBaseUser,
+    daysWorking: "1,1,0,0,0,1,1",
+  },
+  {
+    ...relativeOrderBaseUser,
+    startTime: new Date(Date.parse("2022-11-01T07:59:00Z")),
+  },
+  {
+    ...relativeOrderBaseUser,
+    endTime: new Date(Date.parse("2022-11-01T18:01:00Z")),
+  },
+  {
+    ...relativeOrderBaseUser,
+    startCoordLat: relativeOrderBaseUser.startCoordLat + 0.05,
+  },
+  {
+    ...relativeOrderBaseUser,
+    startCoordLng: relativeOrderBaseUser.startCoordLng + 0.05,
+  },
+  {
+    ...relativeOrderBaseUser,
+    companyCoordLat: relativeOrderBaseUser.companyCoordLat + 0.05,
+  },
+  {
+    ...relativeOrderBaseUser,
+    companyCoordLng: relativeOrderBaseUser.companyCoordLng + 0.05,
+  },
+];
+
+test("Test cutoffs for user 0", () => {
+  const calcScoreForUser1 = calculateScore(relativeOrderBaseUser);
+  const recs = _.compact(usersToBeCutoff.map(calcScoreForUser1));
+  expect(recs.length).toEqual(0);
+  // recs.sort((a, b) => a.score - b.score);
+  // expect(recs.length).toBe(0); //change me
+  // expect(recs).not.toContain(users[0]); // change me
+  // expect(recs).toContain(users[0]); // change
+});
+
+test("Testing the cutoffs for user x", () => {});
 
 const relativeOrderUsers: User[] = [
   {
