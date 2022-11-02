@@ -16,6 +16,8 @@ const relativeOrderBaseUser: User = generateUser({
   endTime: "17:00",
 }).create;
 
+const calcScoreForBaseUser = calculateScore(relativeOrderBaseUser);
+
 const usersToBeCutoff: User[] = [
   {
     ...relativeOrderBaseUser,
@@ -47,13 +49,46 @@ const usersToBeCutoff: User[] = [
   },
 ];
 
-test("Test cutoffs for user 0", () => {
-  const calcScoreForUser1 = calculateScore(relativeOrderBaseUser);
-  const recs = _.compact(usersToBeCutoff.map(calcScoreForUser1));
+const usersToNotBeCutoff: User[] = [
+  {
+    ...relativeOrderBaseUser,
+    daysWorking: "1,1,0,0,0,1,1",
+  },
+  {
+    ...relativeOrderBaseUser,
+    startTime: new Date(Date.parse("2022-11-01T08:00:00Z")),
+  },
+  {
+    ...relativeOrderBaseUser,
+    endTime: new Date(Date.parse("2022-11-01T18:00:00Z")),
+  },
+  {
+    ...relativeOrderBaseUser,
+    startCoordLat: relativeOrderBaseUser.startCoordLat + 0.04,
+  },
+  {
+    ...relativeOrderBaseUser,
+    startCoordLng: relativeOrderBaseUser.startCoordLng + 0.04,
+  },
+  {
+    ...relativeOrderBaseUser,
+    companyCoordLat: relativeOrderBaseUser.companyCoordLat + 0.04,
+  },
+  {
+    ...relativeOrderBaseUser,
+    companyCoordLng: relativeOrderBaseUser.companyCoordLng + 0.04,
+  },
+];
+
+test("Test that users outside of cutoffs are not included", () => {
+  const recs = _.compact(usersToBeCutoff.map(calcScoreForBaseUser));
   expect(recs.length).toEqual(0);
 });
 
-test("Testing the cutoffs for user x", () => {});
+test("Test that users inside of cutoffs are included", () => {
+  const recs = _.compact(usersToNotBeCutoff.map(calcScoreForBaseUser));
+  expect(recs.length).toEqual(usersToNotBeCutoff.length);
+});
 
 const relativeOrderUsers: User[] = [
   {
@@ -103,7 +138,6 @@ const relativeOrderUsers: User[] = [
   },
 ];
 
-const calcScoreForBaseUser = calculateScore(relativeOrderBaseUser);
 const relativeScores = _.compact(
   relativeOrderUsers.map(calcScoreForBaseUser)
 ).map((r) => r.score);
