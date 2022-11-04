@@ -23,6 +23,8 @@ import ControlledCheckbox from "../components/ControlledTextbox";
 import Checkbox from "@mui/material/Checkbox";
 import { time } from "console";
 import DayBox from "../components/DayBox";
+import { Tooltip, Icon } from "@mui/material";
+import { MdHelp } from "react-icons/md";
 
 // Inputs to the onboarding form.
 type OnboardingFormInputs = {
@@ -359,6 +361,14 @@ const Profile: NextPage = () => {
               </h1>
               <div className="flex space-x-4">
                 <Checkbox {...register("timeDiffers")} />
+                <Tooltip
+                  title="If you don't have set times, communicate that on your own with potential riders/drivers."
+                  placement="right"
+                >
+                  <Icon>
+                    <MdHelp />
+                  </Icon>
+                </Tooltip>
               </div>
             </div>
 
