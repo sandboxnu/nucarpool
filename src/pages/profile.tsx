@@ -1,81 +1,89 @@
 import { Combobox, Transition } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Role, Status } from "@prisma/client";
 import { Feature } from "geojson";
-import { debounce } from "lodash";
+import _, { debounce } from "lodash";
 import { GetServerSidePropsContext, NextPage } from "next";
-import { unstable_getServerSession as getServerSession } from "next-auth";
-import Head from "next/head";
 import { useRouter } from "next/router";
 import { Fragment, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { z } from "zod";
 import Header from "../components/Header";
-import { TextField } from "../components/TextField";
-import { trpc } from "../utils/trpc";
+import { unstable_getServerSession as getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]";
-import { User } from "../utils/types";
-import Spinner from "../components/Spinner";
+import Head from "next/head";
+import { z } from "zod";
+import { trpc } from "../utils/trpc";
+import { Role, Status } from "@prisma/client";
+import { TextField } from "../components/TextField";
 import Radio from "../components/Radio";
 import useSearch from "../utils/search";
 import ProtectedPage from "../utils/auth";
+import ControlledTextbox from "../components/ControlledTextbox";
+import ControlledCheckbox from "../components/ControlledTextbox";
+import Checkbox from "@mui/material/Checkbox";
+import { time } from "console";
+import DayBox from "../components/DayBox";
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await getServerSession(context.req, context.res, authOptions);
-
-  if (session?.user) {
-    if (!session.user.isOnboarded) {
-      return {
-        redirect: {
-          destination: "/onboard",
-          permanent: false,
-        },
-      };
-    }
-  } else {
-    return {
-      redirect: {
-        destination: "/sign-in",
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: {},
-  };
-}
-
-type SettingsFormInputs = {
+// Inputs to the onboarding form.
+type OnboardingFormInputs = {
   role: Role;
   seatAvail: number;
-  status: Status;
   companyName: string;
   companyAddress: string;
   startLocation: string;
-  daysWorking: string;
-  startTime: string
-  endTime: string; 
+  daysWorking: boolean[];
+  startTime: string;
+  endTime: string;
+  timeDiffers: boolean;
 };
 
+// Zod object for validation.
 export const onboardSchema = z.object({
   role: z.nativeEnum(Role),
   seatAvail: z
     .number({ invalid_type_error: "Cannot be empty" })
     .int("Must be an integer")
     .nonnegative("Must be greater or equal to 0"),
-  status: z.nativeEnum(Status),
   companyName: z.string().min(1, "Cannot be empty"),
   companyAddress: z.string().min(1, "Cannot be empty"),
   startLocation: z.string().min(1, "Cannot be empty"),
+  daysWorking: z.array(z.boolean()).length(7, "Must be an array of booleans."), // Make this regex.
+  startTime: z.string().length(5), // Somehow make sure this is a valid time.
+  endTime: z.string().length(5), // Somehow make sure this is a valid time.
 });
 
-function UserEditForm({ user }: { user: User }) {
+const daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"];
+
+const Profile: NextPage = () => {
   const router = useRouter();
+  const {
+    register,
+    formState: { errors },
+    watch,
+    handleSubmit,
+  } = useForm<OnboardingFormInputs>({
+    mode: "onBlur",
+    defaultValues: {
+      role: Role.RIDER,
+      seatAvail: 0,
+      companyName: "",
+      companyAddress: "",
+      startLocation: "",
+      daysWorking: [false, false, false, false, false, false, false],
+      startTime: undefined,
+      endTime: undefined,
+      timeDiffers: false,
+    },
+    resolver: zodResolver(onboardSchema),
+  });
+
   const [suggestions, setSuggestions] = useState<Feature[]>([]);
-  const [selected, setSelected] = useState({
-    place_name: user.companyAddress,
+  const [selected, setSelected] = useState({ place_name: "" });
+  const [startLocationsuggestions, setStartLocationSuggestions] = useState<
+    Feature[]
+  >([]);
+  const [startLocationSelected, setStartLocationSelected] = useState({
+    place_name: "",
   });
   const [companyAddress, setCompanyAddress] = useState("");
   const updateCompanyAddress = useMemo(
@@ -87,43 +95,6 @@ function UserEditForm({ user }: { user: User }) {
     () => debounce(setStartingAddress, 1000),
     []
   );
-
-  const [startLocationsuggestions, setStartLocationSuggestions] = useState<
-    Feature[]
-  >([]);
-  const [startLocationSelected, setStartLocationSelected] = useState({
-    place_name: user.startLocation,
-  });
-
-  const editUserMutation = trpc.useMutation("user.edit", {
-    onSuccess: () => {
-      toast.success("Successfully update profile info.");
-    },
-    onError: (error) => {
-      toast.error(`Something went wrong: ${error.message}`);
-    },
-  });
-
-  const {
-    register,
-    formState: { errors, isDirty },
-    watch,
-    handleSubmit,
-  } = useForm<SettingsFormInputs>({
-    mode: "onBlur",
-    defaultValues: {
-      role: user.role,
-      seatAvail: user.seatAvail,
-      status: user.status,
-      companyName: user.companyName,
-      companyAddress: user.companyAddress,
-      startLocation: user.startLocation,
-      daysWorking: user.daysWorking, 
-      startTime: user.startTime?.toTimeString(),
-      endTime: user.endTime?.toTimeString()
-    },
-    resolver: zodResolver(onboardSchema),
-  });
 
   useSearch({
     value: companyAddress,
@@ -137,18 +108,39 @@ function UserEditForm({ user }: { user: User }) {
     setFunc: setStartLocationSuggestions,
   });
 
-  const onSubmit = async (values: SettingsFormInputs) => {
+  const editUserMutation = trpc.useMutation("user.edit", {
+    onSuccess: () => {
+      router.push("/");
+    },
+    onError: (error) => {
+      toast.error(`Something went wrong: ${error.message}`);
+    },
+  });
+
+  const onSubmit = async (values: OnboardingFormInputs) => {
     const coord: number[] = (selected as any).center;
     const userInfo = {
       ...values,
-      companyCoordLng: coord ? coord[0] : user.companyCoordLng,
-      companyCoordLat: coord ? coord[1] : user.companyCoordLat,
+      companyCoordLng: coord[0],
+      companyCoordLat: coord[1],
       seatAvail: values.role === Role.RIDER ? 0 : values.seatAvail,
     };
 
+    // console.log(daysChecked);
+
+    const daysWorkingParsed: string = userInfo.daysWorking
+      .map((val: boolean) => {
+        if (val) {
+          return "1";
+        } else {
+          return "0";
+        }
+      })
+      .join(",");
+
     editUserMutation.mutate({
       role: userInfo.role,
-      status: userInfo.status,
+      status: Status.ACTIVE,
       seatAvail: userInfo.seatAvail,
       companyName: userInfo.companyName,
       companyAddress: userInfo.companyAddress,
@@ -156,19 +148,23 @@ function UserEditForm({ user }: { user: User }) {
       companyCoordLat: userInfo.companyCoordLat!,
       startLocation: userInfo.startLocation,
       isOnboarded: true,
-      daysWorking: userInfo.daysWorking, 
-      startTime: userInfo.startTime, 
-      endTime: userInfo.endTime
+      daysWorking: daysWorkingParsed,
+      startTime: userInfo.startTime,
+      endTime: userInfo.endTime,
     });
   };
 
+  console.log(errors.daysWorking);
   return (
     <>
-      <Head>Settings</Head>
+      <Head>
+        <title>Onboard</title>
+      </Head>
+
       <div className="flex h-screen items-center justify-center bg-gray-100">
         <div className="rounded-2xl bg-white flex flex-col justify-center items-center p-6 m-4 space-y-4 drop-shadow-lg">
           <Header />
-          <h1 className="font-bold text-2xl mb-4">Settings</h1>
+          <h1 className="font-bold text-2xl mb-4">Onboard - Profile</h1>
           <form
             className="w-full flex flex-col space-y-4"
             onSubmit={handleSubmit(onSubmit)}
@@ -202,26 +198,6 @@ function UserEditForm({ user }: { user: User }) {
                 {...register("seatAvail", { valueAsNumber: true })}
               />
             )}
-
-            <div className="flex flex-col space-y-2">
-              <h1 className="font-medium text-sm">Status</h1>
-              <div className="flex space-x-4">
-                <Radio
-                  label="Active"
-                  id="active"
-                  error={errors.status}
-                  value={Status.ACTIVE}
-                  {...register("status")}
-                />
-                <Radio
-                  label="Inactive"
-                  id="inactive"
-                  error={errors.status}
-                  value={Status.INACTIVE}
-                  {...register("status")}
-                />
-              </div>
-            </div>
 
             <TextField
               label="Company Name"
@@ -355,40 +331,63 @@ function UserEditForm({ user }: { user: User }) {
               )}
             </div>
 
-            <div className="flex justify-between">
-              <button
-                type="button"
-                onClick={() => router.push("/")}
-                className="rounded-md text-center text-white bg-blue-500 border border-gray-300 px-3 py-2 hover:bg-blue-800"
-              >
-                Return to Home
-              </button>
-              <button
-                type="submit"
-                className=" bg-northeastern-red hover:bg-red-800 rounded-md text-white px-3 py-2 shadow"
-              >
-                Submit
-              </button>
+            <div>
+              {daysOfWeek.map((day, index) => (
+                <Checkbox
+                  key={day + index.toString()}
+                  sx={{
+                    input: { width: 1, height: 1 },
+                    padding: 0,
+                  }}
+                  {...register(`daysWorking.${index}`)}
+                  checkedIcon={<DayBox day={day} isSelected={true} />}
+                  icon={<DayBox day={day} isSelected={false} />}
+                  defaultChecked={false}
+                />
+              ))}
             </div>
+
+            {/* Start/End Time Fields  */}
+
+            <div className="flex flex-col space-y-2">
+              <h1 className="font-medium text-sm">
+                My start/end time is different each day
+              </h1>
+              <div className="flex space-x-4">
+                <Checkbox {...register("timeDiffers")} />
+              </div>
+            </div>
+
+            {!watch("timeDiffers") && (
+              <div>
+                <TextField
+                  label="Start Time"
+                  id="companyName"
+                  error={errors.timeDiffers}
+                  type="text"
+                  {...register("startTime")}
+                />
+                <TextField
+                  label="End Time"
+                  id="companyName"
+                  error={errors.timeDiffers}
+                  type="text"
+                  {...register("endTime")}
+                />
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="w-full bg-northeastern-red hover:bg-red-800 rounded-md text-white px-3 py-2 shadow"
+            >
+              Submit
+            </button>
           </form>
         </div>
       </div>
     </>
   );
-}
-
-const Settings: NextPage = () => {
-  const { data: user, isLoading: isLoadingUser } = trpc.useQuery(["user.me"]);
-
-  return (
-    <>
-      <Head>
-        <title>Settings</title>
-      </Head>
-
-      {!user || isLoadingUser ? <Spinner /> : <UserEditForm user={user} />}
-    </>
-  );
 };
 
-export default ProtectedPage(Settings);
+export default ProtectedPage(Profile);

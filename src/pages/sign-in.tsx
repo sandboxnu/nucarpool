@@ -24,7 +24,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     }
     return {
       redirect: {
-        destination: "/onboard",
+        destination: "/profile",
         permanent: false,
       },
     };
@@ -39,7 +39,7 @@ const SignIn: NextPage = () => {
   const handleOnclick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     signIn("google", {
-      callbackUrl: "/onboard",
+      callbackUrl: "/profile",
     });
   };
 
