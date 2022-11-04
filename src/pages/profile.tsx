@@ -104,7 +104,7 @@ const Profile: NextPage = () => {
 
   useSearch({
     value: startingAddress,
-    type: "neighborhood%2Cplace",
+    type: "address%2Cpostcode",
     setFunc: setStartLocationSuggestions,
   });
 
@@ -119,10 +119,13 @@ const Profile: NextPage = () => {
 
   const onSubmit = async (values: OnboardingFormInputs) => {
     const coord: number[] = (selected as any).center;
+    const startCoord: number[] = (startLocationSelected as any).center;
     const userInfo = {
       ...values,
       companyCoordLng: coord[0],
       companyCoordLat: coord[1],
+      startCoordLat: startCoord[0],
+      startCoordLng: startCoord[1],
       seatAvail: values.role === Role.RIDER ? 0 : values.seatAvail,
     };
 
@@ -146,7 +149,8 @@ const Profile: NextPage = () => {
       companyAddress: userInfo.companyAddress,
       companyCoordLng: userInfo.companyCoordLng!,
       companyCoordLat: userInfo.companyCoordLat!,
-      startLocation: userInfo.startLocation,
+      startCoordLng: userInfo.startCoordLng!,
+      startCoordLat: userInfo.startCoordLat!,
       isOnboarded: true,
       daysWorking: daysWorkingParsed,
       startTime: userInfo.startTime,
@@ -158,13 +162,13 @@ const Profile: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Onboard</title>
+        <title>Profile</title>
       </Head>
 
       <div className="flex h-screen items-center justify-center bg-gray-100">
         <div className="rounded-2xl bg-white flex flex-col justify-center items-center p-6 m-4 space-y-4 drop-shadow-lg">
           <Header />
-          <h1 className="font-bold text-2xl mb-4">Onboard - Profile</h1>
+          <h1 className="font-bold text-2xl mb-4">Profile</h1>
           <form
             className="w-full flex flex-col space-y-4"
             onSubmit={handleSubmit(onSubmit)}
