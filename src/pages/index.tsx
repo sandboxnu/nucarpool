@@ -46,7 +46,7 @@ const Home: NextPage<any> = () => {
       <Head>
         <title>Home</title>
       </Head>
-      {/* <ProfileModal userInfo={userInfo!} user={user!} /> */}
+      {/* <ProfileModal userInfo={userInfo!} user={user!}  /> */}
       <DropDownMenu />
       <button
         className="flex justify-center items-center w-8 h-8 absolute z-10 right-[8px] bottom-[150px] rounded-md bg-white border-2 border-solid border-gray-300 shadow-sm hover:bg-gray-200"
