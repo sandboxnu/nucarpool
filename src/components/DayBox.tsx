@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 const StyledCheckedBox = styled.div`
-  background-color: blue;
+  background-color: #d0142c;
   border: 3px solid black;
   color: white;
   width: 2rem;

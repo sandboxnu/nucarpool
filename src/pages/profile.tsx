@@ -33,6 +33,7 @@ type OnboardingFormInputs = {
   companyName: string;
   companyAddress: string;
   startLocation: string;
+  pronouns: string;
   daysWorking: boolean[];
   startTime: string;
   endTime: string;
@@ -49,12 +50,13 @@ export const onboardSchema = z.object({
   companyName: z.string().min(1, "Cannot be empty"),
   companyAddress: z.string().min(1, "Cannot be empty"),
   startLocation: z.string().min(1, "Cannot be empty"),
+  pronouns: z.string(),
   daysWorking: z.array(z.boolean()).length(7, "Must be an array of booleans."), // Make this regex.
   startTime: z.string().length(5), // Somehow make sure this is a valid time.
   endTime: z.string().length(5), // Somehow make sure this is a valid time.
 });
 
-const daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"];
+const daysOfWeek = ["Su", "M", "Tu", "W", "Th", "F", "S"];
 
 const Profile: NextPage = () => {
   const router = useRouter();
@@ -71,6 +73,7 @@ const Profile: NextPage = () => {
       companyName: "",
       companyAddress: "",
       startLocation: "",
+      pronouns: "",
       daysWorking: [false, false, false, false, false, false, false],
       startTime: undefined,
       endTime: undefined,
@@ -337,7 +340,19 @@ const Profile: NextPage = () => {
               )}
             </div>
 
+            {/* Pronouns field  */}
+            <TextField
+              label="Pronouns"
+              id="pronouns"
+              type="text"
+              {...register("pronouns")}
+            />
+
+            {/* Days working field  */}
             <div>
+            <h1 className="font-medium text-sm">
+                Commuting Schedule
+              </h1>
               {daysOfWeek.map((day, index) => (
                 <Checkbox
                   key={day + index.toString()}
@@ -404,4 +419,4 @@ const Profile: NextPage = () => {
   );
 };
 
-export default ProtectedPage(Profile);
+export default Profile;
