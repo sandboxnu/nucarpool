@@ -33,6 +33,7 @@ type OnboardingFormInputs = {
   companyName: string;
   companyAddress: string;
   startLocation: string;
+  preferredName: string; 
   pronouns: string;
   daysWorking: boolean[];
   startTime: string;
@@ -73,6 +74,7 @@ const Profile: NextPage = () => {
       companyName: "",
       companyAddress: "",
       startLocation: "",
+      preferredName: "",
       pronouns: "",
       daysWorking: [false, false, false, false, false, false, false],
       startTime: undefined,
@@ -157,6 +159,8 @@ const Profile: NextPage = () => {
       startCoordLng: userInfo.startCoordLng!,
       startCoordLat: userInfo.startCoordLat!,
       isOnboarded: true,
+      preferredName: userInfo.preferredName,
+      pronouns: userInfo.pronouns, 
       daysWorking: daysWorkingParsed,
       startTime: userInfo.startTime,
       endTime: userInfo.endTime,
@@ -340,10 +344,20 @@ const Profile: NextPage = () => {
               )}
             </div>
 
+              {/* Preferred Name field  */}
+              <TextField
+              label="Preferred Name"
+              id="preferredName"
+              error={errors.preferredName}
+              type="text"
+              {...register("preferredName")}
+            />
+
             {/* Pronouns field  */}
             <TextField
               label="Pronouns"
               id="pronouns"
+              error={errors.pronouns}
               type="text"
               {...register("pronouns")}
             />
