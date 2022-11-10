@@ -4,7 +4,13 @@ import { Feature } from "geojson";
 import _, { debounce } from "lodash";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
-import { Fragment, useMemo, useState } from "react";
+import {
+  Fragment,
+  JSXElementConstructor,
+  ReactElement,
+  useMemo,
+  useState,
+} from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Header from "../components/Header";
@@ -23,8 +29,15 @@ import ControlledCheckbox from "../components/ControlledTextbox";
 import Checkbox from "@mui/material/Checkbox";
 import { time } from "console";
 import DayBox from "../components/DayBox";
-import { Tooltip, Icon } from "@mui/material";
+import { Tooltip, Icon, TextFieldProps } from "@mui/material";
 import { MdHelp } from "react-icons/md";
+import StaticTimePicker from "@mui/x-date-pickers/StaticTimePicker";
+import { TimePicker } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { TextField as MUITextField } from "@mui/material";
+import dayjs, { Dayjs } from "dayjs";
+import { RiContactsBookLine } from "react-icons/ri";
 
 // Inputs to the onboarding form.
 type OnboardingFormInputs = {
@@ -33,10 +46,10 @@ type OnboardingFormInputs = {
   companyName: string;
   companyAddress: string;
   startLocation: string;
-  preferredName: string; 
+  preferredName: string;
   pronouns: string;
   daysWorking: boolean[];
-  startTime: string;
+  startTime?: string;
   endTime: string;
   timeDiffers: boolean;
 };
@@ -53,8 +66,8 @@ export const onboardSchema = z.object({
   startLocation: z.string().min(1, "Cannot be empty"),
   pronouns: z.string(),
   daysWorking: z.array(z.boolean()).length(7, "Must be an array of booleans."), // Make this regex.
-  startTime: z.string().length(5), // Somehow make sure this is a valid time.
-  endTime: z.string().length(5), // Somehow make sure this is a valid time.
+  startTime: z.string().nullish(), // Somehow make sure this is a valid time.
+  endTime: z.string(), // Somehow make sure this is a valid time.
 });
 
 const daysOfWeek = ["Su", "M", "Tu", "W", "Th", "F", "S"];
@@ -66,6 +79,7 @@ const Profile: NextPage = () => {
     formState: { errors },
     watch,
     handleSubmit,
+    setValue,
   } = useForm<OnboardingFormInputs>({
     mode: "onBlur",
     defaultValues: {
@@ -160,14 +174,14 @@ const Profile: NextPage = () => {
       startCoordLat: userInfo.startCoordLat!,
       isOnboarded: true,
       preferredName: userInfo.preferredName,
-      pronouns: userInfo.pronouns, 
+      pronouns: userInfo.pronouns,
       daysWorking: daysWorkingParsed,
       startTime: userInfo.startTime,
       endTime: userInfo.endTime,
     });
   };
 
-  console.log(errors.daysWorking);
+  console.log(watch("startTime"));
   return (
     <>
       <Head>
@@ -344,8 +358,8 @@ const Profile: NextPage = () => {
               )}
             </div>
 
-              {/* Preferred Name field  */}
-              <TextField
+            {/* Preferred Name field  */}
+            <TextField
               label="Preferred Name"
               id="preferredName"
               error={errors.preferredName}
@@ -364,9 +378,7 @@ const Profile: NextPage = () => {
 
             {/* Days working field  */}
             <div>
-            <h1 className="font-medium text-sm">
-                Commuting Schedule
-              </h1>
+              <h1 className="font-medium text-sm">Commuting Schedule</h1>
               {daysOfWeek.map((day, index) => (
                 <Checkbox
                   key={day + index.toString()}
@@ -401,7 +413,7 @@ const Profile: NextPage = () => {
               </div>
             </div>
 
-            {!watch("timeDiffers") && (
+            {/* {!watch("timeDiffers") && (
               <div>
                 <TextField
                   label="Start Time"
@@ -417,8 +429,25 @@ const Profile: NextPage = () => {
                   type="text"
                   {...register("endTime")}
                 />
+
               </div>
-            )}
+            )} */}
+
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <TimePicker
+                value={dayjs(watch("startTime"))}
+                // {...register("startTime")}
+                onChange={(value) => {
+                  // console.log(value?.isValid());
+                  value?.isValid() &&
+                    setValue("startTime", value.toISOString());
+                }}
+                renderInput={function (props: TextFieldProps) {
+                  return <MUITextField {...props} error={!!errors.startTime} />;
+                }}
+                disableOpenPicker
+              />
+            </LocalizationProvider>
 
             <button
               type="submit"
