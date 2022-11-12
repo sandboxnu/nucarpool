@@ -67,15 +67,18 @@ export const userRouter = createProtectedRouter()
     }),
 
     async resolve({ ctx, input }) {
-      const [startHour, startMinute] = input.startTime.split(":");
-      const startTimeDate = new Date();
-      startTimeDate.setHours(Number(startHour));
-      startTimeDate.setMinutes(Number(startMinute));
+      // const [startHour, startMinute] = input.startTime.split(":");
+      // const startTimeDate = new Date();
+      // startTimeDate.setHours(Number(startHour));
+      // startTimeDate.setMinutes(Number(startMinute));
 
-      const [endHour, endMinute] = input.endTime.split(":");
-      const endTimeDate = new Date();
-      endTimeDate.setHours(Number(endHour));
-      endTimeDate.setMinutes(Number(endMinute));
+      // const [endHour, endMinute] = input.endTime.split(":");
+      // const endTimeDate = new Date();
+      // endTimeDate.setHours(Number(endHour));
+      // endTimeDate.setMinutes(Number(endMinute));
+
+      const startTimeDate = new Date(Date.parse(input.startTime));
+      const endTimeDate = new Date(Date.parse(input.endTime));
 
       const id = ctx.session.user?.id;
       const user = await ctx.prisma.user.update({

@@ -49,7 +49,7 @@ type OnboardingFormInputs = {
   preferredName: string;
   pronouns: string;
   daysWorking: boolean[];
-  startTime?: string;
+  startTime: string;
   endTime: string;
   timeDiffers: boolean;
 };
@@ -64,9 +64,10 @@ export const onboardSchema = z.object({
   companyName: z.string().min(1, "Cannot be empty"),
   companyAddress: z.string().min(1, "Cannot be empty"),
   startLocation: z.string().min(1, "Cannot be empty"),
+  preferredName: z.string(),
   pronouns: z.string(),
   daysWorking: z.array(z.boolean()).length(7, "Must be an array of booleans."), // Make this regex.
-  startTime: z.string().nullish(), // Somehow make sure this is a valid time.
+  startTime: z.string(), // Somehow make sure this is a valid time.
   endTime: z.string(), // Somehow make sure this is a valid time.
 });
 
@@ -91,8 +92,8 @@ const Profile: NextPage = () => {
       preferredName: "",
       pronouns: "",
       daysWorking: [false, false, false, false, false, false, false],
-      startTime: undefined,
-      endTime: undefined,
+      startTime: "",
+      endTime: "",
       timeDiffers: false,
     },
     resolver: zodResolver(onboardSchema),
@@ -150,8 +151,6 @@ const Profile: NextPage = () => {
       seatAvail: values.role === Role.RIDER ? 0 : values.seatAvail,
     };
 
-    // console.log(daysChecked);
-
     const daysWorkingParsed: string = userInfo.daysWorking
       .map((val: boolean) => {
         if (val) {
@@ -181,7 +180,7 @@ const Profile: NextPage = () => {
     });
   };
 
-  console.log(watch("startTime"));
+  // console.log(watch("preferredName"));
   return (
     <>
       <Head>
@@ -413,41 +412,42 @@ const Profile: NextPage = () => {
               </div>
             </div>
 
-            {/* {!watch("timeDiffers") && (
+            {!watch("timeDiffers") && (
               <div>
-                <TextField
-                  label="Start Time"
-                  id="companyName"
-                  error={errors.timeDiffers}
-                  type="text"
-                  {...register("startTime")}
-                />
-                <TextField
-                  label="End Time"
-                  id="companyName"
-                  error={errors.timeDiffers}
-                  type="text"
-                  {...register("endTime")}
-                />
-
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <TimePicker
+                    label="Start Time"
+                    value={dayjs(watch("startTime"))}
+                    onChange={(value) => {
+                      value?.isValid() &&
+                        setValue("startTime", value.toISOString());
+                    }}
+                    renderInput={function (props: TextFieldProps) {
+                      return (
+                        <MUITextField {...props} error={!!errors.startTime} />
+                      );
+                    }}
+                    disableOpenPicker
+                  />
+                </LocalizationProvider>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <TimePicker
+                    label="End Time"
+                    value={dayjs(watch("endTime"))}
+                    onChange={(value) => {
+                      value?.isValid() &&
+                        setValue("endTime", value.toISOString());
+                    }}
+                    renderInput={function (props: TextFieldProps) {
+                      return (
+                        <MUITextField {...props} error={!!errors.endTime} />
+                      );
+                    }}
+                    disableOpenPicker
+                  />
+                </LocalizationProvider>
               </div>
-            )} */}
-
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <TimePicker
-                value={dayjs(watch("startTime"))}
-                // {...register("startTime")}
-                onChange={(value) => {
-                  // console.log(value?.isValid());
-                  value?.isValid() &&
-                    setValue("startTime", value.toISOString());
-                }}
-                renderInput={function (props: TextFieldProps) {
-                  return <MUITextField {...props} error={!!errors.startTime} />;
-                }}
-                disableOpenPicker
-              />
-            </LocalizationProvider>
+            )}
 
             <button
               type="submit"
