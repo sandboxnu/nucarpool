@@ -8,16 +8,17 @@ import {
   Fragment,
   JSXElementConstructor,
   ReactElement,
+  useEffect,
   useMemo,
   useState,
 } from "react";
-import { useForm } from "react-hook-form";
+import { FieldError, NestedValue, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Header from "../components/Header";
 import { unstable_getServerSession as getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]";
 import Head from "next/head";
-import { z } from "zod";
+import { array, z } from "zod";
 import { trpc } from "../utils/trpc";
 import { Role, Status } from "@prisma/client";
 import { TextField } from "../components/TextField";
@@ -37,7 +38,6 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { TextField as MUITextField } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
-import { RiContactsBookLine } from "react-icons/ri";
 
 // Inputs to the onboarding form.
 type OnboardingFormInputs = {
@@ -49,27 +49,48 @@ type OnboardingFormInputs = {
   preferredName: string;
   pronouns: string;
   daysWorking: boolean[];
-  startTime: string;
-  endTime: string;
+  startTime?: string;
+  endTime?: string;
   timeDiffers: boolean;
 };
 
-// Zod object for validation.
-export const onboardSchema = z.object({
-  role: z.nativeEnum(Role),
-  seatAvail: z
-    .number({ invalid_type_error: "Cannot be empty" })
-    .int("Must be an integer")
-    .nonnegative("Must be greater or equal to 0"),
-  companyName: z.string().min(1, "Cannot be empty"),
-  companyAddress: z.string().min(1, "Cannot be empty"),
-  startLocation: z.string().min(1, "Cannot be empty"),
-  preferredName: z.string(),
-  pronouns: z.string(),
-  daysWorking: z.array(z.boolean()).length(7, "Must be an array of booleans."), // Make this regex.
-  startTime: z.string(), // Somehow make sure this is a valid time.
-  endTime: z.string(), // Somehow make sure this is a valid time.
-});
+const onboardSchema = z.intersection(
+  z.object({
+    role: z.nativeEnum(Role),
+    seatAvail: z
+      .number({ invalid_type_error: "Cannot be empty" })
+      .int("Must be an integer")
+      .nonnegative("Must be greater or equal to 0"),
+    companyName: z.string().min(1, "Cannot be empty"),
+    companyAddress: z.string().min(1, "Cannot be empty"),
+    startLocation: z.string().min(1, "Cannot be empty"),
+    preferredName: z.string(),
+    pronouns: z.string(),
+    daysWorking: z
+      .array(z.boolean())
+      .refine((a) => a.some((b) => b), { message: "Select at least one day" }), // Make this regex.
+  }),
+  z.union([
+    z.object({
+      startTime: z.string().refine(
+        (s) => {
+          return dayjs(s).isValid();
+        },
+        { message: "Time is not valid" }
+      ), // Somehow make sure this is a valid time.
+      endTime: z.string().refine(
+        (s) => {
+          return dayjs(s).isValid();
+        },
+        { message: "Time is not valid" }
+      ),
+      timeDiffers: z.literal(false),
+    }),
+    z.object({
+      timeDiffers: z.literal(true),
+    }),
+  ])
+);
 
 const daysOfWeek = ["Su", "M", "Tu", "W", "Th", "F", "S"];
 
@@ -81,8 +102,9 @@ const Profile: NextPage = () => {
     watch,
     handleSubmit,
     setValue,
+    setError,
   } = useForm<OnboardingFormInputs>({
-    mode: "onBlur",
+    mode: "onSubmit",
     defaultValues: {
       role: Role.RIDER,
       seatAvail: 0,
@@ -180,7 +202,6 @@ const Profile: NextPage = () => {
     });
   };
 
-  // console.log(watch("preferredName"));
   return (
     <>
       <Head>
@@ -391,6 +412,10 @@ const Profile: NextPage = () => {
                   defaultChecked={false}
                 />
               ))}
+
+              {errors.daysWorking && (
+                <p>{(errors.daysWorking as unknown as FieldError).message}</p>
+              )}
             </div>
 
             {/* Start/End Time Fields  */}
@@ -424,7 +449,11 @@ const Profile: NextPage = () => {
                     }}
                     renderInput={function (props: TextFieldProps) {
                       return (
-                        <MUITextField {...props} error={!!errors.startTime} />
+                        <MUITextField
+                          {...props}
+                          helperText={errors.startTime?.message}
+                          error={!!errors.startTime}
+                        />
                       );
                     }}
                     disableOpenPicker
@@ -440,7 +469,11 @@ const Profile: NextPage = () => {
                     }}
                     renderInput={function (props: TextFieldProps) {
                       return (
-                        <MUITextField {...props} error={!!errors.endTime} />
+                        <MUITextField
+                          {...props}
+                          error={!!errors.endTime}
+                          helperText={errors.endTime?.message}
+                        />
                       );
                     }}
                     disableOpenPicker
