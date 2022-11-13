@@ -13,6 +13,8 @@ import { trpc } from "../utils/trpc";
 import DropDownMenu from "../components/DropDownMenu";
 import { browserEnv } from "../utils/env/browser";
 import ProtectedPage from "../utils/auth";
+import { Role, Status, User } from "@prisma/client";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -58,6 +60,33 @@ const Home: NextPage<any> = () => {
       <div id="map" className="h-screen"></div>
     </>
   );
+};
+
+export const userToElem = (user: User) => {
+  return (
+    <>
+      <Head>
+        <title>{user.name}</title>
+        <p>{user.startLocation}</p>
+        <p>{user.companyName}</p>
+        {/* Add user bar */}
+        <p>{"Start: " + dateToTimeString(user.startTime)}</p>
+        <p>{"End: " + dateToTimeString(user.endTime)}</p>
+      </Head>
+    </>
+  );
+};
+
+const dateToTimeString = (date: Date | null) => {
+  if (date == null) {
+    return "N/A";
+  } else {
+    return date.toLocaleString("en-US", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    });
+  }
 };
 
 export default ProtectedPage(Home);
