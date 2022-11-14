@@ -104,6 +104,9 @@ export const userRouter = createProtectedRouter()
       });
       const recs = _.compact(users.map(calculateScore(currentUser)));
       recs.sort((a, b) => a.score - b.score);
-      return recs;
+      const sortedUsers = _.compact(
+        recs.map((rec) => users.find((user) => user.id === rec.id))
+      );
+      return sortedUsers;
     },
   });
