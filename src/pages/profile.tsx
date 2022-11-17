@@ -102,6 +102,7 @@ const Profile: NextPage = () => {
     watch,
     handleSubmit,
     setValue,
+    clearErrors,
     setError,
   } = useForm<OnboardingFormInputs>({
     mode: "onSubmit",
@@ -274,7 +275,10 @@ const Profile: NextPage = () => {
                   }
                   type="text"
                   {...register("companyAddress")}
-                  onChange={(e) => updateCompanyAddress(e.target.value)}
+                  onChange={(e) => {
+                    updateCompanyAddress(e.target.value);
+                    clearErrors("companyAddress");
+                  }}
                 />
                 <Transition
                   as={Fragment}
@@ -338,7 +342,10 @@ const Profile: NextPage = () => {
                   }
                   type="text"
                   {...register("startLocation")}
-                  onChange={(e) => updateStartingAddress(e.target.value)}
+                  onChange={(e) => {
+                    updateStartingAddress(e.target.value);
+                    clearErrors("startLocation");
+                  }}
                 />
                 <Transition
                   as={Fragment}
@@ -414,7 +421,9 @@ const Profile: NextPage = () => {
               ))}
 
               {errors.daysWorking && (
-                <p>{(errors.daysWorking as unknown as FieldError).message}</p>
+                <p className="text-red-500 text-sm mt-2">
+                  {(errors.daysWorking as unknown as FieldError).message}
+                </p>
               )}
             </div>
 
