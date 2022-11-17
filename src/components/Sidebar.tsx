@@ -4,15 +4,27 @@ import Head from "next/head";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Spinner from "./Spinner";
 
-export const Sidebar = (recs: User[] | undefined) => {
-  const users = requireNotUndefined(recs);
+type ScrollableList = {
+  items: User[];
+  idx: number;
+};
+
+export const Sidebar = ({ reccs }: { reccs: User[] | undefined }) => {
+  const users = requireNotUndefined(reccs);
   // ADD QUERY HERE
   // const { data: favs } = trpc.useQuery(["user.favorites"]);
   const favs = requireNotUndefined(undefined);
-
   const [curList, setList] = useState<User[]>(users);
-  const newSize = () => Math.min(5, curList.length);
+  const [moreContents, setmoreContents] = useState<boolean>(true);
+  const newSize = () => Math.min(10, curList.length);
   let listSize = newSize();
+
+  const fetchMoreData = () => {
+    if (curList.length >= 500) {
+      setmoreContents(false);
+      return;
+    }
+  };
 
   return (
     <div>
@@ -32,17 +44,21 @@ export const Sidebar = (recs: User[] | undefined) => {
       >
         Favorites
       </button>
-      <InfiniteScroll
-        dataLength={listSize}
-        next={() => {
-          listSize = Math.min(listSize + 5, curList.length);
-        }}
-        hasMore={listSize < curList.length}
-        loader={<Spinner />}
-        endMessage={<div>The end</div>}
+      <div
+        id="scrollableDiv"
+        className="flex h-5/6 fixed z-10  text-right bg-white m-5 overflow-auto"
       >
-        {curList.slice(0, listSize).map(userToElem)}
-      </InfiniteScroll>
+        <InfiniteScroll
+          dataLength={listSize}
+          next={fetchMoreData}
+          hasMore={moreContents}
+          loader={<Spinner />}
+          endMessage={<div>The end</div>}
+          height=""
+        >
+          {curList.slice(0, listSize).map(userToElem)}
+        </InfiniteScroll>
+      </div>
     </div>
   );
 };

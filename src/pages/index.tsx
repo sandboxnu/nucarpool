@@ -74,9 +74,7 @@ const Home: NextPage<any> = () => {
         <title>Home</title>
       </Head>
       {/* <ProfileModal userInfo={userInfo!} user={user!}  /> */}
-      <div className="flex h-5/6 fixed z-10  text-right bg-white m-5">
-        {Sidebar(recommendations)}
-      </div>
+      <Sidebar reccs={recommendations} />
       <DropDownMenu />
       <button
         className="flex justify-center items-center w-8 h-8 absolute z-10 right-[8px] bottom-[150px] rounded-md bg-white border-2 border-solid border-gray-300 shadow-sm hover:bg-gray-200"
