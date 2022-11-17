@@ -12,7 +12,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { FieldError, NestedValue, useForm } from "react-hook-form";
+import { Controller, FieldError, NestedValue, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Header from "../components/Header";
 import { unstable_getServerSession as getServerSession } from "next-auth";
@@ -49,7 +49,7 @@ type OnboardingFormInputs = {
   preferredName: string;
   pronouns: string;
   daysWorking: boolean[];
-  startTime?: string;
+  startTime?: Date;
   endTime?: string;
   timeDiffers: boolean;
 };
@@ -72,12 +72,13 @@ const onboardSchema = z.intersection(
   }),
   z.union([
     z.object({
-      startTime: z.string().refine(
-        (s) => {
-          return dayjs(s).isValid();
-        },
-        { message: "Time is not valid" }
-      ), // Somehow make sure this is a valid time.
+      startTime: z.date(),
+      // startTime: z.string().refine(
+      //   (s) => {
+      //     return dayjs(s).isValid();
+      //   },
+      //   { message: "Time is not valid" }
+      // ), // Somehow make sure this is a valid time.
       endTime: z.string().refine(
         (s) => {
           return dayjs(s).isValid();
@@ -103,7 +104,7 @@ const Profile: NextPage = () => {
     handleSubmit,
     setValue,
     clearErrors,
-    setError,
+    control,
   } = useForm<OnboardingFormInputs>({
     mode: "onSubmit",
     defaultValues: {
@@ -115,7 +116,7 @@ const Profile: NextPage = () => {
       preferredName: "",
       pronouns: "",
       daysWorking: [false, false, false, false, false, false, false],
-      startTime: "",
+      startTime: undefined,
       endTime: "",
       timeDiffers: false,
     },
@@ -198,10 +199,12 @@ const Profile: NextPage = () => {
       preferredName: userInfo.preferredName,
       pronouns: userInfo.pronouns,
       daysWorking: daysWorkingParsed,
-      startTime: userInfo.startTime,
+      startTime: userInfo.startTime?.toISOString(),
       endTime: userInfo.endTime,
     });
   };
+
+  console.log(watch("startTime"));
 
   return (
     <>
@@ -449,23 +452,32 @@ const Profile: NextPage = () => {
             {!watch("timeDiffers") && (
               <div>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <TimePicker
-                    label="Start Time"
-                    value={dayjs(watch("startTime"))}
-                    onChange={(value) => {
-                      value?.isValid() &&
-                        setValue("startTime", value.toISOString());
-                    }}
-                    renderInput={function (props: TextFieldProps) {
-                      return (
-                        <MUITextField
-                          {...props}
-                          helperText={errors.startTime?.message}
-                          error={!!errors.startTime}
-                        />
-                      );
-                    }}
-                    disableOpenPicker
+                  <Controller
+                    name="startTime"
+                    control={control}
+                    render={({ field: { ref, ...fieldProps } }) => (
+                      <TimePicker
+                        inputRef={ref}
+                        {...fieldProps}
+                        value={
+                          fieldProps.value ? dayjs(fieldProps.value) : null
+                        }
+                        onChange={(date) => {
+                          fieldProps.onChange(date?.toDate());
+                        }}
+                        label="Start Time"
+                        renderInput={function (props: TextFieldProps) {
+                          return (
+                            <MUITextField
+                              {...props}
+                              helperText={errors.startTime?.message}
+                              error={!!errors.startTime}
+                            />
+                          );
+                        }}
+                        disableOpenPicker
+                      />
+                    )}
                   />
                 </LocalizationProvider>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
