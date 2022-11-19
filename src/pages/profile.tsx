@@ -54,6 +54,10 @@ type OnboardingFormInputs = {
   timeDiffers: boolean;
 };
 
+const dateErrorMap: z.ZodErrorMap = (issue, ctx) => {
+  return { message: "Invalid time" };
+};
+
 const onboardSchema = z.intersection(
   z.object({
     role: z.nativeEnum(Role),
@@ -72,19 +76,8 @@ const onboardSchema = z.intersection(
   }),
   z.union([
     z.object({
-      startTime: z.date(),
-      // startTime: z.string().refine(
-      //   (s) => {
-      //     return dayjs(s).isValid();
-      //   },
-      //   { message: "Time is not valid" }
-      // ), // Somehow make sure this is a valid time.
-      endTime: z.string().refine(
-        (s) => {
-          return dayjs(s).isValid();
-        },
-        { message: "Time is not valid" }
-      ),
+      startTime: z.date({ errorMap: dateErrorMap }),
+      endTime: z.date({ errorMap: dateErrorMap }),
       timeDiffers: z.literal(false),
     }),
     z.object({
@@ -204,8 +197,6 @@ const Profile: NextPage = () => {
     });
   };
 
-  console.log(watch("startTime"));
-
   return (
     <>
       <Head>
@@ -268,52 +259,71 @@ const Profile: NextPage = () => {
                 Note: Select the autocomplete results, even if you typed the
                 address out
               </p>
-              <Combobox value={selected} onChange={setSelected}>
-                <Combobox.Input
-                  className={`w-full shadow-sm rounded-md px-3 py-2 ${
-                    errors.companyAddress ? "border-red-500" : "border-gray-300"
-                  }`}
-                  displayValue={(feat: any) =>
-                    feat.place_name ? feat.place_name : ""
-                  }
-                  type="text"
-                  {...register("companyAddress")}
-                  onChange={(e) => {
-                    updateCompanyAddress(e.target.value);
-                    clearErrors("companyAddress");
-                  }}
-                />
-                <Transition
-                  as={Fragment}
-                  leave="transition ease-in duration-100"
-                  leaveFrom="opacity-100"
-                  leaveTo="opacity-0"
-                >
-                  <Combobox.Options className="w-full rounded-md bg-white text-base shadow-lg focus:outline-none ">
-                    {suggestions.length === 0 ? (
-                      <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
-                        Nothing found.
-                      </div>
-                    ) : (
-                      suggestions.map((feat: any) => (
-                        <Combobox.Option
-                          key={feat.id}
-                          className={({ active }) =>
-                            `max-w-fit relative cursor-default select-none p-3 ${
-                              active
-                                ? "bg-blue-400 text-white"
-                                : "text-gray-900"
-                            }`
-                          }
-                          value={feat}
-                        >
-                          {feat.place_name}
-                        </Combobox.Option>
-                      ))
-                    )}
-                  </Combobox.Options>
-                </Transition>
-              </Combobox>
+              <Controller
+                name="companyAddress"
+                control={control}
+                render={({ field: { ref, ...fieldProps } }) => (
+                  <Combobox
+                    as="div"
+                    value={selected}
+                    onChange={(val) => {
+                      setSelected(val);
+                      fieldProps.onChange(val.place_name);
+                    }}
+                    ref={ref}
+                  >
+                    <Combobox.Input
+                      className={`w-full shadow-sm rounded-md px-3 py-2 ${
+                        errors.companyAddress
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      }`}
+                      displayValue={(feat: any) =>
+                        feat.place_name ? feat.place_name : ""
+                      }
+                      type="text"
+                      onChange={(e) => {
+                        if (e.target.value === "") {
+                          setSelected({ place_name: "" });
+                          fieldProps.onChange("");
+                        } else {
+                          updateCompanyAddress(e.target.value);
+                        }
+                      }}
+                    />
+                    <Transition
+                      as={Fragment}
+                      leave="transition ease-in duration-100"
+                      leaveFrom="opacity-100"
+                      leaveTo="opacity-0"
+                    >
+                      <Combobox.Options className="w-full rounded-md bg-white text-base shadow-lg focus:outline-none ">
+                        {suggestions.length === 0 ? (
+                          <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
+                            Nothing found.
+                          </div>
+                        ) : (
+                          suggestions.map((feat: any) => (
+                            <Combobox.Option
+                              key={feat.id}
+                              className={({ active }) =>
+                                `max-w-fit relative cursor-default select-none p-3 ${
+                                  active
+                                    ? "bg-blue-400 text-white"
+                                    : "text-gray-900"
+                                }`
+                              }
+                              value={feat}
+                            >
+                              {feat.place_name}
+                            </Combobox.Option>
+                          ))
+                        )}
+                      </Combobox.Options>
+                    </Transition>
+                  </Combobox>
+                )}
+              />
               {errors.companyAddress && (
                 <p className="text-red-500 text-sm mt-2">
                   {errors?.companyAddress?.message}
@@ -332,55 +342,71 @@ const Profile: NextPage = () => {
                 select the autocomplete results, even if you typed the address
                 out
               </p>
-              <Combobox
-                value={startLocationSelected}
-                onChange={setStartLocationSelected}
-              >
-                <Combobox.Input
-                  className={`w-full shadow-sm rounded-md px-3 py-2 ${
-                    errors.startLocation ? "border-red-500" : "border-gray-300"
-                  }`}
-                  displayValue={(feat: any) =>
-                    feat.place_name ? feat.place_name : ""
-                  }
-                  type="text"
-                  {...register("startLocation")}
-                  onChange={(e) => {
-                    updateStartingAddress(e.target.value);
-                    clearErrors("startLocation");
-                  }}
-                />
-                <Transition
-                  as={Fragment}
-                  leave="transition ease-in duration-100"
-                  leaveFrom="opacity-100"
-                  leaveTo="opacity-0"
-                >
-                  <Combobox.Options className="w-full rounded-md bg-white text-base shadow-lg focus:outline-none ">
-                    {startLocationsuggestions.length === 0 ? (
-                      <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
-                        Nothing found.
-                      </div>
-                    ) : (
-                      startLocationsuggestions.map((feat: any) => (
-                        <Combobox.Option
-                          key={feat.id}
-                          className={({ active }) =>
-                            `max-w-fit relative cursor-default select-none p-3 ${
-                              active
-                                ? "bg-blue-400 text-white"
-                                : "text-gray-900"
-                            }`
-                          }
-                          value={feat}
-                        >
-                          {feat.place_name}
-                        </Combobox.Option>
-                      ))
-                    )}
-                  </Combobox.Options>
-                </Transition>
-              </Combobox>
+              <Controller
+                name="startLocation"
+                control={control}
+                render={({ field: { ref, ...fieldProps } }) => (
+                  <Combobox
+                    as="div"
+                    value={startLocationSelected}
+                    onChange={(val) => {
+                      setStartLocationSelected(val);
+                      fieldProps.onChange(val.place_name);
+                    }}
+                    ref={ref}
+                  >
+                    <Combobox.Input
+                      className={`w-full shadow-sm rounded-md px-3 py-2 ${
+                        errors.startLocation
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      }`}
+                      displayValue={(feat: any) =>
+                        feat.place_name ? feat.place_name : ""
+                      }
+                      type="text"
+                      onChange={(e) => {
+                        if (e.target.value === "") {
+                          setStartLocationSelected({ place_name: "" });
+                          fieldProps.onChange("");
+                        } else {
+                          updateStartingAddress(e.target.value);
+                        }
+                      }}
+                    />
+                    <Transition
+                      as={Fragment}
+                      leave="transition ease-in duration-100"
+                      leaveFrom="opacity-100"
+                      leaveTo="opacity-0"
+                    >
+                      <Combobox.Options className="w-full rounded-md bg-white text-base shadow-lg focus:outline-none ">
+                        {startLocationsuggestions.length === 0 ? (
+                          <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
+                            Nothing found.
+                          </div>
+                        ) : (
+                          startLocationsuggestions.map((feat: any) => (
+                            <Combobox.Option
+                              key={feat.id}
+                              className={({ active }) =>
+                                `max-w-fit relative cursor-default select-none p-3 ${
+                                  active
+                                    ? "bg-blue-400 text-white"
+                                    : "text-gray-900"
+                                }`
+                              }
+                              value={feat}
+                            >
+                              {feat.place_name}
+                            </Combobox.Option>
+                          ))
+                        )}
+                      </Combobox.Options>
+                    </Transition>
+                  </Combobox>
+                )}
+              />
               {errors.startLocation && (
                 <p className="text-red-500 text-sm mt-2">
                   {errors?.startLocation?.message}
@@ -481,23 +507,32 @@ const Profile: NextPage = () => {
                   />
                 </LocalizationProvider>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <TimePicker
-                    label="End Time"
-                    value={dayjs(watch("endTime"))}
-                    onChange={(value) => {
-                      value?.isValid() &&
-                        setValue("endTime", value.toISOString());
-                    }}
-                    renderInput={function (props: TextFieldProps) {
-                      return (
-                        <MUITextField
-                          {...props}
-                          error={!!errors.endTime}
-                          helperText={errors.endTime?.message}
-                        />
-                      );
-                    }}
-                    disableOpenPicker
+                  <Controller
+                    name="endTime"
+                    control={control}
+                    render={({ field: { ref, ...fieldProps } }) => (
+                      <TimePicker
+                        inputRef={ref}
+                        {...fieldProps}
+                        value={
+                          fieldProps.value ? dayjs(fieldProps.value) : null
+                        }
+                        onChange={(date) => {
+                          fieldProps.onChange(date?.toDate());
+                        }}
+                        label="End Time"
+                        renderInput={function (props: TextFieldProps) {
+                          return (
+                            <MUITextField
+                              {...props}
+                              helperText={errors.endTime?.message}
+                              error={!!errors.endTime}
+                            />
+                          );
+                        }}
+                        disableOpenPicker
+                      />
+                    )}
                   />
                 </LocalizationProvider>
               </div>
