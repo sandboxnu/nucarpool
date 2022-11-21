@@ -1,62 +1,87 @@
-import { User } from "@prisma/client";
 import React, { useState } from "react";
-import Head from "next/head";
+import { trpc } from "../utils/trpc";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Spinner from "./Spinner";
+import { Role, Status, User } from "@prisma/client";
 
 type ScrollableList = {
   items: User[];
   idx: number;
 };
 
-export const Sidebar = ({ reccs }: { reccs: User[] | undefined }) => {
-  const users = requireNotUndefined(reccs);
+export const Sidebar = ({ user }: { user: User | undefined }) => {
+  const { data: users } = trpc.useQuery(["user.recommendations"]);
+  // let reccs = requireNotUndefined(users);
   // ADD QUERY HERE
   // const { data: favs } = trpc.useQuery(["user.favorites"]);
-  const favs = requireNotUndefined(undefined);
-  const [curList, setList] = useState<User[]>(users);
-  const [moreContents, setmoreContents] = useState<boolean>(true);
-  const newSize = () => Math.min(10, curList.length);
-  let listSize = newSize();
 
-  const fetchMoreData = () => {
-    if (curList.length >= 500) {
-      setmoreContents(false);
-      return;
-    }
-  };
+  const reccs: User[] | undefined = new Array(50).fill({
+    id: "2",
+    name: `User ${2}`,
+    email: `user${2}@hotmail.com`,
+    emailVerified: new Date("2022-10-14 19:26:21"),
+    image: null,
+    bio: `My name is User ${2}. I like to drive`,
+    pronouns: "they/them",
+    role: "DRIVER",
+    status: "ACTIVE" as Status,
+    seatAvail: 0,
+    companyName: "Sandbox Inc.",
+    companyAddress: "360 Huntington Ave",
+    companyCoordLng: 21,
+    companyCoordLat: 21,
+    startLocation: "Roxbury",
+    startCoordLng: 21,
+    startCoordLat: 21,
+    isOnboarded: true,
+    daysWorking: "0,1,1,1,1,1,0",
+    startTime: new Date(),
+    endTime: new Date(),
+  });
+
+  const favs: User[] | undefined = new Array(50).fill({
+    id: "2",
+    name: `User ${2}`,
+    email: `user${2}@hotmail.com`,
+    emailVerified: new Date("2022-10-14 19:26:21"),
+    image: null,
+    bio: `My name is User ${2}. I like to drive`,
+    pronouns: "they/them",
+    role: "DRIVER",
+    status: "ACTIVE" as Status,
+    seatAvail: 0,
+    companyName: "someone's house",
+    companyAddress: "360 Huntington Ave",
+    companyCoordLng: 21,
+    companyCoordLat: 21,
+    startLocation: "Roxbury",
+    startCoordLng: 21,
+    startCoordLat: 21,
+    isOnboarded: true,
+    daysWorking: "0,1,1,1,1,1,0",
+    startTime: new Date(),
+    endTime: new Date(),
+  });
+
+  const [curList, setCurList] = useState<User[]>(reccs);
 
   return (
-    <div>
-      <button
-        onClick={() => {
-          setList(users);
-          listSize = newSize();
-        }}
-      >
-        Recommendations
-      </button>
-      <button
-        onClick={() => {
-          setList(favs);
-          listSize = newSize();
-        }}
-      >
-        Favorites
-      </button>
-      <div
-        id="scrollableDiv"
-        className="flex h-5/6 fixed z-10  text-right bg-white m-5 overflow-auto"
-      >
+    <div className=" flex flex-col h-5/6 fixed z-10  text-right bg-white m-5">
+      <div className="flex-row">
+        <button onClick={() => setCurList(reccs)}>Recommendations</button>
+        <button onClick={() => setCurList(favs)}>Favorites</button>
+      </div>
+      <div id="scrollableDiv" className="overflow-auto">
         <InfiniteScroll
-          dataLength={listSize}
-          next={fetchMoreData}
-          hasMore={moreContents}
+          dataLength={curList.length}
+          next={() => {
+            return;
+          }}
+          hasMore={false}
           loader={<Spinner />}
           endMessage={<div>The end</div>}
-          height=""
         >
-          {curList.slice(0, listSize).map(userToElem)}
+          {curList.map(userToElem)}
         </InfiniteScroll>
       </div>
     </div>
