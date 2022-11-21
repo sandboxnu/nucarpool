@@ -73,7 +73,7 @@ model User {
   bio             String    @default("")
   preferredName   String    @default("")
   pronouns        String    @default("")
- accounts         Account[] // can have multiple accounts
+  accounts        Account[] // can have multiple accounts
   sessions        Session[] // can have multiple settings
   role            Role      @default(RIDER)
   status          Status    @default(ACTIVE)

@@ -2,9 +2,11 @@ import { TRPCError } from "@trpc/server";
 import { resolve } from "path";
 import { z } from "zod";
 import { createProtectedRouter } from "./createProtectedRouter";
-import { Role } from "@prisma/client";
+import { Role, User } from "@prisma/client";
 import { Status } from "@prisma/client";
 import { Feature, FeatureCollection } from "geojson";
+import calculateScore, { Recommendation } from "../../utils/recommendation";
+import _ from "lodash";
 
 // user router to get information about or edit users
 export const userRouter = createProtectedRouter()
@@ -26,6 +28,8 @@ export const userRouter = createProtectedRouter()
           companyAddress: true,
           companyCoordLng: true,
           companyCoordLat: true,
+          startCoordLng: true,
+          startCoordLat: true,
           startLocation: true,
           preferredName: true,
           pronouns: true,
@@ -97,5 +101,34 @@ export const userRouter = createProtectedRouter()
       });
 
       return user;
+    },
+  })
+  // Generates a list of recommendations for the current user
+  .query("recommendations", {
+    resolve: async ({ ctx }) => {
+      const id = ctx.session.user?.id;
+      const currentUser = await ctx.prisma.user.findUnique({
+        where: {
+          id: id,
+        },
+      });
+      if (!currentUser) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `No user with id ${id}.`,
+        });
+      }
+      const users = await ctx.prisma.user.findMany({
+        where: {
+          id: {
+            not: id, // doesn't include the current user
+          },
+          isOnboarded: true, // only include user that have finished onboarding
+          status: Status.ACTIVE, // only include active users
+        },
+      });
+      const recs = _.compact(users.map(calculateScore(currentUser)));
+      recs.sort((a, b) => a.score - b.score);
+      return recs;
     },
   });
