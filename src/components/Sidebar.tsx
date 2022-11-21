@@ -9,13 +9,19 @@ type ScrollableList = {
   idx: number;
 };
 
-export const Sidebar = ({ user }: { user: User | undefined }) => {
+export const Sidebar = ({
+  reccs,
+  favs,
+}: {
+  reccs: User[] | undefined;
+  favs: User[] | undefined;
+}) => {
   const { data: users } = trpc.useQuery(["user.recommendations"]);
   // let reccs = requireNotUndefined(users);
   // ADD QUERY HERE
   // const { data: favs } = trpc.useQuery(["user.favorites"]);
 
-  const reccs: User[] | undefined = new Array(50).fill({
+  const reccss: User[] | undefined = new Array(50).fill({
     id: "2",
     name: `User ${2}`,
     email: `user${2}@hotmail.com`,
@@ -39,7 +45,7 @@ export const Sidebar = ({ user }: { user: User | undefined }) => {
     endTime: new Date(),
   });
 
-  const favs: User[] | undefined = new Array(50).fill({
+  const favss: User[] | undefined = new Array(50).fill({
     id: "2",
     name: `User ${2}`,
     email: `user${2}@hotmail.com`,
@@ -63,13 +69,13 @@ export const Sidebar = ({ user }: { user: User | undefined }) => {
     endTime: new Date(),
   });
 
-  const [curList, setCurList] = useState<User[]>(reccs);
+  const [curList, setCurList] = useState<User[]>(reccss);
 
   return (
     <div className=" flex flex-col h-5/6 fixed z-10  text-right bg-white m-5">
       <div className="flex-row">
-        <button onClick={() => setCurList(reccs)}>Recommendations</button>
-        <button onClick={() => setCurList(favs)}>Favorites</button>
+        <button onClick={() => setCurList(reccss)}>Recommendations</button>
+        <button onClick={() => setCurList(favss)}>Favorites</button>
       </div>
       <div id="scrollableDiv" className="overflow-auto">
         <InfiniteScroll

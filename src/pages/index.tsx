@@ -24,6 +24,7 @@ const Home: NextPage<any> = () => {
   const { data: user, isLoading: isLoadingUser } = trpc.useQuery(["user.me"]);
   const [isMap, setMap] = useState<boolean>(false);
   // const { data: recommendations } = trpc.useQuery(["user.recommendations"]);
+  // const { data: favs } = trpc.useQuery(["user.favourites"]);
   // Uncomment the above line for the final build
   // Temporarily creating a list of recs in order to test the sidebar
   const recommendations: User[] | undefined = new Array(50).fill({
@@ -48,7 +49,32 @@ const Home: NextPage<any> = () => {
     daysWorking: "0,1,1,1,1,1,0",
     startTime: new Date(),
     endTime: new Date(),
-  }); // end of temporary code
+  });
+
+  const favorites: User[] | undefined = new Array(50).fill({
+    id: "2",
+    name: `User ${2}`,
+    email: `user${2}@hotmail.com`,
+    emailVerified: new Date("2022-10-14 19:26:21"),
+    image: null,
+    bio: `My name is User ${2}. I like to drive`,
+    pronouns: "they/them",
+    role: "DRIVER",
+    status: "ACTIVE" as Status,
+    seatAvail: 0,
+    companyName: "Random house on the hill",
+    companyAddress: "360 Huntington Ave",
+    companyCoordLng: 21,
+    companyCoordLat: 21,
+    startLocation: "Roxbury",
+    startCoordLng: 21,
+    startCoordLat: 21,
+    isOnboarded: true,
+    daysWorking: "0,1,1,1,1,1,0",
+    startTime: new Date(),
+    endTime: new Date(),
+  });
+  // end of temporary code
 
   useEffect(() => {
     if (!isMap && user && geoJsonUsers) {
@@ -74,7 +100,7 @@ const Home: NextPage<any> = () => {
         <title>Home</title>
       </Head>
       {/* <ProfileModal userInfo={userInfo!} user={user!}  /> */}
-      <Sidebar reccs={recommendations} />
+      <Sidebar reccs={recommendations} favs={favorites} />
       <DropDownMenu />
       <button
         className="flex justify-center items-center w-8 h-8 absolute z-10 right-[8px] bottom-[150px] rounded-md bg-white border-2 border-solid border-gray-300 shadow-sm hover:bg-gray-200"
