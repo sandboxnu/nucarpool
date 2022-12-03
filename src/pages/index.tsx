@@ -114,31 +114,4 @@ const Home: NextPage<any> = () => {
   );
 };
 
-export const userToElem = (user: User) => {
-  return (
-    <>
-      <Head>
-        <title>{user.name}</title>
-        <p>{user.startLocation}</p>
-        <p>{user.companyName}</p>
-        {/* Add user bar */}
-        <p>{"Start: " + dateToTimeString(user.startTime)}</p>
-        <p>{"End: " + dateToTimeString(user.endTime)}</p>
-      </Head>
-    </>
-  );
-};
-
-const dateToTimeString = (date: Date | null) => {
-  if (date == null) {
-    return "N/A";
-  } else {
-    return date.toLocaleString("en-US", {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    });
-  }
-};
-
 export default ProtectedPage(Home);

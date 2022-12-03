@@ -9,7 +9,7 @@ type ScrollableList = {
   idx: number;
 };
 
-export const Sidebar = ({
+const Sidebar = ({
   reccs,
   favs,
 }: {
