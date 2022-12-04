@@ -56,7 +56,7 @@ const Sidebar = ({
     role: "DRIVER",
     status: "ACTIVE" as Status,
     seatAvail: 0,
-    companyName: "someone's house",
+    companyName: "a very long string of text that should wrap",
     companyAddress: "360 Huntington Ave",
     companyCoordLng: 21,
     companyCoordLat: 21,
@@ -72,10 +72,20 @@ const Sidebar = ({
   const [curList, setCurList] = useState<User[]>(reccss);
 
   return (
-    <div className=" flex flex-col h-5/6 fixed z-10  text-right bg-white m-5">
+    <div className="flex flex-col h-full w-1/4 fixed z-10 text-left bg-white">
       <div className="flex-row">
-        <button onClick={() => setCurList(reccss)}>Recommendations</button>
-        <button onClick={() => setCurList(favss)}>Favorites</button>
+        <button
+          className="bg-stone-300 hover:bg-stone-400 rounded-xl m-2 px-2.5 py-0.5"
+          onClick={() => setCurList(reccss)}
+        >
+          Recommendations
+        </button>
+        <button
+          className="bg-stone-300 hover:bg-stone-400 rounded-xl m-2 px-2.5 py-0.5"
+          onClick={() => setCurList(favss)}
+        >
+          Favorites
+        </button>
       </div>
       <div id="scrollableDiv" className="overflow-auto">
         <InfiniteScroll
@@ -85,7 +95,8 @@ const Sidebar = ({
           }}
           hasMore={false}
           loader={<Spinner />}
-          endMessage={<div>The end</div>}
+          endMessage={<div></div>}
+          scrollableTarget="scrollableDiv"
         >
           {curList.map(userToElem)}
         </InfiniteScroll>
@@ -96,13 +107,25 @@ const Sidebar = ({
 
 export const userToElem = (user: User) => {
   return (
-    <div>
-      <p>{user.name}</p>
-      <p>{user.startLocation}</p>
-      <p>{user.companyName}</p>
-      {/* Add user bar */}
-      <p>{"Start: " + dateToTimeString(user.startTime)}</p>
-      <p>{"End: " + dateToTimeString(user.endTime)}</p>
+    <div className="bg-stone-100 text-left px-2.5 py-2.5 rounded-xl m-3.5 align-center break-words">
+      <p className="font-bold">{user.name}</p>
+      <div className="flex flex-row space-x-4">
+        <div className="w-1/2">
+          <p>{user.startLocation}</p>
+          <p>{user.companyName}</p>
+          <button className="underline decoration-dashed">View Route</button>
+        </div>
+        <div className="w-1/2">
+          {/* Add user bar */}
+          <div className="text-sm">
+            <p>{"Start: " + dateToTimeString(user.startTime)}</p>
+            <p>{"End: " + dateToTimeString(user.endTime)}</p>
+          </div>
+          <button className="bg-red-500 hover:bg-red-700 rounded-xl m-2 px-2 py-0.5 text-center text-white">
+            Connect
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
