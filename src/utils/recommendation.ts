@@ -185,6 +185,7 @@ export const generateUser = ({
     image: null,
     bio: `My name is User ${id}. I like to drive`,
     pronouns: "they/them",
+    preferredName: `User ${id}`,
     role: role,
     status: "ACTIVE" as Status,
     seatAvail: seatAvail || 0,

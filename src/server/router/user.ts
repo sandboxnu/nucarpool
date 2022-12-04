@@ -31,6 +31,11 @@ export const userRouter = createProtectedRouter()
           startCoordLng: true,
           startCoordLat: true,
           startLocation: true,
+          preferredName: true,
+          pronouns: true,
+          daysWorking: true,
+          startTime: true,
+          endTime: true,
         },
       });
 
@@ -55,10 +60,24 @@ export const userRouter = createProtectedRouter()
       companyAddress: z.string().min(1),
       companyCoordLng: z.number(),
       companyCoordLat: z.number(),
-      startLocation: z.string().min(1),
+      startCoordLng: z.number(),
+      startCoordLat: z.number(),
+      preferredName: z.string(),
+      pronouns: z.string(),
       isOnboarded: z.boolean(),
+      daysWorking: z.string(),
+      startTime: z.optional(z.string()),
+      endTime: z.optional(z.string()),
     }),
+
     async resolve({ ctx, input }) {
+      const startTimeDate = input.startTime
+        ? new Date(Date.parse(input.startTime))
+        : undefined;
+      const endTimeDate = input.endTime
+        ? new Date(Date.parse(input.endTime))
+        : undefined;
+
       const id = ctx.session.user?.id;
       const user = await ctx.prisma.user.update({
         where: { id },
@@ -70,8 +89,14 @@ export const userRouter = createProtectedRouter()
           companyAddress: input.companyAddress,
           companyCoordLng: input.companyCoordLng,
           companyCoordLat: input.companyCoordLat,
-          startLocation: input.startLocation,
+          startCoordLng: input.startCoordLng,
+          startCoordLat: input.startCoordLat,
+          preferredName: input.preferredName,
+          pronouns: input.pronouns,
           isOnboarded: input.isOnboarded,
+          daysWorking: input.daysWorking,
+          startTime: startTimeDate,
+          endTime: endTimeDate,
         },
       });
 

@@ -46,9 +46,9 @@ const DropDownMenu = () => {
                 <p className="font-light text-sm text-gray-500">
                   {session.user.email}
                 </p>
-                <Link href="/settings">
+                <Link href="/profile">
                   <a className="w-4/5 rounded-2xl text-center bg-white border border-gray-300 px-3 py-2 hover:bg-gray-100 mt-4">
-                    Settings
+                    Profile
                   </a>
                 </Link>
               </Menu.Item>

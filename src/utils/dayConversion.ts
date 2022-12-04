@@ -1,4 +1,4 @@
-import { User } from "@prisma/client"
+import { User } from "@prisma/client";
 
 /**
  * Converts a comma separated string representing user's days working to a boolean array
@@ -6,7 +6,7 @@ import { User } from "@prisma/client"
  * @returns a boolean array corresponding to `user.daysWorking` - index 0 is Sunday
  */
 const dayConversion = (user: User) => {
-  return user.daysWorking.split(",").map(str => str === "1")
-}
+  return user.daysWorking.split(",").map((str) => str === "1");
+};
 
-export default dayConversion
+export default dayConversion;
