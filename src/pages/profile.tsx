@@ -50,7 +50,7 @@ type OnboardingFormInputs = {
   pronouns: string;
   daysWorking: boolean[];
   startTime?: Date;
-  endTime?: string;
+  endTime?: Date;
   timeDiffers: boolean;
 };
 
@@ -110,7 +110,7 @@ const Profile: NextPage = () => {
       pronouns: "",
       daysWorking: [false, false, false, false, false, false, false],
       startTime: undefined,
-      endTime: "",
+      endTime: undefined,
       timeDiffers: false,
     },
     resolver: zodResolver(onboardSchema),
@@ -193,7 +193,7 @@ const Profile: NextPage = () => {
       pronouns: userInfo.pronouns,
       daysWorking: daysWorkingParsed,
       startTime: userInfo.startTime?.toISOString(),
-      endTime: userInfo.endTime,
+      endTime: userInfo.endTime?.toISOString(),
     });
   };
 
