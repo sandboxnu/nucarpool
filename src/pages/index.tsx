@@ -18,8 +18,6 @@ import Sidebar from "../components/Sidebar";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
-const [mapState, setMapState] = useState<mapboxgl.Map>();
-
 const Home: NextPage<any> = () => {
   const { data: geoJsonUsers, isLoading: isLoadingGeoJsonUsers } =
     trpc.useQuery(["mapbox.geoJsonUsersList"]);
@@ -28,6 +26,9 @@ const Home: NextPage<any> = () => {
   // const { data: favs } = trpc.useQuery(["user.favourites"]);
   // Uncomment the above line for the final build
   // Temporarily creating a list of recs in order to test the sidebar
+
+  const [mapState, setMapState] = useState<mapboxgl.Map>();
+
   const recommendations: User[] | undefined = new Array(50).fill({
     id: "2",
     name: `User ${2}`,

@@ -107,7 +107,6 @@ const Sidebar = ({
   };
 
   const viewRoute = (user: User) => {
-    // console.log(map);
     if (map !== undefined) {
       previousMarkers.forEach((marker) => marker.remove());
       previousMarkers.length = 0;
