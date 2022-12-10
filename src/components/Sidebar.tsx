@@ -22,60 +22,60 @@ const Sidebar = ({
   map: mapboxgl.Map | undefined;
 }) => {
   const { data: users } = trpc.useQuery(["user.recommendations"]);
-  // let reccs = requireNotUndefined(users);
+  let nurecs = requireNotUndefined(reccs);
+  console.log(nurecs);
   // ADD QUERY HERE
   // const { data: favs } = trpc.useQuery(["user.favorites"]);
 
-  const reccss: User[] | undefined = new Array(50).fill({
-    id: "2",
-    name: `User ${2}`,
-    email: `user${2}@hotmail.com`,
-    emailVerified: new Date("2022-10-14 19:26:21"),
-    image: null,
-    bio: `My name is User ${2}. I like to drive`,
-    pronouns: "they/them",
-    role: "DRIVER",
-    status: "ACTIVE" as Status,
-    seatAvail: 0,
-    companyName: "Sandbox Inc.",
-    companyAddress: "360 Huntington Ave",
-    companyCoordLng: 21,
-    companyCoordLat: 21,
-    startLocation: "Roxbury",
-    startCoordLng: 21,
-    startCoordLat: 21,
-    isOnboarded: true,
-    daysWorking: "0,1,1,1,1,1,0",
-    startTime: new Date(),
-    endTime: new Date(),
-  });
+  // const reccss: User[] | undefined = new Array(50).fill({
+  //   id: "2",
+  //   name: `User ${2}`,
+  //   email: `user${2}@hotmail.com`,
+  //   emailVerified: new Date("2022-10-14 19:26:21"),
+  //   image: null,
+  //   bio: `My name is User ${2}. I like to drive`,
+  //   pronouns: "they/them",
+  //   role: "DRIVER",
+  //   status: "ACTIVE" as Status,
+  //   seatAvail: 0,
+  //   companyName: "Sandbox Inc.",
+  //   companyAddress: "360 Huntington Ave",
+  //   companyCoordLng: 21,
+  //   companyCoordLat: 21,
+  //   startLocation: "Roxbury",
+  //   startCoordLng: 21,
+  //   startCoordLat: 21,
+  //   isOnboarded: true,
+  //   daysWorking: "0,1,1,1,1,1,0",
+  //   startTime: new Date(),
+  //   endTime: new Date(),
+  // });
 
-  const favss: User[] | undefined = new Array(50).fill({
-    id: "2",
-    name: `User ${2}`,
-    email: `user${2}@hotmail.com`,
-    emailVerified: new Date("2022-10-14 19:26:21"),
-    image: null,
-    bio: `My name is User ${2}. I like to drive`,
-    pronouns: "they/them",
-    role: "DRIVER",
-    status: "ACTIVE" as Status,
-    seatAvail: 0,
-    companyName: "a very long string of text that should wrap",
-    companyAddress: "360 Huntington Ave",
-    companyCoordLng: 21,
-    companyCoordLat: 21,
-    startLocation: "Roxbury",
-    startCoordLng: 21,
-    startCoordLat: 21,
-    isOnboarded: true,
-    daysWorking: "0,1,1,1,1,1,0",
-    startTime: new Date(),
-    endTime: new Date(),
-  });
+  // const favss: User[] | undefined = new Array(50).fill({
+  //   id: "2",
+  //   name: `User ${2}`,
+  //   email: `user${2}@hotmail.com`,
+  //   emailVerified: new Date("2022-10-14 19:26:21"),
+  //   image: null,
+  //   bio: `My name is User ${2}. I like to drive`,
+  //   pronouns: "they/them",
+  //   role: "DRIVER",
+  //   status: "ACTIVE" as Status,
+  //   seatAvail: 0,
+  //   companyName: "a very long string of text that should wrap",
+  //   companyAddress: "360 Huntington Ave",
+  //   companyCoordLng: 21,
+  //   companyCoordLat: 21,
+  //   startLocation: "Roxbury",
+  //   startCoordLng: 21,
+  //   startCoordLat: 21,
+  //   isOnboarded: true,
+  //   daysWorking: "0,1,1,1,1,1,0",
+  //   startTime: new Date(),
+  //   endTime: new Date(),
+  // });
 
-  const [curList, setCurList] = useState<User[]>(reccss);
-
+  const [curList, setCurList] = useState<User[]>(nurecs);
   const userToElem = (user: User) => {
     return (
       <div className="bg-stone-100 text-left px-2.5 py-2.5 rounded-xl m-3.5 align-center break-words">
@@ -129,13 +129,13 @@ const Sidebar = ({
       <div className="flex-row">
         <button
           className="bg-stone-300 hover:bg-stone-400 rounded-xl m-2 px-2.5 py-0.5"
-          onClick={() => setCurList(reccss)}
+          onClick={() => setCurList(nurecs)}
         >
           Recommendations
         </button>
         <button
           className="bg-stone-300 hover:bg-stone-400 rounded-xl m-2 px-2.5 py-0.5"
-          onClick={() => setCurList(favss)}
+          onClick={() => setCurList(nurecs)}
         >
           Favorites
         </button>
