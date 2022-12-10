@@ -132,6 +132,6 @@ export const userRouter = createProtectedRouter()
       const sortedUsers = _.compact(
         recs.map((rec) => users.find((user) => user.id === rec.id))
       );
-      return users;
+      return sortedUsers;
     },
   });

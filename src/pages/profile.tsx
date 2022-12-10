@@ -163,8 +163,8 @@ const Profile: NextPage = () => {
       ...values,
       companyCoordLng: coord[0],
       companyCoordLat: coord[1],
-      startCoordLat: startCoord[0],
-      startCoordLng: startCoord[1],
+      startCoordLng: startCoord[0],
+      startCoordLat: startCoord[1],
       seatAvail: values.role === Role.RIDER ? 0 : values.seatAvail,
     };
 

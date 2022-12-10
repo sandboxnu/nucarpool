@@ -22,66 +22,12 @@ const Home: NextPage<any> = () => {
   const { data: geoJsonUsers, isLoading: isLoadingGeoJsonUsers } =
     trpc.useQuery(["mapbox.geoJsonUsersList"]);
   const { data: user, isLoading: isLoadingUser } = trpc.useQuery(["user.me"]);
-  // const { data: recommendations } = trpc.useQuery(["user.recommendations"]);
-  // const { data: favs } = trpc.useQuery(["user.favourites"]);
-  // Uncomment the above line for the final build
-  // Temporarily creating a list of recs in order to test the sidebar
-
-  const hmm = geoJsonUsers;
+  const { data: recommendations } = trpc.useQuery(["user.recommendations"]);
+  // const { data: favorites } = trpc.useQuery(["user.favourites"]);
+  // Uncomment the above line and delete the below line for the final build
+  const favorites = undefined;
 
   const [mapState, setMapState] = useState<mapboxgl.Map>();
-
-  const { data: recommendations } = trpc.useQuery(["user.recommendations"]);
-  console.log(recommendations);
-  console.log(user);
-  // new Array(50).fill({
-  //   id: "2",
-  //   name: `User ${2}`,
-  //   email: `user${2}@hotmail.com`,
-  //   emailVerified: new Date("2022-10-14 19:26:21"),
-  //   image: null,
-  //   bio: `My name is User ${2}. I like to drive`,
-  //   pronouns: "they/them",
-  //   role: "DRIVER",
-  //   status: "ACTIVE" as Status,
-  //   seatAvail: 0,
-  //   companyName: "Sandbox Inc.",
-  //   companyAddress: "360 Huntington Ave",
-  //   companyCoordLng: 21,
-  //   companyCoordLat: 21,
-  //   startLocation: "Roxbury",
-  //   startCoordLng: 21,
-  //   startCoordLat: 21,
-  //   isOnboarded: true,
-  //   daysWorking: "0,1,1,1,1,1,0",
-  //   startTime: new Date(),
-  //   endTime: new Date(),
-  // });
-
-  const favorites: User[] | undefined = new Array(50).fill({
-    id: "2",
-    name: `User ${2}`,
-    email: `user${2}@hotmail.com`,
-    emailVerified: new Date("2022-10-14 19:26:21"),
-    image: null,
-    bio: `My name is User ${2}. I like to drive`,
-    pronouns: "they/them",
-    role: "DRIVER",
-    status: "ACTIVE" as Status,
-    seatAvail: 0,
-    companyName: "Random house on the hill",
-    companyAddress: "360 Huntington Ave",
-    companyCoordLng: 21,
-    companyCoordLat: 21,
-    startLocation: "Roxbury",
-    startCoordLng: 21,
-    startCoordLat: 21,
-    isOnboarded: true,
-    daysWorking: "0,1,1,1,1,1,0",
-    startTime: new Date(),
-    endTime: new Date(),
-  });
-  // end of temporary code
 
   useEffect(() => {
     if (mapState === undefined && user && geoJsonUsers) {

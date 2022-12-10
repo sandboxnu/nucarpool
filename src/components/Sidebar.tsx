@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { trpc } from "../utils/trpc";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Spinner from "./Spinner";
 import { Role, Status, User } from "@prisma/client";
 import mapboxgl, { Marker } from "mapbox-gl";
+import { min } from "lodash";
 
 type ScrollableList = {
   items: User[];
@@ -11,6 +12,10 @@ type ScrollableList = {
 };
 
 const previousMarkers: mapboxgl.Marker[] = [];
+const clearMarkers = () => {
+  previousMarkers.forEach((marker) => marker.remove());
+  previousMarkers.length = 0;
+};
 
 const Sidebar = ({
   reccs,
@@ -21,59 +26,8 @@ const Sidebar = ({
   favs: User[] | undefined;
   map: mapboxgl.Map | undefined;
 }) => {
-  const { data: users } = trpc.useQuery(["user.recommendations"]);
-  let nurecs = requireNotUndefined(reccs);
-  console.log(nurecs);
-  // ADD QUERY HERE
-  // const { data: favs } = trpc.useQuery(["user.favorites"]);
-
-  // const reccss: User[] | undefined = new Array(50).fill({
-  //   id: "2",
-  //   name: `User ${2}`,
-  //   email: `user${2}@hotmail.com`,
-  //   emailVerified: new Date("2022-10-14 19:26:21"),
-  //   image: null,
-  //   bio: `My name is User ${2}. I like to drive`,
-  //   pronouns: "they/them",
-  //   role: "DRIVER",
-  //   status: "ACTIVE" as Status,
-  //   seatAvail: 0,
-  //   companyName: "Sandbox Inc.",
-  //   companyAddress: "360 Huntington Ave",
-  //   companyCoordLng: 21,
-  //   companyCoordLat: 21,
-  //   startLocation: "Roxbury",
-  //   startCoordLng: 21,
-  //   startCoordLat: 21,
-  //   isOnboarded: true,
-  //   daysWorking: "0,1,1,1,1,1,0",
-  //   startTime: new Date(),
-  //   endTime: new Date(),
-  // });
-
-  // const favss: User[] | undefined = new Array(50).fill({
-  //   id: "2",
-  //   name: `User ${2}`,
-  //   email: `user${2}@hotmail.com`,
-  //   emailVerified: new Date("2022-10-14 19:26:21"),
-  //   image: null,
-  //   bio: `My name is User ${2}. I like to drive`,
-  //   pronouns: "they/them",
-  //   role: "DRIVER",
-  //   status: "ACTIVE" as Status,
-  //   seatAvail: 0,
-  //   companyName: "a very long string of text that should wrap",
-  //   companyAddress: "360 Huntington Ave",
-  //   companyCoordLng: 21,
-  //   companyCoordLat: 21,
-  //   startLocation: "Roxbury",
-  //   startCoordLng: 21,
-  //   startCoordLat: 21,
-  //   isOnboarded: true,
-  //   daysWorking: "0,1,1,1,1,1,0",
-  //   startTime: new Date(),
-  //   endTime: new Date(),
-  // });
+  const nurecs = requireNotUndefined(reccs);
+  const nufavs = requireNotUndefined(favs);
 
   const [curList, setCurList] = useState<User[]>(nurecs);
   const userToElem = (user: User) => {
@@ -108,34 +62,50 @@ const Sidebar = ({
 
   const viewRoute = (user: User) => {
     if (map !== undefined) {
-      previousMarkers.forEach((marker) => marker.remove());
-      previousMarkers.length = 0;
+      clearMarkers();
 
-      const startMarker = new mapboxgl.Marker()
+      const startMarker = new mapboxgl.Marker({ color: "#2ae916" })
         .setLngLat([user.startCoordLng, user.startCoordLat])
         .addTo(map);
 
-      const endMarker = new mapboxgl.Marker()
+      const endMarker = new mapboxgl.Marker({ color: "#f0220f" })
         .setLngLat([user.companyCoordLng, user.companyCoordLat])
         .addTo(map);
 
       previousMarkers.push(startMarker);
       previousMarkers.push(endMarker);
+
+      map.fitBounds([
+        [
+          Math.min(user.startCoordLng, user.companyCoordLng) - 0.125,
+          Math.max(user.startCoordLat, user.companyCoordLat) + 0.05,
+        ],
+        [
+          Math.max(user.startCoordLng, user.companyCoordLng) + 0.05,
+          Math.min(user.startCoordLat, user.companyCoordLat) - 0.05,
+        ],
+      ]);
     }
   };
 
   return (
-    <div className="flex flex-col h-full w-1/4 fixed z-10 text-left bg-white">
+    <div className="flex flex-col h-full w-96 fixed z-10 text-left bg-white">
       <div className="flex-row">
         <button
           className="bg-stone-300 hover:bg-stone-400 rounded-xl m-2 px-2.5 py-0.5"
-          onClick={() => setCurList(nurecs)}
+          onClick={() => {
+            setCurList(nurecs);
+            clearMarkers();
+          }}
         >
           Recommendations
         </button>
         <button
           className="bg-stone-300 hover:bg-stone-400 rounded-xl m-2 px-2.5 py-0.5"
-          onClick={() => setCurList(nurecs)}
+          onClick={() => {
+            setCurList(nufavs);
+            clearMarkers();
+          }}
         >
           Favorites
         </button>
