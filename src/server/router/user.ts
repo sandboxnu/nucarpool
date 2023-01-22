@@ -134,4 +134,26 @@ export const userRouter = createProtectedRouter()
       );
       return sortedUsers;
     },
+  })
+  // Returns the list of favorites for the curent user
+  .query("favorites", {
+    async resolve({ ctx }) {
+      const id = ctx.session.user?.id;
+      const favorites = await ctx.prisma.user.findUnique({
+        where: { id },
+        select: {
+          favorites: true,
+        },
+      });
+
+      // throws TRPCError if no user with ID exists
+      if (!favorites) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `No profile with id '${id}'`,
+        });
+      }
+
+      return favorites;
+    },
   });
