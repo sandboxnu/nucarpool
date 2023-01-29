@@ -1,11 +1,58 @@
-import { PrismaClient, Role, Prisma, Status } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
+import { range } from "lodash";
 import Random from "random-seed";
 import { generateUser, GenerateUserInput } from "../src/utils/recommendation";
 
 const prisma = new PrismaClient();
 
 /**
- * Creates users and adds them to the database
+ * Generates favorites for users in our database.
+ */
+const generateFavorites = async () => {
+  const users = await prisma.user.findMany();
+
+  Promise.all(
+    users.map((user, idx) =>
+      prisma.user.update({
+        where: {
+          id: `${idx}`,
+        },
+        data: {
+          favorites: {
+            connect: pickConnections(idx, users.length, 5, "poolPanArtemis"),
+          },
+        },
+      })
+    )
+  );
+};
+
+/**
+ * Returns a list of connections for a given user.
+ *
+ * @param userId the user we're picking favorites for
+ * @param userCount the total amount of users in our database
+ * @param favoriteCount the number of favorites each user should have
+ * @param seed the seed we're using to generate random ints
+ * @returns a list of objects with a single key ``id`` mapping to a int represented as a string
+ */
+const pickConnections = (
+  userId: number,
+  userCount: number,
+  favoriteCount: number,
+  seed: string
+) => {
+  const random = Random.create(seed);
+  return range(favoriteCount)
+    .map(() => random(userCount))
+    .filter((i) => i !== userId)
+    .map((i) => {
+      return { id: `${i}` };
+    });
+};
+
+/**
+ * Creates users and adds them to the database.
  */
 const createUserData = async () => {
   const users: GenerateUserInput[] = [
@@ -52,6 +99,8 @@ const createUserData = async () => {
       await prisma.user.upsert(generateUser({ id: index.toString(), ...user }));
     })
   );
+
+  await generateFavorites();
 };
 
 /**
@@ -116,7 +165,7 @@ const genRandomUsers = ({
 };
 
 /**
- * Runs the database seeding functions
+ * Populates our database with fake data.
  */
 const main = async () => {
   await createUserData();
@@ -128,6 +177,5 @@ main()
     process.exit(1);
   })
   .finally(async () => {
-    // close Prisma Client at the end
     await prisma.$disconnect();
   });

@@ -2,6 +2,7 @@ version: "3"
 
 services:
   mysql:
+    platform: linux/x86_64
     container_name: mysql-on-docker
     image: mysql:5.7
     ports:

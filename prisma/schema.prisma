@@ -1,7 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-
 // Specify the DB type and the connection string AKA DB_URL
 datasource db {
   provider             = "mysql"
@@ -9,14 +8,12 @@ datasource db {
   referentialIntegrity = "prisma"
 }
 
-
 // Boilerplate--we would only change this if we wanted to change how 
 // the Prisma Client is generated.
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["referentialIntegrity"]
 }
-
 
 // Represents a Role.
 enum Role {
@@ -33,10 +30,10 @@ enum Status {
 // Represents an Account--need this for NextAuth.
 model Account {
   id                String  @id @default(cuid()) //primary key
-  userId            String @map(name: "user_id") //foreign key
+  userId            String  @map(name: "user_id") //foreign key
   type              String
   provider          String
-  providerAccountId String @map(name: "provider_account_id")
+  providerAccountId String  @map(name: "provider_account_id")
   refresh_token     String? @db.Text
   access_token      String? @db.Text
   expires_at        Int?
@@ -48,7 +45,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
-
+  @@index([userId])
   @@map(name: "account")
 }
 
@@ -56,10 +53,12 @@ model Account {
 model Session {
   id           String   @id @default(cuid()) // primary key
   sessionToken String   @unique @map(name: "session_token")
-  userId       String  // foreign key
+  userId       String // foreign key
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
   @@map(name: "session")
 }
 
@@ -87,8 +86,10 @@ model User {
   startCoordLat   Float     @default(0) @map("start_coord_lat")
   isOnboarded     Boolean   @default(false) @map("is_onboarded")
   daysWorking     String    @default("") @map("days_working")
-  startTime       DateTime?  @db.Time(0) @map("start_time")
-  endTime         DateTime?  @db.Time(0) @map("end_time")
+  startTime       DateTime? @map("start_time") @db.Time(0)
+  endTime         DateTime? @map("end_time") @db.Time(0)
+  favoritedBy     User[]    @relation("Favorites")
+  favorites       User[]    @relation("Favorites")
 
   @@map(name: "user")
 }
