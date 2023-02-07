@@ -12,3 +12,10 @@ export const profileSchema = z.object({
   companyAddress: z.string().min(1, "Cannot be empty"),
   status: z.enum(["active", "inactive"]),
 });
+
+export const userSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string(),
+  emailVerified: z.string(),
+});

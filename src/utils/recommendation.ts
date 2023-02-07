@@ -43,10 +43,12 @@ const calculateScore = (
   const currentUserDays = dayConversion(currentUser);
 
   return (user: User) => {
+    console.log("starting here");
     if (
       currentUser.role === "RIDER" &&
       (user.role === "RIDER" || user.seatAvail === 0)
     ) {
+      console.log("role issue");
       return undefined;
     }
 
@@ -86,6 +88,11 @@ const calculateScore = (
           (currentUser.endTime.getMinutes() - user.endTime.getMinutes())
       );
       if (startTime > cutoffs.startTime || endTime > cutoffs.endTime) {
+        console.log("time issue");
+        // console.log(" startTime: " + startTime)
+        // console.log(" endTime: " + endTime)
+        console.log(" startTime" + currentUser.startTime);
+        console.log(" our startTime: " + user.startTime);
         return undefined;
       }
     }
@@ -95,6 +102,7 @@ const calculateScore = (
       endDistance > cutoffs.endDistance ||
       days > cutoffs.days
     ) {
+      console.log("distance issue");
       return undefined;
     }
 

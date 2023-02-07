@@ -7,6 +7,8 @@ import { Status } from "@prisma/client";
 import { Feature, FeatureCollection } from "geojson";
 import calculateScore, { Recommendation } from "../../utils/recommendation";
 import _ from "lodash";
+import { FaTruckLoading } from "react-icons/fa";
+import { userSchema } from "../../utils/zodSchema";
 
 // user router to get information about or edit users
 export const userRouter = createProtectedRouter()
@@ -36,6 +38,8 @@ export const userRouter = createProtectedRouter()
           daysWorking: true,
           startTime: true,
           endTime: true,
+          favoritedBy: true,
+          favorites: true,
         },
       });
 
@@ -68,6 +72,9 @@ export const userRouter = createProtectedRouter()
       daysWorking: z.string(),
       startTime: z.optional(z.string()),
       endTime: z.optional(z.string()),
+      /** TODO: finish schema*/
+      // favorites: z.array(userSchema),
+      // favoritedBy: z.array(userSchema),
     }),
 
     async resolve({ ctx, input }) {
@@ -97,6 +104,9 @@ export const userRouter = createProtectedRouter()
           daysWorking: input.daysWorking,
           startTime: startTimeDate,
           endTime: endTimeDate,
+          /**TODO: see .mutation(edit) above */
+          // favorites: input.favorites,
+          // favoritedBy: input.favoritedBy
         },
       });
 
@@ -127,11 +137,18 @@ export const userRouter = createProtectedRouter()
           status: Status.ACTIVE, // only include active users
         },
       });
+      console.log(users);
       const recs = _.compact(users.map(calculateScore(currentUser)));
       recs.sort((a, b) => a.score - b.score);
       const sortedUsers = _.compact(
         recs.map((rec) => users.find((user) => user.id === rec.id))
       );
+
+      const testUser = await ctx.prisma.user.findUnique({
+        where: {
+          id: "64",
+        },
+      });
       return sortedUsers;
     },
   })
