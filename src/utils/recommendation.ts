@@ -165,7 +165,7 @@ export const generateUser = ({
     Date.parse(
       `2022-11-01T${startHours.toString().padStart(2, "0")}:${startMinutes
         .toString()
-        .padStart(2, "0")}:00Z`
+        .padStart(2, "0")}:00-05:00`
     )
   );
   const [endHours, endMinutes] = endTime.split(":").map((s) => _.toInteger(s));
@@ -173,7 +173,7 @@ export const generateUser = ({
     Date.parse(
       `2022-11-01T${endHours.toString().padStart(2, "0")}:${endMinutes
         .toString()
-        .padStart(2, "0")}:00Z`
+        .padStart(2, "0")}:00-05:00`
     )
   );
 
