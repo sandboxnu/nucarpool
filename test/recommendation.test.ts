@@ -25,11 +25,11 @@ const usersToBeCutoff: User[] = [
   },
   {
     ...relativeOrderBaseUser,
-    startTime: new Date(Date.parse("2022-11-01T07:59:00Z")),
+    startTime: new Date(Date.parse("2022-11-01T07:59:00-05:00")),
   },
   {
     ...relativeOrderBaseUser,
-    endTime: new Date(Date.parse("2022-11-01T18:01:00Z")),
+    endTime: new Date(Date.parse("2022-11-01T18:01:00-05:00")),
   },
   {
     ...relativeOrderBaseUser,
@@ -56,11 +56,11 @@ const usersToNotBeCutoff: User[] = [
   },
   {
     ...relativeOrderBaseUser,
-    startTime: new Date(Date.parse("2022-11-01T08:00:00Z")),
+    startTime: new Date(Date.parse("2022-11-01T08:00:00-05:00")),
   },
   {
     ...relativeOrderBaseUser,
-    endTime: new Date(Date.parse("2022-11-01T18:00:00Z")),
+    endTime: new Date(Date.parse("2022-11-01T18:00:00-05:00")),
   },
   {
     ...relativeOrderBaseUser,
@@ -107,12 +107,12 @@ const relativeOrderUsers: User[] = [
   {
     ...relativeOrderBaseUser,
     role: "RIDER",
-    startTime: new Date(Date.parse("2022-11-01T09:15:00Z")),
+    startTime: new Date(Date.parse("2022-11-01T09:15:00-05:00")),
   },
   {
     ...relativeOrderBaseUser,
     role: "RIDER",
-    endTime: new Date(Date.parse("2022-11-01T17:15:00Z")),
+    endTime: new Date(Date.parse("2022-11-01T17:15:00-05:00")),
   },
   {
     ...relativeOrderBaseUser,
