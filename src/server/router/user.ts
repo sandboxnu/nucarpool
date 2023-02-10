@@ -72,8 +72,11 @@ export const userRouter = createProtectedRouter()
       daysWorking: z.string(),
       startTime: z.optional(z.string()),
       endTime: z.optional(z.string()),
-      favorites: z.array(userSchema),
-      favoritedBy: z.array(userSchema),
+      /**
+       * This is causing a type error, unsure why
+       */
+      // favorites: z.array(userSchema),
+      // favoritedBy: z.array(userSchema),
     }),
 
     async resolve({ ctx, input }) {
