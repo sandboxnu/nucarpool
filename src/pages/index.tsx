@@ -30,30 +30,6 @@ const Home: NextPage<any> = () => {
 
   const [mapState, setMapState] = useState<mapboxgl.Map>();
 
-  // const mockUser : User = {
-  //   id: "",
-  //   name: "Jeff",
-  //   email: "asdf@gmail.com",
-  //   emailVerified: null,
-  //   image: null,
-  //   bio: "",
-  //   preferredName: "Jay",
-  //   pronouns: "he/him",
-  //   role: "DRIVER",
-  //   status: "ACTIVE",
-  //   seatAvail: 3,
-  //   companyName: "Microsoft",
-  //   companyAddress: "5 Cambridge Rd",
-  //   companyCoordLng: -71.06,
-  //   startCoordLat: 42.33,
-  //   companyCoordLat: 42.35,
-  //   startLocation: "Roxbury, MA 02120",
-  //   startCoordLng: -71.1,
-  //   isOnboarded: false,
-  //   daysWorking: "0,0,1,1,1,1,1",
-  //   startTime: dayjs("2018-04-13 09:00").toDate(),
-  //   endTime: dayjs("2018-04-13 17:00").toDate(),
-  // }
   useEffect(() => {
     if (mapState === undefined && user && geoJsonUsers) {
       const newMap = new mapboxgl.Map({
@@ -78,11 +54,13 @@ const Home: NextPage<any> = () => {
         <title>Home</title>
       </Head>
       {/* <ProfileModal userInfo={userInfo!} user={user!}  /> */}
-      <Sidebar
-        reccs={recommendations ?? []}
-        favs={favorites ?? []}
-        map={mapState}
-      />
+      {mapState && (
+        <Sidebar
+          reccs={recommendations ?? []}
+          favs={favorites ?? []}
+          map={mapState}
+        />
+      )}
       <DropDownMenu />
       <button
         className="flex justify-center items-center w-8 h-8 absolute z-10 right-[8px] bottom-[150px] rounded-md bg-white border-2 border-solid border-gray-300 shadow-sm hover:bg-gray-200"

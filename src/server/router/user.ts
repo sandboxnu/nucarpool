@@ -72,9 +72,8 @@ export const userRouter = createProtectedRouter()
       daysWorking: z.string(),
       startTime: z.optional(z.string()),
       endTime: z.optional(z.string()),
-      /** TODO: finish schema*/
-      // favorites: z.array(userSchema),
-      // favoritedBy: z.array(userSchema),
+      favorites: z.array(userSchema),
+      favoritedBy: z.array(userSchema),
     }),
 
     async resolve({ ctx, input }) {
@@ -84,6 +83,14 @@ export const userRouter = createProtectedRouter()
       const endTimeDate = input.endTime
         ? new Date(Date.parse(input.endTime))
         : undefined;
+
+      const arrayOfFavoriteIds = input.favorites.map((i) => {
+        return { id: `${i}` };
+      });
+
+      const arrayOfFavoritedByIds = input.favorites.map((i) => {
+        return { id: `${i}` };
+      });
 
       const id = ctx.session.user?.id;
       const user = await ctx.prisma.user.update({
@@ -104,9 +111,12 @@ export const userRouter = createProtectedRouter()
           daysWorking: input.daysWorking,
           startTime: startTimeDate,
           endTime: endTimeDate,
-          /**TODO: see .mutation(edit) above */
-          // favorites: input.favorites,
-          // favoritedBy: input.favoritedBy
+          favorites: {
+            connect: arrayOfFavoriteIds,
+          },
+          favoritedBy: {
+            connect: arrayOfFavoritedByIds,
+          },
         },
       });
 
@@ -152,7 +162,7 @@ export const userRouter = createProtectedRouter()
       return sortedUsers;
     },
   })
-  // Returns the list of favorites for the curent user
+  // Returns the list of favorited user ids for the curent user
   .query("favorites", {
     async resolve({ ctx }) {
       const id = ctx.session.user?.id;
@@ -171,6 +181,10 @@ export const userRouter = createProtectedRouter()
         });
       }
 
-      return favorites;
+      const favArr: number[] = favorites.favorites.map((User: User): number =>
+        Number(User.id)
+      );
+
+      return favArr;
     },
   });

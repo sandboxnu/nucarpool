@@ -25,7 +25,7 @@ const Sidebar = ({
 }: {
   reccs: User[];
   favs: User[];
-  map: mapboxgl.Map | undefined;
+  map: mapboxgl.Map;
 }) => {
   const [curList, setCurList] = useState<User[]>(reccs ?? []);
 
@@ -39,7 +39,6 @@ const Sidebar = ({
         <button
           className="bg-stone-300 hover:bg-stone-400 rounded-xl m-2 px-2.5 py-0.5"
           onClick={() => {
-            console.log();
             setCurList(reccs ?? []);
             clearMarkers();
           }}
@@ -58,7 +57,15 @@ const Sidebar = ({
       </div>
       <div id="scrollableDiv" className="overflow-auto">
         {curList.map((user: User) => (
-          <UserCard user={user} key={user.id} />
+          <UserCard
+            user={user}
+            key={user.id}
+            inputProps={{
+              map: map,
+              previousMarkers: previousMarkers,
+              clearMarkers: clearMarkers,
+            }}
+          />
         ))}
       </div>
     </div>

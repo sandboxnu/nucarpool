@@ -101,7 +101,7 @@ export default function (props: UserCardProps): JSX.Element {
             onClick={() => viewRoute(props.user)}
             className="underline font-light align-text-top"
           >
-            <em>View Route</em>
+            <em onClick={() => viewRoute(props.user)}>View Route</em>
           </button>
           {/* Add user bar */}
           <div className="font-medium">
