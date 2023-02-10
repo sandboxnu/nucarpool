@@ -43,6 +43,7 @@ const DaysWorkingDisplay = (daysWorking: string) => {
     }
     boxes.push(
       <div
+        key={i}
         className={"w-4 h-4 border-l-0 border border-black" + backgroundColor}
       ></div>
     );

@@ -84,13 +84,16 @@ export const userRouter = createProtectedRouter()
         ? new Date(Date.parse(input.endTime))
         : undefined;
 
-      const arrayOfFavoriteIds = input.favorites.map((i) => {
-        return { id: `${i}` };
-      });
+      /**
+       * This is causing a type error, unsure why
+       */
+      // const arrayOfFavoriteIds = input.favorites.map((i) => {
+      //   return { id: `${i}` };
+      // });
 
-      const arrayOfFavoritedByIds = input.favorites.map((i) => {
-        return { id: `${i}` };
-      });
+      // const arrayOfFavoritedByIds = input.favorites.map((i) => {
+      //   return { id: `${i}` };
+      // });
 
       const id = ctx.session.user?.id;
       const user = await ctx.prisma.user.update({
@@ -111,12 +114,15 @@ export const userRouter = createProtectedRouter()
           daysWorking: input.daysWorking,
           startTime: startTimeDate,
           endTime: endTimeDate,
-          favorites: {
-            connect: arrayOfFavoriteIds,
-          },
-          favoritedBy: {
-            connect: arrayOfFavoritedByIds,
-          },
+          /**
+           * This is causing a type error, unsure why
+           */
+          // favorites: {
+          //   connect: arrayOfFavoriteIds,
+          // },
+          // favoritedBy: {
+          //   connect: arrayOfFavoritedByIds,
+          // },
         },
       });
 
@@ -147,18 +153,11 @@ export const userRouter = createProtectedRouter()
           status: Status.ACTIVE, // only include active users
         },
       });
-      console.log(users);
       const recs = _.compact(users.map(calculateScore(currentUser)));
       recs.sort((a, b) => a.score - b.score);
       const sortedUsers = _.compact(
         recs.map((rec) => users.find((user) => user.id === rec.id))
       );
-
-      const testUser = await ctx.prisma.user.findUnique({
-        where: {
-          id: "64",
-        },
-      });
       return sortedUsers;
     },
   })
