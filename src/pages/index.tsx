@@ -13,9 +13,7 @@ import { trpc } from "../utils/trpc";
 import DropDownMenu from "../components/DropDownMenu";
 import { browserEnv } from "../utils/env/browser";
 import ProtectedPage from "../utils/auth";
-import { Role, Status, User } from "@prisma/client";
 import Sidebar from "../components/Sidebar";
-import dayjs from "dayjs";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -24,7 +22,7 @@ const Home: NextPage<any> = () => {
     trpc.useQuery(["mapbox.geoJsonUsersList"]);
   const { data: user, isLoading: isLoadingUser } = trpc.useQuery(["user.me"]);
   const { data: recommendations } = trpc.useQuery(["user.recommendations"]);
-  // const { data: favorites } = trpc.useQuery(["user.favourites"]);
+  // const { data: favorites  = trpc.useQuery(["user.favorites"]);
   // Uncomment the above line and delete the below line for the final build
   const favorites = undefined;
 
@@ -48,6 +46,7 @@ const Home: NextPage<any> = () => {
     }
   }, [user, geoJsonUsers]);
 
+  console.log(favorites);
   return (
     <>
       <Head>

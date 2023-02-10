@@ -8,7 +8,6 @@ import { Feature, FeatureCollection } from "geojson";
 import calculateScore, { Recommendation } from "../../utils/recommendation";
 import _ from "lodash";
 import { FaTruckLoading } from "react-icons/fa";
-import { userSchema } from "../../utils/zodSchema";
 
 // user router to get information about or edit users
 export const userRouter = createProtectedRouter()
@@ -72,11 +71,6 @@ export const userRouter = createProtectedRouter()
       daysWorking: z.string(),
       startTime: z.optional(z.string()),
       endTime: z.optional(z.string()),
-      /**
-       * This is causing a type error, unsure why
-       */
-      // favorites: z.array(userSchema),
-      // favoritedBy: z.array(userSchema),
     }),
 
     async resolve({ ctx, input }) {
@@ -86,17 +80,6 @@ export const userRouter = createProtectedRouter()
       const endTimeDate = input.endTime
         ? new Date(Date.parse(input.endTime))
         : undefined;
-
-      /**
-       * This is causing a type error, unsure why
-       */
-      // const arrayOfFavoriteIds = input.favorites.map((i) => {
-      //   return { id: `${i}` };
-      // });
-
-      // const arrayOfFavoritedByIds = input.favorites.map((i) => {
-      //   return { id: `${i}` };
-      // });
 
       const id = ctx.session.user?.id;
       const user = await ctx.prisma.user.update({
@@ -117,15 +100,6 @@ export const userRouter = createProtectedRouter()
           daysWorking: input.daysWorking,
           startTime: startTimeDate,
           endTime: endTimeDate,
-          /**
-           * This is causing a type error, unsure why
-           */
-          // favorites: {
-          //   connect: arrayOfFavoriteIds,
-          // },
-          // favoritedBy: {
-          //   connect: arrayOfFavoritedByIds,
-          // },
         },
       });
 

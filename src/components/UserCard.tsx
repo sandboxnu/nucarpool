@@ -51,8 +51,8 @@ const DaysWorkingDisplay = (daysWorking: string) => {
   return <div className="flex border-l border-black h-min">{boxes}</div>;
 };
 
-export default function (props: UserCardProps): JSX.Element {
-  const viewRoute = (user: User) => {
+export default function UserCard(props: UserCardProps): JSX.Element {
+  const onViewRouteClick = (user: User) => {
     if (props.inputProps) {
       if (props.inputProps.map !== undefined) {
         props.inputProps.clearMarkers();
@@ -99,12 +99,11 @@ export default function (props: UserCardProps): JSX.Element {
         </div>
         <div className="w-full m-0 flex flex-row justify-between align-middle">
           <button
-            onClick={() => viewRoute(props.user)}
+            onClick={() => onViewRouteClick(props.user)}
             className="underline font-light align-text-top"
           >
-            <em onClick={() => viewRoute(props.user)}>View Route</em>
+            <em>View Route</em>
           </button>
-          {/* Add user bar */}
           <div className="font-medium">
             <p>{"Start: " + dayjs(props.user.startTime).format("hh:mm")}</p>
             <p>{"End: " + dayjs(props.user.endTime).format("hh:mm")}</p>

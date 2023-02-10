@@ -53,6 +53,7 @@ export const userSchema: z.ZodType<User> = z.lazy(() =>
     daysWorking: z.string(),
     startTime: z.date(),
     endTime: z.date(),
+    favorites: z.array(userSchema),
     favoritedBy: z.array(userSchema),
   })
 );

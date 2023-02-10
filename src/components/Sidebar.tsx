@@ -5,10 +5,7 @@ import UserCard from "./UserCard";
 
 /**
  * TODO:
- * 1. Recommendations in index is undefined, and therefore sidebar receivees empty array for both Reccs and Favorites
  * 2. Add Prettier Tailwind omg please
- * 3. Inconsistency in Figma ? Connect vs Send Email?
- * 4. How is daysWorking stored? Currently a "0,0,1,1,1,1,1" but surely there's a better way? Forces me to loop through string?
  * 5. onClick StarButton with Favorites
  */
 
