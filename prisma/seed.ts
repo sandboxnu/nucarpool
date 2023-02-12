@@ -202,15 +202,16 @@ const genRandomUsers = ({
  * Updates the favorites of the user associated with the given ID.
  *
  * @param userId id for the user we're updating.
+ * @param ids the ids to add to the current user
  */
-const addFavorites = async (userId: string) => {
+const addFavorites = async (userId: string, ids: string[]) => {
   await prisma.user.update({
     where: {
       id: userId,
     },
     data: {
       favorites: {
-        connect: [{ id: "0" }, { id: "1" }],
+        connect: ids.map((id) => ({ id })),
       },
     },
   });
