@@ -8,7 +8,7 @@ type POIData = {
   coordLat: number;
 };
 
-// descripes a user's public data along with their IPO's
+// descripes a user's public data along with their POIs
 export type PublicUser = {
   id: string;
   name: string | null;
@@ -57,7 +57,7 @@ export const toPublicUser = (user: User): PublicUser => {
   };
 };
 
-export const ipoData = async (
+export const poiData = async (
   longitude: number,
   latitude: number
 ): Promise<POIData> => {

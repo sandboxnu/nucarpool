@@ -6,7 +6,7 @@ import { Role, User } from "@prisma/client";
 import { Status } from "@prisma/client";
 import { Feature, FeatureCollection } from "geojson";
 import calculateScore, { Recommendation } from "../../utils/recommendation";
-import { toPublicUser, PublicUser, ipoData } from "../../utils/publicUser";
+import { toPublicUser, PublicUser, poiData } from "../../utils/publicUser";
 import _ from "lodash";
 
 // user router to get information about or edit users
@@ -59,8 +59,8 @@ export const userRouter = createProtectedRouter()
         ? new Date(Date.parse(input.endTime))
         : undefined;
       const [startPOIData, endPOIData] = await Promise.all([
-        ipoData(input.startCoordLng, input.startCoordLat),
-        ipoData(input.companyCoordLng, input.companyCoordLat),
+        poiData(input.startCoordLng, input.startCoordLat),
+        poiData(input.companyCoordLng, input.companyCoordLat),
       ]);
 
       const id = ctx.session.user?.id;
