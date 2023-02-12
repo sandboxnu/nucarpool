@@ -132,23 +132,22 @@ export const userRouter = createProtectedRouter()
   .query("favorites", {
     async resolve({ ctx }) {
       const id = ctx.session.user?.id;
-      const { favorites } =
-        (await ctx.prisma.user.findUnique({
-          where: { id },
-          select: {
-            favorites: true,
-          },
-        })) || {};
+      const user = await ctx.prisma.user.findUnique({
+        where: { id },
+        select: {
+          favorites: true,
+        },
+      });
 
       // throws TRPCError if no user with ID exists
-      if (!favorites) {
+      if (!user) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: `No profile with id '${id}'`,
         });
       }
 
-      return Promise.all(favorites.map(toPublicUser));
+      return Promise.all(user.favorites.map(toPublicUser));
     },
   })
   .mutation("favorites", {
