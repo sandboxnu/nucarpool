@@ -1,4 +1,7 @@
 import { Role, Status, User } from "@prisma/client";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import _ from "lodash";
 import dayConversion from "./dayConversion";
 
@@ -161,21 +164,20 @@ export const generateUser = ({
   const [startHours, startMinutes] = startTime
     .split(":")
     .map((s) => _.toInteger(s));
-  const startDate = new Date(
-    Date.parse(
-      `2022-11-01T${startHours.toString().padStart(2, "0")}:${startMinutes
-        .toString()
-        .padStart(2, "0")}:00-05:00`
+
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
+
+  const startDate = dayjs
+    .tz(
+      "2022-11-01 " + startHours + ":" + startMinutes + "00",
+      "America/New_York"
     )
-  );
+    .toDate();
   const [endHours, endMinutes] = endTime.split(":").map((s) => _.toInteger(s));
-  const endDate = new Date(
-    Date.parse(
-      `2022-11-01T${endHours.toString().padStart(2, "0")}:${endMinutes
-        .toString()
-        .padStart(2, "0")}:00-05:00`
-    )
-  );
+  const endDate = dayjs
+    .tz("2022-11-01 " + endHours + ":" + endMinutes + "00", "America/New_York")
+    .toDate();
 
   const updated_obj = {
     id: id,

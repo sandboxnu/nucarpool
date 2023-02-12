@@ -1,4 +1,7 @@
 import calculateScore, { generateUser } from "../src/utils/recommendation";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import { expect, jest, test } from "@jest/globals";
 import { Prisma, User } from "@prisma/client";
 import _ from "lodash";
@@ -25,11 +28,11 @@ const usersToBeCutoff: User[] = [
   },
   {
     ...relativeOrderBaseUser,
-    startTime: new Date(Date.parse("2022-11-01T07:59:00-05:00")),
+    startTime: dayjs.tz("2022-11-01 07:59:00", "America/New_York").toDate(),
   },
   {
     ...relativeOrderBaseUser,
-    endTime: new Date(Date.parse("2022-11-01T18:01:00-05:00")),
+    endTime: dayjs.tz("2022-11-01 18:01:00", "America/New_York").toDate(),
   },
   {
     ...relativeOrderBaseUser,
@@ -56,11 +59,11 @@ const usersToNotBeCutoff: User[] = [
   },
   {
     ...relativeOrderBaseUser,
-    startTime: new Date(Date.parse("2022-11-01T08:00:00-05:00")),
+    startTime: dayjs.tz("2022-11-01 08:00:00", "America/New_York").toDate(),
   },
   {
     ...relativeOrderBaseUser,
-    endTime: new Date(Date.parse("2022-11-01T18:00:00-05:00")),
+    endTime: dayjs.tz("2022-11-01 18:00:00", "America/New_York").toDate(),
   },
   {
     ...relativeOrderBaseUser,
@@ -107,12 +110,12 @@ const relativeOrderUsers: User[] = [
   {
     ...relativeOrderBaseUser,
     role: "RIDER",
-    startTime: new Date(Date.parse("2022-11-01T09:15:00-05:00")),
+    startTime: dayjs.tz("2022-11-01 09:15:00", "America/New_York").toDate(),
   },
   {
     ...relativeOrderBaseUser,
     role: "RIDER",
-    endTime: new Date(Date.parse("2022-11-01T17:15:00-05:00")),
+    endTime: dayjs.tz("2022-11-01 17:15:00", "America/New_York").toDate(),
   },
   {
     ...relativeOrderBaseUser,
