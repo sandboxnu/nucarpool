@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { trpc } from "../utils/trpc";
+import React, { useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Spinner from "./Spinner";
-import { Role, Status, User } from "@prisma/client";
 import mapboxgl, { Marker } from "mapbox-gl";
-import { min } from "lodash";
-import { PublicUser } from "../utils/publicUser";
+import { PublicUser } from "../utils/types";
 
 type ScrollableList = {
   items: PublicUser[];

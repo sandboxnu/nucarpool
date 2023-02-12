@@ -1,35 +1,12 @@
-import { Role, Status, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { serverEnv } from "./env/server";
+import { PublicUser } from "./types";
 
 type POIData = {
   location: string;
   coordLng: number;
   coordLat: number;
-};
-
-// descripes a user's public data along with their POIs
-export type PublicUser = {
-  id: string;
-  name: string | null;
-  email: string | null;
-  image: string | null;
-  bio: string;
-  preferredName: string;
-  pronouns: string;
-  role: Role;
-  status: Status;
-  seatAvail: number;
-  companyName: string;
-  startPOILocation: string;
-  startPOICoordLng: number;
-  startPOICoordLat: number;
-  companyPOIAddress: string;
-  companyPOICoordLng: number;
-  companyPOICoordLat: number;
-  daysWorking: string;
-  startTime: Date | null;
-  endTime: Date | null;
 };
 
 export const toPublicUser = (user: User): PublicUser => {

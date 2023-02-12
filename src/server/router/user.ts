@@ -1,13 +1,12 @@
 import { TRPCError } from "@trpc/server";
-import { resolve } from "path";
 import { z } from "zod";
 import { createProtectedRouter } from "./createProtectedRouter";
-import { Role, User } from "@prisma/client";
+import { Role } from "@prisma/client";
 import { Status } from "@prisma/client";
-import { Feature, FeatureCollection } from "geojson";
-import calculateScore, { Recommendation } from "../../utils/recommendation";
-import { toPublicUser, PublicUser, poiData } from "../../utils/publicUser";
+import calculateScore from "../../utils/recommendation";
+import { toPublicUser, poiData } from "../../utils/publicUser";
 import _ from "lodash";
+import { PublicUser } from "../../utils/types";
 
 // user router to get information about or edit users
 export const userRouter = createProtectedRouter()
