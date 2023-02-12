@@ -198,10 +198,15 @@ const genRandomUsers = ({
   });
 };
 
-const addFavorites = async () => {
+/**
+ * Updates the favorites of the user associated with the given ID.
+ *
+ * @param userId id for the user we're updating.
+ */
+const addFavorites = async (userId: string) => {
   await prisma.user.update({
     where: {
-      id: "cldwgki9300009k1g1tlwh4tj",
+      id: userId,
     },
     data: {
       favorites: {
@@ -215,7 +220,7 @@ const addFavorites = async () => {
  * Populates our database with fake data.
  */
 const main = async () => {
-  // addFavorites();
+  // addFavorites("1");
   await createUserData();
 };
 
