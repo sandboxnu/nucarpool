@@ -6,7 +6,7 @@ import { Role, User } from "@prisma/client";
 import { Status } from "@prisma/client";
 import { Feature, FeatureCollection } from "geojson";
 import calculateScore, { Recommendation } from "../../utils/recommendation";
-import { toPublicUser, PublicUser, ipoData } from "../../utils/publicUser";
+import { toPublicUser, PublicUser, poiData } from "../../utils/publicUser";
 import _ from "lodash";
 
 // user router to get information about or edit users
@@ -59,8 +59,8 @@ export const userRouter = createProtectedRouter()
         ? new Date(Date.parse(input.endTime))
         : undefined;
       const [startPOIData, endPOIData] = await Promise.all([
-        ipoData(input.startCoordLng, input.startCoordLat),
-        ipoData(input.companyCoordLng, input.companyCoordLat),
+        poiData(input.startCoordLng, input.startCoordLat),
+        poiData(input.companyCoordLng, input.companyCoordLat),
       ]);
 
       const id = ctx.session.user?.id;
@@ -132,23 +132,22 @@ export const userRouter = createProtectedRouter()
   .query("favorites", {
     async resolve({ ctx }) {
       const id = ctx.session.user?.id;
-      const { favorites } =
-        (await ctx.prisma.user.findUnique({
-          where: { id },
-          select: {
-            favorites: true,
-          },
-        })) || {};
+      const user = await ctx.prisma.user.findUnique({
+        where: { id },
+        select: {
+          favorites: true,
+        },
+      });
 
       // throws TRPCError if no user with ID exists
-      if (!favorites) {
+      if (!user) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: `No profile with id '${id}'`,
         });
       }
 
-      return Promise.all(favorites.map(toPublicUser));
+      return Promise.all(user.favorites.map(toPublicUser));
     },
   })
   .mutation("favorites", {
