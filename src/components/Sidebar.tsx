@@ -31,26 +31,36 @@ const Sidebar = ({
   }, [reccs]);
 
   return (
-    <div className="flex flex-col h-full w-96 fixed z-10 text-left bg-white">
-      <div className="flex-row">
-        <button
-          className="bg-stone-300 hover:bg-stone-400 rounded-xl m-2 px-2.5 py-0.5"
-          onClick={() => {
-            setCurList(reccs ?? []);
-            clearMarkers();
-          }}
-        >
-          Recommendations
-        </button>
-        <button
-          className="bg-stone-300 hover:bg-stone-400 rounded-xl m-2 px-2.5 py-0.5"
-          onClick={() => {
-            setCurList(favs ?? []);
-            clearMarkers();
-          }}
-        >
-          Favorites
-        </button>
+    <div className="flex flex-col px-5 flex-auto h-full z-10 text-left bg-white">
+      <div className="flex-row py-3">
+        <div className="flex justify-center gap-3">
+          <button
+            className={
+              curList == reccs
+                ? "bg-northeastern-red rounded-xl p-2 font-semibold text-xl text-white"
+                : "rounded-xl p-2 font-semibold text-xl text-black"
+            }
+            onClick={() => {
+              setCurList(reccs ?? []);
+              clearMarkers();
+            }}
+          >
+            Recommendations
+          </button>
+          <button
+            className={
+              curList == favs
+                ? "bg-northeastern-red rounded-xl p-2 font-semibold text-xl text-white"
+                : "rounded-xl p-2 font-semibold text-xl text-black"
+            }
+            onClick={() => {
+              setCurList(favs ?? []);
+              clearMarkers();
+            }}
+          >
+            Favorites
+          </button>
+        </div>
       </div>
       <div id="scrollableDiv" className="overflow-auto">
         {curList.map((user: User) => (
