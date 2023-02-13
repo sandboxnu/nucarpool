@@ -2,6 +2,12 @@ import { inferQueryOutput } from "./trpc";
 import { Role } from "@prisma/client";
 import { Status } from "@prisma/client";
 
+export type PoiData = {
+  location: string;
+  coordLng: number;
+  coordLat: number;
+};
+
 export type ProfileFormInputs = {
   firstName: string;
   lastName: string;

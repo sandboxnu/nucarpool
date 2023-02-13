@@ -221,7 +221,6 @@ const addFavorites = async (userId: string, ids: string[]) => {
  * Populates our database with fake data.
  */
 const main = async () => {
-  // addFavorites("1");
   await createUserData();
 };
 

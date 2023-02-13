@@ -4,7 +4,7 @@ import { createProtectedRouter } from "./createProtectedRouter";
 import { Role } from "@prisma/client";
 import { Status } from "@prisma/client";
 import calculateScore from "../../utils/recommendation";
-import { toPublicUser, poiData } from "../../utils/publicUser";
+import { convertToPublic, generatePoiData } from "../../utils/publicUser";
 import _ from "lodash";
 import { PublicUser } from "../../utils/types";
 
@@ -58,8 +58,8 @@ export const userRouter = createProtectedRouter()
         ? new Date(Date.parse(input.endTime))
         : undefined;
       const [startPOIData, endPOIData] = await Promise.all([
-        poiData(input.startCoordLng, input.startCoordLat),
-        poiData(input.companyCoordLng, input.companyCoordLat),
+        generatePoiData(input.startCoordLng, input.startCoordLat),
+        generatePoiData(input.companyCoordLng, input.companyCoordLat),
       ]);
 
       const id = ctx.session.user?.id;
@@ -124,7 +124,7 @@ export const userRouter = createProtectedRouter()
       const sortedUsers = recs.map((rec) =>
         users.find((user) => user.id === rec.id)
       );
-      return Promise.all(sortedUsers.map((user) => toPublicUser(user!)));
+      return Promise.all(sortedUsers.map((user) => convertToPublic(user!)));
     },
   })
   // Returns the list of favorites for the curent user
@@ -146,7 +146,7 @@ export const userRouter = createProtectedRouter()
         });
       }
 
-      return Promise.all(user.favorites.map(toPublicUser));
+      return Promise.all(user.favorites.map(convertToPublic));
     },
   })
   .mutation("favorites", {

@@ -1,15 +1,15 @@
 import { User } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { serverEnv } from "./env/server";
-import { PublicUser } from "./types";
+import { PublicUser, PoiData } from "./types";
 
-type POIData = {
-  location: string;
-  coordLng: number;
-  coordLat: number;
-};
-
-export const toPublicUser = (user: User): PublicUser => {
+/**
+ * Converts the given ``User`` to a ``PublicUser``, as to hide sensitive data.
+ *
+ * @param user a rider or driver.
+ * @returns non-sensitive information about a user.
+ */
+export const convertToPublic = (user: User): PublicUser => {
   return {
     id: user.id,
     name: user.name,
@@ -34,11 +34,26 @@ export const toPublicUser = (user: User): PublicUser => {
   };
 };
 
-export const poiData = async (
+/**
+ * Generates place of interest data given a point on the map.
+ *
+ * @param longitude the geographical longitude.
+ * @param latitude the geographical latitude.
+ * @returns non-specific location information (AKA POI).
+ */
+export const generatePoiData = async (
   longitude: number,
   latitude: number
-): Promise<POIData> => {
-  const endpoint = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude}, ${latitude}.json?types=poi,locality&access_token=${serverEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`;
+): Promise<PoiData> => {
+  const endpoint = [
+    "https://api.mapbox.com/geocoding/v5/mapbox.places/",
+    longitude,
+    ", ",
+    latitude,
+    ".json?types=poi,locality&access_token=",
+    serverEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN,
+  ].join("");
+
   const data = await fetch(endpoint)
     .then((response) => response.json())
     .catch((err) => {
@@ -50,7 +65,7 @@ export const poiData = async (
     });
 
   return {
-    location: data.features[0]?.properties.address || "NOT FOUND",
+    location: data.features[0]?.place_name || "NOT FOUND",
     coordLng: data.features[0]?.center[0] ?? -999,
     coordLat: data.features[0]?.center[1] ?? -999,
   };
