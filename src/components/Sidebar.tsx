@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Role, Status, User } from "@prisma/client";
 import mapboxgl, { Marker } from "mapbox-gl";
-import UserCard from "./UserCard";
+import { UserCard } from "./UserCard";
 
 /**
  * TODO:

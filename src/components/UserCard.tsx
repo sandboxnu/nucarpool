@@ -13,7 +13,7 @@ interface UserCardProps {
   };
 }
 
-export default function UserCard(props: UserCardProps): JSX.Element {
+export const UserCard = (props: UserCardProps): JSX.Element => {
   /**
    * https://stackoverflow.com/questions/69687530/dynamically-build-classnames-in-tailwindcss
    * Because Tailwind does not support dynnamic CSS, the returns of the two functions below
@@ -148,4 +148,8 @@ export default function UserCard(props: UserCardProps): JSX.Element {
       </div>
     </div>
   );
-}
+};
+
+UserCard.displayName = "UserCard";
+
+export default UserCard;
