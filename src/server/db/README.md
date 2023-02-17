@@ -75,7 +75,7 @@ export const userRouter = createProtectedRouter().mutation("edit", {
     companyAddress: z.string().min(1),
     companyCoordLng: z.number(),
     companyCoordLat: z.number(),
-    startLocation: z.string().min(1),
+    startAddress: z.string().min(1),
     isOnboarded: z.boolean(),
   }),
   async resolve({ ctx, input }) {
@@ -90,7 +90,7 @@ export const userRouter = createProtectedRouter().mutation("edit", {
         companyAddress: input.companyAddress,
         companyCoordLng: input.companyCoordLng,
         companyCoordLat: input.companyCoordLat,
-        startLocation: input.startLocation,
+        startAddress: input.startAddress,
         isOnboarded: input.isOnboarded,
       },
     });

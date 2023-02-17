@@ -201,7 +201,7 @@ export const generateUser = ({
     companyAddress: "360 Huntington Ave",
     companyCoordLng: companyCoordLng,
     companyCoordLat: companyCoordLat,
-    startLocation: "Roxbury",
+    startAddress: "Roxbury",
     startCoordLng: startCoordLng,
     startCoordLat: startCoordLat,
     companyPOIAddress: "Northeastern University",
