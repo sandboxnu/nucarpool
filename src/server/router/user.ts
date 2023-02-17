@@ -6,7 +6,6 @@ import { Status } from "@prisma/client";
 import calculateScore from "../../utils/recommendation";
 import { convertToPublic, generatePoiData } from "../../utils/publicUser";
 import _ from "lodash";
-import { PublicUser } from "../../utils/types";
 
 // user router to get information about or edit users
 export const userRouter = createProtectedRouter()

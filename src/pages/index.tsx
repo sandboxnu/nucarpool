@@ -13,8 +13,8 @@ import { trpc } from "../utils/trpc";
 import DropDownMenu from "../components/DropDownMenu";
 import { browserEnv } from "../utils/env/browser";
 import ProtectedPage from "../utils/auth";
-import { Role, Status, User } from "@prisma/client";
 import Sidebar from "../components/Sidebar";
+import Header from "../components/Header";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -23,7 +23,7 @@ const Home: NextPage<any> = () => {
     trpc.useQuery(["mapbox.geoJsonUsersList"]);
   const { data: user, isLoading: isLoadingUser } = trpc.useQuery(["user.me"]);
   const { data: recommendations } = trpc.useQuery(["user.recommendations"]);
-  // const { data: favorites } = trpc.useQuery(["user.favourites"]);
+  // const { data: favorites  = trpc.useQuery(["user.favorites"]);
   // Uncomment the above line and delete the below line for the final build
   const favorites = undefined;
 
@@ -47,22 +47,38 @@ const Home: NextPage<any> = () => {
     }
   }, [user, geoJsonUsers]);
 
+  console.log(favorites);
   return (
     <>
       <Head>
         <title>Home</title>
       </Head>
-      {/* <ProfileModal userInfo={userInfo!} user={user!}  /> */}
-      <Sidebar reccs={recommendations} favs={favorites} map={mapState} />
-      <DropDownMenu />
-      <button
-        className="flex justify-center items-center w-8 h-8 absolute z-10 right-[8px] bottom-[150px] rounded-md bg-white border-2 border-solid border-gray-300 shadow-sm hover:bg-gray-200"
-        id="fly"
-      >
-        <RiFocus3Line />
-      </button>
-      {/* This is where the Mapbox puts its stuff */}
-      <div id="map" className="h-screen"></div>
+      <div className="max-h-screen w-full h-full m-0">
+        <Header />
+        {/* <ProfileModal userInfo={userInfo!} user={user!}  /> */}
+        <div className="flex flex-auto h-[90%]">
+          <div className="w-3/12">
+            {mapState && (
+              <Sidebar
+                reccs={recommendations ?? []}
+                favs={favorites ?? []}
+                map={mapState}
+              />
+            )}
+          </div>
+
+          <DropDownMenu />
+          <button
+            className="flex justify-center items-center w-8 h-8 absolute z-10 right-[8px] bottom-[150px] rounded-md bg-white border-2 border-solid border-gray-300 shadow-sm hover:bg-gray-200"
+            id="fly"
+          >
+            <RiFocus3Line />
+          </button>
+          {/* This is where the Mapbox puts its stuff */}
+
+          <div id="map" className="flex-auto z-10"></div>
+        </div>
+      </div>
     </>
   );
 };

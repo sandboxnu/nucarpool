@@ -12,6 +12,9 @@ module.exports = {
     extend: {
       colors: {
         "northeastern-red": "#C8102E",
+        "busy-red": "#FFA9A9",
+        "okay-yellow": "#FFCB11",
+        "good-green": "#C7EFB3",
       },
     },
   },
