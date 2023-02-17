@@ -170,13 +170,13 @@ export const generateUser = ({
 
   const startDate = dayjs
     .tz(
-      "2022-11-01 " + startHours + ":" + startMinutes + "00",
+      `2022-11-01 ${startHours}:${startMinutes}00`,
       "America/New_York"
     )
     .toDate();
   const [endHours, endMinutes] = endTime.split(":").map((s) => _.toInteger(s));
   const endDate = dayjs
-    .tz("2022-11-01 " + endHours + ":" + endMinutes + "00", "America/New_York")
+    .tz(`2022-11-01 ${endHours}:${endMinutes}00`, "America/New_York")
     .toDate();
 
   const updated_obj = {
