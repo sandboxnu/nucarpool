@@ -1,20 +1,31 @@
+import { PublicUser, User } from "../utils/types";
 import { TextField } from "./TextField";
 
-export default function ConnectModal(): JSX.Element {
+interface ConnectModalProps {
+  // represents the 'me', the user trying to connect to someone
+  currentUser: User;
+  // represents the other user 'I' am trying to connect to.
+  userToConnectTo: PublicUser;
+
+  closeModal: () => void;
+}
+
+export default function ConnectModal(props: ConnectModalProps): JSX.Element {
   return (
-    <div className=" fixed top-20 left-20 justify-center bg-slate-50 h-1/2 w-1/2 content-center flex flex-col p-9 gap-3 font-sans">
+    <div className="justify-center rounded-md shadow-lg bg-white h-4/6 w-3/6 content-center flex flex-col p-9 gap-4">
       <div className="font-bold text-2xl text-center">
         Send an email to connect!
       </div>
 
-      <div className="text-xs">
-        Use the space below to write out a message to Dev and send a connection
-        request. We recommend writing a bit about yourself, your schedule, and
-        anything else you think would be good to know!
+      <div className="text-sm">
+        Use the space below to write out a message to{" "}
+        {props.userToConnectTo.preferredName} and send a connection request. We
+        recommend writing a bit about yourself, your schedule, and anything else
+        you think would be good to know!
       </div>
 
       <TextField multiline={true} charLimit={280}>
-        {/* add USSER BIO */}
+        {props.currentUser.bio}
       </TextField>
 
       <div className="text-xs italic text-slate-400">
@@ -23,7 +34,10 @@ export default function ConnectModal(): JSX.Element {
       </div>
 
       <div className="flex justify-center space-x-7">
-        <button className="w-full p-1 text-red-700 bg-slate-50 border-2 border-red-700 rounded-md">
+        <button
+          onClick={() => props.closeModal()}
+          className="w-full p-1 text-red-700 bg-slate-50 border-2 border-red-700 rounded-md"
+        >
           Cancel
         </button>
 

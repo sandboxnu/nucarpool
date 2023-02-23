@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import { UserCard } from "./UserCard";
-import { PublicUser } from "../utils/types";
+import { PublicUser, User } from "../utils/types";
 
 /**
  * TODO:
@@ -15,20 +15,20 @@ const clearMarkers = () => {
   previousMarkers.length = 0;
 };
 
-const Sidebar = ({
-  reccs,
-  favs,
-  map,
-}: {
+interface SideBarProps {
+  currentUser: User;
   reccs: PublicUser[];
   favs: PublicUser[];
   map: mapboxgl.Map;
-}) => {
-  const [curList, setCurList] = useState<PublicUser[]>(reccs ?? []);
+  handleConnect: (modalUser: PublicUser) => void;
+}
+
+const Sidebar = (props: SideBarProps) => {
+  const [curList, setCurList] = useState<PublicUser[]>(props.reccs ?? []);
 
   useEffect(() => {
-    setCurList(reccs ?? []);
-  }, [reccs]);
+    setCurList(props.reccs ?? []);
+  }, [props.reccs]);
 
   return (
     <div className="flex flex-col px-5 flex-auto h-full z-10 text-left bg-white">
@@ -36,12 +36,12 @@ const Sidebar = ({
         <div className="flex justify-center gap-3">
           <button
             className={
-              curList == reccs
+              curList == props.reccs
                 ? "bg-northeastern-red rounded-xl p-2 font-semibold text-xl text-white"
                 : "rounded-xl p-2 font-semibold text-xl text-black"
             }
             onClick={() => {
-              setCurList(reccs ?? []);
+              setCurList(props.reccs ?? []);
               clearMarkers();
             }}
           >
@@ -49,12 +49,12 @@ const Sidebar = ({
           </button>
           <button
             className={
-              curList == favs
+              curList == props.favs
                 ? "bg-northeastern-red rounded-xl p-2 font-semibold text-xl text-white"
                 : "rounded-xl p-2 font-semibold text-xl text-black"
             }
             onClick={() => {
-              setCurList(favs ?? []);
+              setCurList(props.favs ?? []);
               clearMarkers();
             }}
           >
@@ -63,15 +63,16 @@ const Sidebar = ({
         </div>
       </div>
       <div id="scrollableDiv" className="overflow-auto">
-        {curList.map((user: PublicUser) => (
+        {curList.map((otherUser: PublicUser) => (
           <UserCard
-            user={user}
-            key={user.id}
+            userToConnectTo={otherUser}
+            key={otherUser.id}
             inputProps={{
-              map: map,
+              map: props.map,
               previousMarkers: previousMarkers,
               clearMarkers: clearMarkers,
             }}
+            handleConnect={props.handleConnect}
           />
         ))}
       </div>

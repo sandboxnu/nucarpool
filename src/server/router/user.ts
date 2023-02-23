@@ -47,6 +47,7 @@ export const userRouter = createProtectedRouter()
       daysWorking: z.string(),
       startTime: z.optional(z.string()),
       endTime: z.optional(z.string()),
+      bio: z.string(),
     }),
 
     async resolve({ ctx, input }) {
@@ -87,8 +88,11 @@ export const userRouter = createProtectedRouter()
           daysWorking: input.daysWorking,
           startTime: startTimeDate,
           endTime: endTimeDate,
+          bio: input.bio,
         },
       });
+      console.log("user preferredName is " + user.preferredName);
+      console.log("user bio is " + user.bio);
 
       return user;
     },

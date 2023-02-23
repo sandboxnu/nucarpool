@@ -18,7 +18,7 @@ export type ProfileFormInputs = {
   status: "active" | "inactive";
 };
 
-// descripes a user's public data along with their POIs
+// describes a user's public data along with their POIs
 export type PublicUser = {
   id: string;
   name: string | null;

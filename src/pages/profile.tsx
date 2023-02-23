@@ -54,6 +54,7 @@ type OnboardingFormInputs = {
   startTime?: Date;
   endTime?: Date;
   timeDiffers: boolean;
+  bio: string;
 };
 
 const dateErrorMap: z.ZodErrorMap = (issue, ctx) => {
@@ -75,6 +76,7 @@ const onboardSchema = z.intersection(
     daysWorking: z
       .array(z.boolean())
       .refine((a) => a.some((b) => b), { message: "Select at least one day" }), // Make this regex.
+    bio: z.string(),
   }),
   z.union([
     z.object({
@@ -114,6 +116,7 @@ const Profile: NextPage = () => {
       startTime: undefined,
       endTime: undefined,
       timeDiffers: false,
+      bio: "",
     },
     resolver: zodResolver(onboardSchema),
   });
@@ -197,6 +200,7 @@ const Profile: NextPage = () => {
       daysWorking: daysWorkingParsed,
       startTime: userInfo.startTime?.toISOString(),
       endTime: userInfo.endTime?.toISOString(),
+      bio: userInfo.bio,
     });
   };
 
@@ -545,10 +549,13 @@ const Profile: NextPage = () => {
               </p>
               <TextField
                 className="w-full"
-                id="intro"
+                label="Bio"
+                id="bio"
+                error={errors.bio}
                 type="text"
                 charLimit={300}
                 multiline={true}
+                {...register("bio")}
               />
             </PersonalInfoSection>
           </ProfileColumn>

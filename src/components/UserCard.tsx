@@ -1,10 +1,15 @@
 import Rating from "@mui/material/Rating/Rating";
 import dayjs from "dayjs";
 import mapboxgl from "mapbox-gl";
-import { PublicUser } from "../utils/types";
+import { useState } from "react";
+import { PublicUser, User } from "../utils/types";
+import ConnectModal from "./ConnectModal";
+import CustomPopUp from "./CustomPopUp";
 
 interface UserCardProps {
-  user: PublicUser;
+  // represents the other user 'I' am trying to connect to.
+  userToConnectTo: PublicUser;
+  handleConnect: (modalUser: PublicUser) => void;
   inputProps?: {
     map: mapboxgl.Map;
     previousMarkers: mapboxgl.Marker[];
@@ -56,17 +61,23 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
     return <div className="flex border-l border-black h-min">{boxes}</div>;
   };
 
-  const onViewRouteClick = (user: PublicUser) => {
+  const onViewRouteClick = (userToConnectTo: PublicUser) => {
     if (props.inputProps) {
       if (props.inputProps.map !== undefined) {
         props.inputProps.clearMarkers();
 
         const startMarker = new mapboxgl.Marker({ color: "#2ae916" })
-          .setLngLat([props.user.startPOICoordLng, user.startPOICoordLat])
+          .setLngLat([
+            props.userToConnectTo.startPOICoordLng,
+            userToConnectTo.startPOICoordLat,
+          ])
           .addTo(props.inputProps.map);
 
         const endMarker = new mapboxgl.Marker({ color: "#f0220f" })
-          .setLngLat([user.companyPOICoordLng, user.companyPOICoordLat])
+          .setLngLat([
+            userToConnectTo.companyPOICoordLng,
+            userToConnectTo.companyPOICoordLat,
+          ])
           .addTo(props.inputProps.map);
 
         props.inputProps.previousMarkers.push(startMarker);
@@ -74,12 +85,24 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
 
         props.inputProps.map.fitBounds([
           [
-            Math.min(user.startPOICoordLng, user.companyPOICoordLng) - 0.125,
-            Math.max(user.startPOICoordLat, user.companyPOICoordLat) + 0.05,
+            Math.min(
+              userToConnectTo.startPOICoordLng,
+              userToConnectTo.companyPOICoordLng
+            ) - 0.125,
+            Math.max(
+              userToConnectTo.startPOICoordLat,
+              userToConnectTo.companyPOICoordLat
+            ) + 0.05,
           ],
           [
-            Math.max(user.startPOICoordLng, user.companyPOICoordLng) + 0.05,
-            Math.min(user.startPOICoordLat, user.companyPOICoordLat) - 0.05,
+            Math.max(
+              userToConnectTo.startPOICoordLng,
+              userToConnectTo.companyPOICoordLng
+            ) + 0.05,
+            Math.min(
+              userToConnectTo.startPOICoordLat,
+              userToConnectTo.companyPOICoordLat
+            ) - 0.05,
           ],
         ]);
       }
@@ -90,7 +113,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
     <div
       className={
         "bg-stone-100 text-left px-6 py-4 rounded-xl m-3.5 align-center flex flex-col border-l-[13px] gap-2 shadow-md" +
-        borderLColorCSS(props.user.seatAvail)
+        borderLColorCSS(props.userToConnectTo.seatAvail)
       }
     >
       <div className="flex justify-between">
@@ -98,25 +121,27 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         <div className="flex">
           <div className="flex text-lg">
             <p className="font-semibold border-r-2 pr-2 border-r-black">
-              {props.user.name}
+              {props.userToConnectTo.name}
             </p>
-            <p className="font-light pl-2">{props.user.companyName}</p>
+            <p className="font-light pl-2">
+              {props.userToConnectTo.companyName}
+            </p>
           </div>
         </div>
         <Rating name="" size="large" max={1} />
       </div>
       {/* second row */}
-      <p className="font-semibold">{props.user.startPOILocation}</p>
+      <p className="font-semibold">{props.userToConnectTo.startPOILocation}</p>
       {/* third row */}
       <div className="w-full flex gap-4 items-center">
-        {DaysWorkingDisplay(props.user.daysWorking)}
+        {DaysWorkingDisplay(props.userToConnectTo.daysWorking)}
         <div
           className={
             "w-7 h-7 flex justify-center items-center rounded-md font-semibold" +
-            backgroundColorCSS(props.user.seatAvail)
+            backgroundColorCSS(props.userToConnectTo.seatAvail)
           }
         >
-          {props.user.seatAvail}
+          {props.userToConnectTo.seatAvail}
         </div>
       </div>
       {/* fourth row */}
@@ -124,24 +149,27 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         <div className="font-normal text-sm flex">
           <p>Start: </p>{" "}
           <p className="font-semibold">
-            {dayjs(props.user.startTime).format("hh:mm")}
+            {dayjs(props.userToConnectTo.startTime).format("hh:mm")}
           </p>
           <p className="font-semibold px-2"> | </p>
           <p>End: </p>{" "}
           <p className="font-semibold">
-            {dayjs(props.user.endTime).format("hh:mm")}
+            {dayjs(props.userToConnectTo.endTime).format("hh:mm")}
           </p>
         </div>
       </div>
       {/* last row */}
       <div className="flex flex-row gap-2 justify-between">
         <button
-          onClick={() => onViewRouteClick(props.user)}
+          onClick={() => onViewRouteClick(props.userToConnectTo)}
           className="w-1/2 hover:bg-stone-200 rounded-md p-1 my-1 text-center border-black border"
         >
           View Route
         </button>
-        <button className="bg-northeastern-red w-1/2 hover:bg-red-700 rounded-md p-1 my-1 text-center text-white">
+        <button
+          onClick={() => props.handleConnect(props.userToConnectTo)}
+          className="bg-northeastern-red w-1/2 hover:bg-red-700 rounded-md p-1 my-1 text-center text-white"
+        >
           Connect
         </button>
       </div>

@@ -15,6 +15,8 @@ import { browserEnv } from "../utils/env/browser";
 import ProtectedPage from "../utils/auth";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
+import { PublicUser } from "../utils/types";
+import ConnectModal from "../components/ConnectModal";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -28,6 +30,19 @@ const Home: NextPage<any> = () => {
   const favorites = undefined;
 
   const [mapState, setMapState] = useState<mapboxgl.Map>();
+
+  const [modalUser, setModalUser] = useState<PublicUser | null>(null);
+  // this will add backdrop-blur-sm when the modal is displayed via handleConnect
+  const [mapOverlayCSS, setmapOverlayCSS] = useState<string>(
+    "absolute top-0 right-0 w-full h-full flex justify-center items-center"
+  );
+
+  const handleConnect = (userToConnectTo: PublicUser) => {
+    setModalUser(userToConnectTo);
+    setmapOverlayCSS(
+      "absolute top-0 right-0 w-full h-full flex justify-center items-center backdrop-blur-sm"
+    );
+  };
 
   useEffect(() => {
     if (mapState === undefined && user && geoJsonUsers) {
@@ -46,8 +61,7 @@ const Home: NextPage<any> = () => {
       setMapState(newMap);
     }
   }, [user, geoJsonUsers]);
-
-  console.log(favorites);
+  console.log(user);
   return (
     <>
       <Head>
@@ -58,11 +72,13 @@ const Home: NextPage<any> = () => {
         {/* <ProfileModal userInfo={userInfo!} user={user!}  /> */}
         <div className="flex flex-auto h-[90%]">
           <div className="w-3/12">
-            {mapState && (
+            {mapState && user && (
               <Sidebar
+                currentUser={user}
                 reccs={recommendations ?? []}
                 favs={favorites ?? []}
                 map={mapState}
+                handleConnect={handleConnect}
               />
             )}
           </div>
@@ -76,7 +92,25 @@ const Home: NextPage<any> = () => {
           </button>
           {/* This is where the Mapbox puts its stuff */}
 
-          <div id="map" className="flex-auto z-10"></div>
+          {/* map wrapper */}
+          <div className="relative flex-auto">
+            <div id="map" className={"flex-auto w-full h-full"}></div>
+            {/* This div overlays the map and will apply a blur over the map when the modal is open */}
+            <div className={mapOverlayCSS}>
+              {user && modalUser && (
+                <ConnectModal
+                  currentUser={user}
+                  userToConnectTo={modalUser}
+                  closeModal={() => {
+                    setModalUser(null);
+                    setmapOverlayCSS(
+                      "absolute top-0 right-0 w-full h-full flex justify-center items-center"
+                    );
+                  }}
+                />
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </>
