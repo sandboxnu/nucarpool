@@ -5,6 +5,7 @@ import Spinner from "./Spinner";
 import { Role, Status, User } from "@prisma/client";
 import mapboxgl, { Marker } from "mapbox-gl";
 import { min } from "lodash";
+import ConnectModal from "./ConnectModal";
 
 type ScrollableList = {
   items: User[];
@@ -90,6 +91,7 @@ const Sidebar = ({
 
   return (
     <div className="flex flex-col h-full w-96 fixed z-10 text-left bg-white">
+      <ConnectModal />
       <div className="flex-row">
         <button
           className="bg-stone-300 hover:bg-stone-400 rounded-xl m-2 px-2.5 py-0.5"
