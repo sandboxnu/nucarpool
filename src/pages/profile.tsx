@@ -47,7 +47,7 @@ type OnboardingFormInputs = {
   seatAvail: number;
   companyName: string;
   companyAddress: string;
-  startLocation: string;
+  startAddress: string;
   preferredName: string;
   pronouns: string;
   daysWorking: boolean[];
@@ -69,7 +69,7 @@ const onboardSchema = z.intersection(
       .nonnegative("Must be greater or equal to 0"),
     companyName: z.string().min(1, "Cannot be empty"),
     companyAddress: z.string().min(1, "Cannot be empty"),
-    startLocation: z.string().min(1, "Cannot be empty"),
+    startAddress: z.string().min(1, "Cannot be empty"),
     preferredName: z.string(),
     pronouns: z.string(),
     daysWorking: z
@@ -107,7 +107,7 @@ const Profile: NextPage = () => {
       seatAvail: 0,
       companyName: "",
       companyAddress: "",
-      startLocation: "",
+      startAddress: "",
       preferredName: "",
       pronouns: "",
       daysWorking: [false, false, false, false, false, false, false],
@@ -120,10 +120,10 @@ const Profile: NextPage = () => {
 
   const [suggestions, setSuggestions] = useState<Feature[]>([]);
   const [selected, setSelected] = useState({ place_name: "" });
-  const [startLocationsuggestions, setStartLocationSuggestions] = useState<
+  const [startAddressSuggestions, setStartAddressSuggestions] = useState<
     Feature[]
   >([]);
-  const [startLocationSelected, setStartLocationSelected] = useState({
+  const [startAddressSelected, setStartAddressSelected] = useState({
     place_name: "",
   });
   const [companyAddress, setCompanyAddress] = useState("");
@@ -146,7 +146,7 @@ const Profile: NextPage = () => {
   useSearch({
     value: startingAddress,
     type: "address%2Cpostcode",
-    setFunc: setStartLocationSuggestions,
+    setFunc: setStartAddressSuggestions,
   });
 
   const editUserMutation = trpc.useMutation("user.edit", {
@@ -160,7 +160,7 @@ const Profile: NextPage = () => {
 
   const onSubmit = async (values: OnboardingFormInputs) => {
     const coord: number[] = (selected as any).center;
-    const startCoord: number[] = (startLocationSelected as any).center;
+    const startCoord: number[] = (startAddressSelected as any).center;
     const userInfo = {
       ...values,
       companyCoordLng: coord[0],
@@ -188,6 +188,7 @@ const Profile: NextPage = () => {
       companyAddress: userInfo.companyAddress,
       companyCoordLng: userInfo.companyCoordLng!,
       companyCoordLat: userInfo.companyCoordLat!,
+      startAddress: userInfo.startAddress,
       startCoordLng: userInfo.startCoordLng!,
       startCoordLat: userInfo.startCoordLat!,
       isOnboarded: true,
@@ -212,27 +213,27 @@ const Profile: NextPage = () => {
               <ProfileHeader>Starting Location</ProfileHeader>
               {/* Starting Location field  */}
 
-              <EntryLabel error={!!errors.startLocation}>
+              <EntryLabel error={!!errors.startAddress}>
                 Home Address
               </EntryLabel>
 
               <Controller
-                name="startLocation"
+                name="startAddress"
                 control={control}
                 render={({ field: { ref, ...fieldProps } }) => (
                   <Combobox
                     className={`w-full`}
                     as="div"
-                    value={startLocationSelected}
+                    value={startAddressSelected}
                     onChange={(val) => {
-                      setStartLocationSelected(val);
+                      setStartAddressSelected(val);
                       fieldProps.onChange(val.place_name);
                     }}
                     ref={ref}
                   >
                     <Combobox.Input
                       className={`w-full shadow-sm rounded-md px-3 py-2 ${
-                        errors.startLocation
+                        errors.startAddress
                           ? "border-red-500"
                           : "border-gray-300"
                       }`}
@@ -242,7 +243,7 @@ const Profile: NextPage = () => {
                       type="text"
                       onChange={(e) => {
                         if (e.target.value === "") {
-                          setStartLocationSelected({ place_name: "" });
+                          setStartAddressSelected({ place_name: "" });
                           fieldProps.onChange("");
                         } else {
                           updateStartingAddress(e.target.value);
@@ -256,12 +257,12 @@ const Profile: NextPage = () => {
                       leaveTo="opacity-0"
                     >
                       <Combobox.Options className="w-full rounded-md bg-white text-base shadow-lg focus:outline-none ">
-                        {startLocationsuggestions.length === 0 ? (
+                        {startAddressSuggestions.length === 0 ? (
                           <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
                             Nothing found.
                           </div>
                         ) : (
-                          startLocationsuggestions.map((feat: any) => (
+                          startAddressSuggestions.map((feat: any) => (
                             <Combobox.Option
                               key={feat.id}
                               className={({ active }) =>
@@ -286,9 +287,9 @@ const Profile: NextPage = () => {
                 Note: Your address will only be used to find users close to you.
                 It will not be displayed to any other users.
               </p>
-              {errors.startLocation && (
+              {errors.startAddress && (
                 <p className="text-red-500 text-sm mt-2">
-                  {errors?.startLocation?.message}
+                  {errors?.startAddress?.message}
                 </p>
               )}
             </TopProfileSection>

@@ -2,6 +2,9 @@ import { Role, Status, User } from "@prisma/client";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import _ from "lodash";
 import dayConversion from "./dayConversion";
 
@@ -131,9 +134,13 @@ export type GenerateUserInput = {
   role: Role;
   seatAvail?: number;
   companyCoordLng: number;
+  companyPOICoordLng: number;
   companyCoordLat: number;
+  companyPOICoordLat: number;
   startCoordLng: number;
+  startPOICoordLng: number;
   startCoordLat: number;
+  startPOICoordLat: number;
   daysWorking: string; // Format: S,M,T,W,R,F,S
   startTime: string;
   endTime: string;
@@ -153,6 +160,10 @@ export const generateUser = ({
   companyCoordLat,
   startCoordLng,
   startCoordLat,
+  companyPOICoordLng,
+  companyPOICoordLat,
+  startPOICoordLng,
+  startPOICoordLat,
   daysWorking,
   startTime,
   endTime,
@@ -169,14 +180,11 @@ export const generateUser = ({
   dayjs.extend(timezone);
 
   const startDate = dayjs
-    .tz(
-      "2022-11-01 " + startHours + ":" + startMinutes + "00",
-      "America/New_York"
-    )
+    .tz(`2022-11-01 ${startHours}:${startMinutes}00`, "America/New_York")
     .toDate();
   const [endHours, endMinutes] = endTime.split(":").map((s) => _.toInteger(s));
   const endDate = dayjs
-    .tz("2022-11-01 " + endHours + ":" + endMinutes + "00", "America/New_York")
+    .tz(`2022-11-01 ${endHours}:${endMinutes}00`, "America/New_York")
     .toDate();
 
   const updated_obj = {
@@ -195,9 +203,15 @@ export const generateUser = ({
     companyAddress: "360 Huntington Ave",
     companyCoordLng: companyCoordLng,
     companyCoordLat: companyCoordLat,
-    startLocation: "Roxbury",
+    startAddress: "Roxbury",
     startCoordLng: startCoordLng,
     startCoordLat: startCoordLat,
+    companyPOIAddress: "Northeastern University",
+    companyPOICoordLng: companyCoordLng,
+    companyPOICoordLat: companyCoordLat,
+    startPOILocation: "Greenfield Commons",
+    startPOICoordLng: startCoordLng,
+    startPOICoordLat: startCoordLat,
     isOnboarded: true,
     daysWorking: daysWorking,
     startTime: startDate,

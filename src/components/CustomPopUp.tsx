@@ -1,5 +1,5 @@
 import React from "react";
-import { User } from "../utils/types";
+import { PublicUser } from "../utils/types";
 import { FaRegBuilding, FaHome } from "react-icons/fa";
 import { FiMail } from "react-icons/fi";
 import { AiOutlineHome } from "react-icons/ai";
@@ -11,10 +11,10 @@ const CustomPopUp = ({
   seatAvail,
   status,
   companyName,
-  companyAddress,
+  companyPOIAddress,
   email,
-  startLocation,
-}: User) => {
+  startPOILocation,
+}: PublicUser) => {
   return (
     <div className="flex flex-col space-y-2">
       <div className="font-bold text-base">{name}</div>
@@ -57,7 +57,7 @@ const CustomPopUp = ({
           </div>
           <div>
             <div className="font-medium">{companyName}</div>
-            <div className="text-xs">{companyAddress}</div>
+            <div className="text-xs">{companyPOIAddress}</div>
           </div>
         </div>
 
@@ -65,7 +65,7 @@ const CustomPopUp = ({
           <div className="flex justify-center items-center shadow-md p-2 border border-gray-500 rounded-md">
             <AiOutlineHome className="w-4 h-4" />
           </div>
-          <span>{startLocation}</span>
+          <span>{startPOILocation}</span>
         </div>
       </div>
     </div>

@@ -6,20 +6,51 @@ import { generateUser, GenerateUserInput } from "../src/utils/recommendation";
 const prisma = new PrismaClient();
 
 /**
+ * Deletes all entries in the user table.
+ */
+const deleteUsers = async () => {
+  await prisma.user.deleteMany({});
+};
+
+/**
+ * Clears connections between users.
+ */
+const clearConnections = async () => {
+  const users = await prisma.user.findMany();
+
+  await Promise.all(
+    users.map(async (user) => {
+      return await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          favorites: {
+            disconnect: new Array(70)
+              .fill(undefined)
+              .map((_, idx) => ({ id: `${idx}` })),
+          },
+        },
+      });
+    })
+  );
+};
+
+/**
  * Generates favorites for users in our database.
  */
 const generateFavorites = async () => {
   const users = await prisma.user.findMany();
 
-  Promise.all(
-    users.map((user, idx) =>
+  await Promise.all(
+    users.map((_, idx) =>
       prisma.user.update({
         where: {
           id: `${idx}`,
         },
         data: {
           favorites: {
-            connect: pickConnections(idx, users.length, 5, "poolPanArtemis"),
+            connect: pickConnections(idx, users.length, 5),
           },
         },
       })
@@ -33,16 +64,14 @@ const generateFavorites = async () => {
  * @param userId the user we're picking favorites for
  * @param userCount the total amount of users in our database
  * @param favoriteCount the number of favorites each user should have
- * @param seed the seed we're using to generate random ints
  * @returns a list of objects with a single key ``id`` mapping to a int represented as a string
  */
 const pickConnections = (
   userId: number,
   userCount: number,
-  favoriteCount: number,
-  seed: string
+  favoriteCount: number
 ) => {
-  const random = Random.create(seed);
+  const random = Random.create();
   return range(favoriteCount)
     .map(() => random(userCount))
     .filter((i) => i !== userId)
@@ -94,12 +123,13 @@ const createUserData = async () => {
     }),
   ];
 
+  await clearConnections();
+  await deleteUsers();
   await Promise.all(
     users.map(async (user, index) => {
       await prisma.user.upsert(generateUser({ id: index.toString(), ...user }));
     })
   );
-
   await generateFavorites();
 };
 
@@ -143,11 +173,15 @@ const genRandomUsers = ({
       startTime:
         8 + Math.floor(rand(3)) + ":" + (startMin == 0 ? "00" : startMin),
       startCoordLat: startCoordLat - coordOffset + rand(doubleOffset),
+      startPOICoordLat: startCoordLat,
       startCoordLng: startCoordLng - coordOffset + rand(doubleOffset),
+      startPOICoordLng: startCoordLat,
       // Generates an end time between 16:00 - 19:45
       endTime: 16 + Math.floor(rand(3)) + ":" + (endMin == 0 ? "00" : endMin),
       companyCoordLat: companyCoordLat - coordOffset + rand(doubleOffset),
+      companyPOICoordLat: companyCoordLat,
       companyCoordLng: companyCoordLng - coordOffset + rand(doubleOffset),
+      companyPOICoordLng: companyCoordLng,
       daysWorking: new Array(7)
         .fill(undefined)
         .map((_, ind) => (rand(1) < 0.5 ? "0" : "1"))
@@ -161,6 +195,25 @@ const genRandomUsers = ({
       };
     }
     return output;
+  });
+};
+
+/**
+ * Updates the favorites of the user associated with the given ID.
+ *
+ * @param userId id for the user we're updating.
+ * @param ids the ids to add to the current user
+ */
+const addFavorites = async (userId: string, ids: string[]) => {
+  await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      favorites: {
+        connect: ids.map((id) => ({ id })),
+      },
+    },
   });
 };
 

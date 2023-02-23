@@ -1,6 +1,7 @@
 import { GeoJSONSource, Map, NavigationControl, Popup } from "mapbox-gl";
 import { createRoot } from "react-dom/client";
 import CustomPopUp from "../../components/CustomPopUp";
+import { PublicUser } from "../types";
 import { User } from "../types";
 
 const addMapEvents = (map: Map, user: User) => {
@@ -31,12 +32,11 @@ const addMapEvents = (map: Map, user: User) => {
     if (e.features[0]!.geometry.type != "Point") return;
 
     const coordinates = e.features[0]!.geometry.coordinates;
-    const properties = e.features[0]!.properties as User;
+    const properties = e.features[0]!.properties as PublicUser;
 
     while (Math.abs(e.lngLat.lng - coordinates[0]!) > 180) {
       coordinates[0] += e.lngLat.lng > coordinates[0]! ? 360 : -360;
     }
-
     const popupNode = document.createElement("div");
     const root = createRoot(popupNode);
     root.render(<CustomPopUp {...properties} />);

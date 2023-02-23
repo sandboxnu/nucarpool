@@ -9,7 +9,7 @@ const addUserLocation = (map: Map, user: User) => {
       type: "Feature",
       geometry: {
         type: "Point",
-        coordinates: [user.companyCoordLng, user.companyCoordLat], // icon position [lng, lat]
+        coordinates: [user.startCoordLng, user.startCoordLat], // icon position [lng, lat]
       },
       properties: {},
     },

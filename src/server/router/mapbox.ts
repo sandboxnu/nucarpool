@@ -58,12 +58,12 @@ export const mapboxRouter = createProtectedRouter()
           status: true,
           seatAvail: true,
           companyName: true,
-          companyAddress: true,
-          companyCoordLng: true,
-          companyCoordLat: true,
-          startCoordLng: true,
-          startCoordLat: true,
-          startLocation: true,
+          companyPOIAddress: true,
+          companyPOICoordLng: true,
+          companyPOICoordLat: true,
+          startPOICoordLng: true,
+          startPOICoordLat: true,
+          startPOILocation: true,
         },
       });
 
@@ -73,7 +73,7 @@ export const mapboxRouter = createProtectedRouter()
           type: "Feature" as "Feature",
           geometry: {
             type: "Point" as "Point",
-            coordinates: [u.companyCoordLng, u.companyCoordLat],
+            coordinates: [u.companyPOICoordLng, u.companyPOICoordLat],
           },
           properties: {
             ...u,
