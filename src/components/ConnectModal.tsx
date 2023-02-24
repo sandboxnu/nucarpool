@@ -23,10 +23,11 @@ export default function ConnectModal(props: ConnectModalProps): JSX.Element {
         recommend writing a bit about yourself, your schedule, and anything else
         you think would be good to know!
       </div>
-
-      <TextField multiline={true} charLimit={280}>
-        {props.currentUser.bio}
-      </TextField>
+      <textarea
+        className={`resize-none form-input w-full shadow-sm rounded-md px-3 py-2`}
+        maxLength={280}
+        defaultValue={props.currentUser.bio}
+      ></textarea>
 
       <div className="text-xs italic text-slate-400">
         Note: The information you’ve provided in your intro is written here.

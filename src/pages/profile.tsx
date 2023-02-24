@@ -1,7 +1,7 @@
 import { Combobox, Transition } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Feature } from "geojson";
-import _, { debounce } from "lodash";
+import _, { debounce, values } from "lodash";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
 import {
@@ -426,20 +426,22 @@ const Profile: NextPage = () => {
             <CommutingScheduleSection>
               <ProfileHeader>Commuting Schedule</ProfileHeader>
               {/* Days working field  */}
-              <div className="my-4 border-l-2 border-l-black">
-                {daysOfWeek.map((day, index) => (
-                  <Checkbox
-                    key={day + index.toString()}
-                    sx={{
-                      input: { width: 1, height: 1 },
-                      padding: 0,
-                    }}
-                    {...register(`daysWorking.${index}`)}
-                    checkedIcon={<DayBox day={day} isSelected={true} />}
-                    icon={<DayBox day={day} isSelected={false} />}
-                    defaultChecked={false}
-                  />
-                ))}
+              <div className="my-4">
+                <div className="border-l-2 border-l-black">
+                  {daysOfWeek.map((day, index) => (
+                    <Checkbox
+                      key={day + index.toString()}
+                      sx={{
+                        input: { width: 1, height: 1 },
+                        padding: 0,
+                      }}
+                      {...register(`daysWorking.${index}`)}
+                      checkedIcon={<DayBox day={day} isSelected={true} />}
+                      icon={<DayBox day={day} isSelected={false} />}
+                      defaultChecked={false}
+                    />
+                  ))}
+                </div>
 
                 {errors.daysWorking && (
                   <p className="text-red-500 text-sm mt-2">
@@ -540,23 +542,19 @@ const Profile: NextPage = () => {
                   {...register("pronouns")}
                 />
               </div>
-              <label htmlFor="intro" className="font-medium text-md">
-                Intro
-              </label>
-              <p className="font-light text-xs text-gray-500 pb-0.5">
-                Note: This intro will be shared with people you choose to
-                connect with.
-              </p>
-              <TextField
-                className="w-full"
-                label="Bio"
-                id="bio"
-                error={errors.bio}
-                type="text"
-                charLimit={300}
-                multiline={true}
-                {...register("bio")}
-              />
+              {/* Bio field */}
+              <div className="py-2">
+                <EntryLabel error={!!errors.bio}>Intro</EntryLabel>
+                <p className="font-light text-xs text-gray-500 pb-0.5">
+                  Note: This intro will be shared with people you choose to
+                  connect with.
+                </p>
+                <textarea
+                  className={`resize-none form-input w-full shadow-sm rounded-md px-3 py-2`}
+                  maxLength={300}
+                  {...register("bio")}
+                />
+              </div>
             </PersonalInfoSection>
           </ProfileColumn>
         </div>
