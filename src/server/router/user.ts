@@ -91,8 +91,6 @@ export const userRouter = createProtectedRouter()
           bio: input.bio,
         },
       });
-      console.log("user preferredName is " + user.preferredName);
-      console.log("user bio is " + user.bio);
 
       return user;
     },

@@ -2,6 +2,8 @@ import Rating from "@mui/material/Rating/Rating";
 import dayjs from "dayjs";
 import mapboxgl from "mapbox-gl";
 import { useState } from "react";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import { PublicUser, User } from "../utils/types";
 import ConnectModal from "./ConnectModal";
 import CustomPopUp from "./CustomPopUp";
@@ -43,6 +45,9 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       return " border-l-good-green";
     }
   };
+
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
 
   const DaysWorkingDisplay = (daysWorking: string) => {
     const boxes: JSX.Element[] = [];
@@ -147,14 +152,26 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       {/* fourth row */}
       <div className="w-full m-0 flex justify-between align-middle">
         <div className="font-normal text-sm flex">
-          <p>Start: </p>{" "}
+          <p>Start: </p>
           <p className="font-semibold">
-            {dayjs(props.userToConnectTo.startTime).format("hh:mm")}
+            {/* Converts from EST to UTC, eg: will turn 03:00AM EST into 08:00AM UTC */}
+            {/* From my understanding, Date object created by Seed.TS is in UTC 
+            which means that our users are technically if we initialize it to 8AM, they start work at 3AM Boston time.
+            To fix this, in Recommendation.ts, we convert from 8AM UTC to 3AM Boston time.
+            But that's still scuffed, because now over here in UserCard, I have to convert from 3AM Boston time
+            into 8AM UTC. Why are we doing all of these conversions? Leading to confusion and errors.
+            
+            Possible Solution: We stick to one timezone.
+            1. Modify Prisma to use EST, and not UTC.?
+            2. In seed.ts, we create startTime as a EST time, so instead of 8am, it would be +5 = 1PM
+            2. This means that SQL will show startTimes at +5, 1PM, etc
+            3. Recommendation no longer */}
+            {dayjs.tz(props.userToConnectTo.startTime, "UTC").format("h:mm")} am
           </p>
           <p className="font-semibold px-2"> | </p>
-          <p>End: </p>{" "}
+          <p>End: </p>
           <p className="font-semibold">
-            {dayjs(props.userToConnectTo.endTime).format("hh:mm")}
+            {dayjs.tz(props.userToConnectTo.endTime, "UTC").format("h:mm")} pm
           </p>
         </div>
       </div>

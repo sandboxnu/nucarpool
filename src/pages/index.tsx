@@ -61,7 +61,6 @@ const Home: NextPage<any> = () => {
       setMapState(newMap);
     }
   }, [user, geoJsonUsers]);
-  console.log(user);
   return (
     <>
       <Head>
@@ -95,8 +94,9 @@ const Home: NextPage<any> = () => {
           {/* map wrapper */}
           <div className="relative flex-auto">
             <div id="map" className={"flex-auto w-full h-full"}></div>
-            {/* This div overlays the map and will apply a blur over the map when the modal is open */}
+            {/* This div below overlays the map and will apply a blur over the map when the modal is open */}
             <div className={mapOverlayCSS}>
+              {/* The connect modal will then overlay on top of the div which overlays the map */}
               {user && modalUser && (
                 <ConnectModal
                   currentUser={user}

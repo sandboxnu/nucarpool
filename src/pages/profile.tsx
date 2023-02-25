@@ -1,6 +1,7 @@
 import { Combobox, Transition } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Feature } from "geojson";
+import utc from "dayjs/plugin/utc";
 import _, { debounce, values } from "lodash";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
@@ -39,10 +40,11 @@ import {
   EntryLabel,
   EntryRow,
 } from "../styles/profile";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
+import ControlledTimePicker from "../components/ControlledTimePicker";
 
 // Inputs to the onboarding form.
-type OnboardingFormInputs = {
+export type OnboardingFormInputs = {
   role: Role;
   seatAvail: number;
   companyName: string;
@@ -203,6 +205,9 @@ const Profile: NextPage = () => {
       bio: userInfo.bio,
     });
   };
+
+  dayjs.extend(utc);
+  dayjs.utc().format();
 
   return (
     <>
@@ -479,39 +484,15 @@ const Profile: NextPage = () => {
               </div>
 
               <div>
-                <Controller
-                  name="startTime"
+                <ControlledTimePicker
                   control={control}
-                  render={({ field: { ref, ...fieldProps } }) => (
-                    <TimePicker
-                      format="h:mm A"
-                      placeholder="Start time"
-                      showNow={false}
-                      minuteStep={15}
-                      value={fieldProps.value ? dayjs(fieldProps.value) : null}
-                      use12Hours={true}
-                      onSelect={(value) => {
-                        fieldProps.onChange(value?.toDate());
-                      }}
-                    />
-                  )}
+                  name={"startTime"}
+                  placeholder={"Start time"}
                 />
-                <Controller
-                  name="endTime"
+                <ControlledTimePicker
                   control={control}
-                  render={({ field: { ref, ...fieldProps } }) => (
-                    <TimePicker
-                      format="h:mm A"
-                      placeholder="End time"
-                      showNow={false}
-                      minuteStep={15}
-                      value={fieldProps.value ? dayjs(fieldProps.value) : null}
-                      use12Hours={true}
-                      onSelect={(value) => {
-                        fieldProps.onChange(value?.toDate());
-                      }}
-                    />
-                  )}
+                  name={"endTime"}
+                  placeholder={"End time"}
                 />
               </div>
             </CommutingScheduleSection>
