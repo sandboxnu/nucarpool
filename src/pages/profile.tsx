@@ -277,7 +277,7 @@ const Profile: NextPage = () => {
                               <Combobox.Option
                                 key={feat.id}
                                 className={({ active }) =>
-                                  `max-w-fit relative cursor-default select-none p-3 border-black${
+                                  `w-full relative cursor-default select-none p-3 border-black ${
                                     active
                                       ? "bg-blue-400 text-white"
                                       : "text-gray-900"
@@ -371,7 +371,7 @@ const Profile: NextPage = () => {
                               <Combobox.Option
                                 key={feat.id}
                                 className={({ active }) =>
-                                  `max-w-fit relative cursor-default select-none p-3 ${
+                                  `w-full relative cursor-default select-none p-3 ${
                                     active
                                       ? "bg-blue-400 text-white"
                                       : "text-gray-900"
@@ -475,7 +475,6 @@ const Profile: NextPage = () => {
                   <EntryRow>
                     <Checkbox
                       {...register("timeDiffers")}
-                      size={"large"}
                       sx={{
                         padding: 0,
                         input: {

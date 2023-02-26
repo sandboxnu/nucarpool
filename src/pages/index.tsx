@@ -34,13 +34,13 @@ const Home: NextPage<any> = () => {
   const [modalUser, setModalUser] = useState<PublicUser | null>(null);
   // this will add backdrop-blur-sm when the modal is displayed via handleConnect
   const [mapOverlayCSS, setmapOverlayCSS] = useState<string>(
-    "absolute top-0 right-0 w-full h-full flex justify-center items-center"
+    "pointer-events-none absolute top-0 right-0 w-full h-full flex justify-center items-center"
   );
 
   const handleConnect = (userToConnectTo: PublicUser) => {
     setModalUser(userToConnectTo);
     setmapOverlayCSS(
-      "absolute top-0 right-0 w-full h-full flex justify-center items-center backdrop-blur-sm"
+      "pointer-events-auto absolute top-0 right-0 w-full h-full flex justify-center items-center backdrop-blur-sm"
     );
   };
 
@@ -69,8 +69,8 @@ const Home: NextPage<any> = () => {
       <div className="max-h-screen w-full h-full m-0">
         <Header />
         {/* <ProfileModal userInfo={userInfo!} user={user!}  /> */}
-        <div className="flex flex-auto h-[90%]">
-          <div className="w-3/12">
+        <div className="flex flex-auto h-[91.5%]">
+          <div className="w-96">
             {mapState && user && (
               <Sidebar
                 currentUser={user}
@@ -104,7 +104,7 @@ const Home: NextPage<any> = () => {
                   closeModal={() => {
                     setModalUser(null);
                     setmapOverlayCSS(
-                      "absolute top-0 right-0 w-full h-full flex justify-center items-center"
+                      "pointer-events-none absolute top-0 right-0 w-full h-full flex justify-center items-center"
                     );
                   }}
                 />

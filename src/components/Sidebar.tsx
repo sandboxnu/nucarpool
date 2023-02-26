@@ -31,7 +31,7 @@ const Sidebar = (props: SideBarProps) => {
   }, [props.reccs]);
 
   return (
-    <div className="flex flex-col px-5 flex-auto h-full z-10 text-left bg-white">
+    <div className="flex flex-col px-5 flex-shrink-0 h-full z-10 text-left bg-white">
       <div className="flex-row py-3">
         <div className="flex justify-center gap-3">
           <button
