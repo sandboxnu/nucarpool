@@ -1,11 +1,14 @@
 import * as React from "react";
 import { FieldError } from "react-hook-form";
+import { EntryLabel, ErrorDisplay } from "../styles/profile";
 import { classNames } from "../utils/classNames";
 
 type TextFieldOwnProps = {
   label?: string;
   error?: FieldError;
   charLimit?: number;
+  // classnames passed to the Input HTML element for styling purposes
+  inputClassName?: string;
 };
 
 type TextFieldProps = TextFieldOwnProps &
@@ -13,15 +16,21 @@ type TextFieldProps = TextFieldOwnProps &
 
 export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
   (
-    { charLimit = 524288, label, id, name, error, type, className, ...rest },
+    {
+      charLimit = 524288,
+      label,
+      id,
+      name,
+      error,
+      type,
+      className,
+      inputClassName,
+      ...rest
+    },
     forwardedRef
   ) => (
-    <div className={classNames(`flex flex-col space-y-2 w-full}`, className)}>
-      {label && (
-        <label htmlFor={id || name} className="font-medium text-sm">
-          {label}
-        </label>
-      )}
+    <div className={classNames(`flex flex-col space-y-2 w-full`, className)}>
+      {label && <EntryLabel error={!!error?.message}>{label}</EntryLabel>}
       <input
         {...rest}
         ref={forwardedRef}
@@ -29,11 +38,14 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
         name={name}
         type={type}
         maxLength={charLimit}
-        className={`form-input w-full shadow-sm rounded-md px-3 py-2 ${
-          error ? "border-red-500" : "border-gray-300"
-        }`}
+        className={classNames(
+          `form-input border-black w-full shadow-sm rounded-md px-3 py-2 ${
+            error ? "border-northeastern-red" : "border-gray-300"
+          }`,
+          inputClassName
+        )}
       />
-      {error && <p className="text-red-500 text-sm mt-2">{error.message}</p>}
+      {error && <ErrorDisplay>{error.message}</ErrorDisplay>}
     </div>
   )
 );

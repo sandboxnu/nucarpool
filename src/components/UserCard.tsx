@@ -154,18 +154,6 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         <div className="font-normal text-sm flex">
           <p>Start: </p>
           <p className="font-semibold">
-            {/* Converts from EST to UTC, eg: will turn 03:00AM EST into 08:00AM UTC */}
-            {/* From my understanding, Date object created by Seed.TS is in UTC 
-            which means that our users are technically if we initialize it to 8AM, they start work at 3AM Boston time.
-            To fix this, in Recommendation.ts, we convert from 8AM UTC to 3AM Boston time.
-            But that's still scuffed, because now over here in UserCard, I have to convert from 3AM Boston time
-            into 8AM UTC. Why are we doing all of these conversions? Leading to confusion and errors.
-            
-            Possible Solution: We stick to one timezone.
-            1. Modify Prisma to use EST, and not UTC.?
-            2. In seed.ts, we create startTime as a EST time, so instead of 8am, it would be +5 = 1PM
-            2. This means that SQL will show startTimes at +5, 1PM, etc
-            3. Recommendation no longer */}
             {dayjs.tz(props.userToConnectTo.startTime, "UTC").format("h:mm")} am
           </p>
           <p className="font-semibold px-2"> | </p>

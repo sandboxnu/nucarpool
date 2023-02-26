@@ -4,7 +4,7 @@ export const CompleteProfileButton = styled.button`
   background: #b12424;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 10px;
-  font-family: "Lato", sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 24px;
@@ -19,71 +19,107 @@ export const ProfileContainer = styled.form`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: 100%;
-  height: 85%;
+  width: 90%;
+  height: 100%;
   align-items: center;
-  padding: 2rem 1.5rem;
+  padding: 4rem 1.5rem;
 `;
 
 export const ProfileColumn = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  height: 90%;
+  height: 85%;
   width: 50%;
 `;
 
 export const TopProfileSection = styled(ProfileColumn)`
-  height: 30%;
   width: 100%;
+  flex: 1 1 auto;
 `;
 
 export const MiddleProfileSection = styled(ProfileColumn)`
-  height: 60%;
   width: 100%;
+  flex: 1 1 auto;
+  margin-bottom: 24px;
 `;
 
 export const BottomProfileSection = styled(ProfileColumn)`
-  height: 10%;
   width: 100%;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
+  padding-top: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  flex: 0 1 auto;
 `;
 
 export const PersonalInfoSection = styled(ProfileColumn)`
-  height: 50%;
   width: 100%;
+  flex: 1 1 auto;
 `;
 
 export const CommutingScheduleSection = styled(ProfileColumn)`
-  height: 50%;
   width: 100%;
+  flex: 1 1 auto;
 `;
 
 export const ProfileHeader = styled.h1`
   display: flex;
-  font-family: "Lato", sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-style: normal;
   font-weight: 700;
   font-size: 32px;
-  line-height: 38px;
+  line-height: 39px;
   color: #000000;
-  margin-bottom: 27px;
+  margin-bottom: 22px;
+`;
+
+export const ProfileHeaderNoMB = styled(ProfileHeader)`
+  margin-bottom: 0;
 `;
 
 export const EntryLabel = styled.label<{
   error?: boolean;
+  required?: boolean;
 }>`
-  font-family: 'Lato', sans-serif;
-  font-s  yle: normal;
-  font-weight: 400;
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 700;
   font-size: 20px;
-  line-height: 24px;
+  line-height: 24.38px;
   display: flex;
   align-items: center;
   color: ${(props) => (props.error ? "#B12424" : "#000000")};
-  margin-bottom: 4px;
+`;
+
+export const Note = styled.p<{}>`
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 300;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: gray;
+`;
+
+export const ErrorDisplay = styled.span<{}>`
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 19px;
+  color: #b12424;
+`;
+
+export const LightEntryLabel = styled.label<{
+  error?: boolean;
+}>`
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 24.38px;
+  display: flex;
+  align-items: center;
+  color: ${(props) => (props.error ? "#B12424" : "#000000")};
 `;
 
 export const EntryRow = styled.div`

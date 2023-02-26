@@ -1,17 +1,27 @@
 import { TimePicker } from "antd";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { Control, Controller } from "react-hook-form";
 import { OnboardingFormInputs } from "../pages/profile";
+import { EntryLabel, ErrorDisplay } from "../styles/profile";
 
 interface ControlledTimePickerProps {
   control: Control<OnboardingFormInputs>;
+  label?: string;
   name: "startTime" | "endTime";
   placeholder?: string;
 }
 
 const ControlledTimePicker = (props: ControlledTimePickerProps) => {
   const [displayedTime, setDisplayedTime] = useState<dayjs.Dayjs | null>(null);
+
+  const customSuffixIcon = (): ReactNode => {
+    return (
+      <div className="w-1/12 h-1/12 text-xs flex justify-center text-northeastern-red text-center">
+        ▼
+      </div>
+    );
+  };
 
   const convertInputDateToUTC = (inputDate: Date): Date => {
     const inputHours = inputDate.getHours();
@@ -20,29 +30,26 @@ const ControlledTimePicker = (props: ControlledTimePickerProps) => {
      * eg: utcOffset for inputDate's that are EST will either -5 or -4 depending on Daylight savings
      *  */
     const utcOffset: number = parseInt(dayjs(inputDate).format("Z"));
-
     let utcHours: number;
-
     if (inputHours + utcOffset < 0) {
       utcHours = inputHours + utcOffset + 24;
     } else {
       utcHours = inputHours + utcOffset;
     }
     const result = dayjs(`2022-2-2 ${utcHours}:${inputDate.getMinutes()}`);
-
     return result.toDate();
   };
   return (
     <Controller
       name={props.name}
       control={props.control}
-      rules={{
-        required: "Please enter a start time",
-      }}
       render={({ field: { ref, ...fieldProps }, fieldState }) => (
-        <>
+        <div className={"flex flex-col"}>
+          <EntryLabel error={!!fieldState.error}>{props.label}</EntryLabel>
           <TimePicker
+            className="form-input w-full rounded-lg"
             format="h:mm A"
+            suffixIcon={customSuffixIcon()}
             ref={ref}
             status={fieldState.error ? "error" : undefined}
             placeholder={props.placeholder}
@@ -54,14 +61,13 @@ const ControlledTimePicker = (props: ControlledTimePickerProps) => {
             onSelect={(date) => {
               setDisplayedTime(dayjs(date.valueOf()));
               const convertedDate = convertInputDateToUTC(date.toDate());
-
               fieldProps.onChange(convertedDate);
             }}
           />
-          {fieldState.error ? (
-            <span className="">{fieldState.error.message}</span>
-          ) : null}
-        </>
+          {fieldState.error && (
+            <ErrorDisplay>{fieldState.error.message}</ErrorDisplay>
+          )}
+        </div>
       )}
     />
   );
