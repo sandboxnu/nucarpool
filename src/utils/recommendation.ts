@@ -171,9 +171,17 @@ export const generateUser = ({
 
   dayjs.extend(utc);
   dayjs.extend(timezone);
+  const [startHours, startMinutes] = startTime
+    .split(":")
+    .map((s) => _.toInteger(s));
+  const startDate = dayjs
+    .tz(`2022-11-01 ${startHours}:${startMinutes}00`, "UTC")
+    .toDate();
 
-  const startDate = dayjs.tz(`2022-11-01 ${startTime}00`, "UTC").toDate();
-  const endDate = dayjs.tz(`2022-11-01 ${endTime}00`, "UTC").toDate();
+  const [endHours, endMinutes] = endTime.split(":").map((s) => _.toInteger(s));
+  const endDate = dayjs
+    .tz(`2022-11-01 ${endHours}:${endMinutes}00`, "UTC")
+    .toDate();
 
   const updated_obj = {
     id: id,
