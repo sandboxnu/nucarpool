@@ -81,7 +81,7 @@ model User {
   companyAddress     String    @default("") @map("company_address")
   companyCoordLng    Float     @default(0) @map("company_coord_lng")
   companyCoordLat    Float     @default(0) @map("company_coord_lat")
-  startAddress      String    @default("") @map("start_address")
+  startAddress       String    @default("") @map("start_address")
   startCoordLng      Float     @default(0) @map("start_coord_lng")
   startCoordLat      Float     @default(0) @map("start_coord_lat")
   companyPOIAddress  String    @default("") @map("company_poi_address")

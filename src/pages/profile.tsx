@@ -60,8 +60,8 @@ export type OnboardingFormInputs = {
   preferredName: string;
   pronouns: string;
   daysWorking: boolean[];
-  startTime?: Date;
-  endTime?: Date;
+  startTime: Date | null;
+  endTime: Date | null;
   timeDiffers: boolean;
   bio: string;
 };
@@ -110,6 +110,8 @@ const Profile: NextPage = () => {
     handleSubmit,
     setValue,
     clearErrors,
+    getValues,
+    reset,
     control,
   } = useForm<OnboardingFormInputs>({
     mode: "onSubmit",
@@ -129,7 +131,6 @@ const Profile: NextPage = () => {
     },
     resolver: zodResolver(onboardSchema),
   });
-
   const [suggestions, setSuggestions] = useState<Feature[]>([]);
   const [selected, setSelected] = useState({ place_name: "" });
   const [startAddressSuggestions, setStartAddressSuggestions] = useState<
@@ -148,6 +149,37 @@ const Profile: NextPage = () => {
     () => debounce(setStartingAddress, 1000),
     []
   );
+  const [daysWorkingDefaults, setDaysWorkingDefaults] = useState([
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ]);
+  const { data: user } = trpc.useQuery(["user.me"]);
+
+  useEffect(() => {
+    // TODO
+    if (!user) return;
+    setDaysWorkingDefaults(
+      user.daysWorking.split(",").map((bit) => bit === "1")
+    );
+    reset({
+      role: user.role,
+      seatAvail: user.seatAvail,
+      companyName: user.companyName,
+      companyAddress: user.companyAddress,
+      startAddress: user.startAddress,
+      preferredName: user.preferredName,
+      pronouns: user.pronouns,
+      daysWorking: user.daysWorking.split(",").map((bit) => bit === "1"),
+      startTime: user.startTime,
+      endTime: user.endTime,
+      timeDiffers: false,
+    });
+  }, [user]);
 
   useSearch({
     value: companyAddress,

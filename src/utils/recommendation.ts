@@ -177,8 +177,6 @@ export const generateUser = ({
   const startDate = dayjs
     .tz(`2022-11-01 ${startHours}:${startMinutes}00`, "UTC")
     .toDate();
-  console.log(startDate);
-  console.log("hello");
 
   const [endHours, endMinutes] = endTime.split(":").map((s) => _.toInteger(s));
   const endDate = dayjs
