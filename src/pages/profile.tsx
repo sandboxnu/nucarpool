@@ -131,32 +131,47 @@ const Profile: NextPage = () => {
     },
     resolver: zodResolver(onboardSchema),
   });
-  const [suggestions, setSuggestions] = useState<Feature[]>([]);
-  const [selected, setSelected] = useState({ place_name: "" });
+  const { data: user } = trpc.useQuery(["user.me"], { refetchOnMount: true });
+
+  const [companyAddressSuggestions, setCompanyAddressSuggestions] = useState<
+    Feature[]
+  >([]);
   const [startAddressSuggestions, setStartAddressSuggestions] = useState<
     Feature[]
   >([]);
+
+  const [companyAddressSelected, setCompanyAddressSelected] = useState({
+    place_name: "",
+    center: [0, 0],
+  });
   const [startAddressSelected, setStartAddressSelected] = useState({
     place_name: "",
+    center: [0, 0],
   });
+
   const [companyAddress, setCompanyAddress] = useState("");
   const updateCompanyAddress = useMemo(
-    () => debounce(setCompanyAddress, 1000),
+    () => debounce(setCompanyAddress, 500),
     []
   );
+
   const [startingAddress, setStartingAddress] = useState("");
   const updateStartingAddress = useMemo(
-    () => debounce(setStartingAddress, 1000),
+    () => debounce(setStartingAddress, 500),
     []
   );
 
-  const { data: user } = trpc.useQuery(["user.me"]);
-
-  // console.log(getValues());
-
   useEffect(() => {
-    // TODO
     if (!user) return;
+
+    setStartAddressSelected({
+      place_name: user.startAddress,
+      center: [user.startCoordLng, user.startCoordLat],
+    });
+    setCompanyAddressSelected({
+      place_name: user.companyAddress,
+      center: [user.companyCoordLng, user.companyCoordLat],
+    });
 
     reset({
       role: user.role,
@@ -170,13 +185,14 @@ const Profile: NextPage = () => {
       startTime: user.startTime,
       endTime: user.endTime,
       timeDiffers: false,
+      bio: user.bio,
     });
   }, [user]);
 
   useSearch({
     value: companyAddress,
     type: "address%2Cpostcode",
-    setFunc: setSuggestions,
+    setFunc: setCompanyAddressSuggestions,
   });
 
   useSearch({
@@ -195,7 +211,7 @@ const Profile: NextPage = () => {
   });
 
   const onSubmit = async (values: OnboardingFormInputs) => {
-    const coord: number[] = (selected as any).center;
+    const coord: number[] = (companyAddressSelected as any).center;
     const startCoord: number[] = (startAddressSelected as any).center;
     const userInfo = {
       ...values,
@@ -353,9 +369,9 @@ const Profile: NextPage = () => {
                     <Combobox
                       className={`w-full`}
                       as="div"
-                      value={selected}
+                      value={companyAddressSelected}
                       onChange={(val) => {
-                        setSelected(val);
+                        setCompanyAddressSelected(val);
                         fieldProps.onChange(val.place_name);
                       }}
                       ref={ref}
@@ -372,7 +388,7 @@ const Profile: NextPage = () => {
                         type="text"
                         onChange={(e) => {
                           if (e.target.value === "") {
-                            setSelected({ place_name: "" });
+                            setCompanyAddressSelected({ place_name: "" });
                             fieldProps.onChange("");
                           } else {
                             updateCompanyAddress(e.target.value);
@@ -386,12 +402,12 @@ const Profile: NextPage = () => {
                         leaveTo="opacity-0"
                       >
                         <Combobox.Options className="w-full rounded-md bg-white text-base shadow-lg focus:outline-none ">
-                          {suggestions.length === 0 ? (
+                          {companyAddressSuggestions.length === 0 ? (
                             <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
                               Nothing found.
                             </div>
                           ) : (
-                            suggestions.map((feat: any) => (
+                            companyAddressSuggestions.map((feat: any) => (
                               <Combobox.Option
                                 key={feat.id}
                                 className={({ active }) =>
