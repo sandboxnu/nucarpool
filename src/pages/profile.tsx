@@ -149,23 +149,15 @@ const Profile: NextPage = () => {
     () => debounce(setStartingAddress, 1000),
     []
   );
-  const [daysWorkingDefaults, setDaysWorkingDefaults] = useState([
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ]);
+
   const { data: user } = trpc.useQuery(["user.me"]);
+
+  // console.log(getValues());
 
   useEffect(() => {
     // TODO
     if (!user) return;
-    setDaysWorkingDefaults(
-      user.daysWorking.split(",").map((bit) => bit === "1")
-    );
+
     reset({
       role: user.role,
       seatAvail: user.seatAvail,
@@ -469,16 +461,28 @@ const Profile: NextPage = () => {
                 <div className="my-4">
                   <div className="border-l-2 border-l-black">
                     {daysOfWeek.map((day, index) => (
-                      <Checkbox
-                        key={day + index.toString()}
-                        sx={{
-                          input: { width: 1, height: 1 },
-                          padding: 0,
-                        }}
-                        {...register(`daysWorking.${index}`)}
-                        checkedIcon={<DayBox day={day} isSelected={true} />}
-                        icon={<DayBox day={day} isSelected={false} />}
-                        defaultChecked={false}
+                      <Controller
+                        name={`daysWorking.${index}`}
+                        control={control}
+                        render={({
+                          field: { onChange, value },
+                          formState: { defaultValues },
+                        }) => (
+                          <Checkbox
+                            key={day + index.toString()}
+                            sx={{
+                              input: { width: 1, height: 1 },
+                              padding: 0,
+                            }}
+                            checked={value}
+                            onChange={onChange}
+                            checkedIcon={<DayBox day={day} isSelected={true} />}
+                            icon={<DayBox day={day} isSelected={false} />}
+                            defaultChecked={
+                              !!defaultValues?.daysWorking ? true : false
+                            }
+                          />
+                        )}
                       />
                     ))}
                   </div>
