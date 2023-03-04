@@ -2,6 +2,7 @@ import { Feature, Geometry, GeoJsonProperties } from "geojson";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { toast } from "react-toastify";
 import { trpc } from "./trpc";
+import { CarpoolFeature } from "./types";
 
 /**
  * Listens to updates from `value` - on updates, new queries are sent to Mapbox search, with customization
@@ -18,7 +19,7 @@ export default function useSearch({
 }: {
   value: string;
   type: "address%2Cpostcode" | "neighborhood%2Cplace";
-  setFunc: Dispatch<SetStateAction<Feature<Geometry, GeoJsonProperties>[]>>;
+  setFunc: Dispatch<SetStateAction<CarpoolFeature[]>>;
 }) {
   const query = trpc.useQuery(
     [
@@ -33,7 +34,9 @@ export default function useSearch({
     ],
     {
       onSuccess: (data) => {
-        setFunc(data?.features || []);
+        /* the standard Feature type does not describe the full breadth of properties 
+        available such as "place_name" and "center" */
+        setFunc((data?.features || []) as CarpoolFeature[]);
       },
       onError: (error) => {
         toast.error(`Something went wrong: ${error}`);

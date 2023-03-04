@@ -1,27 +1,13 @@
 import { Combobox, Transition } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Feature } from "geojson";
-import _, { debounce, values } from "lodash";
-import { GetServerSidePropsContext, NextPage } from "next";
+import _, { debounce } from "lodash";
+import { NextPage } from "next";
 import { useRouter } from "next/router";
-import {
-  Fragment,
-  JSXElementConstructor,
-  ReactElement,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import {
-  Controller,
-  Field,
-  FieldError,
-  NestedValue,
-  useForm,
-} from "react-hook-form";
+import { Fragment, useEffect, useMemo, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Header from "../components/Header";
-import { array, z } from "zod";
+import { z } from "zod";
 import { trpc } from "../utils/trpc";
 import { Role, Status } from "@prisma/client";
 import { TextField } from "../components/TextField";
@@ -29,7 +15,7 @@ import Radio from "../components/Radio";
 import useSearch from "../utils/search";
 import Checkbox from "@mui/material/Checkbox";
 import DayBox from "../components/DayBox";
-import { Tooltip, Icon, TextFieldProps } from "@mui/material";
+import { Tooltip, Icon } from "@mui/material";
 import { MdHelp } from "react-icons/md";
 import {
   BottomProfileSection,
@@ -49,6 +35,7 @@ import {
   ProfileHeaderNoMB,
 } from "../styles/profile";
 import ControlledTimePicker from "../components/ControlledTimePicker";
+import { CarpoolAddress, CarpoolFeature } from "../utils/types";
 
 // Inputs to the onboarding form.
 export type OnboardingFormInputs = {
@@ -108,9 +95,6 @@ const Profile: NextPage = () => {
     formState: { errors },
     watch,
     handleSubmit,
-    setValue,
-    clearErrors,
-    getValues,
     reset,
     control,
   } = useForm<OnboardingFormInputs>({
@@ -134,20 +118,22 @@ const Profile: NextPage = () => {
   const { data: user } = trpc.useQuery(["user.me"], { refetchOnMount: true });
 
   const [companyAddressSuggestions, setCompanyAddressSuggestions] = useState<
-    Feature[]
+    CarpoolFeature[]
   >([]);
   const [startAddressSuggestions, setStartAddressSuggestions] = useState<
-    Feature[]
+    CarpoolFeature[]
   >([]);
 
-  const [companyAddressSelected, setCompanyAddressSelected] = useState({
-    place_name: "",
-    center: [0, 0],
-  });
-  const [startAddressSelected, setStartAddressSelected] = useState({
-    place_name: "",
-    center: [0, 0],
-  });
+  const [companyAddressSelected, setCompanyAddressSelected] =
+    useState<CarpoolAddress>({
+      place_name: "",
+      center: [0, 0],
+    });
+  const [startAddressSelected, setStartAddressSelected] =
+    useState<CarpoolAddress>({
+      place_name: "",
+      center: [0, 0],
+    });
 
   const [companyAddress, setCompanyAddress] = useState("");
   const updateCompanyAddress = useMemo(
@@ -160,6 +146,8 @@ const Profile: NextPage = () => {
     () => debounce(setStartingAddress, 500),
     []
   );
+
+  console.log(startAddressSuggestions);
 
   useEffect(() => {
     if (!user) return;
@@ -211,8 +199,8 @@ const Profile: NextPage = () => {
   });
 
   const onSubmit = async (values: OnboardingFormInputs) => {
-    const coord: number[] = (companyAddressSelected as any).center;
-    const startCoord: number[] = (startAddressSelected as any).center;
+    const coord: number[] = companyAddressSelected.center;
+    const startCoord: number[] = startAddressSelected.center;
     const userInfo = {
       ...values,
       companyCoordLng: coord[0],
@@ -276,7 +264,7 @@ const Profile: NextPage = () => {
                       className={`w-full`}
                       as="div"
                       value={startAddressSelected}
-                      onChange={(val) => {
+                      onChange={(val: CarpoolFeature) => {
                         setStartAddressSelected(val);
                         fieldProps.onChange(val.place_name);
                       }}
@@ -288,13 +276,16 @@ const Profile: NextPage = () => {
                             ? "border-northeastern-red"
                             : "border-black"
                         }`}
-                        displayValue={(feat: any) =>
+                        displayValue={(feat: CarpoolAddress) =>
                           feat.place_name ? feat.place_name : ""
                         }
                         type="text"
                         onChange={(e) => {
                           if (e.target.value === "") {
-                            setStartAddressSelected({ place_name: "" });
+                            setStartAddressSelected({
+                              place_name: "",
+                              center: [0, 0],
+                            });
                             fieldProps.onChange("");
                           } else {
                             updateStartingAddress(e.target.value);
@@ -313,7 +304,7 @@ const Profile: NextPage = () => {
                               Nothing found.
                             </div>
                           ) : (
-                            startAddressSuggestions.map((feat: any) => (
+                            startAddressSuggestions.map((feat) => (
                               <Combobox.Option
                                 key={feat.id}
                                 className={({ active }) =>
@@ -370,7 +361,7 @@ const Profile: NextPage = () => {
                       className={`w-full`}
                       as="div"
                       value={companyAddressSelected}
-                      onChange={(val) => {
+                      onChange={(val: CarpoolFeature) => {
                         setCompanyAddressSelected(val);
                         fieldProps.onChange(val.place_name);
                       }}
@@ -382,13 +373,16 @@ const Profile: NextPage = () => {
                             ? "border-northeastern-red"
                             : "border-black"
                         }`}
-                        displayValue={(feat: any) =>
+                        displayValue={(feat: CarpoolAddress) =>
                           feat.place_name ? feat.place_name : ""
                         }
                         type="text"
                         onChange={(e) => {
                           if (e.target.value === "") {
-                            setCompanyAddressSelected({ place_name: "" });
+                            setCompanyAddressSelected({
+                              place_name: "",
+                              center: [0, 0],
+                            });
                             fieldProps.onChange("");
                           } else {
                             updateCompanyAddress(e.target.value);
@@ -407,7 +401,7 @@ const Profile: NextPage = () => {
                               Nothing found.
                             </div>
                           ) : (
-                            companyAddressSuggestions.map((feat: any) => (
+                            companyAddressSuggestions.map((feat) => (
                               <Combobox.Option
                                 key={feat.id}
                                 className={({ active }) =>

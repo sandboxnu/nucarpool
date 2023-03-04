@@ -1,6 +1,7 @@
 import { inferQueryOutput } from "./trpc";
 import { Role } from "@prisma/client";
 import { Status } from "@prisma/client";
+import { Feature } from "geojson";
 
 export type PoiData = {
   location: string;
@@ -44,3 +45,9 @@ export type PublicUser = {
 
 export type User = inferQueryOutput<"user.me">;
 export type GeoJsonUsers = inferQueryOutput<"mapbox.geoJsonUsersList">;
+
+export type CarpoolAddress = {
+  place_name: string;
+  center: [longitude: number, latitude: number];
+};
+export type CarpoolFeature = Feature & CarpoolAddress;
