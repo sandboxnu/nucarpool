@@ -472,6 +472,7 @@ const Profile: NextPage = () => {
                   <div className="border-l-2 border-l-black">
                     {daysOfWeek.map((day, index) => (
                       <Controller
+                        key={day + index.toString()}
                         name={`daysWorking.${index}`}
                         control={control}
                         render={({
