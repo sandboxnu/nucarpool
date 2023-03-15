@@ -36,6 +36,7 @@ import {
 } from "../styles/profile";
 import ControlledTimePicker from "../components/ControlledTimePicker";
 import { CarpoolAddress, CarpoolFeature } from "../utils/types";
+import ProtectedPage from "../utils/auth";
 
 // Inputs to the onboarding form.
 export type OnboardingFormInputs = {
@@ -146,8 +147,6 @@ const Profile: NextPage = () => {
     () => debounce(setStartingAddress, 1000),
     []
   );
-
-  console.log(startAddressSuggestions);
 
   useEffect(() => {
     if (!user) return;
@@ -599,4 +598,4 @@ const Profile: NextPage = () => {
   );
 };
 
-export default Profile;
+export default ProtectedPage(Profile);
