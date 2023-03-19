@@ -138,13 +138,13 @@ const Profile: NextPage = () => {
 
   const [companyAddress, setCompanyAddress] = useState("");
   const updateCompanyAddress = useMemo(
-    () => debounce(setCompanyAddress, 1000),
+    () => debounce(setCompanyAddress, 250),
     []
   );
 
   const [startingAddress, setStartingAddress] = useState("");
   const updateStartingAddress = useMemo(
-    () => debounce(setStartingAddress, 1000),
+    () => debounce(setStartingAddress, 250),
     []
   );
 
