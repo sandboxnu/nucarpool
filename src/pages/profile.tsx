@@ -436,7 +436,7 @@ const Profile: NextPage = () => {
               {/* Role field  */}
               <BottomProfileSection>
                 <ProfileHeaderNoMB>
-                  I am a... <span>*</span>
+                  I am a... <span className="text-northeastern-red">*</span>
                 </ProfileHeaderNoMB>
                 <div className="flex items-end space-x-4">
                   <Radio

@@ -117,7 +117,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       }
     }
   };
-
+  console.log(props.userToConnectTo);
   return (
     <div
       className={
