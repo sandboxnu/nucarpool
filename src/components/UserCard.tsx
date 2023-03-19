@@ -156,12 +156,12 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       {/* fourth row */}
       <div className="w-full m-0 flex justify-between align-middle">
         <div className="font-normal text-sm flex">
-          <p>Start: </p>
+          <p className="pr-1">Start:</p>
           <p className="font-semibold">
             {dayjs.tz(props.userToConnectTo.startTime, "UTC").format("h:mm")} am
           </p>
           <p className="font-semibold px-2"> | </p>
-          <p>End: </p>
+          <p className="pr-1">End:</p>
           <p className="font-semibold">
             {dayjs.tz(props.userToConnectTo.endTime, "UTC").format("h:mm")} pm
           </p>
