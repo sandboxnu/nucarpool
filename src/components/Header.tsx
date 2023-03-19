@@ -45,7 +45,6 @@ const Header = () => {
   return (
     <HeaderDiv>
       <Logo>CarPool</Logo>
-      <PageName>My Profile</PageName>
     </HeaderDiv>
   );
 };
