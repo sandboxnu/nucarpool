@@ -14,7 +14,7 @@ const DropDownMenu = () => {
   };
 
   return (
-    <div className="fixed z-30 right-2 top-2 text-right">
+    <div className="fixed z-30 right-5 top-3 text-right">
       <Menu>
         <Menu.Button className="rounded-full bg-gray-400 p-2">
           <AiOutlineUser className="w-8 h-8" />
