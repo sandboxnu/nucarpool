@@ -128,13 +128,9 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       <div className="flex justify-between">
         {/* top row */}
         <div className="flex">
-          <div className="flex text-lg">
-            <p className="font-semibold border-r-2 pr-2 border-r-black">
-              {props.userToConnectTo.name}
-            </p>
-            <p className="font-light pl-2">
-              {props.userToConnectTo.companyName}
-            </p>
+          <div className="text-lg">
+            <p className="font-semibold">{props.userToConnectTo.name}</p>
+            <p className="font-light">{props.userToConnectTo.companyName}</p>
           </div>
         </div>
         <Rating name="" size="large" max={1} />
