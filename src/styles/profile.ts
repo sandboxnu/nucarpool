@@ -77,20 +77,6 @@ export const ProfileHeaderNoMB = styled(ProfileHeader)`
   margin-bottom: 0;
 `;
 
-export const EntryLabel = styled.label<{
-  error?: boolean;
-  required?: boolean;
-}>`
-  font-family: "Montserrat";
-  font-style: normal;
-  font-weight: 700;
-  font-size: 20px;
-  line-height: 24.38px;
-  display: flex;
-  align-items: center;
-  color: ${(props) => (props.error ? "#B12424" : "#000000")};
-`;
-
 export const Note = styled.p<{}>`
   font-family: "Montserrat";
   font-style: normal;

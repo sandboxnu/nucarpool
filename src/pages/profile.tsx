@@ -27,7 +27,6 @@ import {
   ProfileHeader,
   TopProfileSection,
   CommutingScheduleSection,
-  EntryLabel,
   EntryRow,
   LightEntryLabel,
   Note,
@@ -37,6 +36,7 @@ import {
 import ControlledTimePicker from "../components/ControlledTimePicker";
 import { CarpoolAddress, CarpoolFeature } from "../utils/types";
 import ProtectedPage from "../utils/auth";
+import { EntryLabel } from "../components/EntryLabel";
 
 // Inputs to the onboarding form.
 export type OnboardingFormInputs = {
@@ -250,11 +250,11 @@ const Profile: NextPage = () => {
               <TopProfileSection>
                 <ProfileHeader>Locations</ProfileHeader>
                 {/* Starting Location field  */}
-
-                <EntryLabel error={!!errors.startAddress}>
-                  Home Address
-                </EntryLabel>
-
+                <EntryLabel
+                  required={true}
+                  error={errors.startAddress}
+                  label="Home Address"
+                />
                 <Controller
                   name="startAddress"
                   control={control}
@@ -334,6 +334,11 @@ const Profile: NextPage = () => {
               </TopProfileSection>
 
               <MiddleProfileSection>
+                <EntryLabel
+                  required={true}
+                  error={errors.companyName}
+                  label="Workplace Name"
+                />
                 <TextField
                   className={`w-full mb-6`}
                   label="Workplace Name"
@@ -345,9 +350,11 @@ const Profile: NextPage = () => {
 
                 {/* Company Address field  */}
 
-                <EntryLabel error={!!errors.startAddress}>
-                  Workplace Address
-                </EntryLabel>
+                <EntryLabel
+                  required={true}
+                  error={errors.companyAddress}
+                  label="Workplace Address"
+                />
                 <Note>
                   Note: Select the autocomplete results, even if you typed the
                   address out
@@ -504,18 +511,32 @@ const Profile: NextPage = () => {
 
                 {/* Start/End Time Fields  */}
                 <div className="flex w-full gap-6 pb-4">
-                  <ControlledTimePicker
-                    control={control}
-                    label="Start time"
-                    name={"startTime"}
-                    placeholder={"Start time"}
-                  />
-                  <ControlledTimePicker
-                    control={control}
-                    label="End time"
-                    name={"endTime"}
-                    placeholder={"End time"}
-                  />
+                  <div>
+                    <EntryLabel
+                      required={true}
+                      error={errors.startTime}
+                      label="Start Time"
+                    />
+                    <ControlledTimePicker
+                      control={control}
+                      label="Start time"
+                      name={"startTime"}
+                      placeholder={"Start time"}
+                    />
+                  </div>
+                  <div>
+                    <EntryLabel
+                      required={true}
+                      error={errors.endTime}
+                      label="End Time"
+                    />
+                    <ControlledTimePicker
+                      control={control}
+                      label="End time"
+                      name={"endTime"}
+                      placeholder={"End time"}
+                    />
+                  </div>
                 </div>
                 <div className="flex flex-col space-y-2">
                   <EntryRow>
@@ -575,7 +596,11 @@ const Profile: NextPage = () => {
                 </div>
                 {/* Bio field */}
                 <div className="py-2 w-full">
-                  <EntryLabel error={!!errors.bio}>Intro</EntryLabel>
+                  <EntryLabel
+                    required
+                    error={errors.companyAddress}
+                    label="Intro"
+                  />
                   <textarea
                     className={`resize-none form-input w-full shadow-sm rounded-md px-3 py-2`}
                     maxLength={300}

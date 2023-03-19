@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { ReactNode, useState } from "react";
 import { Control, Controller } from "react-hook-form";
 import { OnboardingFormInputs } from "../pages/profile";
-import { EntryLabel, ErrorDisplay } from "../styles/profile";
+import { ErrorDisplay } from "../styles/profile";
 
 interface ControlledTimePickerProps {
   control: Control<OnboardingFormInputs>;
@@ -45,7 +45,6 @@ const ControlledTimePicker = (props: ControlledTimePickerProps) => {
       control={props.control}
       render={({ field: { ref, ...fieldProps }, fieldState }) => (
         <div className={"flex flex-col"}>
-          <EntryLabel error={!!fieldState.error}>{props.label}</EntryLabel>
           <TimePicker
             className="form-input w-full rounded-lg"
             format="h:mm A"

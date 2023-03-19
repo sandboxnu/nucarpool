@@ -1,6 +1,6 @@
 import * as React from "react";
 import { FieldError } from "react-hook-form";
-import { EntryLabel, ErrorDisplay } from "../styles/profile";
+import { ErrorDisplay } from "../styles/profile";
 import { classNames } from "../utils/classNames";
 
 type TextFieldOwnProps = {
@@ -30,7 +30,6 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
     forwardedRef
   ) => (
     <div className={classNames(`flex flex-col space-y-2 w-full`, className)}>
-      {label && <EntryLabel error={!!error?.message}>{label}</EntryLabel>}
       <input
         {...rest}
         ref={forwardedRef}
