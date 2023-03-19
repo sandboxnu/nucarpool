@@ -1,12 +1,9 @@
 import Rating from "@mui/material/Rating/Rating";
 import dayjs from "dayjs";
 import mapboxgl from "mapbox-gl";
-import { SyntheticEvent, useState } from "react";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { PublicUser, User } from "../utils/types";
-import { trpc } from "../utils/trpc";
-import { toast } from "react-toastify";
 
 interface UserCardProps {
   // represents the other user 'I' am trying to connect to.

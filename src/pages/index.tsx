@@ -83,7 +83,7 @@ const Home: NextPage<any> = () => {
       );
     }
   };
-  console.log(favorites?.length);
+
   return (
     <>
       <Head>
