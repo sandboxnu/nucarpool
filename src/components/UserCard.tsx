@@ -49,6 +49,9 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
 
+  /** Creates a div with 7 boxes, each representing a day of the week.
+   *  Background color is green if the user is working on that day.
+   */
   const DaysWorkingDisplay = (daysWorking: string) => {
     const boxes: JSX.Element[] = [];
     for (let i = 0; i < daysWorking.length; i = i + 2) {
@@ -66,6 +69,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
     return <div className="flex border-l border-black h-min">{boxes}</div>;
   };
 
+  // Creates MapBox markers showing user's start address and the start area of the other user.
   const onViewRouteClick = (userToConnectTo: PublicUser) => {
     if (props.inputProps) {
       if (props.inputProps.map !== undefined) {

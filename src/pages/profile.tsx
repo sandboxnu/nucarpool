@@ -435,7 +435,9 @@ const Profile: NextPage = () => {
 
               {/* Role field  */}
               <BottomProfileSection>
-                <ProfileHeaderNoMB>I am a... </ProfileHeaderNoMB>
+                <ProfileHeaderNoMB>
+                  I am a... <span>*</span>
+                </ProfileHeaderNoMB>
                 <div className="flex items-end space-x-4">
                   <Radio
                     label="Rider"
@@ -458,7 +460,7 @@ const Profile: NextPage = () => {
                   {watch("role") == Role.DRIVER && (
                     <TextField
                       inputClassName="py-[14px]"
-                      className="self-start"
+                      className="self-end w-36"
                       label="Seat Availability"
                       id="seatAvail"
                       error={errors.seatAvail}
@@ -595,7 +597,7 @@ const Profile: NextPage = () => {
                   </div>
                 </div>
                 {/* Bio field */}
-                <div className="py-2 w-full">
+                <div className="py-4 w-full">
                   <EntryLabel
                     required
                     error={errors.companyAddress}

@@ -55,6 +55,7 @@ export const BottomProfileSection = styled(ProfileColumn)`
 export const PersonalInfoSection = styled(ProfileColumn)`
   width: 100%;
   flex: 1 1 auto;
+  gap: 4px;
 `;
 
 export const CommutingScheduleSection = styled(ProfileColumn)`
