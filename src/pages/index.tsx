@@ -66,7 +66,7 @@ const Home: NextPage<any> = () => {
     }
   }, [user, geoJsonUsers]);
 
-  const addFavorite = async (favoriteId: string, add: boolean) => {
+  const addFavorite = (favoriteId: string, add: boolean) => {
     if (!user) return;
     mutateFavorites({
       userId: user.id,
