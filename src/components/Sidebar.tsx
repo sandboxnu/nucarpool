@@ -21,6 +21,7 @@ interface SideBarProps {
   favs: PublicUser[];
   map: mapboxgl.Map;
   handleConnect: (modalUser: PublicUser) => void;
+  handleFavorite: (otherUser: string, add: boolean) => void;
 }
 
 const Sidebar = (props: SideBarProps) => {
@@ -72,7 +73,9 @@ const Sidebar = (props: SideBarProps) => {
               previousMarkers: previousMarkers,
               clearMarkers: clearMarkers,
             }}
+            isFavorited={props.favs.map((fav) => fav.id).includes(otherUser.id)}
             handleConnect={props.handleConnect}
+            handleFavorite={(add) => props.handleFavorite(otherUser.id, add)}
           />
         ))}
       </div>

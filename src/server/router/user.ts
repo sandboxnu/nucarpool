@@ -150,7 +150,7 @@ export const userRouter = createProtectedRouter()
       return Promise.all(user.favorites.map(convertToPublic));
     },
   })
-  .mutation("favorites", {
+  .mutation("edit-favorites", {
     input: z.object({
       userId: z.string(),
       favoriteId: z.string(),
