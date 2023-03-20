@@ -22,6 +22,7 @@ import { toast } from "react-toastify";
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
 const Home: NextPage<any> = () => {
+  const utils = trpc.useContext();
   const { data: geoJsonUsers, isLoading: isLoadingGeoJsonUsers } =
     trpc.useQuery(["mapbox.geoJsonUsersList"]);
   const { data: user, isLoading: isLoadingUser } = trpc.useQuery(["user.me"]);
@@ -30,6 +31,9 @@ const Home: NextPage<any> = () => {
   const { mutate: mutateFavorites } = trpc.useMutation("user.edit-favorites", {
     onError: (error) => {
       toast.error(`Something went wrong: ${error.message}`);
+    },
+    onSuccess() {
+      utils.invalidateQueries(["user.favorites"]);
     },
   });
 
@@ -73,15 +77,6 @@ const Home: NextPage<any> = () => {
       favoriteId,
       add,
     });
-    // manage local favorites state
-    if (add) {
-      favorites?.push(recommendations!.find((rec) => rec.id == favoriteId)!);
-    } else {
-      favorites?.splice(
-        favorites!.findIndex((rec) => rec.id == favoriteId),
-        1
-      );
-    }
   };
 
   return (

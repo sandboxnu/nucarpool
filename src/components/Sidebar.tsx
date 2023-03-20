@@ -31,6 +31,8 @@ const Sidebar = (props: SideBarProps) => {
     setCurList(props.reccs ?? []);
   }, [props.reccs]);
 
+  const favIds = props.favs.map((fav) => fav.id);
+
   return (
     <div className="flex flex-col px-5 flex-shrink-0 h-full z-10 text-left bg-white">
       <div className="flex-row py-3">
@@ -73,7 +75,7 @@ const Sidebar = (props: SideBarProps) => {
               previousMarkers: previousMarkers,
               clearMarkers: clearMarkers,
             }}
-            isFavorited={props.favs.map((fav) => fav.id).includes(otherUser.id)}
+            isFavorited={favIds.includes(otherUser.id)}
             handleConnect={props.handleConnect}
             handleFavorite={(add) => props.handleFavorite(otherUser.id, add)}
           />
