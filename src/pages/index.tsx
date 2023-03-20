@@ -70,7 +70,7 @@ const Home: NextPage<any> = () => {
     }
   }, [user, geoJsonUsers]);
 
-  const addFavorite = (favoriteId: string, add: boolean) => {
+  const handleFavorite = (favoriteId: string, add: boolean) => {
     if (!user) return;
     mutateFavorites({
       userId: user.id,
@@ -96,7 +96,7 @@ const Home: NextPage<any> = () => {
                 favs={favorites ?? []}
                 map={mapState}
                 handleConnect={handleConnect}
-                handleFavorite={addFavorite}
+                handleFavorite={handleFavorite}
               />
             )}
           </div>
