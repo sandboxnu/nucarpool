@@ -521,9 +521,9 @@ const Profile: NextPage = () => {
                     />
                     <ControlledTimePicker
                       control={control}
-                      label="Start time"
                       name={"startTime"}
                       placeholder={"Start time"}
+                      value={user?.startTime ? user.startTime : undefined}
                     />
                   </div>
                   <div>
@@ -534,9 +534,9 @@ const Profile: NextPage = () => {
                     />
                     <ControlledTimePicker
                       control={control}
-                      label="End time"
                       name={"endTime"}
                       placeholder={"End time"}
+                      value={user?.endTime ? user.endTime : undefined}
                     />
                   </div>
                 </div>
