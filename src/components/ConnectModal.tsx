@@ -12,7 +12,7 @@ interface ConnectModalProps {
 }
 
 const ConnectModal = (props: ConnectModalProps): JSX.Element => {
-  let [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(true);
 
   const onClose = () => {
     setIsOpen(false);
