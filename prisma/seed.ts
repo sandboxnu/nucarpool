@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Role } from "@prisma/client";
 import { range } from "lodash";
 import Random from "random-seed";
 import { generateUser, GenerateUserInput } from "../src/utils/recommendation";
@@ -10,6 +10,7 @@ const prisma = new PrismaClient();
  */
 const deleteUsers = async () => {
   await prisma.user.deleteMany({});
+  await prisma.invitation.deleteMany({});
 };
 
 /**
@@ -19,8 +20,25 @@ const clearConnections = async () => {
   const users = await prisma.user.findMany();
 
   await Promise.all(
-    users.map(async (user) => {
-      return await prisma.user.update({
+    users.map((user) =>
+      Promise.all([
+        prisma.invitation.findMany({
+          where: {
+            OR: [{ fromUserId: user.id }, { toUserId: user.id }],
+          },
+        }),
+        prisma.invitation.deleteMany({
+          where: {
+            OR: [{ fromUserId: user.id }, { toUserId: user.id }],
+          },
+        }),
+      ])
+    )
+  );
+
+  await Promise.all(
+    users.map((user) =>
+      prisma.user.update({
         where: {
           id: user.id,
         },
@@ -30,20 +48,40 @@ const clearConnections = async () => {
               .fill(undefined)
               .map((_, idx) => ({ id: `${idx}` })),
           },
+          connectedTo: {
+            disconnect: new Array(70)
+              .fill(undefined)
+              .map((_, idx) => ({ id: `${idx}` })),
+          },
         },
-      });
-    })
+      })
+    )
   );
 };
 
 /**
  * Generates favorites for users in our database.
  */
-const generateFavorites = async () => {
+const generateConnectedFields = async () => {
   const users = await prisma.user.findMany();
-
   await Promise.all(
     users.map((_, idx) =>
+      prisma.invitation.create({
+        data: {
+          message: "Hello",
+          fromUser: {
+            connect: { id: idx.toString() },
+          },
+          toUser: {
+            connect: { id: ((idx + 1) % 70).toString() },
+          },
+        },
+      })
+    )
+  );
+
+  await Promise.all(
+    users.map((user, idx) =>
       prisma.user.update({
         where: {
           id: `${idx}`,
@@ -51,6 +89,13 @@ const generateFavorites = async () => {
         data: {
           favorites: {
             connect: pickConnections(idx, users.length, 5),
+          },
+          connectedTo: {
+            connect: pickConnections(
+              idx,
+              users.length,
+              user.role === Role.DRIVER ? user.seatAvail : 1
+            ),
           },
         },
       })
@@ -130,7 +175,7 @@ const createUserData = async () => {
       await prisma.user.upsert(generateUser({ id: index.toString(), ...user }));
     })
   );
-  await generateFavorites();
+  await generateConnectedFields();
 };
 
 /**
