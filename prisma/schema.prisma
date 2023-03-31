@@ -62,6 +62,16 @@ model Session {
   @@map(name: "session")
 }
 
+// Represents an Invitation to a user
+model Invitation {
+  id           String   @id @default(cuid()) // primary key
+  message       String
+  fromUserId String // foreign key
+  toUserId   String // foreign key
+  fromUser User  @relation("sentInvitations", fields: [fromUserId], references: [id])
+  toUser   User  @relation("receivedInvitations", fields: [toUserId], references: [id])
+}
+
 // Represents a User--need this for NextAuth and the data it stores.
 model User {
   id                 String    @id @default(cuid()) // primary key
@@ -96,6 +106,10 @@ model User {
   endTime            DateTime? @map("end_time") @db.Time(0)
   favoritedBy        User[]    @relation("Favorites")
   favorites          User[]    @relation("Favorites")
+  sentInvitations    Invitation[]  @relation("sentInvitations")
+  receivedInvitations Invitation[] @relation("receivedInvitations")
+  connectedBy        User[] @relation("Connections")
+  connectedTo        User[] @relation("Connections")
 
   @@map(name: "user")
 }
