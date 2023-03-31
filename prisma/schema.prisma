@@ -70,6 +70,9 @@ model Invitation {
   toUserId   String // foreign key
   fromUser User  @relation("sentInvitations", fields: [fromUserId], references: [id])
   toUser   User  @relation("receivedInvitations", fields: [toUserId], references: [id])
+
+  @@index([fromUserId])
+  @@index([toUserId])
 }
 
 // Represents a User--need this for NextAuth and the data it stores.
