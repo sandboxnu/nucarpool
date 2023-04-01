@@ -147,7 +147,7 @@ export const userRouter = createProtectedRouter()
         });
       }
 
-      return Promise.all(user.favorites.map(convertToPublic));
+      return user.favorites.map(convertToPublic);
     },
   })
   .mutation("edit-favorites", {
@@ -165,6 +165,48 @@ export const userRouter = createProtectedRouter()
         data: {
           favorites: {
             [input.add ? "connect" : "disconnect"]: { id: input.favoriteId },
+          },
+        },
+      });
+    },
+  })
+  // Returns the list of connections for the curent user
+  .query("connections", {
+    async resolve({ ctx }) {
+      const id = ctx.session.user?.id;
+      const user = await ctx.prisma.user.findUnique({
+        where: { id },
+        select: {
+          connectedTo: true,
+        },
+      });
+
+      // throws TRPCError if no user with ID exists
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `No profile with id '${id}'`,
+        });
+      }
+
+      return user.connectedTo.map(convertToPublic);
+    },
+  })
+  .mutation("edit-connections", {
+    input: z.object({
+      userId: z.string(),
+      connectToId: z.string(),
+      add: z.boolean(),
+    }),
+
+    async resolve({ ctx, input }) {
+      await ctx.prisma.user.update({
+        where: {
+          id: input.userId,
+        },
+        data: {
+          connectedTo: {
+            [input.add ? "connect" : "disconnect"]: { id: input.connectToId },
           },
         },
       });
