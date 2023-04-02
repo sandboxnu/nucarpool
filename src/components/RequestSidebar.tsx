@@ -19,6 +19,7 @@ interface RequestSidebarProps {
   currentUser: User;
   sent: PublicUser[];
   received: PublicUser[];
+  favs: PublicUser[];
   map: mapboxgl.Map;
   handleManage: (modalUser: PublicUser) => void;
   handleFavorite: (otherUser: string, add: boolean) => void;
@@ -30,8 +31,6 @@ const RequestSidebar = (props: RequestSidebarProps) => {
   useEffect(() => {
     setCurList(props.sent ?? []);
   }, [props.sent]);
-
-  const favIds = props.received.map((fav) => fav.id);
 
   return (
     <div className="flex flex-col px-5 flex-shrink-0 h-full z-10 text-left bg-white">
@@ -74,6 +73,7 @@ const RequestSidebar = (props: RequestSidebarProps) => {
           color: "bg-blue-900",
         }}
         handleFavorite={props.handleFavorite}
+        favs={props.favs}
         map={props.map}
       />
     </div>

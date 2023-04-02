@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import styled from "styled-components";
 
 const HeaderDiv = styled.div`
@@ -41,10 +41,47 @@ const PageName = styled.h1`
   color: #f4f4f4;
 `;
 
-const Header = () => {
+interface HeaderProps {
+  sidebarValue: string;
+  setSidebar: Dispatch<SetStateAction<string>>;
+}
+
+const Header = (props: HeaderProps) => {
+  const renderClassName = (sidebarValue: string, sidebarText: string) => {
+    if (sidebarValue == "explore" && sidebarText == "explore") {
+      return "underline underline-offset-8 rounded-xl p-4 font-medium text-xl text-white";
+    } else if (sidebarValue == "requests" && sidebarText == "explore") {
+      return "rounded-xl p-4 font-medium text-xl text-white";
+    }
+
+    if (sidebarValue == "requests" && sidebarText == "requests") {
+      return "underline underline-offset-8 rounded-xl p-4 font-medium text-xl text-white";
+    } else if (sidebarValue == "explore" && sidebarText == "requests") {
+      return "rounded-xl p-4 font-medium text-xl text-white";
+    }
+  };
+
   return (
     <HeaderDiv>
       <Logo>CarPool</Logo>
+      <div className="pr-12">
+        <button
+          onClick={() => {
+            props.setSidebar("explore");
+          }}
+          className={renderClassName(props.sidebarValue, "explore")}
+        >
+          Explore
+        </button>
+        <button
+          onClick={() => {
+            props.setSidebar("requests");
+          }}
+          className={renderClassName(props.sidebarValue, "requests")}
+        >
+          Requests
+        </button>
+      </div>
     </HeaderDiv>
   );
 };

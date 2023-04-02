@@ -74,6 +74,7 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
           color: undefined,
         }}
         handleFavorite={props.handleFavorite}
+        favs={props.favs}
         map={props.map}
       />
     </div>

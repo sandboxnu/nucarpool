@@ -30,6 +30,10 @@ const Home: NextPage<any> = () => {
   const { data: user, isLoading: isLoadingUser } = trpc.useQuery(["user.me"]);
   const { data: recommendations } = trpc.useQuery(["user.recommendations"]);
   const { data: favorites } = trpc.useQuery(["user.favorites"]);
+  // const { data: sent } = trpc.useQuery(["user.sent"]);
+  // const { data: received } = trpc.useQuery(["user.received"]);
+  const sent: PublicUser[] = [];
+  const received: PublicUser[] = [];
   const { mutate: mutateFavorites } = trpc.useMutation("user.edit-favorites", {
     onError: (error) => {
       toast.error(`Something went wrong: ${error.message}`);
@@ -42,6 +46,7 @@ const Home: NextPage<any> = () => {
   const [mapState, setMapState] = useState<mapboxgl.Map>();
 
   const [modalUser, setModalUser] = useState<PublicUser | null>(null);
+  const [sidebarState, setSidebarState] = useState<string>("explore");
 
   const handleConnect = (userToConnectTo: PublicUser) => {
     setModalUser(userToConnectTo);
@@ -74,35 +79,45 @@ const Home: NextPage<any> = () => {
     });
   };
 
+  const renderSidebar = () => {
+    if (mapState && user) {
+      if (sidebarState == "explore") {
+        return (
+          <ExploreSidebar
+            currentUser={user}
+            reccs={recommendations ?? []}
+            favs={favorites ?? []}
+            map={mapState}
+            handleConnect={handleConnect}
+            handleFavorite={handleFavorite}
+          />
+        );
+      } else {
+        return (
+          <RequestSidebar
+            currentUser={user}
+            sent={recommendations ?? []}
+            received={received ?? []}
+            favs={favorites ?? []}
+            map={mapState}
+            handleManage={handleConnect}
+            handleFavorite={handleFavorite}
+          />
+        );
+      }
+    }
+  };
+
   return (
     <>
       <Head>
         <title>Home</title>
       </Head>
       <div className="max-h-screen w-full h-full m-0">
-        <Header />
+        <Header sidebarValue={sidebarState} setSidebar={setSidebarState} />
         {/* <ProfileModal userInfo={userInfo!} user={user!}  /> */}
         <div className="flex flex-auto h-[91.5%]">
-          <div className="w-96">
-            {mapState && user && (
-              <ExploreSidebar
-                currentUser={user}
-                reccs={recommendations ?? []}
-                favs={favorites ?? []}
-                map={mapState}
-                handleConnect={handleConnect}
-                handleFavorite={handleFavorite}
-              />
-              // <RequestSidebar
-              //   currentUser={user}
-              //   sent={recommendations ?? []}
-              //   received={favorites ?? []}
-              //   map={mapState}
-              //   handleManage={handleConnect}
-              //   handleFavorite={handleFavorite}
-              // />
-            )}
-          </div>
+          <div className="w-96">{mapState && user && renderSidebar()}</div>
 
           <DropDownMenu />
           <button

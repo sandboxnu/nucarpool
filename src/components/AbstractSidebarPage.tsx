@@ -18,6 +18,7 @@ const clearMarkers = () => {
 interface AbstractSidebarPageProps {
   currentUser: User;
   userCardList: PublicUser[];
+  favs: PublicUser[];
   leftButton?: ButtonInfo;
   rightButton: ButtonInfo;
   handleFavorite: (otherUser: string, add: boolean) => void;
@@ -33,7 +34,7 @@ const AbstractSidebarPage = (props: AbstractSidebarPageProps) => {
     setCurList(props.userCardList ?? []);
   }, [props.userCardList]);
 
-  //   const favIds = props.favs.map((fav) => fav.id);
+  const favIds = props.favs.map((fav) => fav.id);
 
   return (
     <div id="scrollableDiv" className="overflow-auto">
@@ -41,8 +42,7 @@ const AbstractSidebarPage = (props: AbstractSidebarPageProps) => {
         <AbstractUserCard
           userCardObj={otherUser}
           key={otherUser.id}
-          // isFavorited={favIds.includes(otherUser.id)}
-          isFavorited={false}
+          isFavorited={favIds.includes(otherUser.id)}
           handleFavorite={(add: boolean) =>
             props.handleFavorite(otherUser.id, add)
           }
