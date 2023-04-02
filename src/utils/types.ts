@@ -51,3 +51,9 @@ export type CarpoolAddress = {
   center: [longitude: number, latitude: number];
 };
 export type CarpoolFeature = Feature & CarpoolAddress;
+
+export type ButtonInfo = {
+  text: string;
+  onPress: (user: PublicUser) => void;
+  color?: string;
+};

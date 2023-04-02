@@ -18,6 +18,8 @@ import Header from "../components/Header";
 import { PublicUser } from "../utils/types";
 import ConnectModal from "../components/ConnectModal";
 import { toast } from "react-toastify";
+import ExploreSidebar from "../components/ExploreSidebar";
+import RequestSidebar from "../components/RequestSidebar";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -83,7 +85,7 @@ const Home: NextPage<any> = () => {
         <div className="flex flex-auto h-[91.5%]">
           <div className="w-96">
             {mapState && user && (
-              <Sidebar
+              <ExploreSidebar
                 currentUser={user}
                 reccs={recommendations ?? []}
                 favs={favorites ?? []}
@@ -91,6 +93,14 @@ const Home: NextPage<any> = () => {
                 handleConnect={handleConnect}
                 handleFavorite={handleFavorite}
               />
+              // <RequestSidebar
+              //   currentUser={user}
+              //   sent={recommendations ?? []}
+              //   received={favorites ?? []}
+              //   map={mapState}
+              //   handleManage={handleConnect}
+              //   handleFavorite={handleFavorite}
+              // />
             )}
           </div>
 
