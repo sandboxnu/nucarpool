@@ -13,8 +13,9 @@
     "seed": "yarn prisma db seed",
     "prepare": "husky install",
     "test": "jest",
-    "vercel-build": "prisma generate && prisma db push && next build",
-    "startup": "docker-compose -f docker-compose.yml up -d && next dev"
+    "vercel-build": "./vercel.sh",
+    "build:preview": "prisma generate && echo \"y\" | prisma db push && next build",
+    "build:main": "prisma generate & next build"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
