@@ -12,24 +12,35 @@ export const CompleteProfileButton = styled.button`
   color: #ffffff;
   width: 222px;
   align-self: flex-end;
-  justify-self: flex-end;
+  @media (min-width: 834px) {
+    justify-self: flex-end;
+    margin: 0px;
+  }
 `;
 
 export const ProfileContainer = styled.form`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  @media (min-width: 834px) {
+    align-items: center;
+    height: 100%;
+  }
   width: 90%;
-  height: 100%;
-  align-items: center;
   padding: 4rem 1.5rem;
 `;
 
 export const ProfileColumn = styled.div`
   display: flex;
   flex-direction: column;
+  @media (min-width: 834px) {
+    height: 85%;
+    width: 50%;
+    gap: 0px;
+  }
+  gap: 12px;
   height: 85%;
-  width: 50%;
+  width: 80%;
 `;
 
 export const TopProfileSection = styled(ProfileColumn)`
@@ -45,7 +56,10 @@ export const MiddleProfileSection = styled(ProfileColumn)`
 
 export const BottomProfileSection = styled(ProfileColumn)`
   width: 100%;
-  padding-top: 40px;
+  @media (min-width: 834px) {
+    padding-top: 40px;
+  }
+
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -56,11 +70,23 @@ export const PersonalInfoSection = styled(ProfileColumn)`
   width: 100%;
   flex: 1 1 auto;
   gap: 4px;
+  @media (min-width: 834px) {
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+  padding-top: 12px;
+  padding-bottom: 12px;
 `;
 
 export const CommutingScheduleSection = styled(ProfileColumn)`
   width: 100%;
   flex: 1 1 auto;
+  @media (min-width: 834px) {
+    height: 85%;
+    width: 50%;
+    gap: 0px;
+  }
+  gap: 6px;
 `;
 
 export const ProfileHeader = styled.h1`
@@ -71,7 +97,9 @@ export const ProfileHeader = styled.h1`
   font-size: 32px;
   line-height: 39px;
   color: #000000;
-  margin-bottom: 22px;
+  @media (min-width: 834px) {
+    margin-bottom: 22px;
+  }
 `;
 
 export const ProfileHeaderNoMB = styled(ProfileHeader)`
@@ -107,10 +135,4 @@ export const LightEntryLabel = styled.label<{
   display: flex;
   align-items: center;
   color: ${(props) => (props.error ? "#B12424" : "#000000")};
-`;
-
-export const EntryRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
 `;

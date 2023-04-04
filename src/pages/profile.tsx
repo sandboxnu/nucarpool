@@ -27,7 +27,6 @@ import {
   ProfileHeader,
   TopProfileSection,
   CommutingScheduleSection,
-  EntryRow,
   LightEntryLabel,
   Note,
   ErrorDisplay,
@@ -245,7 +244,7 @@ const Profile: NextPage = () => {
       <div className="flex flex-col w-full h-full items-center">
         <Header />
         <ProfileContainer onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex flex-col flex-auto md:flex-row md:space-x-20">
+          <div className="flex flex-col gap-16 flex-auto md:flex-row md:gap-0 md:space-x-20">
             <ProfileColumn>
               <TopProfileSection>
                 <ProfileHeader>Locations</ProfileHeader>
@@ -513,7 +512,7 @@ const Profile: NextPage = () => {
 
                 {/* Start/End Time Fields  */}
                 <div className="flex w-full gap-6 pb-4">
-                  <div>
+                  <div className="flex flex-col gap-2">
                     <EntryLabel
                       required={true}
                       error={errors.startTime}
@@ -526,7 +525,7 @@ const Profile: NextPage = () => {
                       value={user?.startTime ? user.startTime : undefined}
                     />
                   </div>
-                  <div>
+                  <div className="flex flex-col gap-2">
                     <EntryLabel
                       required={true}
                       error={errors.endTime}
@@ -541,7 +540,7 @@ const Profile: NextPage = () => {
                   </div>
                 </div>
                 <div className="flex flex-col space-y-2">
-                  <EntryRow>
+                  <div className="flex flex-row items-center">
                     <Checkbox
                       {...register("timeDiffers")}
                       sx={{
@@ -552,7 +551,7 @@ const Profile: NextPage = () => {
                         },
                       }}
                     />
-                    <LightEntryLabel>
+                    <LightEntryLabel className="pl-2">
                       My start/end time is different each day
                     </LightEntryLabel>
                     <Tooltip
@@ -563,7 +562,7 @@ const Profile: NextPage = () => {
                         <MdHelp fill="#C8102E" />
                       </Icon>
                     </Tooltip>
-                  </EntryRow>
+                  </div>
                 </div>
               </CommutingScheduleSection>
 
@@ -625,4 +624,4 @@ const Profile: NextPage = () => {
   );
 };
 
-export default ProtectedPage(Profile);
+export default Profile;
