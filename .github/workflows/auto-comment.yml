@@ -10,4 +10,4 @@ jobs:
           pullRequestOpened: |
             👋 @{{ author }}
             If your PR contains any changes to the schema.prisma file, please open a deploy request on 
-            PlanetScale before merging. If you have any questions, ping @lukejianu on Slack.
+            PlanetScale before merging. If you have any questions, ping @Luke Jianu on Slack.
