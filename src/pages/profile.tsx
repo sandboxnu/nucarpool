@@ -288,9 +288,7 @@ const Profile: NextPage = () => {
                   type="text"
                   {...register("companyName")}
                 />
-
                 {/* Company Address field  */}
-
                 <EntryLabel
                   required={true}
                   error={errors.companyAddress}
@@ -302,12 +300,12 @@ const Profile: NextPage = () => {
                 </Note>
                 <ControlledAddressCombobox
                   control={control}
-                  name={"startAddress"}
-                  addressSelected={startAddressSelected}
-                  addressSetter={setStartAddressSelected}
-                  addressSuggestions={startAddressSuggestions}
-                  error={errors.startAddress}
-                  addressUpdater={updateStartingAddress}
+                  name={"companyAddress"}
+                  addressSelected={companyAddressSelected}
+                  addressSetter={setCompanyAddressSelected}
+                  addressSuggestions={companyAddressSuggestions}
+                  error={errors.companyAddress}
+                  addressUpdater={updateCompanyAddress}
                 />
                 {errors.companyAddress && (
                   <ErrorDisplay>{errors.companyAddress.message}</ErrorDisplay>
