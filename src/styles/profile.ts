@@ -35,12 +35,10 @@ export const ProfileColumn = styled.div`
   flex-direction: column;
   @media (min-width: 834px) {
     height: 85%;
-    width: 50%;
+    width: 80%;
     gap: 0px;
   }
   gap: 12px;
-  height: 85%;
-  width: 80%;
 `;
 
 export const TopProfileSection = styled(ProfileColumn)`
@@ -82,8 +80,6 @@ export const CommutingScheduleSection = styled(ProfileColumn)`
   width: 100%;
   flex: 1 1 auto;
   @media (min-width: 834px) {
-    height: 85%;
-    width: 50%;
     gap: 0px;
   }
   gap: 6px;
