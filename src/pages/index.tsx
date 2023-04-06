@@ -25,7 +25,11 @@ const Home: NextPage<any> = () => {
   const utils = trpc.useContext();
   const { data: geoJsonUsers, isLoading: isLoadingGeoJsonUsers } =
     trpc.useQuery(["mapbox.geoJsonUsersList"]);
-  const { data: user, isLoading: isLoadingUser } = trpc.useQuery(["user.me"]);
+  const {
+    data: user,
+    isLoading: isLoadingUser,
+    refetch,
+  } = trpc.useQuery(["user.me"]);
   const { data: recommendations } = trpc.useQuery(["user.recommendations"]);
   const { data: favorites } = trpc.useQuery(["user.favorites"]);
   const { mutate: mutateFavorites } = trpc.useMutation("user.edit-favorites", {
@@ -62,6 +66,10 @@ const Home: NextPage<any> = () => {
       setMapState(newMap);
     }
   }, [user, geoJsonUsers]);
+
+  useEffect(() => {
+    refetch();
+  }, []);
 
   const handleFavorite = (favoriteId: string, add: boolean) => {
     if (!user) return;
