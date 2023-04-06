@@ -36,6 +36,7 @@ import ControlledTimePicker from "../components/ControlledTimePicker";
 import { CarpoolAddress, CarpoolFeature } from "../utils/types";
 import ProtectedPage from "../utils/auth";
 import { EntryLabel } from "../components/EntryLabel";
+import ControlledAddressCombobox from "../components/ControlledAddressCombobox";
 
 // Inputs to the onboarding form.
 export type OnboardingFormInputs = {
@@ -254,75 +255,16 @@ const Profile: NextPage = () => {
                   error={errors.startAddress}
                   label="Home Address"
                 />
-                <Controller
-                  name="startAddress"
+                <ControlledAddressCombobox
                   control={control}
-                  render={({ field: { ref, ...fieldProps } }) => (
-                    <Combobox
-                      className={`w-full`}
-                      as="div"
-                      value={startAddressSelected}
-                      onChange={(val: CarpoolFeature) => {
-                        setStartAddressSelected(val);
-                        fieldProps.onChange(val.place_name);
-                      }}
-                      ref={ref}
-                    >
-                      <Combobox.Input
-                        className={`w-full shadow-sm rounded-md px-3 py-2 ${
-                          errors.startAddress
-                            ? "border-northeastern-red"
-                            : "border-black"
-                        }`}
-                        displayValue={(feat: CarpoolAddress) =>
-                          feat.place_name ? feat.place_name : ""
-                        }
-                        type="text"
-                        onChange={(e) => {
-                          if (e.target.value === "") {
-                            setStartAddressSelected({
-                              place_name: "",
-                              center: [0, 0],
-                            });
-                            fieldProps.onChange("");
-                          } else {
-                            updateStartingAddress(e.target.value);
-                          }
-                        }}
-                      />
-                      <Transition
-                        as={Fragment}
-                        leave="transition ease-in duration-100"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
-                      >
-                        <Combobox.Options className="w-full rounded-md bg-white text-base shadow-lg focus:outline-none ">
-                          {startAddressSuggestions.length === 0 ? (
-                            <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
-                              Nothing found.
-                            </div>
-                          ) : (
-                            startAddressSuggestions.map((feat) => (
-                              <Combobox.Option
-                                key={feat.id}
-                                className={({ active }) =>
-                                  `w-full relative cursor-default select-none p-3 border-black ${
-                                    active
-                                      ? "bg-blue-400 text-white"
-                                      : "text-gray-900"
-                                  }`
-                                }
-                                value={feat}
-                              >
-                                {feat.place_name}
-                              </Combobox.Option>
-                            ))
-                          )}
-                        </Combobox.Options>
-                      </Transition>
-                    </Combobox>
-                  )}
+                  name={"startAddress"}
+                  addressSelected={startAddressSelected}
+                  addressSetter={setStartAddressSelected}
+                  addressSuggestions={startAddressSuggestions}
+                  error={errors.startAddress}
+                  addressUpdater={updateStartingAddress}
                 />
+
                 <Note>
                   Note: Your address will only be used to find users close to
                   you. It will not be displayed to any other users.
@@ -358,74 +300,14 @@ const Profile: NextPage = () => {
                   Note: Select the autocomplete results, even if you typed the
                   address out
                 </Note>
-                <Controller
-                  name="companyAddress"
+                <ControlledAddressCombobox
                   control={control}
-                  render={({ field: { ref, ...fieldProps } }) => (
-                    <Combobox
-                      className={`w-full`}
-                      as="div"
-                      value={companyAddressSelected}
-                      onChange={(val: CarpoolFeature) => {
-                        setCompanyAddressSelected(val);
-                        fieldProps.onChange(val.place_name);
-                      }}
-                      ref={ref}
-                    >
-                      <Combobox.Input
-                        className={`w-full shadow-sm rounded-md px-3 py-2 ${
-                          errors.companyAddress
-                            ? "border-northeastern-red"
-                            : "border-black"
-                        }`}
-                        displayValue={(feat: CarpoolAddress) =>
-                          feat.place_name ? feat.place_name : ""
-                        }
-                        type="text"
-                        onChange={(e) => {
-                          if (e.target.value === "") {
-                            setCompanyAddressSelected({
-                              place_name: "",
-                              center: [0, 0],
-                            });
-                            fieldProps.onChange("");
-                          } else {
-                            updateCompanyAddress(e.target.value);
-                          }
-                        }}
-                      />
-                      <Transition
-                        as={Fragment}
-                        leave="transition ease-in duration-100"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
-                      >
-                        <Combobox.Options className="w-full rounded-md bg-white text-base shadow-lg focus:outline-none ">
-                          {companyAddressSuggestions.length === 0 ? (
-                            <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
-                              Nothing found.
-                            </div>
-                          ) : (
-                            companyAddressSuggestions.map((feat) => (
-                              <Combobox.Option
-                                key={feat.id}
-                                className={({ active }) =>
-                                  `w-full relative cursor-default select-none p-3 ${
-                                    active
-                                      ? "bg-blue-400 text-white"
-                                      : "text-gray-900"
-                                  }`
-                                }
-                                value={feat}
-                              >
-                                {feat.place_name}
-                              </Combobox.Option>
-                            ))
-                          )}
-                        </Combobox.Options>
-                      </Transition>
-                    </Combobox>
-                  )}
+                  name={"startAddress"}
+                  addressSelected={startAddressSelected}
+                  addressSetter={setStartAddressSelected}
+                  addressSuggestions={startAddressSuggestions}
+                  error={errors.startAddress}
+                  addressUpdater={updateStartingAddress}
                 />
                 {errors.companyAddress && (
                   <ErrorDisplay>{errors.companyAddress.message}</ErrorDisplay>
