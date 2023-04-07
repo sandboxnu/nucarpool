@@ -1,5 +1,6 @@
 import Image from "next/image";
 import React, { Dispatch, SetStateAction } from "react";
+import { Type } from "react-toastify/dist/utils";
 import styled from "styled-components";
 
 const HeaderDiv = styled.div`
@@ -41,10 +42,17 @@ const PageName = styled.h1`
   color: #f4f4f4;
 `;
 
-interface HeaderProps {
-  sidebarValue: string;
-  setSidebar: Dispatch<SetStateAction<string>>;
-}
+export type HeaderProps =
+  | {
+      sidebarValue: string;
+      setSidebar: Dispatch<SetStateAction<HeaderOptions>>;
+      showOptions?: true;
+    }
+  | {
+      showOptions: false;
+    };
+
+export type HeaderOptions = "explore" | "requests";
 
 const Header = (props: HeaderProps) => {
   const renderClassName = (sidebarValue: string, sidebarText: string) => {
@@ -64,24 +72,26 @@ const Header = (props: HeaderProps) => {
   return (
     <HeaderDiv>
       <Logo>CarPool</Logo>
-      <div className="pr-12">
-        <button
-          onClick={() => {
-            props.setSidebar("explore");
-          }}
-          className={renderClassName(props.sidebarValue, "explore")}
-        >
-          Explore
-        </button>
-        <button
-          onClick={() => {
-            props.setSidebar("requests");
-          }}
-          className={renderClassName(props.sidebarValue, "requests")}
-        >
-          Requests
-        </button>
-      </div>
+      {props.showOptions !== false && (
+        <div className="pr-12">
+          <button
+            onClick={() => {
+              props.setSidebar("explore");
+            }}
+            className={renderClassName(props.sidebarValue, "explore")}
+          >
+            Explore
+          </button>
+          <button
+            onClick={() => {
+              props.setSidebar("requests");
+            }}
+            className={renderClassName(props.sidebarValue, "requests")}
+          >
+            Requests
+          </button>
+        </div>
+      )}
     </HeaderDiv>
   );
 };

@@ -51,7 +51,7 @@ const SignIn: NextPage = () => {
 
       <div className="flex min-h-screen items-center justify-center bg-gray-100">
         <div className="rounded-2xl w-fit bg-white flex flex-col justify-center items-center p-6 m-4 space-y-4 drop-shadow-lg">
-          <Header sidebarValue="Header" setSidebar={() => {}} />
+          <Header showOptions={false} />
           <button onClick={handleOnclick}>
             <div className="bg-blue-500 text-white hover:bg-blue-700 shadow font-bold text-sm py-3 px-4 rounded flex justify-start items-center cursor-pointer w-64">
               <svg

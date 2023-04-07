@@ -243,7 +243,7 @@ const Profile: NextPage = () => {
   return (
     <>
       <div className="flex flex-col w-full h-full items-center">
-        <Header sidebarValue="Header" setSidebar={() => {}} />
+        <Header showOptions={false} />
         <ProfileContainer onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col flex-auto md:flex-row md:space-x-20">
             <ProfileColumn>

@@ -14,7 +14,7 @@ import DropDownMenu from "../components/DropDownMenu";
 import { browserEnv } from "../utils/env/browser";
 import ProtectedPage from "../utils/auth";
 import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
+import Header, { HeaderOptions } from "../components/Header";
 import { PublicUser } from "../utils/types";
 import ConnectModal from "../components/ConnectModal";
 import { toast } from "react-toastify";
@@ -46,7 +46,7 @@ const Home: NextPage<any> = () => {
   const [mapState, setMapState] = useState<mapboxgl.Map>();
 
   const [modalUser, setModalUser] = useState<PublicUser | null>(null);
-  const [sidebarState, setSidebarState] = useState<string>("explore");
+  const [sidebarState, setSidebarState] = useState<HeaderOptions>("explore");
 
   const handleConnect = (userToConnectTo: PublicUser) => {
     setModalUser(userToConnectTo);
