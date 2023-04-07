@@ -1,6 +1,4 @@
-import Image from "next/image";
 import React, { Dispatch, SetStateAction } from "react";
-import { Type } from "react-toastify/dist/utils";
 import styled from "styled-components";
 
 const HeaderDiv = styled.div`
