@@ -1,5 +1,9 @@
 import styled from "styled-components";
 
+/**
+ * Media queries are min-width 834, and 420.
+ */
+
 export const CompleteProfileButton = styled.button`
   background: #b12424;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
@@ -26,8 +30,14 @@ export const ProfileContainer = styled.form`
     align-items: center;
     height: 100%;
   }
+
+  @media (min-width: 420px) {
+    padding: 4rem 1rem;
+  }
+
+  padding: 1.5rem 0;
+
   width: 90%;
-  padding: 4rem 1.5rem;
 `;
 
 export const ProfileColumn = styled.div`
@@ -35,9 +45,10 @@ export const ProfileColumn = styled.div`
   flex-direction: column;
   @media (min-width: 834px) {
     height: 85%;
-    width: 80%;
+    width: 85%;
     gap: 0px;
   }
+  padding: 0 0.2rem 0 0.2rem;
   gap: 12px;
 `;
 
@@ -90,12 +101,15 @@ export const ProfileHeader = styled.h1`
   font-family: "Montserrat", sans-serif;
   font-style: normal;
   font-weight: 700;
-  font-size: 32px;
+
   line-height: 39px;
   color: #000000;
-  @media (min-width: 834px) {
+
+  @media (min-width: 420px) {
     margin-bottom: 22px;
+    font-size: 32px;
   }
+  font-size: 24px;
 `;
 
 export const ProfileHeaderNoMB = styled(ProfileHeader)`
@@ -122,13 +136,17 @@ export const ErrorDisplay = styled.span<{}>`
 
 export const LightEntryLabel = styled.label<{
   error?: boolean;
+  fontSize?: string;
 }>`
   font-family: "Montserrat";
   font-style: normal;
   font-weight: 400;
-  font-size: 20px;
+  font-size: ${(props) => (props.fontSize ? props.fontSize : "14px")};
   line-height: 24.38px;
   display: flex;
   align-items: center;
   color: ${(props) => (props.error ? "#B12424" : "#000000")};
+  @media (min-width: 420px) {
+    font-size: 16px;
+  }
 `;

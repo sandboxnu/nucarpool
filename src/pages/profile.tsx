@@ -245,7 +245,7 @@ const Profile: NextPage = () => {
       <div className="flex flex-col w-full h-full items-center">
         <Header />
         <ProfileContainer onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex flex-col gap-16 flex-auto md:flex-row md:gap-0 md:space-x-20">
+          <div className="flex flex-col gap-32 flex-auto md:flex-row md:gap-12">
             <ProfileColumn>
               <TopProfileSection>
                 <ProfileHeader>Locations</ProfileHeader>
@@ -338,8 +338,8 @@ const Profile: NextPage = () => {
                   />
                   {watch("role") == Role.DRIVER && (
                     <TextField
-                      inputClassName="py-[14px]"
-                      className="self-end w-36"
+                      inputClassName="py-[14px] h-14"
+                      className="self-end w-1/3"
                       label="Seat Availability"
                       id="seatAvail"
                       error={errors.seatAvail}
@@ -391,8 +391,8 @@ const Profile: NextPage = () => {
                 </div>
 
                 {/* Start/End Time Fields  */}
-                <div className="flex w-full gap-6 pb-4">
-                  <div className="flex flex-col gap-2">
+                <div className="flex w-full gap-6 pb-4 justify-between">
+                  <div className="flex flex-col gap-2 flex-1">
                     <EntryLabel
                       required={true}
                       error={errors.startTime}
@@ -401,11 +401,10 @@ const Profile: NextPage = () => {
                     <ControlledTimePicker
                       control={control}
                       name={"startTime"}
-                      placeholder={"Start time"}
                       value={user?.startTime ? user.startTime : undefined}
                     />
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2 flex-1">
                     <EntryLabel
                       required={true}
                       error={errors.endTime}
@@ -414,7 +413,6 @@ const Profile: NextPage = () => {
                     <ControlledTimePicker
                       control={control}
                       name={"endTime"}
-                      placeholder={"End time"}
                       value={user?.endTime ? user.endTime : undefined}
                     />
                   </div>
@@ -431,14 +429,14 @@ const Profile: NextPage = () => {
                         },
                       }}
                     />
-                    <LightEntryLabel className="pl-2">
+                    <LightEntryLabel fontSize="36px" className="pl-2 pr-3">
                       My start/end time is different each day
                     </LightEntryLabel>
                     <Tooltip
                       title="If you don't have set times, communicate that on your own with potential riders/drivers."
                       placement="right"
                     >
-                      <Icon>
+                      <Icon classes={"w-48"} fontSize={"medium"}>
                         <MdHelp fill="#C8102E" />
                       </Icon>
                     </Tooltip>
@@ -480,7 +478,7 @@ const Profile: NextPage = () => {
                   <EntryLabel
                     required
                     error={errors.companyAddress}
-                    label="Intro"
+                    label="About Me"
                   />
                   <textarea
                     className={`resize-none form-input w-full shadow-sm rounded-md px-3 py-2`}
@@ -504,4 +502,8 @@ const Profile: NextPage = () => {
   );
 };
 
+/**
+ *
+ * MAKE SURE THIS IS PROTECTED PAGE BEFORE PR
+ */
 export default Profile;

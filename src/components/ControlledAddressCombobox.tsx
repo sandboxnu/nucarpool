@@ -8,7 +8,7 @@ interface ControlledAddressComboboxProps {
   control: Control<OnboardingFormInputs>;
   name: "startAddress" | "companyAddress";
   addressSelected: CarpoolAddress;
-  addressSetter: (val: CarpoolAddress) => void;
+  addressSetter: (val: SetStateAction<CarpoolAddress>) => void;
   addressUpdater: (val: SetStateAction<string>) => void;
   addressSuggestions: CarpoolFeature[];
   error?: FieldError;

@@ -18,6 +18,11 @@ const StyledLabel = styled.label<{
   display: flex;
   align-items: center;
   color: ${(props) => (props.error ? "#B12424" : "#000000")};
+
+  @media (min-width: 834px) {
+    font-size: 20px;
+  }
+  font-size: 16px;
 `;
 
 export const EntryLabel = (props: EntryLabelProps) => {
