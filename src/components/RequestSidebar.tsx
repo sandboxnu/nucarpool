@@ -21,12 +21,22 @@ interface RequestSidebarProps {
   received: PublicUser[];
   favs: PublicUser[];
   map: mapboxgl.Map;
-  handleManage: (modalUser: PublicUser) => void;
+  handleSent: (modalUser: PublicUser) => void;
+  handleReceived: (modalUser: PublicUser) => void;
   handleFavorite: (otherUser: string, add: boolean) => void;
 }
 
 const RequestSidebar = (props: RequestSidebarProps) => {
   const [curList, setCurList] = useState<PublicUser[]>(props.sent ?? []);
+  const [handleManage, setHandleManage] = useState<"sent" | "received">("sent");
+
+  const passManageFunction = () => {
+    if (handleManage === "sent") {
+      return props.handleSent;
+    } else {
+      return props.handleReceived;
+    }
+  };
 
   useEffect(() => {
     setCurList(props.sent ?? []);
@@ -44,10 +54,11 @@ const RequestSidebar = (props: RequestSidebarProps) => {
             }
             onClick={() => {
               setCurList(props.sent ?? []);
+              setHandleManage("sent");
               clearMarkers();
             }}
           >
-            Sent
+            Received
           </button>
           <button
             className={
@@ -57,10 +68,11 @@ const RequestSidebar = (props: RequestSidebarProps) => {
             }
             onClick={() => {
               setCurList(props.received ?? []);
+              setHandleManage("received");
               clearMarkers();
             }}
           >
-            Received
+            Sent
           </button>
         </div>
       </div>
@@ -69,7 +81,7 @@ const RequestSidebar = (props: RequestSidebarProps) => {
         userCardList={curList}
         rightButton={{
           text: "Manage",
-          onPress: props.handleManage,
+          onPress: passManageFunction(),
           color: "bg-blue-900",
         }}
         handleFavorite={props.handleFavorite}

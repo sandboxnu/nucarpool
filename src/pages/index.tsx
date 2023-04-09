@@ -20,6 +20,8 @@ import ConnectModal from "../components/ConnectModal";
 import { toast } from "react-toastify";
 import ExploreSidebar from "../components/ExploreSidebar";
 import RequestSidebar from "../components/RequestSidebar";
+import SentRequestModal from "../components/SentRequestModal";
+import ReceivedRequestModal from "../components/ReceivedRequestModal";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -49,6 +51,14 @@ const Home: NextPage<any> = () => {
   const [sidebarState, setSidebarState] = useState<HeaderOptions>("explore");
 
   const handleConnect = (userToConnectTo: PublicUser) => {
+    setModalUser(userToConnectTo);
+  };
+
+  const handleSentRequests = (userToConnectTo: PublicUser) => {
+    setModalUser(userToConnectTo);
+  };
+
+  const handleReceivedRequests = (userToConnectTo: PublicUser) => {
     setModalUser(userToConnectTo);
   };
 
@@ -100,7 +110,8 @@ const Home: NextPage<any> = () => {
             received={received ?? []}
             favs={favorites ?? []}
             map={mapState}
-            handleManage={handleConnect}
+            handleSent={handleSentRequests}
+            handleReceived={handleReceivedRequests}
             handleFavorite={handleFavorite}
           />
         );
@@ -135,6 +146,24 @@ const Home: NextPage<any> = () => {
             <div id="map" className={"flex-auto w-full h-full"}></div>
             {user && modalUser && (
               <ConnectModal
+                currentUser={user}
+                userToConnectTo={modalUser}
+                closeModal={() => {
+                  setModalUser(null);
+                }}
+              />
+            )}
+            {user && modalUser && (
+              <SentRequestModal
+                currentUser={user}
+                userToConnectTo={modalUser}
+                closeModal={() => {
+                  setModalUser(null);
+                }}
+              />
+            )}
+            {user && modalUser && (
+              <ReceivedRequestModal
                 currentUser={user}
                 userToConnectTo={modalUser}
                 closeModal={() => {
