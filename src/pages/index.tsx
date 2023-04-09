@@ -114,7 +114,9 @@ const Home: NextPage<any> = () => {
         <title>Home</title>
       </Head>
       <div className="max-h-screen w-full h-full m-0">
-        <Header sidebarValue={sidebarState} setSidebar={setSidebarState} />
+        <Header
+          data={{ sidebarValue: sidebarState, setSidebar: setSidebarState }}
+        />
         {/* <ProfileModal userInfo={userInfo!} user={user!}  /> */}
         <div className="flex flex-auto h-[91.5%]">
           <div className="w-96">{mapState && user && renderSidebar()}</div>

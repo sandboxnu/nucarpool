@@ -1,4 +1,5 @@
 import React, { Dispatch, SetStateAction } from "react";
+import { Type } from "react-toastify/dist/utils";
 import styled from "styled-components";
 
 const HeaderDiv = styled.div`
@@ -40,15 +41,12 @@ const PageName = styled.h1`
   color: #f4f4f4;
 `;
 
-export type HeaderProps =
-  | {
-      sidebarValue: string;
-      setSidebar: Dispatch<SetStateAction<HeaderOptions>>;
-      showOptions?: true;
-    }
-  | {
-      showOptions: false;
-    };
+interface HeaderProps {
+  data?: {
+    sidebarValue: string;
+    setSidebar: Dispatch<SetStateAction<HeaderOptions>>;
+  };
+}
 
 export type HeaderOptions = "explore" | "requests";
 
@@ -67,29 +65,39 @@ const Header = (props: HeaderProps) => {
     }
   };
 
+  const renderSidebarOptions = ({
+    sidebarValue,
+    setSidebar,
+  }: {
+    sidebarValue: string;
+    setSidebar: Dispatch<SetStateAction<HeaderOptions>>;
+  }) => {
+    return (
+      <div className="pr-12">
+        <button
+          onClick={() => {
+            setSidebar("explore");
+          }}
+          className={renderClassName(sidebarValue, "explore")}
+        >
+          Explore
+        </button>
+        <button
+          onClick={() => {
+            setSidebar("requests");
+          }}
+          className={renderClassName(sidebarValue, "requests")}
+        >
+          Requests
+        </button>
+      </div>
+    );
+  };
+
   return (
     <HeaderDiv>
       <Logo>CarPool</Logo>
-      {props.showOptions !== false && (
-        <div className="pr-12">
-          <button
-            onClick={() => {
-              props.setSidebar("explore");
-            }}
-            className={renderClassName(props.sidebarValue, "explore")}
-          >
-            Explore
-          </button>
-          <button
-            onClick={() => {
-              props.setSidebar("requests");
-            }}
-            className={renderClassName(props.sidebarValue, "requests")}
-          >
-            Requests
-          </button>
-        </div>
-      )}
+      {props.data && renderSidebarOptions(props.data)}
     </HeaderDiv>
   );
 };

@@ -15,7 +15,8 @@
     "test": "jest",
     "vercel-build": "./vercel.sh",
     "build:preview": "prisma generate && echo \"y\" | prisma db push && next build",
-    "build:main": "prisma generate & next build"
+    "build:main": "prisma generate & next build",
+    "startup": "docker-compose -f docker-compose.yml up -d && next dev"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
