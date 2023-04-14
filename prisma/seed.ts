@@ -153,13 +153,15 @@ const generateGroups = async (users: User[]) => {
     data: groupNames.map((name, idx) => ({ id: idx.toString(), name })),
   });
 
-  await groups.map((group, idx) =>
-    Promise.all(
-      group.map((user) =>
-        prisma.user.update({
-          where: { id: user.id },
-          data: { carpools: { connect: { id: idx.toString() } } },
-        })
+  await Promise.all(
+    groups.map((group, idx) =>
+      Promise.all(
+        group.map((user) =>
+          prisma.user.update({
+            where: { id: user.id },
+            data: { carpools: { connect: { id: idx.toString() } } },
+          })
+        )
       )
     )
   );
@@ -211,9 +213,9 @@ const createUserData = async () => {
   await clearConnections();
   await deleteUsers();
   await Promise.all(
-    users.map(async (user, index) => {
-      await prisma.user.upsert(generateUser({ id: index.toString(), ...user }));
-    })
+    users.map((user, index) =>
+      prisma.user.upsert(generateUser({ id: index.toString(), ...user }))
+    )
   );
   const dbUsers = await prisma.user.findMany();
   await Promise.all([
