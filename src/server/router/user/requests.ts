@@ -1,10 +1,10 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createProtectedRouter } from "./createProtectedRouter";
+import { createProtectedRouter } from "../createProtectedRouter";
 import _ from "lodash";
 
 // use this router to manage invitations
-export const invitationsRouter = createProtectedRouter()
+export const requestsRouter = createProtectedRouter()
   .query("me", {
     async resolve({ ctx }) {
       const id = ctx.session.user?.id;
@@ -21,10 +21,10 @@ export const invitationsRouter = createProtectedRouter()
       }
 
       const [from, to] = await Promise.all([
-        ctx.prisma.invitation.findMany({
+        ctx.prisma.request.findMany({
           where: { fromUserId: id },
         }),
-        ctx.prisma.invitation.findMany({
+        ctx.prisma.request.findMany({
           where: { toUserId: id },
         }),
       ]);
@@ -39,27 +39,7 @@ export const invitationsRouter = createProtectedRouter()
     }),
 
     async resolve({ ctx, input }) {
-      // const [from, to] = await Promise.all([input.fromId, input.toId].map(id => (
-      //   ctx.prisma.user.findUnique({
-      //     where: { id },
-      //   })
-      // )))
-
-      // if (!from) {
-      //   throw new TRPCError({
-      //     code: "NOT_FOUND",
-      //     message: `No user with id '${input.fromId}'`,
-      //   });
-      // }
-
-      // if (!to) {
-      //   throw new TRPCError({
-      //     code: "NOT_FOUND",
-      //     message: `No user with id '${input.toId}'`,
-      //   });
-      // }
-
-      await ctx.prisma.invitation.create({
+      await ctx.prisma.request.create({
         data: {
           message: input.message,
           fromUser: {
@@ -78,7 +58,7 @@ export const invitationsRouter = createProtectedRouter()
     }),
 
     async resolve({ ctx, input }) {
-      const invitation = await ctx.prisma.invitation.findUnique({
+      const invitation = await ctx.prisma.request.findUnique({
         where: { id: input.invitationId },
       });
 
@@ -89,7 +69,7 @@ export const invitationsRouter = createProtectedRouter()
         });
       }
 
-      await ctx.prisma.invitation.delete({
+      await ctx.prisma.request.delete({
         where: {
           id: input.invitationId,
         },

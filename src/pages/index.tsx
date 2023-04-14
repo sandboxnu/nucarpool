@@ -26,14 +26,14 @@ const Home: NextPage<any> = () => {
   const { data: geoJsonUsers, isLoading: isLoadingGeoJsonUsers } =
     trpc.useQuery(["mapbox.geoJsonUsersList"]);
   const { data: user, isLoading: isLoadingUser } = trpc.useQuery(["user.me"]);
-  const { data: recommendations } = trpc.useQuery(["user.recommendations"]);
-  const { data: favorites } = trpc.useQuery(["user.favorites"]);
-  const { mutate: mutateFavorites } = trpc.useMutation("user.edit-favorites", {
+  const { data: recommendations } = trpc.useQuery(["user.recommendations.me"]);
+  const { data: favorites } = trpc.useQuery(["user.favorites.me"]);
+  const { mutate: mutateFavorites } = trpc.useMutation("user.favorites.edit", {
     onError: (error) => {
       toast.error(`Something went wrong: ${error.message}`);
     },
     onSuccess() {
-      utils.invalidateQueries(["user.favorites"]);
+      utils.invalidateQueries(["user.favorites.me"]);
     },
   });
 
