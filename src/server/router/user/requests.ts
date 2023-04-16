@@ -31,7 +31,7 @@ export const requestsRouter = createProtectedRouter()
       return { from, to };
     },
   })
-  .mutation("new", {
+  .mutation("create", {
     input: z.object({
       fromId: z.string(),
       toId: z.string(),
@@ -52,7 +52,7 @@ export const requestsRouter = createProtectedRouter()
       });
     },
   })
-  .mutation("remove", {
+  .mutation("delete", {
     input: z.object({
       invitationId: z.string(),
     }),
@@ -74,5 +74,21 @@ export const requestsRouter = createProtectedRouter()
           id: input.invitationId,
         },
       });
+    },
+  })
+  .mutation("edit", {
+    input: z.object({
+      invitationId: z.string(),
+      message: z.string(),
+    }),
+
+    async resolve({ ctx, input }) {
+      const user = await ctx.prisma.request.update({
+        where: { id: input.invitationId },
+        data: {
+          message: input.message,
+        },
+      });
+      return user;
     },
   });

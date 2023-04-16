@@ -72,6 +72,20 @@ export const groupsRouter = createProtectedRouter()
       return group;
     },
   })
+  .mutation("delete", {
+    input: z.object({
+      groupId: z.string(),
+    }),
+
+    async resolve({ ctx, input }) {
+      const group = await ctx.prisma.carpoolGroup.delete({
+        where: {
+          id: input.groupId,
+        },
+      });
+      return group;
+    },
+  })
   .mutation("edit", {
     input: z.object({
       userId: z.string(),
