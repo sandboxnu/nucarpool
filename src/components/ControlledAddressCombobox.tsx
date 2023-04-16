@@ -31,7 +31,7 @@ const ControlledAddressCombobox = (props: ControlledAddressComboboxProps) => {
           ref={ref}
         >
           <Combobox.Input
-            className={`w-full shadow-sm rounded-md px-3 py-2 ${
+            className={`w-full shadow-sm rounded-md px-3 py-2 h-12 ${
               props.error ? "border-northeastern-red" : "border-black"
             }`}
             displayValue={(feat: CarpoolAddress) =>

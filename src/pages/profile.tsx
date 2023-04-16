@@ -1,9 +1,8 @@
-import { Combobox, Transition } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import _, { debounce } from "lodash";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Header from "../components/Header";
@@ -265,7 +264,7 @@ const Profile: NextPage = () => {
                   addressUpdater={updateStartingAddress}
                 />
 
-                <Note>
+                <Note className="pt-2">
                   Note: Your address will only be used to find users close to
                   you. It will not be displayed to any other users.
                 </Note>
@@ -317,7 +316,7 @@ const Profile: NextPage = () => {
                 <ProfileHeaderNoMB>
                   I am a... <span className="text-northeastern-red">*</span>
                 </ProfileHeaderNoMB>
-                <div className="flex items-end space-x-4">
+                <div className="flex items-end space-x-4 pb-8">
                   <Radio
                     label="Rider"
                     id="rider"
@@ -336,17 +335,24 @@ const Profile: NextPage = () => {
                     currentlySelected={watch("role")}
                     {...register("role")}
                   />
-                  {watch("role") == Role.DRIVER && (
-                    <TextField
-                      inputClassName="py-[14px] h-14"
-                      className="self-end w-1/3"
-                      label="Seat Availability"
-                      id="seatAvail"
+                  <div className="flex flex-col">
+                    <EntryLabel
+                      required={true}
                       error={errors.seatAvail}
-                      type="number"
-                      {...register("seatAvail", { valueAsNumber: true })}
+                      label="Seat availability"
                     />
-                  )}
+                    {watch("role") == Role.DRIVER && (
+                      <TextField
+                        inputClassName="py-[14px] h-14"
+                        className="self-end w-full"
+                        label="Seat Availability"
+                        id="seatAvail"
+                        error={errors.seatAvail}
+                        type="number"
+                        {...register("seatAvail", { valueAsNumber: true })}
+                      />
+                    )}
+                  </div>
                 </div>
               </BottomProfileSection>
             </ProfileColumn>
@@ -391,7 +397,7 @@ const Profile: NextPage = () => {
                 </div>
 
                 {/* Start/End Time Fields  */}
-                <div className="flex w-full gap-6 pb-4 justify-between">
+                <div className="flex w-full md:w-4/6 gap-6 pb-4 justify-between">
                   <div className="flex flex-col gap-2 flex-1">
                     <EntryLabel
                       required={true}

@@ -66,7 +66,7 @@ export const MiddleProfileSection = styled(ProfileColumn)`
 export const BottomProfileSection = styled(ProfileColumn)`
   width: 100%;
   @media (min-width: 834px) {
-    padding-top: 40px;
+    padding-bottom: 32px;
   }
 
   display: flex;

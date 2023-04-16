@@ -79,7 +79,7 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
     if (isActive) {
       return (
         <StyledActiveRadioButton
-          className={"form-input w-1/3 h-14 mt-5"}
+          className={"form-input w-3/12 h-14 mt-5"}
           htmlFor={id}
         >
           {input}
@@ -92,7 +92,7 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
     } else {
       return (
         <StyledInactiveRadioButton
-          className={"form-input w-1/3 h-14"}
+          className={"form-input w-3/12 h-14"}
           htmlFor={id}
         >
           {input}

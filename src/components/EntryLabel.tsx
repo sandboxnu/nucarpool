@@ -18,6 +18,8 @@ const StyledLabel = styled.label<{
   display: flex;
   align-items: center;
   color: ${(props) => (props.error ? "#B12424" : "#000000")};
+  padding-bottom: 0.4rem;
+  padding-top: 0.3rem;
 
   @media (min-width: 834px) {
     font-size: 20px;
