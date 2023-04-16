@@ -106,8 +106,8 @@ const Home: NextPage<any> = () => {
         return (
           <RequestSidebar
             currentUser={user}
-            sent={recommendations ?? []}
-            received={received ?? []}
+            sent={getPublicUserArray("Sent Users")}
+            received={getPublicUserArray("Received Users")}
             favs={favorites ?? []}
             map={mapState}
             handleSent={handleSentRequests}
@@ -176,6 +176,45 @@ const Home: NextPage<any> = () => {
       </div>
     </>
   );
+};
+
+// TEMPORARY TESTING CODE
+const getPublicUserArray = (name: string): PublicUser[] => {
+  return new Array(50).fill(undefined).map((_, index) => {
+    const user: PublicUser = {
+      id: `${index}`,
+      name: `${name} ${index}`,
+      email: `${name} ${index}@yahoo.com`,
+      bio: "Howdy!",
+      preferredName: `${name} ${index}`,
+      pronouns: "they",
+      role: "RIDER",
+      status: "ACTIVE",
+      companyName: "Sandbox",
+      startPOILocation: "Mission Hill",
+      startPOICoordLng: 42,
+      startPOICoordLat: -71,
+      companyPOIAddress: "Sandbox Corp",
+      companyPOICoordLng: 42.1,
+      companyPOICoordLat: -71.1,
+      daysWorking: new Array(7)
+        .fill(undefined)
+        .map((_, ind) => (Math.random() < 0.5 ? "0" : "1"))
+        .join(","),
+      image: null,
+      seatAvail: 0,
+      startTime: null,
+      endTime: null,
+    };
+    if (Math.random() < 0.5) {
+      return {
+        ...user,
+        role: "DRIVER",
+        seatAvail: Math.ceil(6 * Math.random()),
+      };
+    }
+    return user;
+  });
 };
 
 export default ProtectedPage(Home);
