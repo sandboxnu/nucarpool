@@ -32,7 +32,7 @@ export const ProfileContainer = styled.form`
   }
 
   @media (min-width: 420px) {
-    padding: 4rem 1rem;
+    padding: 3.5rem 1rem;
   }
 
   padding: 1.5rem 0;
@@ -44,12 +44,12 @@ export const ProfileColumn = styled.div`
   display: flex;
   flex-direction: column;
   @media (min-width: 834px) {
-    height: 85%;
+    height: 90%;
     width: 85%;
     gap: 0px;
   }
-  padding: 0 0.2rem 0 0.2rem;
-  gap: 12px;
+  padding: 0 0.09rem 0 0.09rem;
+  gap: 6px;
 `;
 
 export const TopProfileSection = styled(ProfileColumn)`
@@ -94,6 +94,7 @@ export const CommutingScheduleSection = styled(ProfileColumn)`
     gap: 0px;
   }
   gap: 6px;
+  padding-bottom: 1rem;
 `;
 
 export const ProfileHeader = styled.h1`
@@ -136,12 +137,10 @@ export const ErrorDisplay = styled.span<{}>`
 
 export const LightEntryLabel = styled.label<{
   error?: boolean;
-  fontSize?: string;
 }>`
   font-family: "Montserrat";
   font-style: normal;
   font-weight: 400;
-  font-size: ${(props) => (props.fontSize ? props.fontSize : "14px")};
   line-height: 24.38px;
   display: flex;
   align-items: center;

@@ -38,7 +38,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
         type={type}
         maxLength={charLimit}
         className={classNames(
-          `form-input border-black w-full shadow-sm rounded-md px-3 py-2 h-12 ${
+          `form-input border-black w-full shadow-sm rounded-md px-3 py-2 ${
             error ? "border-northeastern-red" : "border-gray-300"
           }`,
           inputClassName

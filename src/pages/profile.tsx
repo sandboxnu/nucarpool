@@ -249,25 +249,28 @@ const Profile: NextPage = () => {
               <TopProfileSection>
                 <ProfileHeader>Locations</ProfileHeader>
                 {/* Starting Location field  */}
+
                 <EntryLabel
                   required={true}
                   error={errors.startAddress}
                   label="Home Address"
                 />
-                <ControlledAddressCombobox
-                  control={control}
-                  name={"startAddress"}
-                  addressSelected={startAddressSelected}
-                  addressSetter={setStartAddressSelected}
-                  addressSuggestions={startAddressSuggestions}
-                  error={errors.startAddress}
-                  addressUpdater={updateStartingAddress}
-                />
+                <div>
+                  <ControlledAddressCombobox
+                    control={control}
+                    name={"startAddress"}
+                    addressSelected={startAddressSelected}
+                    addressSetter={setStartAddressSelected}
+                    addressSuggestions={startAddressSuggestions}
+                    error={errors.startAddress}
+                    addressUpdater={updateStartingAddress}
+                  />
 
-                <Note className="pt-2">
-                  Note: Your address will only be used to find users close to
-                  you. It will not be displayed to any other users.
-                </Note>
+                  <Note className="pt-2">
+                    Note: Your address will only be used to find users close to
+                    you. It will not be displayed to any other users.
+                  </Note>
+                </div>
                 {errors.startAddress && (
                   <ErrorDisplay>{errors.startAddress.message}</ErrorDisplay>
                 )}
@@ -281,6 +284,7 @@ const Profile: NextPage = () => {
                 />
                 <TextField
                   className={`w-full mb-6`}
+                  inputClassName={`h-12`}
                   label="Workplace Name"
                   id="companyName"
                   error={errors.companyName}
@@ -343,7 +347,7 @@ const Profile: NextPage = () => {
                     />
                     {watch("role") == Role.DRIVER && (
                       <TextField
-                        inputClassName="py-[14px] h-14"
+                        inputClassName="py-[14px] h-14 text-lg"
                         className="self-end w-full"
                         label="Seat Availability"
                         id="seatAvail"
@@ -397,7 +401,7 @@ const Profile: NextPage = () => {
                 </div>
 
                 {/* Start/End Time Fields  */}
-                <div className="flex w-full md:w-4/6 gap-6 pb-4 justify-between">
+                <div className="flex w-full md:w-96 gap-6 pb-4 justify-between">
                   <div className="flex flex-col gap-2 flex-1">
                     <EntryLabel
                       required={true}
@@ -435,7 +439,7 @@ const Profile: NextPage = () => {
                         },
                       }}
                     />
-                    <LightEntryLabel fontSize="36px" className="pl-2 pr-3">
+                    <LightEntryLabel className="pl-2 pr-3 text-sm ">
                       My start/end time is different each day
                     </LightEntryLabel>
                     <Tooltip
@@ -462,6 +466,7 @@ const Profile: NextPage = () => {
                       id="preferredName"
                       error={errors.preferredName}
                       type="text"
+                      inputClassName={`h-12`}
                       {...register("preferredName")}
                     />
                   </div>
@@ -473,6 +478,7 @@ const Profile: NextPage = () => {
                     </LightEntryLabel>
                     <TextField
                       id="pronouns"
+                      inputClassName={`h-12`}
                       error={errors.pronouns}
                       type="text"
                       {...register("pronouns")}
@@ -487,7 +493,7 @@ const Profile: NextPage = () => {
                     label="About Me"
                   />
                   <textarea
-                    className={`resize-none form-input w-full shadow-sm rounded-md px-3 py-2`}
+                    className={`resize-none form-input w-full rounded-md px-3 py-2 border-black`}
                     maxLength={300}
                     {...register("bio")}
                   />
