@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { CarpoolGroup, PrismaClient, Role, User } from "@prisma/client";
 import { range } from "lodash";
 import Random from "random-seed";
 import { generateUser, GenerateUserInput } from "../src/utils/recommendation";
@@ -10,6 +10,8 @@ const prisma = new PrismaClient();
  */
 const deleteUsers = async () => {
   await prisma.user.deleteMany({});
+  await prisma.request.deleteMany({});
+  await prisma.carpoolGroup.deleteMany({});
 };
 
 /**
@@ -19,8 +21,18 @@ const clearConnections = async () => {
   const users = await prisma.user.findMany();
 
   await Promise.all(
-    users.map(async (user) => {
-      return await prisma.user.update({
+    users.map((user) =>
+      prisma.request.deleteMany({
+        where: {
+          OR: [{ fromUserId: user.id }, { toUserId: user.id }],
+        },
+      })
+    )
+  );
+
+  await Promise.all(
+    users.map((user) =>
+      prisma.user.update({
         where: {
           id: user.id,
         },
@@ -31,17 +43,50 @@ const clearConnections = async () => {
               .map((_, idx) => ({ id: `${idx}` })),
           },
         },
-      });
-    })
+      })
+    )
   );
 };
 
 /**
- * Generates favorites for users in our database.
+ * Generates requests between users in our database.
  */
-const generateFavorites = async () => {
-  const users = await prisma.user.findMany();
+const generateRequests = async (users: User[]) => {
+  await Promise.all(
+    users.map((_, idx) =>
+      prisma.request.create({
+        data: {
+          message: "Hello",
+          fromUser: {
+            connect: { id: idx.toString() },
+          },
+          toUser: {
+            connect: { id: pickConnection(idx, users.length) },
+          },
+        },
+      })
+    )
+  );
+};
 
+/**
+ * Generate a random number thats not the same as the userId
+ * @param userId the userId
+ * @param limit the limit of the number
+ * @returns
+ */
+const pickConnection = (userId: number, limit: number) => {
+  let rand = userId;
+  while (rand === userId) {
+    rand = Random.create()(limit);
+  }
+  return rand.toString();
+};
+
+/**
+ * Generates favorites between users in our database.
+ */
+const generateFavorites = async (users: User[]) => {
   await Promise.all(
     users.map((_, idx) =>
       prisma.user.update({
@@ -78,6 +123,48 @@ const pickConnections = (
     .map((i) => {
       return { id: `${i}` };
     });
+};
+
+/**
+ * Generates favorites between users in our database.
+ */
+const generateGroups = async (users: User[]) => {
+  const groups: User[][] = [];
+  let i = 0;
+  for (let j = 0; j < 10; j++) {
+    for (let k = 0; k < 4; k++) {
+      (groups[j] ??= []).push(users[i]);
+      i++;
+    }
+  }
+  const groupNames = [
+    "Apple",
+    "Banana",
+    "Carpoolers of the Year",
+    "Devashish",
+    "Estrogen",
+    "French People",
+    "Gary",
+    "Hello World",
+    "Iguanas",
+    "Jun",
+  ];
+  await prisma.carpoolGroup.createMany({
+    data: groupNames.map((name, idx) => ({ id: idx.toString(), name })),
+  });
+
+  await Promise.all(
+    groups.map((group, idx) =>
+      Promise.all(
+        group.map((user) =>
+          prisma.user.update({
+            where: { id: user.id },
+            data: { carpools: { connect: { id: idx.toString() } } },
+          })
+        )
+      )
+    )
+  );
 };
 
 /**
@@ -126,11 +213,16 @@ const createUserData = async () => {
   await clearConnections();
   await deleteUsers();
   await Promise.all(
-    users.map(async (user, index) => {
-      await prisma.user.upsert(generateUser({ id: index.toString(), ...user }));
-    })
+    users.map((user, index) =>
+      prisma.user.upsert(generateUser({ id: index.toString(), ...user }))
+    )
   );
-  await generateFavorites();
+  const dbUsers = await prisma.user.findMany();
+  await Promise.all([
+    generateFavorites(dbUsers),
+    generateRequests(dbUsers),
+    generateGroups(dbUsers),
+  ]);
 };
 
 /**

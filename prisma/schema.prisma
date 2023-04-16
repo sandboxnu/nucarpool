@@ -62,40 +62,66 @@ model Session {
   @@map(name: "session")
 }
 
+// Represents an Invitation to a user
+model Request {
+  id         String @id @default(cuid()) // primary key
+  message    String
+  fromUserId String // foreign key
+  toUserId   String // foreign key
+  fromUser   User   @relation("sentRequests", fields: [fromUserId], references: [id])
+  toUser     User   @relation("receivedRequests", fields: [toUserId], references: [id])
+
+  @@index([fromUserId])
+  @@index([toUserId])
+  @@map(name: "request")
+}
+
+// Represents a group of users
+model CarpoolGroup {
+  id    String @id @default(cuid()) // primary key
+  name  String
+  users User[] @relation("userCarpools")
+
+  @@map(name: "group")
+}
+
 // Represents a User--need this for NextAuth and the data it stores.
 model User {
-  id                 String    @id @default(cuid()) // primary key
+  id                 String         @id @default(cuid()) // primary key
   name               String?
-  email              String?   @unique
-  emailVerified      DateTime? @map(name: "email_verified")
+  email              String?        @unique
+  emailVerified      DateTime?      @map(name: "email_verified")
   image              String?
-  bio                String    @default("")
-  preferredName      String    @default("")
-  pronouns           String    @default("")
+  bio                String         @default("")
+  preferredName      String         @default("")
+  pronouns           String         @default("")
   accounts           Account[] // can have multiple accounts
   sessions           Session[] // can have multiple settings
-  role               Role      @default(RIDER)
-  status             Status    @default(ACTIVE)
-  seatAvail          Int       @default(0) @map("seat_avail")
-  companyName        String    @default("") @map("company_name")
-  companyAddress     String    @default("") @map("company_address")
-  companyCoordLng    Float     @default(0) @map("company_coord_lng")
-  companyCoordLat    Float     @default(0) @map("company_coord_lat")
-  startAddress       String    @default("") @map("start_address")
-  startCoordLng      Float     @default(0) @map("start_coord_lng")
-  startCoordLat      Float     @default(0) @map("start_coord_lat")
-  companyPOIAddress  String    @default("") @map("company_poi_address")
-  companyPOICoordLng Float     @default(0) @map("company_poi_coord_lng")
-  companyPOICoordLat Float     @default(0) @map("company_poi_coord_lat")
-  startPOILocation   String    @default("") @map("start_poi_location")
-  startPOICoordLng   Float     @default(0) @map("start_poi_coord_lng")
-  startPOICoordLat   Float     @default(0) @map("start_poi_coord_lat")
-  isOnboarded        Boolean   @default(false) @map("is_onboarded")
-  daysWorking        String    @default("") @map("days_working")
-  startTime          DateTime? @map("start_time") @db.Time(0)
-  endTime            DateTime? @map("end_time") @db.Time(0)
-  favoritedBy        User[]    @relation("Favorites")
-  favorites          User[]    @relation("Favorites")
+  role               Role           @default(RIDER)
+  status             Status         @default(ACTIVE)
+  seatAvail          Int            @default(0) @map("seat_avail")
+  companyName        String         @default("") @map("company_name")
+  companyAddress     String         @default("") @map("company_address")
+  companyCoordLng    Float          @default(0) @map("company_coord_lng")
+  companyCoordLat    Float          @default(0) @map("company_coord_lat")
+  startAddress       String         @default("") @map("start_address")
+  startCoordLng      Float          @default(0) @map("start_coord_lng")
+  startCoordLat      Float          @default(0) @map("start_coord_lat")
+  companyPOIAddress  String         @default("") @map("company_poi_address")
+  companyPOICoordLng Float          @default(0) @map("company_poi_coord_lng")
+  companyPOICoordLat Float          @default(0) @map("company_poi_coord_lat")
+  startPOILocation   String         @default("") @map("start_poi_location")
+  startPOICoordLng   Float          @default(0) @map("start_poi_coord_lng")
+  startPOICoordLat   Float          @default(0) @map("start_poi_coord_lat")
+  isOnboarded        Boolean        @default(false) @map("is_onboarded")
+  daysWorking        String         @default("") @map("days_working")
+  startTime          DateTime?      @map("start_time") @db.Time(0)
+  endTime            DateTime?      @map("end_time") @db.Time(0)
+  favoritedBy        User[]         @relation("Favorites")
+  favorites          User[]         @relation("Favorites")
+  sentRequests       Request[]      @relation("sentRequests")
+  receivedRequests   Request[]      @relation("receivedRequests")
+  carpools           CarpoolGroup[] @relation("userCarpools")
 
   @@map(name: "user")
 }
