@@ -12,7 +12,10 @@
     "db:schema": "prisma migrate dev && prisma generate",
     "seed": "yarn prisma db seed",
     "prepare": "husky install",
-    "test": "jest"
+    "test": "jest",
+    "vercel-build": "./vercel.sh",
+    "build:preview": "prisma generate && echo \"y\" | prisma db push && next build",
+    "build:main": "prisma generate & next build"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
@@ -39,7 +42,7 @@
     "mapbox-gl": "^2.9.1",
     "material-ui": "^0.20.2",
     "next": "^12.2.4",
-    "next-auth": "^4.10.3",
+    "next-auth": "4.17.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.32.2",

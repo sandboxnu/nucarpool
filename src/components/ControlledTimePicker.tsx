@@ -1,19 +1,29 @@
 import { TimePicker } from "antd";
-import dayjs from "dayjs";
-import { ReactNode, useState } from "react";
+import { Dayjs } from "dayjs";
+import { ReactNode, useEffect, useState } from "react";
 import { Control, Controller } from "react-hook-form";
 import { OnboardingFormInputs } from "../pages/profile";
 import { ErrorDisplay } from "../styles/profile";
 
 interface ControlledTimePickerProps {
   control: Control<OnboardingFormInputs>;
-  label?: string;
   name: "startTime" | "endTime";
   placeholder?: string;
+  value?: Date;
 }
 
 const ControlledTimePicker = (props: ControlledTimePickerProps) => {
-  const [displayedTime, setDisplayedTime] = useState<dayjs.Dayjs | null>(null);
+  const dayjs = require("dayjs");
+  const utc = require("dayjs/plugin/utc");
+  dayjs.extend(utc);
+
+  const [displayedTime, setDisplayedTime] = useState<Dayjs | null>(null);
+
+  useEffect(() => {
+    if (props.value) {
+      setDisplayedTime(dayjs.utc(props.value));
+    }
+  }, [props.value]);
 
   const customSuffixIcon = (): ReactNode => {
     return (
@@ -39,6 +49,7 @@ const ControlledTimePicker = (props: ControlledTimePickerProps) => {
     const result = dayjs(`2022-2-2 ${utcHours}:${inputDate.getMinutes()}`);
     return result.toDate();
   };
+
   return (
     <Controller
       name={props.name}

@@ -40,16 +40,9 @@ const Home: NextPage<any> = () => {
   const [mapState, setMapState] = useState<mapboxgl.Map>();
 
   const [modalUser, setModalUser] = useState<PublicUser | null>(null);
-  // this will add backdrop-blur-sm when the modal is displayed via handleConnect
-  const [mapOverlayCSS, setmapOverlayCSS] = useState<string>(
-    "pointer-events-none absolute top-0 right-0 w-full h-full flex justify-center items-center"
-  );
 
   const handleConnect = (userToConnectTo: PublicUser) => {
     setModalUser(userToConnectTo);
-    setmapOverlayCSS(
-      "pointer-events-auto absolute top-0 right-0 w-full h-full flex justify-center items-center backdrop-blur-sm"
-    );
   };
 
   useEffect(() => {
@@ -69,6 +62,10 @@ const Home: NextPage<any> = () => {
       setMapState(newMap);
     }
   }, [user, geoJsonUsers]);
+
+  useEffect(() => {
+    refetch();
+  }, []);
 
   const handleFavorite = (favoriteId: string, add: boolean) => {
     if (!user) return;
@@ -113,22 +110,15 @@ const Home: NextPage<any> = () => {
           {/* map wrapper */}
           <div className="relative flex-auto">
             <div id="map" className={"flex-auto w-full h-full"}></div>
-            {/* This div below overlays the map and will apply a blur over the map when the modal is open */}
-            <div className={mapOverlayCSS}>
-              {/* The connect modal will then overlay on top of the div which overlays the map */}
-              {user && modalUser && (
-                <ConnectModal
-                  currentUser={user}
-                  userToConnectTo={modalUser}
-                  closeModal={() => {
-                    setModalUser(null);
-                    setmapOverlayCSS(
-                      "pointer-events-none absolute top-0 right-0 w-full h-full flex justify-center items-center"
-                    );
-                  }}
-                />
-              )}
-            </div>
+            {user && modalUser && (
+              <ConnectModal
+                currentUser={user}
+                userToConnectTo={modalUser}
+                closeModal={() => {
+                  setModalUser(null);
+                }}
+              />
+            )}
           </div>
         </div>
       </div>
