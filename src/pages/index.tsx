@@ -25,7 +25,11 @@ const Home: NextPage<any> = () => {
   const utils = trpc.useContext();
   const { data: geoJsonUsers, isLoading: isLoadingGeoJsonUsers } =
     trpc.useQuery(["mapbox.geoJsonUsersList"]);
-  const { data: user, isLoading: isLoadingUser } = trpc.useQuery(["user.me"]);
+  const {
+    data: user,
+    isLoading: isLoadingUser,
+    refetch,
+  } = trpc.useQuery(["user.me"]);
   const { data: recommendations } = trpc.useQuery(["user.recommendations.me"]);
   const { data: favorites } = trpc.useQuery(["user.favorites.me"]);
   const { mutate: mutateFavorites } = trpc.useMutation("user.favorites.edit", {
