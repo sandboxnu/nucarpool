@@ -207,8 +207,8 @@ const getPublicUserArray = (name: string): PublicUser[] => {
         .join(","),
       image: null,
       seatAvail: 0,
-      startTime: null,
-      endTime: null,
+      startTime: new Date("December 17, 1995 16:00:00"),
+      endTime: new Date("December 17, 1995 00:24:00"),
     };
     if (Math.random() < 0.5) {
       return {
