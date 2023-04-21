@@ -13,7 +13,7 @@ export default async function sendConnectEmail(
     const msg = JSON.parse(req.body);
     sgMail.send(msg);
     res.status(200).json("Email sent successfully");
-  } catch (error) {
-    res.status(401).json("L");
+  } catch (err: any) {
+    res.status(500).json({ error: err });
   }
 }

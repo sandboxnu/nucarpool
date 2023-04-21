@@ -19,19 +19,10 @@ const connectEmail = async () => {
     text: `TESTTESTTEST`,
   };
 
-  // const objToQuery = (obj: {[key: string]: string}): string => {
-  //   return Object.keys(obj).map(key => `${key}=${obj[key]}`).join("&")
-  // }
-
-  // ? key=value&key2=value2
-
   const result = await fetch(`/api/sendEmail`, {
     method: "POST",
     body: JSON.stringify(msg),
   });
-  console.log("Results");
-  console.log(result.status);
-  console.log(result.body);
 };
 
 const ConnectModal = (props: ConnectModalProps): JSX.Element => {
