@@ -1,6 +1,7 @@
 name: Auto Comment
 on: [issues, pull_request]
-paths: [prisma/**]
+paths:
+  - "prisma/**"
 jobs:
   run:
     runs-on: ubuntu-latest
