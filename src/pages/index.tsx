@@ -6,8 +6,6 @@ import { RiFocus3Line } from "react-icons/ri";
 import addClusters from "../utils/map/addClusters";
 import addMapEvents from "../utils/map/addMapEvents";
 import addUserLocation from "../utils/map/addUserLocation";
-import { unstable_getServerSession as getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]";
 import Head from "next/head";
 import { trpc } from "../utils/trpc";
 import DropDownMenu from "../components/DropDownMenu";
