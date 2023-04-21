@@ -2,7 +2,7 @@ name: Auto Comment
 on:
   pull_request:
     paths:
-      - "prisma/**"
+      - "prisma/schema.prisma"
 
 jobs:
   run:
