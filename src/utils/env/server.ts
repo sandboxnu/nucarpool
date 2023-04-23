@@ -24,7 +24,7 @@ export const serverEnv = {
       input: process.env.GOOGLE_CLIENT_SECRET,
     }),
     SENDGRID_API_KEY: str({
-      input: process.env.SENDGRID_API_KEY ?? "fake",
+      input: process.env.SENDGRID_API_KEY,
     }),
   }),
 };
