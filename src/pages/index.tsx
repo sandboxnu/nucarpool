@@ -72,7 +72,13 @@ const Home: NextPage<any> = () => {
       newMap.on("load", () => {
         addClusters(newMap, geoJsonUsers);
         addUserLocation(newMap, user);
-        addMapEvents(newMap, user);
+        addMapEvents({
+          map: newMap,
+          user,
+          favorites,
+          handleConnect,
+          handleFavorite,
+        });
       });
       setMapState(newMap);
     }

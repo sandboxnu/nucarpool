@@ -6,3 +6,8 @@
   width: 100vw;
   height: 100vh;
 }
+
+.custom-map-popup .mapboxgl-popup-content {
+  background-color: transparent;
+  box-shadow: none;
+}

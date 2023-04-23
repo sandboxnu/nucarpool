@@ -58,6 +58,7 @@ export const mapboxRouter = createProtectedRouter()
           status: true,
           seatAvail: true,
           companyName: true,
+          daysWorking: true,
           companyPOIAddress: true,
           companyPOICoordLng: true,
           companyPOICoordLat: true,
