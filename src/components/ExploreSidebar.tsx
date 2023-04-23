@@ -26,6 +26,9 @@ interface ExploreSidebarProps {
 
 const ExploreSidebar = (props: ExploreSidebarProps) => {
   const [curList, setCurList] = useState<PublicUser[]>(props.reccs ?? []);
+  const [curOption, setCurOption] = useState<"reccomendations" | "favorites">(
+    "reccomendations"
+  );
 
   useEffect(() => {
     setCurList(props.reccs ?? []);
@@ -39,12 +42,13 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
         <div className="flex justify-center gap-3">
           <button
             className={
-              curList == props.reccs
+              curOption === "reccomendations"
                 ? "bg-northeastern-red rounded-xl p-2 font-semibold text-xl text-white"
                 : "rounded-xl p-2 font-semibold text-xl text-black"
             }
             onClick={() => {
               setCurList(props.reccs ?? []);
+              setCurOption("reccomendations");
               clearMarkers();
             }}
           >
@@ -52,12 +56,13 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
           </button>
           <button
             className={
-              curList == props.favs
+              curOption === "favorites"
                 ? "bg-northeastern-red rounded-xl p-2 font-semibold text-xl text-white"
                 : "rounded-xl p-2 font-semibold text-xl text-black"
             }
             onClick={() => {
               setCurList(props.favs ?? []);
+              setCurOption("favorites");
               clearMarkers();
             }}
           >
