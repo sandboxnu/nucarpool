@@ -28,7 +28,7 @@ interface RequestSidebarProps {
 
 const RequestSidebar = (props: RequestSidebarProps) => {
   const [curList, setCurList] = useState<PublicUser[]>(props.sent ?? []);
-  const [handleManage, setHandleManage] = useState<string>("sent");
+  const [handleManage, setHandleManage] = useState<"sent" | "received">("sent");
 
   const passManageFunction = () => {
     if (handleManage === "sent") {
@@ -48,7 +48,7 @@ const RequestSidebar = (props: RequestSidebarProps) => {
         <div className="flex justify-center gap-3">
           <button
             className={
-              handleManage == "sent"
+              curList == props.sent
                 ? "bg-sky-900 rounded-xl p-2 font-semibold text-xl text-white"
                 : "rounded-xl p-2 font-semibold text-xl text-black"
             }
@@ -58,11 +58,11 @@ const RequestSidebar = (props: RequestSidebarProps) => {
               clearMarkers();
             }}
           >
-            Sent
+            Received
           </button>
           <button
             className={
-              handleManage == "received"
+              curList == props.received
                 ? "bg-sky-900 rounded-xl p-2 font-semibold text-xl text-white"
                 : "rounded-xl p-2 font-semibold text-xl text-black"
             }
@@ -72,7 +72,7 @@ const RequestSidebar = (props: RequestSidebarProps) => {
               clearMarkers();
             }}
           >
-            Received
+            Sent
           </button>
         </div>
       </div>
