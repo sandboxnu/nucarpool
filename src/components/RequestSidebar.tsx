@@ -48,7 +48,7 @@ const RequestSidebar = (props: RequestSidebarProps) => {
         <div className="flex justify-center gap-3">
           <button
             className={
-              curList == props.sent
+              handleManage === "sent"
                 ? "bg-sky-900 rounded-xl p-2 font-semibold text-xl text-white"
                 : "rounded-xl p-2 font-semibold text-xl text-black"
             }
@@ -62,7 +62,7 @@ const RequestSidebar = (props: RequestSidebarProps) => {
           </button>
           <button
             className={
-              curList == props.received
+              handleManage === "received"
                 ? "bg-sky-900 rounded-xl p-2 font-semibold text-xl text-white"
                 : "rounded-xl p-2 font-semibold text-xl text-black"
             }
