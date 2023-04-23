@@ -9,6 +9,7 @@ import { favoritesRouter } from "./user/favorites";
 import { groupsRouter } from "./user/groups";
 import { requestsRouter } from "./user/requests";
 import { recommendationsRouter } from "./user/recommendations";
+import { convertToPublic } from "../../utils/publicUser";
 
 // user router to get information about or edit users
 export const userRouter = createProtectedRouter()
@@ -29,6 +30,27 @@ export const userRouter = createProtectedRouter()
       }
 
       return user;
+    },
+  })
+  .query("else", {
+    input: z.object({
+      id: z.string(),
+    }),
+    async resolve({ ctx, input }) {
+      const id = input.id;
+      const user = await ctx.prisma.user.findUnique({
+        where: { id },
+      });
+
+      // throws TRPCError if no user with ID exists
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `No profile with id '${id}'`,
+        });
+      }
+
+      return convertToPublic(user);
     },
   })
   // edits a user

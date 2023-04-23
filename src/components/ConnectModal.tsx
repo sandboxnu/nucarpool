@@ -8,22 +8,10 @@ interface ConnectModalProps {
   // represents the other user 'I' am trying to connect to.
   userToConnectTo: PublicUser;
 
+  handleEmailConect: () => void;
+
   closeModal: () => void;
 }
-
-const connectEmail = async () => {
-  const msg = {
-    to: "devashishsood18@gmail.com", // Replace with your recipient
-    from: "devashishsood9@gmail.com", // Replace with your verified sender
-    subject: "New Contact Message",
-    text: `TESTTESTTEST`,
-  };
-
-  const result = await fetch(`/api/sendEmail`, {
-    method: "POST",
-    body: JSON.stringify(msg),
-  });
-};
 
 const ConnectModal = (props: ConnectModalProps): JSX.Element => {
   const [isOpen, setIsOpen] = useState(true);
@@ -68,7 +56,7 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
               </button>
               <button
                 className="w-full p-1 text-slate-50 bg-red-700 border-2 border-red-700 rounded-md"
-                onClick={() => connectEmail()}
+                onClick={() => props.handleEmailConect()}
               >
                 Send Email
               </button>
