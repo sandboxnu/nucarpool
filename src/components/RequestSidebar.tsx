@@ -28,7 +28,7 @@ interface RequestSidebarProps {
 
 const RequestSidebar = (props: RequestSidebarProps) => {
   const [curList, setCurList] = useState<PublicUser[]>(props.sent ?? []);
-  const [handleManage, setHandleManage] = useState<"sent" | "received">("sent");
+  const [handleManage, setHandleManage] = useState<string>("sent");
 
   const passManageFunction = () => {
     if (handleManage === "sent") {
@@ -58,7 +58,7 @@ const RequestSidebar = (props: RequestSidebarProps) => {
               clearMarkers();
             }}
           >
-            Received
+            Sent
           </button>
           <button
             className={
@@ -72,7 +72,7 @@ const RequestSidebar = (props: RequestSidebarProps) => {
               clearMarkers();
             }}
           >
-            Sent
+            Received
           </button>
         </div>
       </div>

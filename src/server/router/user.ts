@@ -9,6 +9,7 @@ import { favoritesRouter } from "./user/favorites";
 import { groupsRouter } from "./user/groups";
 import { requestsRouter } from "./user/requests";
 import { recommendationsRouter } from "./user/recommendations";
+import { convertToPublic } from "../../utils/publicUser";
 
 // user router to get information about or edit users
 export const userRouter = createProtectedRouter()

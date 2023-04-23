@@ -1,5 +1,5 @@
 import { inferQueryOutput } from "./trpc";
-import { Role } from "@prisma/client";
+import { Request, Role } from "@prisma/client";
 import { Status } from "@prisma/client";
 import { Feature } from "geojson";
 
@@ -56,4 +56,9 @@ export type ButtonInfo = {
   text: string;
   onPress: (user: PublicUser) => void;
   color?: string;
+};
+
+export type ResolvedRequest = {
+  fromUser: User | PublicUser | null;
+  toUser: User | PublicUser | null;
 };

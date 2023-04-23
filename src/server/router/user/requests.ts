@@ -2,6 +2,9 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createProtectedRouter } from "../createProtectedRouter";
 import _ from "lodash";
+import { Request, User } from "@prisma/client";
+import { convertToPublic } from "../../../utils/publicUser";
+import { PublicUser, ResolvedRequest } from "../../../utils/types";
 
 // use this router to manage invitations
 export const requestsRouter = createProtectedRouter()
@@ -20,14 +23,62 @@ export const requestsRouter = createProtectedRouter()
         });
       }
 
+      const resolveRequest = async (
+        req: Request
+      ): Promise<ResolvedRequest & Request> => {
+        let [from, to] = await Promise.all([
+          ctx.prisma.user.findUnique({
+            where: { id: req.fromUserId },
+          }),
+          ctx.prisma.user.findUnique({
+            where: { id: req.toUserId },
+          }),
+        ]);
+
+        if (!from) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `No user with id '${req.fromUserId}'`,
+          });
+        }
+
+        if (!to) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `No user with id '${req.toUserId}'`,
+          });
+        }
+
+        let toUser: User | PublicUser;
+        let fromUser: User | PublicUser;
+
+        if (from?.id === ctx.session.user?.id) {
+          fromUser = from;
+        } else {
+          fromUser = convertToPublic(from);
+        }
+
+        if (to?.id === ctx.session.user?.id) {
+          toUser = to;
+        } else {
+          toUser = convertToPublic(to);
+        }
+        return { ...req, fromUser, toUser };
+      };
+
       const [from, to] = await Promise.all([
-        ctx.prisma.request.findMany({
-          where: { fromUserId: id },
-        }),
-        ctx.prisma.request.findMany({
-          where: { toUserId: id },
-        }),
+        ctx.prisma.request
+          .findMany({
+            where: { fromUserId: id },
+          })
+          .then((reqs) => Promise.all(reqs.map(resolveRequest))),
+        ctx.prisma.request
+          .findMany({
+            where: { toUserId: id },
+          })
+          .then((reqs) => Promise.all(reqs.map(resolveRequest))),
       ]);
+
       return { from, to };
     },
   })

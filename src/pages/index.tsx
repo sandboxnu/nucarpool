@@ -11,9 +11,8 @@ import { trpc } from "../utils/trpc";
 import DropDownMenu from "../components/DropDownMenu";
 import { browserEnv } from "../utils/env/browser";
 import ProtectedPage from "../utils/auth";
-import Sidebar from "../components/Sidebar";
 import Header, { HeaderOptions } from "../components/Header";
-import { PublicUser } from "../utils/types";
+import { PublicUser, User } from "../utils/types";
 import ConnectModal from "../components/ConnectModal";
 import { toast } from "react-toastify";
 import ExploreSidebar from "../components/ExploreSidebar";
@@ -32,8 +31,10 @@ const Home: NextPage<any> = () => {
     isLoading: isLoadingUser,
     refetch,
   } = trpc.useQuery(["user.me"]);
+
   const { data: recommendations } = trpc.useQuery(["user.recommendations.me"]);
   const { data: favorites } = trpc.useQuery(["user.favorites.me"]);
+  const { data: requests } = trpc.useQuery(["user.requests.me"]);
   const { mutate: mutateFavorites } = trpc.useMutation("user.favorites.edit", {
     onError: (error) => {
       toast.error(`Something went wrong: ${error.message}`);
@@ -46,18 +47,54 @@ const Home: NextPage<any> = () => {
   const [mapState, setMapState] = useState<mapboxgl.Map>();
 
   const [modalUser, setModalUser] = useState<PublicUser | null>(null);
+  const [modalType, setModalType] = useState<string>("connect");
   const [sidebarState, setSidebarState] = useState<HeaderOptions>("explore");
 
   const handleConnect = (userToConnectTo: PublicUser) => {
     setModalUser(userToConnectTo);
+    setModalType("connect");
+  };
+
+  const { mutate: mutateRequests } = trpc.useMutation("user.requests.create", {
+    onError: (error) => {
+      toast.error(`Something went wrong: ${error.message}`);
+    },
+    onSuccess() {
+      utils.invalidateQueries(["user.requests.me"]);
+    },
+  });
+
+  const handleEmailConnect = (curUser: User, toUser: PublicUser) => {
+    connectEmail(toUser.email);
+    mutateRequests({
+      fromId: curUser.id,
+      toId: toUser.id,
+      message: "Not sure if we need this",
+    });
+  };
+  const connectEmail = async (email: string | null) => {
+    const msg = {
+      to: email, // Replace with your recipient
+      from: "devashishsood9@gmail.com", // Replace with your verified sender
+      subject: "New Contact Message",
+      text: `Dior Dior`,
+    };
+
+    const result = await fetch(`/api/sendEmail`, {
+      method: "POST",
+      body: JSON.stringify(msg),
+    });
+    console.log(result);
   };
 
   const handleSentRequests = (userToConnectTo: PublicUser) => {
     setModalUser(userToConnectTo);
+    setModalType("sent");
   };
 
   const handleReceivedRequests = (userToConnectTo: PublicUser) => {
     setModalUser(userToConnectTo);
+    setModalType("received");
   };
 
   useEffect(() => {
@@ -108,8 +145,8 @@ const Home: NextPage<any> = () => {
         return (
           <RequestSidebar
             currentUser={user}
-            sent={getPublicUserArray("Sent Users")}
-            received={getPublicUserArray("Received Users")}
+            sent={requests?.from.map((req) => req.toUser!) ?? []}
+            received={requests?.to.map((req) => req.fromUser!) ?? []}
             favs={favorites ?? []}
             map={mapState}
             handleSent={handleSentRequests}
@@ -146,16 +183,17 @@ const Home: NextPage<any> = () => {
           {/* map wrapper */}
           <div className="relative flex-auto">
             <div id="map" className={"flex-auto w-full h-full"}></div>
-            {user && modalUser && (
+            {user && modalUser && modalType === "connect" && (
               <ConnectModal
                 currentUser={user}
                 userToConnectTo={modalUser}
+                handleEmailConect={() => handleEmailConnect(user, modalUser)}
                 closeModal={() => {
                   setModalUser(null);
                 }}
               />
             )}
-            {user && modalUser && (
+            {user && modalUser && modalType === "sent" && (
               <SentRequestModal
                 currentUser={user}
                 userToConnectTo={modalUser}
@@ -164,7 +202,7 @@ const Home: NextPage<any> = () => {
                 }}
               />
             )}
-            {user && modalUser && (
+            {user && modalUser && modalType === "received" && (
               <ReceivedRequestModal
                 currentUser={user}
                 userToConnectTo={modalUser}
