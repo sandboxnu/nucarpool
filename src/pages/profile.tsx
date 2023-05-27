@@ -521,8 +521,4 @@ const Profile: NextPage = () => {
   );
 };
 
-/**
- *
- * MAKE SURE THIS IS PROTECTED PAGE BEFORE PR
- */
-export default Profile;
+export default ProtectedPage(Profile);
