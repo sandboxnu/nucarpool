@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 /**
- * Media queries are min-width 834, and 420.
+ * Media queries are min-width 1440, 834, and 420.
  */
 
 export const CompleteProfileButton = styled.button`
@@ -18,37 +18,38 @@ export const CompleteProfileButton = styled.button`
   align-self: flex-end;
   @media (min-width: 834px) {
     justify-self: flex-end;
-    margin: 0px;
+    margin: 1rem 0 1rem 0;
   }
 `;
 
 export const ProfileContainer = styled.form`
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  @media (min-width: 834px) {
-    align-items: center;
+  justify-content: center;
+  align-items: center;
+  flex: 1 1 auto;
+  width: 100%;
+  padding: 1.25rem;
+  @media (min-width: 1440px) {
     height: 100%;
   }
 
-  @media (min-width: 420px) {
-    padding: 3.5rem 1rem;
+  @media (min-width: 834px) {
+    flex-direction: row;
   }
-
-  padding: 1.5rem 0;
-
-  width: 90%;
 `;
 
 export const ProfileColumn = styled.div`
   display: flex;
   flex-direction: column;
-  @media (min-width: 834px) {
-    height: 90%;
-    width: 85%;
-    gap: 0px;
-  }
+  // @media (min-width: 834px) {
+  //   max-height: 90%;
+  //   width: 85%;
+  //   gap: 0px;
+  // }
   padding: 0 0.09rem 0 0.09rem;
+  width: 100%;
+  flex: 1 1 auto;
   gap: 6px;
 `;
 
@@ -65,9 +66,6 @@ export const MiddleProfileSection = styled(ProfileColumn)`
 
 export const BottomProfileSection = styled(ProfileColumn)`
   width: 100%;
-  @media (min-width: 834px) {
-    padding-bottom: 32px;
-  }
 
   display: flex;
   flex-direction: column;

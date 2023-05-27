@@ -23,7 +23,7 @@ module.exports = {
 
       // ipad 14 size
       md: "834px",
-      // => @media (min-width: 960px) { ... }
+      // => @media (min-width: 834px) { ... }
 
       lg: "1440px",
       // => @media (min-width: 1440px) { ... }
