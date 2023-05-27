@@ -341,7 +341,7 @@ const Profile: NextPage = () => {
                     />
 
                     {watch("role") == Role.DRIVER && (
-                      <div className="flex flex-col">
+                      <div className="flex flex-col flex-1">
                         <EntryLabel
                           required={true}
                           error={errors.seatAvail}
@@ -478,7 +478,7 @@ const Profile: NextPage = () => {
                     </div>
 
                     {/* Pronouns field  */}
-                    <div className="w-2/6">
+                    <div className="w-2/6 flex-1">
                       <LightEntryLabel error={!!errors.pronouns}>
                         Pronouns
                       </LightEntryLabel>
