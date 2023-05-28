@@ -1,0 +1,16 @@
+name: Auto Comment
+on:
+  pull_request:
+    paths:
+      - "prisma/schema.prisma"
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: wow-actions/auto-comment@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          pullRequestOpened: |
+            👋 @{{ author }}
+            Looks like your PR might contain changes to the schema.prisma file. Please open a deploy request on PlanetScale before merging. If you have any questions, ping @lukejianu on Slack.

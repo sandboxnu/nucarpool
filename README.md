@@ -26,6 +26,10 @@ GOOGLE_CLIENT_SECRET=
 # Mapbox
 
 NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=
+
+# Sendgrid/Mail
+
+SENDGRID_API_KEY=
 ```
 
 Then do `yarn` and `yarn dev` to get the project running.

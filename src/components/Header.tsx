@@ -1,5 +1,5 @@
-import Image from "next/image";
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
+import { Type } from "react-toastify/dist/utils";
 import styled from "styled-components";
 
 const HeaderDiv = styled.div`
@@ -41,10 +41,63 @@ const PageName = styled.h1`
   color: #f4f4f4;
 `;
 
-const Header = () => {
+interface HeaderProps {
+  data?: {
+    sidebarValue: string;
+    setSidebar: Dispatch<SetStateAction<HeaderOptions>>;
+  };
+}
+
+export type HeaderOptions = "explore" | "requests";
+
+const Header = (props: HeaderProps) => {
+  const renderClassName = (sidebarValue: string, sidebarText: string) => {
+    if (sidebarValue == "explore" && sidebarText == "explore") {
+      return "underline underline-offset-8 rounded-xl p-4 font-medium text-xl text-white";
+    } else if (sidebarValue == "requests" && sidebarText == "explore") {
+      return "rounded-xl p-4 font-medium text-xl text-white";
+    }
+
+    if (sidebarValue == "requests" && sidebarText == "requests") {
+      return "underline underline-offset-8 rounded-xl p-4 font-medium text-xl text-white";
+    } else if (sidebarValue == "explore" && sidebarText == "requests") {
+      return "rounded-xl p-4 font-medium text-xl text-white";
+    }
+  };
+
+  const renderSidebarOptions = ({
+    sidebarValue,
+    setSidebar,
+  }: {
+    sidebarValue: string;
+    setSidebar: Dispatch<SetStateAction<HeaderOptions>>;
+  }) => {
+    return (
+      <div className="pr-12">
+        <button
+          onClick={() => {
+            setSidebar("explore");
+          }}
+          className={renderClassName(sidebarValue, "explore")}
+        >
+          Explore
+        </button>
+        <button
+          onClick={() => {
+            setSidebar("requests");
+          }}
+          className={renderClassName(sidebarValue, "requests")}
+        >
+          Requests
+        </button>
+      </div>
+    );
+  };
+
   return (
     <HeaderDiv>
       <Logo>CarPool</Logo>
+      {props.data && renderSidebarOptions(props.data)}
     </HeaderDiv>
   );
 };

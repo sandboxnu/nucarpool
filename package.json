@@ -13,7 +13,10 @@
     "seed": "yarn prisma db seed",
     "prepare": "husky install",
     "test": "jest",
-    "vercel-build": "prisma generate && prisma db push && next build"
+    "vercel-build": "./vercel.sh",
+    "build:preview": "prisma generate && echo \"y\" | prisma db push && next build",
+    "build:main": "prisma generate & next build",
+    "startup": "yarn db:start && next dev"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
@@ -26,7 +29,8 @@
     "@mui/material": "^5.10.11",
     "@mui/x-date-pickers": "^5.0.7",
     "@next-auth/prisma-adapter": "^1.0.3",
-    "@prisma/client": "^4.14.1",
+    "@prisma/client": "^4.4.0",
+    "@sendgrid/mail": "^7.7.0",
     "@trpc/client": "^9.25.3",
     "@trpc/next": "^9.25.3",
     "@trpc/react": "^9.25.3",
