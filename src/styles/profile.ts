@@ -42,11 +42,6 @@ export const ProfileContainer = styled.form`
 export const ProfileColumn = styled.div`
   display: flex;
   flex-direction: column;
-  // @media (min-width: 834px) {
-  //   max-height: 90%;
-  //   width: 85%;
-  //   gap: 0px;
-  // }
   padding: 0 0.09rem 0 0.09rem;
   width: 100%;
   flex: 1 1 auto;
