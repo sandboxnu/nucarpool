@@ -366,7 +366,7 @@ const Profile: NextPage = () => {
                 <CommutingScheduleSection>
                   <ProfileHeader>Commuting Schedule</ProfileHeader>
                   {/* Days working field  */}
-                  <div className="mb-2 md:my-4 w-full aspect-[7/1] max-w-[420px]">
+                  <div className="mb-2 md:my-4 w-full aspect-[7/1] max-w-[360px]">
                     <div className="w-full h-full border-l flex justify-evenly items-center border-l-black">
                       {daysOfWeek.map((day, index) => (
                         <Controller
