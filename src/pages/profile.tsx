@@ -283,7 +283,7 @@ const Profile: NextPage = () => {
                     label="Workplace Name"
                   />
                   <TextField
-                    className={`w-full mb-6`}
+                    className={`w-full`}
                     inputClassName={`h-12`}
                     label="Workplace Name"
                     id="companyName"

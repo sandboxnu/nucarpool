@@ -61,7 +61,7 @@ export const MiddleProfileSection = styled(ProfileColumn)`
 
 export const BottomProfileSection = styled(ProfileColumn)`
   width: 100%;
-
+  padding: 1rem 0 1rem 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
