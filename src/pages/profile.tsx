@@ -452,7 +452,7 @@ const Profile: NextPage = () => {
                         title="If you don't have set times, communicate that on your own with potential riders/drivers."
                         placement="right"
                       >
-                        <Icon classes={"w-48"} fontSize={"medium"}>
+                        <Icon classes={{ root: "w-48" }} fontSize="medium">
                           <MdHelp fill="#C8102E" />
                         </Icon>
                       </Tooltip>
