@@ -57,7 +57,7 @@ const ControlledTimePicker = (props: ControlledTimePickerProps) => {
       render={({ field: { ref, ...fieldProps }, fieldState }) => (
         <div className={"flex flex-col"}>
           <TimePicker
-            className="form-input w-full rounded-lg"
+            className="form-input w-full rounded-lg h-12 border-black"
             format="h:mm A"
             suffixIcon={customSuffixIcon()}
             ref={ref}

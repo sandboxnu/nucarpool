@@ -1,6 +1,6 @@
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import type { GetServerSidePropsContext, NextPage } from "next";
+import type { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { RiFocus3Line } from "react-icons/ri";
 import addClusters from "../utils/map/addClusters";

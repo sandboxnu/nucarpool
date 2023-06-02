@@ -1,32 +1,23 @@
 import React from "react";
 import styled from "styled-components";
 
-const StyledCheckedBox = styled.div`
-  background-color: #d0142c;
-  border: 2px solid black;
-  border-left: 0rem solid;
-  color: white;
-  width: 2.5rem;
-  height: 2.5rem;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-`;
-
-const StyledUncheckedBox = styled.div`
-  border: 2px solid black;
+const BaseBox = styled.div`
+  border: 1px solid black;
   border-left: 0rem solid;
   color: black;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 100%;
+  height: 100%;
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 1.4rem;
 `;
+const StyledCheckedBox = styled(BaseBox)`
+  background-color: #c7efb3;
+`;
+
+const StyledUncheckedBox = styled(BaseBox)``;
 
 const DayBox = ({
   day,

@@ -1,5 +1,9 @@
 import styled from "styled-components";
 
+/**
+ * Media queries are min-width 1440, 834, and 420.
+ */
+
 export const CompleteProfileButton = styled.button`
   background: #b12424;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
@@ -12,24 +16,36 @@ export const CompleteProfileButton = styled.button`
   color: #ffffff;
   width: 222px;
   align-self: flex-end;
-  justify-self: flex-end;
+  @media (min-width: 834px) {
+    justify-self: flex-end;
+    margin: 1rem 0 1rem 0;
+  }
 `;
 
 export const ProfileContainer = styled.form`
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  width: 90%;
-  height: 100%;
+  justify-content: center;
   align-items: center;
-  padding: 4rem 1.5rem;
+  flex: 1 1 auto;
+  width: 100%;
+  padding: 1.25rem;
+  @media (min-width: 1440px) {
+    height: 100%;
+  }
+
+  @media (min-width: 834px) {
+    flex-direction: row;
+  }
 `;
 
 export const ProfileColumn = styled.div`
   display: flex;
   flex-direction: column;
-  height: 85%;
-  width: 50%;
+  padding: 0 0.09rem 0 0.09rem;
+  width: 100%;
+  flex: 1 1 auto;
+  gap: 6px;
 `;
 
 export const TopProfileSection = styled(ProfileColumn)`
@@ -45,7 +61,7 @@ export const MiddleProfileSection = styled(ProfileColumn)`
 
 export const BottomProfileSection = styled(ProfileColumn)`
   width: 100%;
-  padding-top: 40px;
+  padding: 1rem 0 1rem 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -56,11 +72,22 @@ export const PersonalInfoSection = styled(ProfileColumn)`
   width: 100%;
   flex: 1 1 auto;
   gap: 4px;
+  @media (min-width: 834px) {
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+  padding-top: 12px;
+  padding-bottom: 12px;
 `;
 
 export const CommutingScheduleSection = styled(ProfileColumn)`
   width: 100%;
   flex: 1 1 auto;
+  @media (min-width: 834px) {
+    gap: 0px;
+  }
+  gap: 6px;
+  padding-bottom: 1rem;
 `;
 
 export const ProfileHeader = styled.h1`
@@ -68,10 +95,15 @@ export const ProfileHeader = styled.h1`
   font-family: "Montserrat", sans-serif;
   font-style: normal;
   font-weight: 700;
-  font-size: 32px;
+
   line-height: 39px;
   color: #000000;
-  margin-bottom: 22px;
+
+  @media (min-width: 420px) {
+    margin-bottom: 22px;
+    font-size: 32px;
+  }
+  font-size: 24px;
 `;
 
 export const ProfileHeaderNoMB = styled(ProfileHeader)`
@@ -102,15 +134,11 @@ export const LightEntryLabel = styled.label<{
   font-family: "Montserrat";
   font-style: normal;
   font-weight: 400;
-  font-size: 20px;
   line-height: 24.38px;
   display: flex;
   align-items: center;
   color: ${(props) => (props.error ? "#B12424" : "#000000")};
-`;
-
-export const EntryRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+  @media (min-width: 420px) {
+    font-size: 16px;
+  }
 `;

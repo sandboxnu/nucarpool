@@ -1,9 +1,8 @@
-import { Combobox, Transition } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import _, { debounce } from "lodash";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Header from "../components/Header";
@@ -27,7 +26,6 @@ import {
   ProfileHeader,
   TopProfileSection,
   CommutingScheduleSection,
-  EntryRow,
   LightEntryLabel,
   Note,
   ErrorDisplay,
@@ -37,6 +35,7 @@ import ControlledTimePicker from "../components/ControlledTimePicker";
 import { CarpoolAddress, CarpoolFeature } from "../utils/types";
 import ProtectedPage from "../utils/auth";
 import { EntryLabel } from "../components/EntryLabel";
+import ControlledAddressCombobox from "../components/ControlledAddressCombobox";
 
 // Inputs to the onboarding form.
 export type OnboardingFormInputs = {
@@ -242,383 +241,280 @@ const Profile: NextPage = () => {
 
   return (
     <>
-      <div className="flex flex-col w-full h-full items-center">
+      <div className="flex flex-col h-full w-full items-center">
         <Header />
         <ProfileContainer onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex flex-col flex-auto md:flex-row md:space-x-20">
-            <ProfileColumn>
-              <TopProfileSection>
-                <ProfileHeader>Locations</ProfileHeader>
-                {/* Starting Location field  */}
-                <EntryLabel
-                  required={true}
-                  error={errors.startAddress}
-                  label="Home Address"
-                />
-                <Controller
-                  name="startAddress"
-                  control={control}
-                  render={({ field: { ref, ...fieldProps } }) => (
-                    <Combobox
-                      className={`w-full`}
-                      as="div"
-                      value={startAddressSelected}
-                      onChange={(val: CarpoolFeature) => {
-                        setStartAddressSelected(val);
-                        fieldProps.onChange(val.place_name);
-                      }}
-                      ref={ref}
-                    >
-                      <Combobox.Input
-                        className={`w-full shadow-sm rounded-md px-3 py-2 ${
-                          errors.startAddress
-                            ? "border-northeastern-red"
-                            : "border-black"
-                        }`}
-                        displayValue={(feat: CarpoolAddress) =>
-                          feat.place_name ? feat.place_name : ""
-                        }
-                        type="text"
-                        onChange={(e) => {
-                          if (e.target.value === "") {
-                            setStartAddressSelected({
-                              place_name: "",
-                              center: [0, 0],
-                            });
-                            fieldProps.onChange("");
-                          } else {
-                            updateStartingAddress(e.target.value);
-                          }
-                        }}
-                      />
-                      <Transition
-                        as={Fragment}
-                        leave="transition ease-in duration-100"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
-                      >
-                        <Combobox.Options className="w-full rounded-md bg-white text-base shadow-lg focus:outline-none ">
-                          {startAddressSuggestions.length === 0 ? (
-                            <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
-                              Nothing found.
-                            </div>
-                          ) : (
-                            startAddressSuggestions.map((feat) => (
-                              <Combobox.Option
-                                key={feat.id}
-                                className={({ active }) =>
-                                  `w-full relative cursor-default select-none p-3 border-black ${
-                                    active
-                                      ? "bg-blue-400 text-white"
-                                      : "text-gray-900"
-                                  }`
-                                }
-                                value={feat}
-                              >
-                                {feat.place_name}
-                              </Combobox.Option>
-                            ))
-                          )}
-                        </Combobox.Options>
-                      </Transition>
-                    </Combobox>
-                  )}
-                />
-                <Note>
-                  Note: Your address will only be used to find users close to
-                  you. It will not be displayed to any other users.
-                </Note>
-                {errors.startAddress && (
-                  <ErrorDisplay>{errors.startAddress.message}</ErrorDisplay>
-                )}
-              </TopProfileSection>
-
-              <MiddleProfileSection>
-                <EntryLabel
-                  required={true}
-                  error={errors.companyName}
-                  label="Workplace Name"
-                />
-                <TextField
-                  className={`w-full mb-6`}
-                  label="Workplace Name"
-                  id="companyName"
-                  error={errors.companyName}
-                  type="text"
-                  {...register("companyName")}
-                />
-
-                {/* Company Address field  */}
-
-                <EntryLabel
-                  required={true}
-                  error={errors.companyAddress}
-                  label="Workplace Address"
-                />
-                <Note>
-                  Note: Select the autocomplete results, even if you typed the
-                  address out
-                </Note>
-                <Controller
-                  name="companyAddress"
-                  control={control}
-                  render={({ field: { ref, ...fieldProps } }) => (
-                    <Combobox
-                      className={`w-full`}
-                      as="div"
-                      value={companyAddressSelected}
-                      onChange={(val: CarpoolFeature) => {
-                        setCompanyAddressSelected(val);
-                        fieldProps.onChange(val.place_name);
-                      }}
-                      ref={ref}
-                    >
-                      <Combobox.Input
-                        className={`w-full shadow-sm rounded-md px-3 py-2 ${
-                          errors.companyAddress
-                            ? "border-northeastern-red"
-                            : "border-black"
-                        }`}
-                        displayValue={(feat: CarpoolAddress) =>
-                          feat.place_name ? feat.place_name : ""
-                        }
-                        type="text"
-                        onChange={(e) => {
-                          if (e.target.value === "") {
-                            setCompanyAddressSelected({
-                              place_name: "",
-                              center: [0, 0],
-                            });
-                            fieldProps.onChange("");
-                          } else {
-                            updateCompanyAddress(e.target.value);
-                          }
-                        }}
-                      />
-                      <Transition
-                        as={Fragment}
-                        leave="transition ease-in duration-100"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
-                      >
-                        <Combobox.Options className="w-full rounded-md bg-white text-base shadow-lg focus:outline-none ">
-                          {companyAddressSuggestions.length === 0 ? (
-                            <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
-                              Nothing found.
-                            </div>
-                          ) : (
-                            companyAddressSuggestions.map((feat) => (
-                              <Combobox.Option
-                                key={feat.id}
-                                className={({ active }) =>
-                                  `w-full relative cursor-default select-none p-3 ${
-                                    active
-                                      ? "bg-blue-400 text-white"
-                                      : "text-gray-900"
-                                  }`
-                                }
-                                value={feat}
-                              >
-                                {feat.place_name}
-                              </Combobox.Option>
-                            ))
-                          )}
-                        </Combobox.Options>
-                      </Transition>
-                    </Combobox>
-                  )}
-                />
-                {errors.companyAddress && (
-                  <ErrorDisplay>{errors.companyAddress.message}</ErrorDisplay>
-                )}
-              </MiddleProfileSection>
-
-              {/* Role field  */}
-              <BottomProfileSection>
-                <ProfileHeaderNoMB>
-                  I am a... <span className="text-northeastern-red">*</span>
-                </ProfileHeaderNoMB>
-                <div className="flex items-end space-x-4">
-                  <Radio
-                    label="Rider"
-                    id="rider"
-                    error={errors.role}
-                    role={Role.RIDER}
-                    value={Role.RIDER}
-                    currentlySelected={watch("role")}
-                    {...register("role")}
-                  />
-                  <Radio
-                    label="Driver"
-                    id="driver"
-                    error={errors.role}
-                    role={Role.DRIVER}
-                    value={Role.DRIVER}
-                    currentlySelected={watch("role")}
-                    {...register("role")}
-                  />
-                  {watch("role") == Role.DRIVER && (
-                    <TextField
-                      inputClassName="py-[14px]"
-                      className="self-end w-36"
-                      label="Seat Availability"
-                      id="seatAvail"
-                      error={errors.seatAvail}
-                      type="number"
-                      {...register("seatAvail", { valueAsNumber: true })}
-                    />
-                  )}
-                </div>
-              </BottomProfileSection>
-            </ProfileColumn>
-
-            <ProfileColumn>
-              <CommutingScheduleSection>
-                <ProfileHeader>Commuting Schedule</ProfileHeader>
-                {/* Days working field  */}
-                <div className="my-4">
-                  <div className="border-l-2 border-l-black">
-                    {daysOfWeek.map((day, index) => (
-                      <Controller
-                        key={day + index.toString()}
-                        name={`daysWorking.${index}`}
-                        control={control}
-                        render={({
-                          field: { onChange, value },
-                          formState: { defaultValues },
-                        }) => (
-                          <Checkbox
-                            key={day + index.toString()}
-                            sx={{
-                              input: { width: 1, height: 1 },
-                              padding: 0,
-                            }}
-                            checked={value}
-                            onChange={onChange}
-                            checkedIcon={<DayBox day={day} isSelected={true} />}
-                            icon={<DayBox day={day} isSelected={false} />}
-                            defaultChecked={
-                              !!defaultValues?.daysWorking ? true : false
-                            }
-                          />
-                        )}
-                      />
-                    ))}
-                  </div>
-
-                  {errors.daysWorking && (
-                    <ErrorDisplay>{errors.daysWorking.message}</ErrorDisplay>
-                  )}
-                </div>
-
-                {/* Start/End Time Fields  */}
-                <div className="flex w-full gap-6 pb-4">
-                  <div>
-                    <EntryLabel
-                      required={true}
-                      error={errors.startTime}
-                      label="Start Time"
-                    />
-                    <ControlledTimePicker
-                      control={control}
-                      name={"startTime"}
-                      placeholder={"Start time"}
-                      value={user?.startTime ? user.startTime : undefined}
-                    />
-                  </div>
-                  <div>
-                    <EntryLabel
-                      required={true}
-                      error={errors.endTime}
-                      label="End Time"
-                    />
-                    <ControlledTimePicker
-                      control={control}
-                      name={"endTime"}
-                      placeholder={"End time"}
-                      value={user?.endTime ? user.endTime : undefined}
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col space-y-2">
-                  <EntryRow>
-                    <Checkbox
-                      {...register("timeDiffers")}
-                      sx={{
-                        padding: 0,
-                        input: {
-                          width: 30,
-                          height: 30,
-                        },
-                      }}
-                    />
-                    <LightEntryLabel>
-                      My start/end time is different each day
-                    </LightEntryLabel>
-                    <Tooltip
-                      title="If you don't have set times, communicate that on your own with potential riders/drivers."
-                      placement="right"
-                    >
-                      <Icon>
-                        <MdHelp fill="#C8102E" />
-                      </Icon>
-                    </Tooltip>
-                  </EntryRow>
-                </div>
-              </CommutingScheduleSection>
-
-              <PersonalInfoSection>
-                <ProfileHeader>Personal Info</ProfileHeader>
-                <div className="flex flex-row space-x-6 w-full">
-                  {/* Preferred Name field  */}
-                  <div className="flex flex-col w-3/5">
-                    <LightEntryLabel error={!!errors.preferredName}>
-                      Preferred Name
-                    </LightEntryLabel>
-                    <TextField
-                      id="preferredName"
-                      error={errors.preferredName}
-                      type="text"
-                      {...register("preferredName")}
-                    />
-                  </div>
-
-                  {/* Pronouns field  */}
-                  <div className="w-2/6">
-                    <LightEntryLabel error={!!errors.pronouns}>
-                      Pronouns
-                    </LightEntryLabel>
-                    <TextField
-                      id="pronouns"
-                      error={errors.pronouns}
-                      type="text"
-                      {...register("pronouns")}
-                    />
-                  </div>
-                </div>
-                {/* Bio field */}
-                <div className="py-4 w-full">
+          <div className="flex flex-col justify-center items-center md:w-10/12">
+            <div className="flex flex-col gap-8 md:gap-12 lg:flex-row lg:items-start justify-center items-center">
+              <ProfileColumn>
+                <TopProfileSection>
+                  <ProfileHeader>Locations</ProfileHeader>
+                  {/* Starting Location field  */}
                   <EntryLabel
-                    required
-                    error={errors.companyAddress}
-                    label="Intro"
+                    required={true}
+                    error={errors.startAddress}
+                    label="Home Address"
                   />
-                  <textarea
-                    className={`resize-none form-input w-full shadow-sm rounded-md px-3 py-2`}
-                    maxLength={300}
-                    {...register("bio")}
+                  <div>
+                    <ControlledAddressCombobox
+                      control={control}
+                      name={"startAddress"}
+                      addressSelected={startAddressSelected}
+                      addressSetter={setStartAddressSelected}
+                      addressSuggestions={startAddressSuggestions}
+                      error={errors.startAddress}
+                      addressUpdater={updateStartingAddress}
+                    />
+
+                    <Note className="pt-2">
+                      Note: Your address will only be used to find users close
+                      to you. It will not be displayed to any other users.
+                    </Note>
+                  </div>
+                  {errors.startAddress && (
+                    <ErrorDisplay>{errors.startAddress.message}</ErrorDisplay>
+                  )}
+                </TopProfileSection>
+
+                <MiddleProfileSection>
+                  <EntryLabel
+                    required={true}
+                    error={errors.companyName}
+                    label="Workplace Name"
+                  />
+                  <TextField
+                    className={`w-full`}
+                    inputClassName={`h-12`}
+                    label="Workplace Name"
+                    id="companyName"
+                    error={errors.companyName}
+                    type="text"
+                    {...register("companyName")}
+                  />
+                  {/* Company Address field  */}
+                  <EntryLabel
+                    required={true}
+                    error={errors.companyAddress}
+                    label="Workplace Address"
                   />
                   <Note>
-                    Note: This intro will be shared with people you choose to
-                    connect with.
+                    Note: Select the autocomplete results, even if you typed the
+                    address out
                   </Note>
-                </div>
-              </PersonalInfoSection>
-            </ProfileColumn>
+                  <ControlledAddressCombobox
+                    control={control}
+                    name={"companyAddress"}
+                    addressSelected={companyAddressSelected}
+                    addressSetter={setCompanyAddressSelected}
+                    addressSuggestions={companyAddressSuggestions}
+                    error={errors.companyAddress}
+                    addressUpdater={updateCompanyAddress}
+                  />
+                  {errors.companyAddress && (
+                    <ErrorDisplay>{errors.companyAddress.message}</ErrorDisplay>
+                  )}
+                </MiddleProfileSection>
+
+                {/* Role field  */}
+                <BottomProfileSection>
+                  <ProfileHeaderNoMB>
+                    I am a... <span className="text-northeastern-red">*</span>
+                  </ProfileHeaderNoMB>
+                  <div className="flex items-end space-x-4">
+                    <Radio
+                      label="Rider"
+                      id="rider"
+                      error={errors.role}
+                      role={Role.RIDER}
+                      value={Role.RIDER}
+                      currentlySelected={watch("role")}
+                      {...register("role")}
+                    />
+                    <Radio
+                      label="Driver"
+                      id="driver"
+                      error={errors.role}
+                      role={Role.DRIVER}
+                      value={Role.DRIVER}
+                      currentlySelected={watch("role")}
+                      {...register("role")}
+                    />
+
+                    {watch("role") == Role.DRIVER && (
+                      <div className="flex flex-col flex-1">
+                        <EntryLabel
+                          required={true}
+                          error={errors.seatAvail}
+                          label="Seat availability"
+                        />
+                        <TextField
+                          inputClassName="py-[14px] h-14 text-lg"
+                          className="self-end w-full"
+                          label="Seat Availability"
+                          id="seatAvail"
+                          error={errors.seatAvail}
+                          type="number"
+                          {...register("seatAvail", { valueAsNumber: true })}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </BottomProfileSection>
+              </ProfileColumn>
+
+              <ProfileColumn>
+                <CommutingScheduleSection>
+                  <ProfileHeader>Commuting Schedule</ProfileHeader>
+                  {/* Days working field  */}
+                  <div className="mb-2 md:my-4 w-full aspect-[7/1] max-w-[360px]">
+                    <div className="w-full h-full border-l flex justify-evenly items-center border-l-black">
+                      {daysOfWeek.map((day, index) => (
+                        <Controller
+                          key={day + index.toString()}
+                          name={`daysWorking.${index}`}
+                          control={control}
+                          render={({
+                            field: { onChange, value },
+                            formState: { defaultValues },
+                          }) => (
+                            <Checkbox
+                              key={day + index.toString()}
+                              sx={{
+                                input: { width: 1, height: 1 },
+                                aspectRatio: 1 / 1,
+                                width: 1,
+                                height: 1,
+                                padding: 0,
+                              }}
+                              checked={value}
+                              onChange={onChange}
+                              checkedIcon={
+                                <DayBox day={day} isSelected={true} />
+                              }
+                              icon={<DayBox day={day} isSelected={false} />}
+                              defaultChecked={
+                                !!defaultValues?.daysWorking ? true : false
+                              }
+                            />
+                          )}
+                        />
+                      ))}
+                    </div>
+
+                    {errors.daysWorking && (
+                      <ErrorDisplay>{errors.daysWorking.message}</ErrorDisplay>
+                    )}
+                  </div>
+
+                  {/* Start/End Time Fields  */}
+                  <div className="flex w-full md:w-96 gap-6 pb-4 justify-between">
+                    <div className="flex flex-col gap-2 flex-1">
+                      <EntryLabel
+                        required={true}
+                        error={errors.startTime}
+                        label="Start Time"
+                      />
+                      <ControlledTimePicker
+                        control={control}
+                        name={"startTime"}
+                        value={user?.startTime ? user.startTime : undefined}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-2 flex-1">
+                      <EntryLabel
+                        required={true}
+                        error={errors.endTime}
+                        label="End Time"
+                      />
+                      <ControlledTimePicker
+                        control={control}
+                        name={"endTime"}
+                        value={user?.endTime ? user.endTime : undefined}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col space-y-2">
+                    <div className="flex flex-row items-center">
+                      <Checkbox
+                        {...register("timeDiffers")}
+                        sx={{
+                          padding: 0,
+                          input: {
+                            width: 30,
+                            height: 30,
+                          },
+                        }}
+                      />
+                      <LightEntryLabel className="pl-2 pr-3 text-sm ">
+                        My start/end time is different each day
+                      </LightEntryLabel>
+                      <Tooltip
+                        title="If you don't have set times, communicate that on your own with potential riders/drivers."
+                        placement="right"
+                      >
+                        <Icon classes={{ root: "w-48" }} fontSize="medium">
+                          <MdHelp fill="#C8102E" />
+                        </Icon>
+                      </Tooltip>
+                    </div>
+                  </div>
+                </CommutingScheduleSection>
+
+                <PersonalInfoSection>
+                  <ProfileHeader>Personal Info</ProfileHeader>
+                  <div className="flex flex-row space-x-6 w-full">
+                    {/* Preferred Name field  */}
+                    <div className="flex flex-col w-3/5">
+                      <LightEntryLabel error={!!errors.preferredName}>
+                        Preferred Name
+                      </LightEntryLabel>
+                      <TextField
+                        id="preferredName"
+                        error={errors.preferredName}
+                        type="text"
+                        inputClassName={`h-12`}
+                        {...register("preferredName")}
+                      />
+                    </div>
+
+                    {/* Pronouns field  */}
+                    <div className="w-2/6 flex-1">
+                      <LightEntryLabel error={!!errors.pronouns}>
+                        Pronouns
+                      </LightEntryLabel>
+                      <TextField
+                        id="pronouns"
+                        inputClassName={`h-12`}
+                        error={errors.pronouns}
+                        type="text"
+                        {...register("pronouns")}
+                      />
+                    </div>
+                  </div>
+                  {/* Bio field */}
+                  <div className="py-4 w-full">
+                    <EntryLabel
+                      required
+                      error={errors.companyAddress}
+                      label="About Me"
+                    />
+                    <textarea
+                      className={`resize-none form-input w-full rounded-md px-3 py-2 border-black`}
+                      maxLength={300}
+                      {...register("bio")}
+                    />
+                    <Note>
+                      Note: This intro will be shared with people you choose to
+                      connect with.
+                    </Note>
+                  </div>
+                </PersonalInfoSection>
+              </ProfileColumn>
+            </div>
+            <CompleteProfileButton type="submit">
+              Complete Profile
+            </CompleteProfileButton>
           </div>
-          <CompleteProfileButton type="submit">
-            Complete Profile
-          </CompleteProfileButton>
         </ProfileContainer>
       </div>
     </>
