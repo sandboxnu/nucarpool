@@ -20,8 +20,6 @@ const Redirect: NextPage = () => {
     } else {
       router.push("/profile");
     }
-
-    return;
   }, [user]);
 
   return <Spinner />;
