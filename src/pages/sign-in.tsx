@@ -39,7 +39,7 @@ const SignIn: NextPage = () => {
   const handleOnclick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     signIn("google", {
-      callbackUrl: "/profile",
+      callbackUrl: "/redirect",
     });
   };
 
