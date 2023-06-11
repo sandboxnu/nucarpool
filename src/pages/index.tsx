@@ -147,6 +147,7 @@ const Home: NextPage<any> = () => {
             currentUser={user}
             reccs={recommendations ?? []}
             favs={favorites ?? []}
+            sent={requests?.sent.map((req) => req.toUser!) ?? []}
             map={mapState}
             handleConnect={handleConnect}
             handleFavorite={handleFavorite}

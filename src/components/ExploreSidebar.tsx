@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import { PublicUser, User } from "../utils/types";
 import AbstractSidebarPage from "./AbstractSidebarPage";
+import _ from "lodash";
 
 /**
  * TODO:
@@ -19,19 +20,24 @@ interface ExploreSidebarProps {
   currentUser: User;
   reccs: PublicUser[];
   favs: PublicUser[];
+  sent: PublicUser[];
   map: mapboxgl.Map;
   handleConnect: (modalUser: PublicUser) => void;
   handleFavorite: (otherUser: string, add: boolean) => void;
 }
 
 const ExploreSidebar = (props: ExploreSidebarProps) => {
-  const [curList, setCurList] = useState<PublicUser[]>(props.reccs ?? []);
+  const [curList, setCurList] = useState<PublicUser[]>([]);
   const [curOption, setCurOption] = useState<"recommendations" | "favorites">(
     "recommendations"
   );
 
+  const filteredRecs = (): PublicUser[] => {
+    return _.differenceBy(props.reccs, props.sent, "id");
+  };
+
   useEffect(() => {
-    setCurList(curOption == "recommendations" ? props.reccs : props.favs);
+    setCurList(curOption == "recommendations" ? filteredRecs : props.favs);
   }, [props.reccs, props.favs, curOption]);
 
   return (
