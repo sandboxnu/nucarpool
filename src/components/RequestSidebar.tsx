@@ -21,17 +21,18 @@ interface RequestSidebarProps {
   received: PublicUser[];
   favs: PublicUser[];
   map: mapboxgl.Map;
+  startingTab: 0 | 1;
+  setStartingTab: (idx: 0 | 1) => void;
   handleSent: (modalUser: PublicUser) => void;
   handleReceived: (modalUser: PublicUser) => void;
   handleFavorite: (otherUser: string, add: boolean) => void;
 }
 
 const RequestSidebar = (props: RequestSidebarProps) => {
-  const [curList, setCurList] = useState<PublicUser[]>(props.sent ?? []);
-  const [handleManage, setHandleManage] = useState<string>("sent");
-
+  const handleManage = props.startingTab == 0 ? "sent" : "received";
+  const [curList, setCurList] = useState<PublicUser[]>([]);
   const passManageFunction = () => {
-    if (handleManage === "sent") {
+    if (props.startingTab === 0) {
       return props.handleSent;
     } else {
       return props.handleReceived;
@@ -39,8 +40,8 @@ const RequestSidebar = (props: RequestSidebarProps) => {
   };
 
   useEffect(() => {
-    setCurList(props.sent ?? []);
-  }, [props.sent]);
+    setCurList(handleManage === "sent" ? props.sent : props.received);
+  }, [props.sent, props.received, handleManage]);
 
   return (
     <div className="flex flex-col px-5 flex-shrink-0 h-full z-10 text-left bg-white">
@@ -53,8 +54,7 @@ const RequestSidebar = (props: RequestSidebarProps) => {
                 : "rounded-xl p-2 font-semibold text-xl text-black"
             }
             onClick={() => {
-              setCurList(props.sent ?? []);
-              setHandleManage("sent");
+              props.setStartingTab(0);
               clearMarkers();
             }}
           >
@@ -67,8 +67,7 @@ const RequestSidebar = (props: RequestSidebarProps) => {
                 : "rounded-xl p-2 font-semibold text-xl text-black"
             }
             onClick={() => {
-              setCurList(props.received ?? []);
-              setHandleManage("received");
+              props.setStartingTab(1);
               clearMarkers();
             }}
           >
