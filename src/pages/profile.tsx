@@ -33,7 +33,6 @@ import {
 } from "../styles/profile";
 import ControlledTimePicker from "../components/ControlledTimePicker";
 import { CarpoolAddress, CarpoolFeature } from "../utils/types";
-import ProtectedPage from "../utils/auth";
 import { EntryLabel } from "../components/EntryLabel";
 import ControlledAddressCombobox from "../components/ControlledAddressCombobox";
 import { getSession } from "next-auth/react";
