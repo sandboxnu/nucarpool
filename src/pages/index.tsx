@@ -10,7 +10,6 @@ import Head from "next/head";
 import { trpc } from "../utils/trpc";
 import DropDownMenu from "../components/DropDownMenu";
 import { browserEnv } from "../utils/env/browser";
-import ProtectedPage from "../utils/auth";
 import Header, { HeaderOptions } from "../components/Header";
 import { PublicUser, User } from "../utils/types";
 import ConnectModal from "../components/ConnectModal";
@@ -307,4 +306,4 @@ const getPublicUserArray = (name: string): PublicUser[] => {
   });
 };
 
-export default ProtectedPage(Home);
+export default Home;
