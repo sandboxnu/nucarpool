@@ -3,15 +3,14 @@ import {
   InferGetServerSidePropsType,
   NextPage,
 } from "next";
-import { getProviders, signIn } from "next-auth/react";
-import { unstable_getServerSession as getServerSession } from "next-auth";
+import { getSession, signIn } from "next-auth/react";
 import React from "react";
 import Head from "next/head";
 import Header from "../components/Header";
 import { authOptions } from "./api/auth/[...nextauth]";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await getServerSession(context.req, context.res, authOptions);
+  const session = await getSession(context);
 
   if (session?.user) {
     if (session.user.isOnboarded) {
@@ -39,7 +38,7 @@ const SignIn: NextPage = () => {
   const handleOnclick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     signIn("google", {
-      callbackUrl: "/redirect",
+      callbackUrl: "/",
     });
   };
 
