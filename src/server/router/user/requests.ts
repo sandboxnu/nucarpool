@@ -66,7 +66,7 @@ export const requestsRouter = createProtectedRouter()
         return { ...req, fromUser, toUser };
       };
 
-      const [from, to] = await Promise.all([
+      const [sent, received] = await Promise.all([
         ctx.prisma.request
           .findMany({
             where: { fromUserId: id },
@@ -79,7 +79,7 @@ export const requestsRouter = createProtectedRouter()
           .then((reqs) => Promise.all(reqs.map(resolveRequest))),
       ]);
 
-      return { from, to };
+      return { sent, received };
     },
   })
   .mutation("create", {
@@ -90,6 +90,28 @@ export const requestsRouter = createProtectedRouter()
     }),
 
     async resolve({ ctx, input }) {
+      const existingRequests = await ctx.prisma.request.findMany({
+        where: {
+          OR: [
+            {
+              fromUserId: input.fromId,
+              toUserId: input.toId,
+            },
+            {
+              fromUserId: input.toId,
+              toUserId: input.fromId,
+            },
+          ],
+        },
+      });
+
+      if (existingRequests.length != 0) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: `Existing request between '${input.toId} and ${input.fromId}'`,
+        });
+      }
+
       await ctx.prisma.request.create({
         data: {
           message: input.message,

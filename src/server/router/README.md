@@ -6,10 +6,12 @@ This folder contains files relating to tRPC's [router](https://trpc.io/docs/v9/r
 
 ### Contents:
 
-- [Context](#context)
-- [Protection](#protection)
-- [Endpoint Structure](#endpoints)
-- [Frontend Usage](#frontend)
+- [Routers](#routers)
+  - [Contents:](#contents)
+  - [Context](#context)
+  - [Protection](#protection)
+  - [Endpoints](#endpoints)
+  - [Frontend](#frontend)
 
 ---
 

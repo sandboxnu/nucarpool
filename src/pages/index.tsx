@@ -20,6 +20,7 @@ import RequestSidebar from "../components/RequestSidebar";
 import SentRequestModal from "../components/SentRequestModal";
 import ReceivedRequestModal from "../components/ReceivedRequestModal";
 import { getSession } from "next-auth/react";
+import AlreadyConnectedModal from "../components/AlreadyConnectedModal";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -75,10 +76,17 @@ const Home: NextPage<any> = () => {
   const [modalUser, setModalUser] = useState<PublicUser | null>(null);
   const [modalType, setModalType] = useState<string>("connect");
   const [sidebarState, setSidebarState] = useState<HeaderOptions>("explore");
+  const [startingRequestsTab, setStartingRequestsTab] = useState<0 | 1>(0);
 
   const handleConnect = (userToConnectTo: PublicUser) => {
     setModalUser(userToConnectTo);
-    setModalType("connect");
+    if (
+      requests?.received.find((req) => req.fromUserId === userToConnectTo.id)
+    ) {
+      setModalType("already-requested");
+    } else {
+      setModalType("connect");
+    }
   };
 
   const { mutate: mutateRequests } = trpc.useMutation("user.requests.create", {
@@ -89,6 +97,11 @@ const Home: NextPage<any> = () => {
       utils.invalidateQueries(["user.requests.me"]);
     },
   });
+
+  const handleNavigateToRequests = (received: boolean) => {
+    setSidebarState("requests");
+    setStartingRequestsTab(received ? 1 : 0);
+  };
 
   const handleEmailConnect = (curUser: User, toUser: PublicUser) => {
     connectEmail(toUser.email);
@@ -110,11 +123,9 @@ const Home: NextPage<any> = () => {
       method: "POST",
       body: JSON.stringify(msg),
     });
-    console.log(result);
   };
 
   const handleSentRequests = (userToConnectTo: PublicUser) => {
-    setModalUser(userToConnectTo);
     setModalType("sent");
   };
 
@@ -162,6 +173,7 @@ const Home: NextPage<any> = () => {
             currentUser={user}
             reccs={recommendations ?? []}
             favs={favorites ?? []}
+            sent={requests?.sent.map((req) => req.toUser!) ?? []}
             map={mapState}
             handleConnect={handleConnect}
             handleFavorite={handleFavorite}
@@ -171,10 +183,12 @@ const Home: NextPage<any> = () => {
         return (
           <RequestSidebar
             currentUser={user}
-            sent={requests?.from.map((req) => req.toUser!) ?? []}
-            received={requests?.to.map((req) => req.fromUser!) ?? []}
+            sent={requests?.sent.map((req) => req.toUser!) ?? []}
+            received={requests?.received.map((req) => req.fromUser!) ?? []}
             favs={favorites ?? []}
             map={mapState}
+            startingTab={startingRequestsTab}
+            setStartingTab={setStartingRequestsTab}
             handleSent={handleSentRequests}
             handleReceived={handleReceivedRequests}
             handleFavorite={handleFavorite}
@@ -214,6 +228,16 @@ const Home: NextPage<any> = () => {
                 currentUser={user}
                 userToConnectTo={modalUser}
                 handleEmailConect={() => handleEmailConnect(user, modalUser)}
+                closeModal={() => {
+                  setModalUser(null);
+                }}
+              />
+            )}
+            {user && modalUser && modalType === "already-requested" && (
+              <AlreadyConnectedModal
+                currentUser={user}
+                userToConnectTo={modalUser}
+                handleManageRequest={() => handleNavigateToRequests(true)}
                 closeModal={() => {
                   setModalUser(null);
                 }}

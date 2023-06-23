@@ -36,8 +36,6 @@ const AbstractSidebarPage = (props: AbstractSidebarPageProps) => {
 
   const favIds = props.favs.map((fav) => fav.id);
 
-  console.log(props.rightButton);
-
   return (
     <div id="scrollableDiv" className="overflow-auto">
       {curList.map((otherUser: PublicUser) => (

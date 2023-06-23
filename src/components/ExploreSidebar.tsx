@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import { PublicUser, User } from "../utils/types";
 import AbstractSidebarPage from "./AbstractSidebarPage";
+import _ from "lodash";
 
 /**
  * TODO:
@@ -19,22 +20,25 @@ interface ExploreSidebarProps {
   currentUser: User;
   reccs: PublicUser[];
   favs: PublicUser[];
+  sent: PublicUser[];
   map: mapboxgl.Map;
   handleConnect: (modalUser: PublicUser) => void;
   handleFavorite: (otherUser: string, add: boolean) => void;
 }
 
 const ExploreSidebar = (props: ExploreSidebarProps) => {
-  const [curList, setCurList] = useState<PublicUser[]>(props.reccs ?? []);
-  const [curOption, setCurOption] = useState<"reccomendations" | "favorites">(
-    "reccomendations"
+  const [curList, setCurList] = useState<PublicUser[]>([]);
+  const [curOption, setCurOption] = useState<"recommendations" | "favorites">(
+    "recommendations"
   );
 
-  useEffect(() => {
-    setCurList(props.reccs ?? []);
-  }, [props.reccs]);
+  const filteredRecs = (): PublicUser[] => {
+    return _.differenceBy(props.reccs, props.sent, "id");
+  };
 
-  const favIds = props.favs.map((fav) => fav.id);
+  useEffect(() => {
+    setCurList(curOption == "recommendations" ? filteredRecs : props.favs);
+  }, [props.reccs, props.favs, curOption]);
 
   return (
     <div className="flex flex-col px-5 flex-shrink-0 h-full z-10 text-left bg-white">
@@ -42,13 +46,12 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
         <div className="flex justify-center gap-3">
           <button
             className={
-              curOption === "reccomendations"
+              curOption === "recommendations"
                 ? "bg-northeastern-red rounded-xl p-2 font-semibold text-xl text-white"
                 : "rounded-xl p-2 font-semibold text-xl text-black"
             }
             onClick={() => {
-              setCurList(props.reccs ?? []);
-              setCurOption("reccomendations");
+              setCurOption("recommendations");
               clearMarkers();
             }}
           >
@@ -61,7 +64,6 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
                 : "rounded-xl p-2 font-semibold text-xl text-black"
             }
             onClick={() => {
-              setCurList(props.favs ?? []);
               setCurOption("favorites");
               clearMarkers();
             }}
