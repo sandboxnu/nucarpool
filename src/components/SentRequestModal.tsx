@@ -31,7 +31,7 @@ const SentRequestModal = (props: SentModalProps): JSX.Element => {
             <div className="text-sm text-center">
               {" "}
               {props.userToConnectTo.preferredName} has not yet responded. If
-              you\'d like to, you can withdraw your request.
+              you&apos;d like to, you can withdraw your request.
             </div>
             <div className="flex justify-center space-x-7">
               <button
