@@ -125,6 +125,7 @@ const Home: NextPage<any> = () => {
   };
 
   const handleSentRequests = (userToConnectTo: PublicUser) => {
+    setModalUser(userToConnectTo);
     setModalType("sent");
   };
 
@@ -265,45 +266,6 @@ const Home: NextPage<any> = () => {
       </div>
     </>
   );
-};
-
-// TEMPORARY TESTING CODE
-const getPublicUserArray = (name: string): PublicUser[] => {
-  return new Array(50).fill(undefined).map((_, index) => {
-    const user: PublicUser = {
-      id: `${index}`,
-      name: `${name} ${index}`,
-      email: `${name} ${index}@yahoo.com`,
-      bio: "Howdy!",
-      preferredName: `${name} ${index}`,
-      pronouns: "they",
-      role: "RIDER",
-      status: "ACTIVE",
-      companyName: "Sandbox",
-      startPOILocation: "Mission Hill",
-      startPOICoordLng: 42,
-      startPOICoordLat: -71,
-      companyPOIAddress: "Sandbox Corp",
-      companyPOICoordLng: 42.1,
-      companyPOICoordLat: -71.1,
-      daysWorking: new Array(7)
-        .fill(undefined)
-        .map((_, ind) => (Math.random() < 0.5 ? "0" : "1"))
-        .join(","),
-      image: null,
-      seatAvail: 0,
-      startTime: new Date("December 17, 1995 16:00:00"),
-      endTime: new Date("December 17, 1995 00:24:00"),
-    };
-    if (Math.random() < 0.5) {
-      return {
-        ...user,
-        role: "DRIVER",
-        seatAvail: Math.ceil(6 * Math.random()),
-      };
-    }
-    return user;
-  });
 };
 
 export default Home;
