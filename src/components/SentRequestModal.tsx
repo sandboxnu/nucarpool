@@ -28,11 +28,10 @@ const SentRequestModal = (props: SentModalProps): JSX.Element => {
             <Dialog.Title className="font-bold text-2xl text-center">
               Manage Sent Request
             </Dialog.Title>
-            <div className="text-sm">
-              Use the space below to write out a message to{" "}
-              {props.userToConnectTo.preferredName} and send a connection
-              request. We recommend writing a bit about yourself, your schedule,
-              and anything else you think would be good to know!
+            <div className="text-sm text-center">
+              {" "}
+              {props.userToConnectTo.preferredName} has not yet responded. If
+              you&apos;d like to, you can withdraw your request.
             </div>
             <div className="flex justify-center space-x-7">
               <button
@@ -42,7 +41,7 @@ const SentRequestModal = (props: SentModalProps): JSX.Element => {
                 Cancel
               </button>
               <button className="w-full p-1 text-slate-50 bg-blue-900 border-2 border-blue-900 rounded-md">
-                Widthdraw Request
+                Withdraw Request
               </button>
             </div>
           </Dialog.Panel>

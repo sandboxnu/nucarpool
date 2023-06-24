@@ -30,10 +30,9 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
               Manage Received Request
             </Dialog.Title>
             <div className="text-sm">
-              Use the space below to write out a message to{" "}
-              {props.userToConnectTo.preferredName} and send a connection
-              request. We recommend writing a bit about yourself, your schedule,
-              and anything else you think would be good to know!
+              We think you and {props.userToConnectTo.preferredName} would be a
+              good carpool match! Have a look at their profile, and connect with
+              them if they fit into your carpooling schedule!
             </div>
             <div className="flex justify-center space-x-7">
               <button
