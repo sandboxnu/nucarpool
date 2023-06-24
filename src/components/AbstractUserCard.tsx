@@ -53,16 +53,23 @@ export const AbstractUserCard = (props: AbstractUserCardProps): JSX.Element => {
    */
   const DaysWorkingDisplay = (daysWorking: string) => {
     const boxes: JSX.Element[] = [];
+    const days: string[] = ["S", "M", "T", "W", "Th", "F", "Sa"];
     for (let i = 0; i < daysWorking.length; i = i + 2) {
       let backgroundColor = "";
+      let dayIndex = Math.floor(i / 2);
       if (daysWorking[i] == "1") {
         backgroundColor = " bg-good-green";
       }
       boxes.push(
         <div
           key={i}
-          className={"w-6 h-6 border-l-0 border border-black" + backgroundColor}
-        ></div>
+          className={
+            "w-6 h-6 border-l-0 border border-black text-center font-heavy text-sm pl-auto pt-0.5" +
+            backgroundColor
+          }
+        >
+          {days[dayIndex]}
+        </div>
       );
     }
     return <div className="flex border-l border-black h-min">{boxes}</div>;
