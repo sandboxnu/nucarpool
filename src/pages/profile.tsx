@@ -356,7 +356,6 @@ const Profile: NextPage = () => {
                           {...register("seatAvail", { valueAsNumber: true })}
                         />
                         <Note>
-                          {" "}
                           Registering 0 available seats will remove you from the
                           app's recommendaiton generation.
                         </Note>
