@@ -14,8 +14,6 @@ import Radio from "../components/Radio";
 import useSearch from "../utils/search";
 import Checkbox from "@mui/material/Checkbox";
 import DayBox from "../components/DayBox";
-import { Tooltip, Icon } from "@mui/material";
-import { MdHelp } from "react-icons/md";
 import {
   BottomProfileSection,
   CompleteProfileButton,
@@ -357,6 +355,11 @@ const Profile: NextPage = () => {
                           type="number"
                           {...register("seatAvail", { valueAsNumber: true })}
                         />
+                        <Note>
+                          {" "}
+                          Registering 0 available seats will remove you from the
+                          app's recommendaiton generation.
+                        </Note>
                       </div>
                     )}
                   </div>
