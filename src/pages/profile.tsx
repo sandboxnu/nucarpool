@@ -357,7 +357,7 @@ const Profile: NextPage = () => {
                         />
                         <Note>
                           Registering 0 available seats will remove you from the
-                          app's recommendaiton generation.
+                          app&apos;s recommendaiton generation.
                         </Note>
                       </div>
                     )}
@@ -439,9 +439,9 @@ const Profile: NextPage = () => {
                   <div className="flex flex-col space-y-2">
                     <div className="flex flex-row items-center">
                       <Note>
-                        If you don't have set times, communicate that on your
-                        own with potential riders/drivers. For start/end time,
-                        enter whatever best matches your work schedule.
+                        If you don&apos;t have set times, communicate that on
+                        your own with potential riders/drivers. For start/end
+                        time, enter whatever best matches your work schedule.
                       </Note>
                     </div>
                   </div>
