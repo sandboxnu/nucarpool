@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import _, { debounce } from "lodash";
-import { NextPage } from "next";
+import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -31,9 +31,9 @@ import {
 } from "../styles/profile";
 import ControlledTimePicker from "../components/ControlledTimePicker";
 import { CarpoolAddress, CarpoolFeature } from "../utils/types";
-import ProtectedPage from "../utils/auth";
 import { EntryLabel } from "../components/EntryLabel";
 import ControlledAddressCombobox from "../components/ControlledAddressCombobox";
+import { getSession } from "next-auth/react";
 
 // Inputs to the onboarding form.
 export type OnboardingFormInputs = {
@@ -87,6 +87,22 @@ const onboardSchema = z.intersection(
 
 const daysOfWeek = ["Su", "M", "Tu", "W", "Th", "F", "S"];
 
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const session = await getSession(context);
+
+  if (!session?.user) {
+    return {
+      redirect: {
+        destination: "/sign-in",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {}, // will be passed to the page component as props
+  };
+}
 const Profile: NextPage = () => {
   const router = useRouter();
   const {
@@ -508,4 +524,4 @@ const Profile: NextPage = () => {
   );
 };
 
-export default ProtectedPage(Profile);
+export default Profile;

@@ -1,6 +1,6 @@
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import type { NextPage } from "next";
+import type { GetServerSidePropsContext, NextPage } from "next";
 import { useEffect, useState } from "react";
 import { RiFocus3Line } from "react-icons/ri";
 import addClusters from "../utils/map/addClusters";
@@ -10,7 +10,6 @@ import Head from "next/head";
 import { trpc } from "../utils/trpc";
 import DropDownMenu from "../components/DropDownMenu";
 import { browserEnv } from "../utils/env/browser";
-import ProtectedPage from "../utils/auth";
 import Header, { HeaderOptions } from "../components/Header";
 import { PublicUser, User } from "../utils/types";
 import ConnectModal from "../components/ConnectModal";
@@ -19,9 +18,35 @@ import ExploreSidebar from "../components/ExploreSidebar";
 import RequestSidebar from "../components/RequestSidebar";
 import SentRequestModal from "../components/SentRequestModal";
 import ReceivedRequestModal from "../components/ReceivedRequestModal";
+import { getSession } from "next-auth/react";
 import AlreadyConnectedModal from "../components/AlreadyConnectedModal";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const session = await getSession(context);
+
+  if (!session?.user) {
+    return {
+      redirect: {
+        destination: "/sign-in",
+        permanent: false,
+      },
+    };
+  }
+  if (!session.user.isOnboarded) {
+    return {
+      redirect: {
+        destination: "/profile",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {}, // will be passed to the page component as props
+  };
+}
 
 const Home: NextPage<any> = () => {
   const utils = trpc.useContext();
@@ -243,4 +268,4 @@ const Home: NextPage<any> = () => {
   );
 };
 
-export default ProtectedPage(Home);
+export default Home;
