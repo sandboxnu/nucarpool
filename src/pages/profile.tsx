@@ -14,8 +14,6 @@ import Radio from "../components/Radio";
 import useSearch from "../utils/search";
 import Checkbox from "@mui/material/Checkbox";
 import DayBox from "../components/DayBox";
-import { Tooltip, Icon } from "@mui/material";
-import { MdHelp } from "react-icons/md";
 import {
   BottomProfileSection,
   CompleteProfileButton,
@@ -63,7 +61,8 @@ const onboardSchema = z.intersection(
     seatAvail: z
       .number({ invalid_type_error: "Cannot be empty" })
       .int("Must be an integer")
-      .nonnegative("Must be greater or equal to 0"),
+      .nonnegative("Must be greater or equal to 0")
+      .max(6),
     companyName: z.string().min(1, "Cannot be empty"),
     companyAddress: z.string().min(1, "Cannot be empty"),
     startAddress: z.string().min(1, "Cannot be empty"),
@@ -356,6 +355,10 @@ const Profile: NextPage = () => {
                           type="number"
                           {...register("seatAvail", { valueAsNumber: true })}
                         />
+                        <Note>
+                          Registering 0 available seats will remove you from the
+                          app&apos;s recommendaiton generation.
+                        </Note>
                       </div>
                     )}
                   </div>
@@ -435,27 +438,11 @@ const Profile: NextPage = () => {
                   </div>
                   <div className="flex flex-col space-y-2">
                     <div className="flex flex-row items-center">
-                      <Checkbox
-                        {...register("timeDiffers")}
-                        sx={{
-                          padding: 0,
-                          input: {
-                            width: 30,
-                            height: 30,
-                          },
-                        }}
-                      />
-                      <LightEntryLabel className="pl-2 pr-3 text-sm ">
-                        My start/end time is different each day
-                      </LightEntryLabel>
-                      <Tooltip
-                        title="If you don't have set times, communicate that on your own with potential riders/drivers."
-                        placement="right"
-                      >
-                        <Icon classes={{ root: "w-48" }} fontSize="medium">
-                          <MdHelp fill="#C8102E" />
-                        </Icon>
-                      </Tooltip>
+                      <Note>
+                        If you don&apos;t have set times, communicate that on
+                        your own with potential riders/drivers. For start/end
+                        time, enter whatever best matches your work schedule.
+                      </Note>
                     </div>
                   </div>
                 </CommutingScheduleSection>
@@ -504,7 +491,7 @@ const Profile: NextPage = () => {
                       {...register("bio")}
                     />
                     <Note>
-                      Note: This intro will be shared with people you choose to
+                      This intro will be shared with people you choose to
                       connect with.
                     </Note>
                   </div>
