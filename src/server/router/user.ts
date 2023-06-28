@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createProtectedRouter } from "./createProtectedRouter";
+import { protectedRouter, router } from "./createRouter";
 import { Role } from "@prisma/client";
 import { Status } from "@prisma/client";
 import { generatePoiData } from "../../utils/publicUser";
@@ -9,52 +9,48 @@ import { favoritesRouter } from "./user/favorites";
 import { groupsRouter } from "./user/groups";
 import { requestsRouter } from "./user/requests";
 import { recommendationsRouter } from "./user/recommendations";
-import { convertToPublic } from "../../utils/publicUser";
 
 // user router to get information about or edit users
-export const userRouter = createProtectedRouter()
-  // query for information about current user
-  .query("me", {
-    async resolve({ ctx }) {
-      const id = ctx.session.user?.id;
-      const user = await ctx.prisma.user.findUnique({
-        where: { id },
+export const userRouter = router({
+  me: protectedRouter.query(async ({ ctx }) => {
+    const id = ctx.session.user?.id;
+    const user = await ctx.prisma.user.findUnique({
+      where: { id },
+    });
+
+    // throws TRPCError if no user with ID exists
+    if (!user) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `No profile with id '${id}'`,
       });
+    }
+    return user;
+  }),
 
-      // throws TRPCError if no user with ID exists
-      if (!user) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `No profile with id '${id}'`,
-        });
-      }
-
-      return user;
-    },
-  })
-  // edits a user
-  .mutation("edit", {
-    input: z.object({
-      role: z.nativeEnum(Role),
-      status: z.nativeEnum(Status),
-      seatAvail: z.number().int().min(0),
-      companyName: z.string().min(1),
-      companyAddress: z.string().min(1),
-      companyCoordLng: z.number(),
-      companyCoordLat: z.number(),
-      startAddress: z.string().min(1),
-      startCoordLng: z.number(),
-      startCoordLat: z.number(),
-      preferredName: z.string(),
-      pronouns: z.string(),
-      isOnboarded: z.boolean(),
-      daysWorking: z.string(),
-      startTime: z.optional(z.string()),
-      endTime: z.optional(z.string()),
-      bio: z.string(),
-    }),
-
-    async resolve({ ctx, input }) {
+  edit: protectedRouter
+    .input(
+      z.object({
+        role: z.nativeEnum(Role),
+        status: z.nativeEnum(Status),
+        seatAvail: z.number().int().min(0),
+        companyName: z.string().min(1),
+        companyAddress: z.string().min(1),
+        companyCoordLng: z.number(),
+        companyCoordLat: z.number(),
+        startAddress: z.string().min(1),
+        startCoordLng: z.number(),
+        startCoordLat: z.number(),
+        preferredName: z.string(),
+        pronouns: z.string(),
+        isOnboarded: z.boolean(),
+        daysWorking: z.string(),
+        startTime: z.optional(z.string()),
+        endTime: z.optional(z.string()),
+        bio: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
       const startTimeDate = input.startTime
         ? new Date(Date.parse(input.startTime))
         : undefined;
@@ -97,9 +93,11 @@ export const userRouter = createProtectedRouter()
       });
 
       return user;
-    },
-  })
-  .merge("favorites.", favoritesRouter)
-  .merge("groups.", groupsRouter)
-  .merge("requests.", requestsRouter)
-  .merge("recommendations.", recommendationsRouter);
+    }),
+
+  //merging secondary user routes
+  favorites: favoritesRouter,
+  recommendations: recommendationsRouter,
+  requests: requestsRouter,
+  groups: groupsRouter,
+});

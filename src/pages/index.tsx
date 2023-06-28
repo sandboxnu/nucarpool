@@ -51,24 +51,16 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 const Home: NextPage<any> = () => {
   const utils = trpc.useContext();
   const { data: geoJsonUsers, isLoading: isLoadingGeoJsonUsers } =
-    trpc.useQuery(["mapbox.geoJsonUsersList"]);
+    trpc.mapbox.geoJsonUserList.useQuery();
   const {
     data: user,
     isLoading: isLoadingUser,
     refetch,
-  } = trpc.useQuery(["user.me"]);
+  } = trpc.user.me.useQuery();
 
-  const { data: recommendations } = trpc.useQuery(["user.recommendations.me"]);
-  const { data: favorites } = trpc.useQuery(["user.favorites.me"]);
-  const { data: requests } = trpc.useQuery(["user.requests.me"]);
-  const { mutate: mutateFavorites } = trpc.useMutation("user.favorites.edit", {
-    onError: (error) => {
-      toast.error(`Something went wrong: ${error.message}`);
-    },
-    onSuccess() {
-      utils.invalidateQueries(["user.favorites.me"]);
-    },
-  });
+  const { data: recommendations } = trpc.user.recommendations.me.useQuery();
+  const { data: favorites } = trpc.user.favorites.me.useQuery();
+  const { data: requests } = trpc.user.requests.me.useQuery();
 
   const [mapState, setMapState] = useState<mapboxgl.Map>();
 
@@ -88,12 +80,21 @@ const Home: NextPage<any> = () => {
     }
   };
 
-  const { mutate: mutateRequests } = trpc.useMutation("user.requests.create", {
-    onError: (error) => {
+  const { mutate: mutateRequests } = trpc.user.requests.create.useMutation({
+    onError: (error: any) => {
       toast.error(`Something went wrong: ${error.message}`);
     },
     onSuccess() {
-      utils.invalidateQueries(["user.requests.me"]);
+      utils.user.requests.me.invalidate();
+    },
+  });
+
+  const { mutate: mutateFavorites } = trpc.user.favorites.edit.useMutation({
+    onError: (error: any) => {
+      toast.error(`Something went wrong: ${error.message}`);
+    },
+    onSuccess() {
+      utils.user.favorites.me.invalidate();
     },
   });
 
