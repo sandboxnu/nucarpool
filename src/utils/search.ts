@@ -21,17 +21,14 @@ export default function useSearch({
   type: "address%2Cpostcode" | "neighborhood%2Cplace";
   setFunc: Dispatch<SetStateAction<CarpoolFeature[]>>;
 }) {
-  const query = trpc.useQuery(
-    [
-      "mapbox.search",
-      {
-        value: value,
-        types: type,
-        proximity: "ip",
-        country: "us",
-        autocomplete: true,
-      },
-    ],
+  const query = trpc.mapbox.search.useQuery(
+    {
+      value: value,
+      types: type,
+      proximity: "ip",
+      country: "us",
+      autocomplete: true,
+    },
     {
       onSuccess: (data) => {
         /* the standard Feature type does not describe the full breadth of properties 
