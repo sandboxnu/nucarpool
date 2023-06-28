@@ -1,7 +1,10 @@
-import { inferQueryOutput } from "./trpc";
 import { Request, Role } from "@prisma/client";
 import { Status } from "@prisma/client";
 import { Feature } from "geojson";
+import type { AppRouter } from "../server/router";
+import { inferRouterOutputs } from "@trpc/server";
+
+type RouterOutput = inferRouterOutputs<AppRouter>;
 
 export type PoiData = {
   location: string;
@@ -43,8 +46,8 @@ export type PublicUser = {
   endTime: Date | null;
 };
 
-export type User = inferQueryOutput<"user.me">;
-export type GeoJsonUsers = inferQueryOutput<"mapbox.geoJsonUsersList">;
+export type User = RouterOutput["user"]["me"];
+export type GeoJsonUsers = RouterOutput["mapbox"]["geoJsonUserList"];
 
 export type CarpoolAddress = {
   place_name: string;
