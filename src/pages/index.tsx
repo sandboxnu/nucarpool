@@ -50,13 +50,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
 const Home: NextPage<any> = () => {
   const utils = trpc.useContext();
-  const { data: geoJsonUsers, isLoading: isLoadingGeoJsonUsers } =
-    trpc.mapbox.geoJsonUserList.useQuery();
-  const {
-    data: user,
-    isLoading: isLoadingUser,
-    refetch,
-  } = trpc.user.me.useQuery();
+  const { data: geoJsonUsers } = trpc.mapbox.geoJsonUserList.useQuery();
+  const { data: user, refetch } = trpc.user.me.useQuery();
 
   const { data: recommendations } = trpc.user.recommendations.me.useQuery();
   const { data: favorites } = trpc.user.favorites.me.useQuery();

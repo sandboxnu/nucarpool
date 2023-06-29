@@ -2,6 +2,7 @@ import { httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import type { AppRouter } from "../server/router";
 import superjson from "superjson";
+import { TRPCError } from "@trpc/server";
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") {
@@ -22,21 +23,28 @@ export const trpc = createTRPCNext<AppRouter>({
             (opts.direction === "down" && opts.result instanceof Error),
         }),
         httpBatchLink({
-          /**
-           * If you want to use SSR, you need to use the server's full URL
-           * @link https://trpc.io/docs/ssr
-           **/
           url: `${getBaseUrl()}/api/trpc`,
-
-          // You can pass any HTTP headers you wish here
-          async headers() {
-            return {
-              // authorization: getAuthCookie(),
-            };
-          },
         }),
       ],
       transformer: superjson,
+      queryClientConfig: {
+        defaultOptions: {
+          queries: {
+            retry: (failureCount: number, error: any) => {
+              const trcpErrorCode = error?.data?.code as TRPCError["code"];
+              if (trcpErrorCode === "NOT_FOUND") {
+                return false;
+              }
+              if (failureCount < 3) {
+                return true;
+              }
+              return false;
+            },
+            refetchOnMount: false,
+            refetchOnWindowFocus: false,
+          },
+        },
+      },
     };
   },
   /**

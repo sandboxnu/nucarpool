@@ -2,15 +2,6 @@ import { TRPCError, initTRPC } from "@trpc/server";
 import { Context } from "./context";
 import superjson from "superjson";
 
-export const transformer = {
-  input: superjson,
-  output: {
-    serialize: (object: any) => superjson.stringify(object),
-    // This `eval` only ever happens on the **client**
-    deserialize: (object: any) => eval(`(${object})`),
-  },
-};
-
 const t = initTRPC.context<Context>().create({
   transformer: superjson,
 });
