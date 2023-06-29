@@ -23,6 +23,7 @@ interface AbstractSidebarPageProps {
   rightButton: ButtonInfo;
   handleFavorite: (otherUser: string, add: boolean) => void;
   map: mapboxgl.Map;
+  emptyMessage?: string;
 }
 
 const AbstractSidebarPage = (props: AbstractSidebarPageProps) => {
@@ -38,23 +39,29 @@ const AbstractSidebarPage = (props: AbstractSidebarPageProps) => {
 
   return (
     <div id="scrollableDiv" className="overflow-auto">
-      {curList.map((otherUser: PublicUser) => (
-        <AbstractUserCard
-          userCardObj={otherUser}
-          key={otherUser.id}
-          isFavorited={favIds.includes(otherUser.id)}
-          handleFavorite={(add: boolean) =>
-            props.handleFavorite(otherUser.id, add)
-          }
-          leftButton={props.leftButton}
-          rightButton={props.rightButton}
-          inputProps={{
-            map: props.map,
-            previousMarkers: previousMarkers,
-            clearMarkers: clearMarkers,
-          }}
-        />
-      ))}
+      {curList.length > 0 &&
+        curList.map((otherUser: PublicUser) => (
+          <AbstractUserCard
+            userCardObj={otherUser}
+            key={otherUser.id}
+            isFavorited={favIds.includes(otherUser.id)}
+            handleFavorite={(add: boolean) =>
+              props.handleFavorite(otherUser.id, add)
+            }
+            leftButton={props.leftButton}
+            rightButton={props.rightButton}
+            inputProps={{
+              map: props.map,
+              previousMarkers: previousMarkers,
+              clearMarkers: clearMarkers,
+            }}
+          />
+        ))}
+      {props.emptyMessage && curList.length === 0 && (
+        <div className="text-center text-lg font-light m-4">
+          {props.emptyMessage}
+        </div>
+      )}
     </div>
   );
 };
