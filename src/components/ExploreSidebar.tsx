@@ -26,6 +26,13 @@ interface ExploreSidebarProps {
   handleFavorite: (otherUser: string, add: boolean) => void;
 }
 
+const emptyMessages = {
+  recommendations: `We're unable to find any recommendations for you right now.
+  We recommend reviewing your profile to make sure all information you've entered is accurate!`,
+  favorites: `You have no users currently favorited.
+  Click the star icon on the upper-right side of a user's card to add them to your favorites!`,
+};
+
 const ExploreSidebar = (props: ExploreSidebarProps) => {
   const [curList, setCurList] = useState<PublicUser[]>([]);
   const [curOption, setCurOption] = useState<"recommendations" | "favorites">(
@@ -83,6 +90,7 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
         handleFavorite={props.handleFavorite}
         favs={props.favs}
         map={props.map}
+        emptyMessage={emptyMessages[curOption]}
       />
     </div>
   );
