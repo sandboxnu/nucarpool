@@ -8,6 +8,10 @@ interface ReceivedModalProps {
   // represents the other user 'I' am trying to connect to.
   userToConnectTo: PublicUser;
 
+  handleReject: () => void;
+
+  handleAccept: () => void;
+
   closeModal: () => void;
 }
 

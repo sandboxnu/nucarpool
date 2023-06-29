@@ -62,7 +62,8 @@ export const requestsRouter = router({
       } else {
         toUser = convertToPublic(to);
       }
-      return { ...req, fromUser, toUser };
+
+      return { fromUser, toUser, ...req };
     };
 
     const [sent, received] = await Promise.all([

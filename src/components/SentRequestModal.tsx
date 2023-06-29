@@ -7,6 +7,9 @@ interface SentModalProps {
   currentUser: User;
   // represents the other user 'I' am trying to connect to.
   userToConnectTo: PublicUser;
+  // handle the withdrawing of a request
+  handleWithdraw: () => void;
+
   closeModal: () => void;
 }
 
@@ -40,7 +43,13 @@ const SentRequestModal = (props: SentModalProps): JSX.Element => {
               >
                 Cancel
               </button>
-              <button className="w-full p-1 text-slate-50 bg-blue-900 border-2 border-blue-900 rounded-md">
+              <button
+                onClick={() => {
+                  props.handleWithdraw();
+                  onClose();
+                }}
+                className="w-full p-1 text-slate-50 bg-blue-900 border-2 border-blue-900 rounded-md"
+              >
                 Withdraw Request
               </button>
             </div>
