@@ -40,12 +40,21 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
             </div>
             <div className="flex justify-center space-x-7">
               <button
-                onClick={onClose}
+                onClick={() => {
+                  props.handleReject();
+                  onClose();
+                }}
                 className="w-full p-1 text-blue-900 bg-slate-50 border-2 border-blue-900 rounded-md"
               >
                 Decline
               </button>
-              <button className="w-full p-1 text-slate-50 bg-blue-900 border-2 border-blue-900 rounded-md">
+              <button
+                onClick={() => {
+                  props.handleAccept();
+                  onClose();
+                }}
+                className="w-full p-1 text-slate-50 bg-blue-900 border-2 border-blue-900 rounded-md"
+              >
                 Accept
               </button>
             </div>
