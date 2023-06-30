@@ -373,13 +373,15 @@ const Profile: NextPage = () => {
                           type="number"
                           {...register("seatAvail", { valueAsNumber: true })}
                         />
-                        <Note>
-                          Registering 0 available seats will remove you from the
-                          app&apos;s recommendaiton generation.
-                        </Note>
                       </div>
                     )}
                   </div>
+                  {watch("role") == Role.DRIVER && (
+                    <Note>
+                      Registering 0 available seats will remove you from the
+                      app&apos;s recommendaiton generation.
+                    </Note>
+                  )}
                 </BottomProfileSection>
               </ProfileColumn>
 
@@ -454,14 +456,13 @@ const Profile: NextPage = () => {
                       />
                     </div>
                   </div>
+                  <Note className="md:w-96">
+                    If you don&apos;t have set times, communicate that on your
+                    own with potential riders/drivers. For start/end time, enter
+                    whatever best matches your work schedule.
+                  </Note>
                   <div className="flex flex-col space-y-2">
-                    <div className="flex flex-row items-center">
-                      <Note>
-                        If you don&apos;t have set times, communicate that on
-                        your own with potential riders/drivers. For start/end
-                        time, enter whatever best matches your work schedule.
-                      </Note>
-                    </div>
+                    <div className="flex flex-row items-center"></div>
                   </div>
                 </CommutingScheduleSection>
 
