@@ -130,6 +130,8 @@ const Home: NextPage<any> = () => {
     }
   };
 
+  const handleAcceptRequest = (fromUser: PublicUser) => {};
+
   const handleDeleteRequest = (request: ResolvedRequest) => {
     deleteRequest({
       invitationId: request.id,
