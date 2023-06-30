@@ -14,7 +14,7 @@
     "prepare": "husky install",
     "test": "jest",
     "vercel-build": "./vercel.sh",
-    "build:preview": "prisma generate && echo \"y\" | prisma db push && next build",
+    "build:preview": "prisma generate && yarn prisma db seed && echo \"y\" | prisma db push && next build && yarn prisma db seed",
     "build:main": "prisma generate & next build",
     "startup": "yarn db:start && next dev"
   },
