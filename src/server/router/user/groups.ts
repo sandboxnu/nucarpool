@@ -19,7 +19,7 @@ export const groupsRouter = router({
         message: `No profile with id '${id}'`,
       });
     }
-
+    
     if (user.carpoolId) {
       const group = await ctx.prisma.carpoolGroup.findUnique({
         where: {
@@ -47,6 +47,7 @@ export const groupsRouter = router({
         },
       });
       return group;
+      //maybe adjust the user.carpoolId here? Do we even have to do that manually?
     }),
 
   delete: protectedRouter
