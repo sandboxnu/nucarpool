@@ -142,6 +142,7 @@ export type GenerateUserInput = {
   daysWorking: string; // Format: S,M,T,W,R,F,S
   startTime: string;
   endTime: string;
+  carpoolId?: string;
 };
 
 /**
@@ -213,6 +214,7 @@ export const generateUser = ({
     daysWorking: daysWorking,
     startTime: startDate,
     endTime: endDate,
+    carpoolId: null,
   };
   return {
     where: { id: id },
