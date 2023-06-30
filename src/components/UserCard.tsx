@@ -1,4 +1,4 @@
-import Rating from "@mui/material/Rating/Rating";
+import Rating from "@mui/material/Rating";
 import dayjs from "dayjs";
 import mapboxgl from "mapbox-gl";
 import utc from "dayjs/plugin/utc";

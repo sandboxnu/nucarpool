@@ -1,25 +1,54 @@
-import { createReactQueryHooks } from "@trpc/react";
-import { inferProcedureInput, inferProcedureOutput } from "@trpc/server";
-import { AppRouter } from "../server/router";
+import { httpBatchLink, loggerLink } from "@trpc/client";
+import { createTRPCNext } from "@trpc/next";
+import type { AppRouter } from "../server/router";
+import superjson from "superjson";
+import { TRPCError } from "@trpc/server";
 
-export const trpc = createReactQueryHooks<AppRouter>();
+const getBaseUrl = () => {
+  if (typeof window !== "undefined") {
+    return "";
+  }
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
 
-/**
- * This is a helper method to infer the output of a query resolver
- * @example type HelloOutput = inferQueryOutput<'hello'>
- */
-export type inferQueryOutput<
-  TRouteKey extends keyof AppRouter["_def"]["queries"]
-> = inferProcedureOutput<AppRouter["_def"]["queries"][TRouteKey]>;
+  return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
+};
 
-export type inferQueryInput<
-  TRouteKey extends keyof AppRouter["_def"]["queries"]
-> = inferProcedureInput<AppRouter["_def"]["queries"][TRouteKey]>;
-
-export type inferMutationOutput<
-  TRouteKey extends keyof AppRouter["_def"]["mutations"]
-> = inferProcedureOutput<AppRouter["_def"]["mutations"][TRouteKey]>;
-
-export type inferMutationInput<
-  TRouteKey extends keyof AppRouter["_def"]["mutations"]
-> = inferProcedureInput<AppRouter["_def"]["mutations"][TRouteKey]>;
+export const trpc = createTRPCNext<AppRouter>({
+  config(opts) {
+    return {
+      links: [
+        loggerLink({
+          enabled: (opts) =>
+            process.env.NODE_ENV === "development" ||
+            (opts.direction === "down" && opts.result instanceof Error),
+        }),
+        httpBatchLink({
+          url: `${getBaseUrl()}/api/trpc`,
+        }),
+      ],
+      transformer: superjson,
+      queryClientConfig: {
+        defaultOptions: {
+          queries: {
+            retry: (failureCount: number, error: any) => {
+              const trcpErrorCode = error?.data?.code as TRPCError["code"];
+              if (trcpErrorCode === "NOT_FOUND") {
+                return false;
+              }
+              if (failureCount < 3) {
+                return true;
+              }
+              return false;
+            },
+            refetchOnMount: false,
+            refetchOnWindowFocus: false,
+          },
+        },
+      },
+    };
+  },
+  /**
+   * @link https://trpc.io/docs/ssr
+   **/
+  ssr: false,
+});

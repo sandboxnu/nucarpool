@@ -1,41 +1,39 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createProtectedRouter } from "../createProtectedRouter";
+import { router, protectedRouter } from "../createRouter";
 import _ from "lodash";
 import { convertToPublic } from "../../../utils/publicUser";
+import { disconnect } from "process";
 
-// use this router to manage invitations
-export const favoritesRouter = createProtectedRouter()
-  // Returns the list of favorites for the curent user
-  .query("me", {
-    async resolve({ ctx }) {
-      const id = ctx.session.user?.id;
-      const user = await ctx.prisma.user.findUnique({
-        where: { id },
-        select: {
-          favorites: true,
-        },
+export const favoritesRouter = router({
+  me: protectedRouter.query(async ({ ctx }) => {
+    const id = ctx.session.user?.id;
+    const user = await ctx.prisma.user.findUnique({
+      where: { id },
+      select: {
+        favorites: true,
+      },
+    });
+
+    // throws TRPCError if no user with ID exists
+    if (!user) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `No profile with id '${id}'`,
       });
+    }
 
-      // throws TRPCError if no user with ID exists
-      if (!user) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `No profile with id '${id}'`,
-        });
-      }
-
-      return user.favorites.map(convertToPublic);
-    },
-  })
-  .mutation("edit", {
-    input: z.object({
-      userId: z.string(),
-      favoriteId: z.string(),
-      add: z.boolean(),
-    }),
-
-    async resolve({ ctx, input }) {
+    return user.favorites.map(convertToPublic);
+  }),
+  edit: protectedRouter
+    .input(
+      z.object({
+        userId: z.string(),
+        favoriteId: z.string(),
+        add: z.boolean(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
       await ctx.prisma.user.update({
         where: {
           id: input.userId,
@@ -46,5 +44,5 @@ export const favoritesRouter = createProtectedRouter()
           },
         },
       });
-    },
-  });
+    }),
+});

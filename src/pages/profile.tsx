@@ -130,7 +130,9 @@ const Profile: NextPage = () => {
     },
     resolver: zodResolver(onboardSchema),
   });
-  const { data: user } = trpc.useQuery(["user.me"], { refetchOnMount: true });
+  const { data: user } = trpc.user.me.useQuery(undefined, {
+    refetchOnMount: true,
+  });
 
   const [companyAddressSuggestions, setCompanyAddressSuggestions] = useState<
     CarpoolFeature[]
@@ -202,7 +204,7 @@ const Profile: NextPage = () => {
     setFunc: setStartAddressSuggestions,
   });
 
-  const editUserMutation = trpc.useMutation("user.edit", {
+  const editUserMutation = trpc.user.edit.useMutation({
     onSuccess: () => {
       router.push("/");
     },
