@@ -413,9 +413,6 @@ const Profile: NextPage = () => {
                                 <DayBox day={day} isSelected={true} />
                               }
                               icon={<DayBox day={day} isSelected={false} />}
-                              defaultChecked={
-                                !!defaultValues?.daysWorking ? true : false
-                              }
                             />
                           )}
                         />
