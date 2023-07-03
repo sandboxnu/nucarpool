@@ -337,7 +337,7 @@ const Profile: NextPage = () => {
                   <ProfileHeaderNoMB>
                     I am a... <span className="text-northeastern-red">*</span>
                   </ProfileHeaderNoMB>
-                  <div className="flex items-end space-x-4">
+                  <div className="flex items-center space-x-4 h-24">
                     <Radio
                       label="Rider"
                       id="rider"
@@ -375,7 +375,7 @@ const Profile: NextPage = () => {
                         />
                         <Note>
                           Registering 0 available seats will remove you from the
-                          app&apos;s recommendaiton generation.
+                          app&apos;s recommendation generation.
                         </Note>
                       </div>
                     )}
