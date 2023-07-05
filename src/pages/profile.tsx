@@ -373,17 +373,13 @@ const Profile: NextPage = () => {
                           type="number"
                           {...register("seatAvail", { valueAsNumber: true })}
                         />
-                        {/* <Note>
-                      Registering 0 available seats will remove you from the
-                      app&apos;s recommendaiton generation.
-                    </Note> */}
                       </div>
                     )}
                   </div>
                   {watch("role") == Role.DRIVER && (
                     <Note>
                       Registering 0 available seats will remove you from the
-                      app&apos;s recommendaiton generation.
+                      app&apos;s recommendation generation.
                     </Note>
                   )}
                 </BottomProfileSection>
