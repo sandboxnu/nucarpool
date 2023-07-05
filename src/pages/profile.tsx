@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Header from "../components/Header";
-import { z } from "zod";
+import { ZodIntersection, z } from "zod";
 import { trpc } from "../utils/trpc";
 import { Role, Status } from "@prisma/client";
 import { TextField } from "../components/TextField";
@@ -373,6 +373,10 @@ const Profile: NextPage = () => {
                           type="number"
                           {...register("seatAvail", { valueAsNumber: true })}
                         />
+                        {/* <Note>
+                      Registering 0 available seats will remove you from the
+                      app&apos;s recommendaiton generation.
+                    </Note> */}
                       </div>
                     )}
                   </div>
@@ -461,9 +465,7 @@ const Profile: NextPage = () => {
                     own with potential riders/drivers. For start/end time, enter
                     whatever best matches your work schedule.
                   </Note>
-                  <div className="flex flex-col space-y-2">
-                    <div className="flex flex-row items-center"></div>
-                  </div>
+                  <div className="flex flex-col space-y-2"></div>
                 </CommutingScheduleSection>
 
                 <PersonalInfoSection>

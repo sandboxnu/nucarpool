@@ -68,8 +68,6 @@ const Home: NextPage<any> = () => {
     },
   });
 
-  // const { mutate: createGroups } = trpc.user.groups.
-
   const { mutate: mutateFavorites } = trpc.user.favorites.edit.useMutation({
     onError: (error: any) => {
       toast.error(`Something went wrong: ${error.message}`);
@@ -238,10 +236,6 @@ const Home: NextPage<any> = () => {
       }
     }
   };
-
-  useEffect(() => {
-    renderSidebar();
-  }, [recommendations, favorites, requests]);
 
   return (
     <>
