@@ -64,4 +64,5 @@ export type ButtonInfo = {
 export type ResolvedRequest = {
   fromUser: User | PublicUser | null;
   toUser: User | PublicUser | null;
+  id: string;
 };
