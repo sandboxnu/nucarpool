@@ -19,37 +19,15 @@ export const groupsRouter = router({
         message: `No profile with id '${id}'`,
       });
     }
-
-    const groups = await ctx.prisma.carpoolGroup.findMany({
-      where: {
-        users: {
-          some: {
-            id: user.id,
-          },
+    
+    if (user.carpoolId) {
+      const group = await ctx.prisma.carpoolGroup.findUnique({
+        where: {
+          id: user.carpoolId,
         },
-      },
-    });
-
-    // a map of groupId to the users in it
-    const usersByGroup = new Map(
-      await Promise.all(
-        groups.map(
-          async (group): Promise<[id: string, users: User[]]> => [
-            group.id,
-            await ctx.prisma.user.findMany({
-              where: {
-                carpools: {
-                  some: {
-                    id: group.id,
-                  },
-                },
-              },
-            }),
-          ]
-        )
-      )
-    );
-    return usersByGroup;
+      });
+      return group;
+    }
   }),
 
   create: protectedRouter
@@ -69,6 +47,7 @@ export const groupsRouter = router({
         },
       });
       return group;
+      //maybe adjust the user.carpoolId here? Do we even have to do that manually?
     }),
 
   delete: protectedRouter
@@ -95,11 +74,11 @@ export const groupsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const user = await ctx.prisma.user.update({
-        where: { id: input.userId },
+      const user = await ctx.prisma.carpoolGroup.update({
+        where: { id: input.groupId },
         data: {
-          carpools: {
-            [input.add ? "connect" : "disconnect"]: { id: input.groupId },
+          users: {
+            [input.add ? "connect" : "disconnect"]: { id: input.userId },
           },
         },
       });

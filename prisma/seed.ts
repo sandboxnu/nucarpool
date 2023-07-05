@@ -159,7 +159,7 @@ const generateGroups = async (users: User[]) => {
         group.map((user) =>
           prisma.user.update({
             where: { id: user.id },
-            data: { carpools: { connect: { id: idx.toString() } } },
+            data: { carpool: { connect: { id: idx.toString() } } },
           })
         )
       )

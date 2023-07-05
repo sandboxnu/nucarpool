@@ -56,7 +56,10 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
               </button>
               <button
                 className="w-full p-1 text-slate-50 bg-red-700 border-2 border-red-700 rounded-md"
-                onClick={() => props.handleEmailConect()}
+                onClick={() => {
+                  props.handleEmailConect();
+                  onClose();
+                }}
               >
                 Send Email
               </button>

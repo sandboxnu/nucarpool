@@ -62,6 +62,7 @@ export const requestsRouter = router({
       } else {
         toUser = convertToPublic(to);
       }
+      
       return { ...req, fromUser, toUser };
     };
 
