@@ -337,7 +337,7 @@ const Profile: NextPage = () => {
                   <ProfileHeaderNoMB>
                     I am a... <span className="text-northeastern-red">*</span>
                   </ProfileHeaderNoMB>
-                  <div className="flex items-end space-x-4">
+                  <div className="flex items-end space-x-4 h-24">
                     <Radio
                       label="Rider"
                       id="rider"
@@ -373,19 +373,18 @@ const Profile: NextPage = () => {
                           type="number"
                           {...register("seatAvail", { valueAsNumber: true })}
                         />
-                        {/* <Note>
-                      Registering 0 available seats will remove you from the
-                      app&apos;s recommendaiton generation.
-                    </Note> */}
                       </div>
                     )}
                   </div>
-                  {watch("role") == Role.DRIVER && (
-                    <Note>
-                      Registering 0 available seats will remove you from the
-                      app&apos;s recommendaiton generation.
-                    </Note>
-                  )}
+                  <Note
+                    style={{
+                      visibility:
+                        watch("role") == Role.DRIVER ? "visible" : "hidden",
+                    }}
+                  >
+                    Registering 0 available seats will remove you from the
+                    app&apos;s recommendation generation.
+                  </Note>
                 </BottomProfileSection>
               </ProfileColumn>
 
@@ -419,9 +418,6 @@ const Profile: NextPage = () => {
                                 <DayBox day={day} isSelected={true} />
                               }
                               icon={<DayBox day={day} isSelected={false} />}
-                              defaultChecked={
-                                !!defaultValues?.daysWorking ? true : false
-                              }
                             />
                           )}
                         />

@@ -19,7 +19,7 @@ export const groupsRouter = router({
         message: `No profile with id '${id}'`,
       });
     }
-    
+
     if (user.carpoolId) {
       const group = await ctx.prisma.carpoolGroup.findUnique({
         where: {
