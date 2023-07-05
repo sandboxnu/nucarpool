@@ -376,12 +376,15 @@ const Profile: NextPage = () => {
                       </div>
                     )}
                   </div>
-                  {watch("role") == Role.DRIVER && (
-                    <Note>
-                      Registering 0 available seats will remove you from the
-                      app&apos;s recommendation generation.
-                    </Note>
-                  )}
+                  <Note
+                    style={{
+                      visibility:
+                        watch("role") == Role.DRIVER ? "visible" : "hidden",
+                    }}
+                  >
+                    Registering 0 available seats will remove you from the
+                    app&apos;s recommendation generation.
+                  </Note>
                 </BottomProfileSection>
               </ProfileColumn>
 
