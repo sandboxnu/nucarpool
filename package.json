@@ -22,6 +22,8 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.363.0",
+    "@aws-sdk/credential-provider-env": "^3.363.0",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@headlessui/react": "^1.6.5",
