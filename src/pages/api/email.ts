@@ -18,31 +18,47 @@ const sesClient = new SESClient({
   credentials: fromEnv(),
 });
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  try {
-    const params = generateParams(req.body);
-    const data = sesClient.send(new SendEmailCommand(params));
-    console.log("Email sent successfully");
-  } catch (err) {
-    console.error(err);
-  }
-};
-
 const generateParams = (schema: emailSchema): SendEmailCommandInput => {
+  console.log(`schema.body: ${schema.body}`);
+  console.log(`schema.subject: ${schema.subject}`);
   return {
     Destination: {
-      ToAddresses: [schema.destination],
+      /* required */ CcAddresses: [],
+      ToAddresses: [
+        "devashishsood9@gmail.com",
+        /* more items */
+      ],
     },
     Message: {
+      /* required */
       Body: {
+        /* required */
         Text: {
+          Charset: "UTF-8",
           Data: schema.body,
         },
       },
       Subject: {
+        Charset: "UTF-8",
         Data: schema.subject,
       },
     },
-    Source: schema.subject,
+    Source: "test@carpoolnu.com" /* required */,
+    ReplyToAddresses: [],
   };
 };
+
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  console.log("Attempting to send email");
+  try {
+    const emailData: emailSchema = JSON.parse(req.body);
+    const params = generateParams(emailData);
+    console.log(JSON.stringify(params, null, 2));
+    const data = await sesClient.send(new SendEmailCommand(params));
+    res.status(200).json({ message: "Email sent successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+};
+
+export default handler;
