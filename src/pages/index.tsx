@@ -20,7 +20,7 @@ import SentRequestModal from "../components/SentRequestModal";
 import ReceivedRequestModal from "../components/ReceivedRequestModal";
 import { getSession } from "next-auth/react";
 import AlreadyConnectedModal from "../components/AlreadyConnectedModal";
-import { emailSchema } from "./api/email";
+import { emailSchema } from "../utils/email";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -150,14 +150,18 @@ const Home: NextPage<any> = () => {
     if (user && email) {
       const msg: emailSchema = {
         destination: email,
-        subject: "test",
-        body: user?.bio,
+        subject: "Carpool Connect Request",
+        body: user.bio,
       };
 
       const result = await fetch(`/api/email`, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(msg),
       });
+
       console.log(result);
     } else {
       console.log("User email does not exist");
