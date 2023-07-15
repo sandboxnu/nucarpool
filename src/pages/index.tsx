@@ -51,11 +51,15 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 const Home: NextPage<any> = () => {
   //tRPC queries to fetch user related data
   const utils = trpc.useContext();
-  const { data: geoJsonUsers } = trpc.mapbox.geoJsonUserList.useQuery();
-  const { data: user, refetch } = trpc.user.me.useQuery();
-  const { data: recommendations } = trpc.user.recommendations.me.useQuery();
-  const { data: favorites } = trpc.user.favorites.me.useQuery();
-  const { data: requests } = trpc.user.requests.me.useQuery();
+  const { data: geoJsonUsers, refetch: refetchGeoJsonUsers } =
+    trpc.mapbox.geoJsonUserList.useQuery();
+  const { data: user, refetch: refetchMe } = trpc.user.me.useQuery();
+  const { data: recommendations, refetch: refetchRecs } =
+    trpc.user.recommendations.me.useQuery();
+  const { data: favorites, refetch: refetchFavs } =
+    trpc.user.favorites.me.useQuery();
+  const { data: requests, refetch: refetchRequests } =
+    trpc.user.requests.me.useQuery();
   const { sent = [], received = [] } = requests ?? {};
 
   //tRPC mutations to update user related data
@@ -64,6 +68,7 @@ const Home: NextPage<any> = () => {
       toast.error(`Something went wrong: ${error.message}`);
     },
     onSuccess() {
+      utils.user.recommendations.me.invalidate();
       utils.user.requests.me.invalidate();
     },
   });
@@ -83,6 +88,7 @@ const Home: NextPage<any> = () => {
     },
     onSuccess() {
       utils.user.requests.me.invalidate();
+      utils.user.recommendations.me.invalidate();
     },
   });
 
@@ -143,7 +149,6 @@ const Home: NextPage<any> = () => {
       toId: toUser.id,
       message: "Not sure if we need this",
     });
-    utils.user.requests.me.invalidate();
   };
   const connectEmail = async (email: string | null) => {
     const msg = {
@@ -188,7 +193,11 @@ const Home: NextPage<any> = () => {
   }, [user, geoJsonUsers]);
 
   useEffect(() => {
-    refetch();
+    refetchMe();
+    refetchRecs();
+    refetchRequests();
+    refetchFavs();
+    refetchGeoJsonUsers();
   }, []);
 
   const handleFavorite = (favoriteId: string, add: boolean) => {

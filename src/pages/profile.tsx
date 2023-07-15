@@ -105,6 +105,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 const Profile: NextPage = () => {
   const router = useRouter();
+  const utils = trpc.useContext();
   const {
     register,
     formState: { errors },
@@ -234,6 +235,9 @@ const Profile: NextPage = () => {
         }
       })
       .join(",");
+
+    utils.user.invalidate();
+    utils.mapbox.geoJsonUserList.invalidate();
 
     editUserMutation.mutate({
       role: userInfo.role,
