@@ -25,17 +25,6 @@ const ControlledTimePickerRHF = (props: ControlledTimePickerRHFProps) => {
 
   const convertInputDateToUTC = (inputDate: Date): Date => {
     const inputHours = inputDate.getHours();
-    /**
-     * this will be the hours difference between GMT-0 and the inputDate's timezone
-     * eg: utcOffset for inputDate's that are EST will either -5 or -4 depending on Daylight savings
-     *  */
-    const utcOffset: number = parseInt(dayjs(inputDate).format("Z"));
-    let utcHours: number;
-    if (inputHours + utcOffset < 0) {
-      utcHours = inputHours + utcOffset + 24;
-    } else {
-      utcHours = inputHours + utcOffset;
-    }
     const result = dayjs.utc(
       `2022-2-2 ${inputHours}:${inputDate.getMinutes()}`
     );
