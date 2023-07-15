@@ -1,14 +1,15 @@
 import { SendEmailCommandInput } from "@aws-sdk/client-ses";
 
 export const generateParams = (schema: emailSchema): SendEmailCommandInput => {
+  //TODO: When the AWS account is moved out of the sandbox env, we can remove this check
+  const dest: string =
+    process.env.NODE_ENV === "production"
+      ? schema.destination
+      : "carpoolnu@gmail.com";
   return {
     Destination: {
       CcAddresses: [],
-      ToAddresses: [
-        schema.destination,
-        // While our AWS account is in the sandbox env, we can only use manually verified emails. For development, comment out schema.destination, and use the following email instead:
-        // "carpoolnu@gmail.com",
-      ],
+      ToAddresses: [dest],
     },
     Message: {
       Body: {
