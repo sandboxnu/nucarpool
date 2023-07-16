@@ -1,20 +1,34 @@
 import { Combobox, Transition } from "@headlessui/react";
 import { Control, Controller, FieldError } from "react-hook-form";
 import { OnboardingFormInputs } from "../pages/profile";
-import { Fragment, SetStateAction } from "react";
+import { Fragment, SetStateAction, useMemo, useState } from "react";
 import { CarpoolFeature, CarpoolAddress } from "../utils/types";
+import { debounce } from "lodash";
+import useSearch from "../utils/search";
 
 interface ControlledAddressComboboxProps {
   control: Control<OnboardingFormInputs>;
   name: "startAddress" | "companyAddress";
-  addressSelected: CarpoolAddress;
-  addressSetter: (val: SetStateAction<CarpoolAddress>) => void;
-  addressUpdater: (val: SetStateAction<string>) => void;
-  addressSuggestions: CarpoolFeature[];
+  selectedAddress: CarpoolAddress;
+  setSelectedAddress: (val: SetStateAction<CarpoolAddress>) => void;
   error?: FieldError;
 }
 
 const ControlledAddressCombobox = (props: ControlledAddressComboboxProps) => {
+  const [addressSuggestions, setAddressSuggestions] = useState<
+    CarpoolFeature[]
+  >([]);
+
+  const [address, setAddress] = useState("");
+
+  const updateAddress = useMemo(() => debounce(setAddress, 250), []);
+
+  useSearch({
+    value: address,
+    type: "address%2Cpostcode",
+    setFunc: setAddressSuggestions,
+  });
+
   return (
     <Controller
       name={props.name}
@@ -23,9 +37,10 @@ const ControlledAddressCombobox = (props: ControlledAddressComboboxProps) => {
         <Combobox
           className={`relative w-full`}
           as="div"
-          value={props.addressSelected}
+          value={props.selectedAddress}
           onChange={(val: CarpoolFeature) => {
-            props.addressSetter(val);
+            console.log("onChange triggered");
+            props.setSelectedAddress(val);
             fieldProps.onChange(val.place_name);
           }}
           ref={ref}
@@ -40,13 +55,13 @@ const ControlledAddressCombobox = (props: ControlledAddressComboboxProps) => {
             type="text"
             onChange={(e) => {
               if (e.target.value === "") {
-                props.addressSetter({
+                props.setSelectedAddress({
                   place_name: "",
                   center: [0, 0],
                 });
                 fieldProps.onChange("");
               } else {
-                props.addressUpdater(e.target.value);
+                updateAddress(e.target.value);
               }
             }}
           />
@@ -57,12 +72,12 @@ const ControlledAddressCombobox = (props: ControlledAddressComboboxProps) => {
             leaveTo="opacity-0"
           >
             <Combobox.Options className="absolute w-full rounded-md bg-white text-base shadow-lg focus:outline-none ">
-              {props.addressSuggestions.length === 0 ? (
+              {addressSuggestions.length === 0 ? (
                 <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
                   Nothing found.
                 </div>
               ) : (
-                props.addressSuggestions.map((feat) => (
+                addressSuggestions.map((feat) => (
                   <Combobox.Option
                     key={feat.id}
                     className={({ active }) =>

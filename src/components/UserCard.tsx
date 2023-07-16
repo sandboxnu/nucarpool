@@ -145,14 +145,6 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       {/* third row */}
       <div className="w-full flex gap-4 items-center">
         {DaysWorkingDisplay(props.userToConnectTo.daysWorking)}
-        <div
-          className={
-            "w-7 h-7 flex justify-center items-center rounded-md font-semibold" +
-            backgroundColorCSS(props.userToConnectTo.seatAvail)
-          }
-        >
-          {props.userToConnectTo.seatAvail}
-        </div>
       </div>
       {/* fourth row */}
       <div className="w-full m-0 flex justify-between align-middle">

@@ -135,44 +135,25 @@ const Profile: NextPage = () => {
     refetchOnMount: true,
   });
 
-  const [companyAddressSuggestions, setCompanyAddressSuggestions] = useState<
-    CarpoolFeature[]
-  >([]);
-  const [startAddressSuggestions, setStartAddressSuggestions] = useState<
-    CarpoolFeature[]
-  >([]);
-
-  const [companyAddressSelected, setCompanyAddressSelected] =
+  const [selectedCompanyAddress, setSelectedCompanyAddress] =
     useState<CarpoolAddress>({
       place_name: "",
       center: [0, 0],
     });
-  const [startAddressSelected, setStartAddressSelected] =
+  const [selectedStartAddress, setSelectedStartAddress] =
     useState<CarpoolAddress>({
       place_name: "",
       center: [0, 0],
     });
-
-  const [companyAddress, setCompanyAddress] = useState("");
-  const updateCompanyAddress = useMemo(
-    () => debounce(setCompanyAddress, 250),
-    []
-  );
-
-  const [startingAddress, setStartingAddress] = useState("");
-  const updateStartingAddress = useMemo(
-    () => debounce(setStartingAddress, 250),
-    []
-  );
 
   useEffect(() => {
     if (!user) return;
 
-    setStartAddressSelected({
+    setSelectedStartAddress({
       place_name: user.startAddress,
       center: [user.startCoordLng, user.startCoordLat],
     });
-    setCompanyAddressSelected({
+    setSelectedCompanyAddress({
       place_name: user.companyAddress,
       center: [user.companyCoordLng, user.companyCoordLat],
     });
@@ -193,18 +174,6 @@ const Profile: NextPage = () => {
     });
   }, [user]);
 
-  useSearch({
-    value: companyAddress,
-    type: "address%2Cpostcode",
-    setFunc: setCompanyAddressSuggestions,
-  });
-
-  useSearch({
-    value: startingAddress,
-    type: "address%2Cpostcode",
-    setFunc: setStartAddressSuggestions,
-  });
-
   const editUserMutation = trpc.user.edit.useMutation({
     onSuccess: () => {
       router.push("/");
@@ -215,14 +184,15 @@ const Profile: NextPage = () => {
   });
 
   const onSubmit = async (values: OnboardingFormInputs) => {
-    const coord: number[] = companyAddressSelected.center;
-    const startCoord: number[] = startAddressSelected.center;
+    const WorkCoordinates: number[] = selectedCompanyAddress.center;
+    const startingCoordinates: number[] = selectedStartAddress.center;
+    console.log(values);
     const userInfo = {
       ...values,
-      companyCoordLng: coord[0],
-      companyCoordLat: coord[1],
-      startCoordLng: startCoord[0],
-      startCoordLat: startCoord[1],
+      startCoordLng: startingCoordinates[0],
+      startCoordLat: startingCoordinates[1],
+      companyCoordLng: WorkCoordinates[0],
+      companyCoordLat: WorkCoordinates[1],
       seatAvail: values.role === Role.RIDER ? 0 : values.seatAvail,
     };
 
@@ -239,6 +209,7 @@ const Profile: NextPage = () => {
     utils.user.invalidate();
     utils.mapbox.geoJsonUserList.invalidate();
 
+    console.log(userInfo);
     editUserMutation.mutate({
       role: userInfo.role,
       status: Status.ACTIVE,
@@ -280,11 +251,9 @@ const Profile: NextPage = () => {
                     <ControlledAddressCombobox
                       control={control}
                       name={"startAddress"}
-                      addressSelected={startAddressSelected}
-                      addressSetter={setStartAddressSelected}
-                      addressSuggestions={startAddressSuggestions}
+                      selectedAddress={selectedStartAddress}
+                      setSelectedAddress={setSelectedStartAddress}
                       error={errors.startAddress}
-                      addressUpdater={updateStartingAddress}
                     />
 
                     <Note className="pt-2">
@@ -325,11 +294,9 @@ const Profile: NextPage = () => {
                   <ControlledAddressCombobox
                     control={control}
                     name={"companyAddress"}
-                    addressSelected={companyAddressSelected}
-                    addressSetter={setCompanyAddressSelected}
-                    addressSuggestions={companyAddressSuggestions}
+                    selectedAddress={selectedCompanyAddress}
+                    setSelectedAddress={setSelectedCompanyAddress}
                     error={errors.companyAddress}
-                    addressUpdater={updateCompanyAddress}
                   />
                   {errors.companyAddress && (
                     <ErrorDisplay>{errors.companyAddress.message}</ErrorDisplay>
