@@ -40,7 +40,7 @@
     "@trpc/react-query": "^10.33.0",
     "@trpc/server": "^10.33.0",
     "@types/styled-components": "^5.1.26",
-    "antd": "^5.1.6",
+    "antd": "^5.5.2",
     "axios": "^0.27.2",
     "dayjs": "^1.11.6",
     "envsafe": "^2.0.3",
