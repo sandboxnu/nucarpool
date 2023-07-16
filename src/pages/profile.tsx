@@ -184,15 +184,15 @@ const Profile: NextPage = () => {
   });
 
   const onSubmit = async (values: OnboardingFormInputs) => {
-    const WorkCoordinates: number[] = selectedCompanyAddress.center;
-    const startingCoordinates: number[] = selectedStartAddress.center;
+    const companyCoord: number[] = selectedCompanyAddress.center;
+    const startCoord: number[] = selectedStartAddress.center;
     console.log(values);
     const userInfo = {
       ...values,
-      startCoordLng: startingCoordinates[0],
-      startCoordLat: startingCoordinates[1],
-      companyCoordLng: WorkCoordinates[0],
-      companyCoordLat: WorkCoordinates[1],
+      startCoordLng: startCoord[0],
+      startCoordLat: startCoord[1],
+      companyCoordLng: companyCoord[0],
+      companyCoordLat: companyCoord[1],
       seatAvail: values.role === Role.RIDER ? 0 : values.seatAvail,
     };
 
