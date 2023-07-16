@@ -137,21 +137,25 @@ const Home: NextPage<any> = () => {
     });
   };
 
-  const handleEmailConnect = (curUser: User, toUser: PublicUser) => {
-    connectEmail(toUser.email);
+  const handleEmailConnect = (
+    curUser: User,
+    toUser: PublicUser,
+    userMessage: string
+  ) => {
+    connectEmail(toUser.email, userMessage);
     createRequests({
       fromId: curUser.id,
       toId: toUser.id,
-      message: "Not sure if we need this",
+      message: userMessage,
     });
     utils.user.requests.me.invalidate();
   };
-  const connectEmail = async (email: string | null) => {
+  const connectEmail = async (email: string | null, message: string) => {
     if (user && email) {
       const msg: emailSchema = {
         destination: email,
         subject: "Carpool Connect Request",
-        body: user.bio,
+        body: message,
       };
 
       const result = await fetch(`/api/email`, {
@@ -275,7 +279,9 @@ const Home: NextPage<any> = () => {
               <ConnectModal
                 currentUser={user}
                 userToConnectTo={modalUser}
-                handleEmailConect={() => handleEmailConnect(user, modalUser)}
+                handleEmailConnect={(message) =>
+                  handleEmailConnect(user, modalUser, message)
+                }
                 closeModal={() => {
                   setModalUser(null);
                 }}

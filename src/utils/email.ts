@@ -1,7 +1,7 @@
 import { SendEmailCommandInput } from "@aws-sdk/client-ses";
 
 export const generateParams = (schema: emailSchema): SendEmailCommandInput => {
-  //TODO: When the AWS account is moved out of the sandbox env, we can remove this check
+  //TODO: When the AWS account is moved out of the sandbox env, we remove this check
   const dest: string =
     process.env.NODE_ENV === "production"
       ? schema.destination
