@@ -18,8 +18,7 @@ const ControlledTimePickerRHF = (props: ControlledTimePickerRHFProps) => {
 
   useEffect(() => {
     if (props.value) {
-      const utcOffset = props.value.getTimezoneOffset();
-      setDisplayedTime(dayjs(props.value).add(utcOffset, "minute"));
+      dayjs.utc(props.value);
     }
   }, [props.value]);
 
