@@ -1,5 +1,5 @@
 import { Dialog } from "@headlessui/react";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { PublicUser, User } from "../utils/types";
 
 interface ConnectModalProps {
@@ -8,18 +8,26 @@ interface ConnectModalProps {
   // represents the other user 'I' am trying to connect to.
   userToConnectTo: PublicUser;
 
-  handleEmailConect: () => void;
+  handleEmailConnect: (message: string) => void;
 
   closeModal: () => void;
 }
 
 const ConnectModal = (props: ConnectModalProps): JSX.Element => {
   const [isOpen, setIsOpen] = useState(true);
+  const [customMessage, setCustomMessage] = useState(
+    props.currentUser.bio ?? ""
+  );
 
   const onClose = () => {
     setIsOpen(false);
     props.closeModal();
   };
+
+  const handleMessageChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setCustomMessage(event.target.value);
+  };
+
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
       {/* backdrop panel */}
@@ -40,7 +48,8 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
             <textarea
               className={`resize-none form-input w-full shadow-sm rounded-md px-3 py-2`}
               maxLength={280}
-              defaultValue={props.currentUser.bio}
+              defaultValue={customMessage}
+              onChange={handleMessageChange}
             ></textarea>
             <div className="text-xs italic text-slate-400">
               Note: The information you’ve provided in your intro is written
@@ -57,7 +66,7 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
               <button
                 className="w-full p-1 text-slate-50 bg-red-700 border-2 border-red-700 rounded-md"
                 onClick={() => {
-                  props.handleEmailConect();
+                  props.handleEmailConnect(customMessage);
                   onClose();
                 }}
               >

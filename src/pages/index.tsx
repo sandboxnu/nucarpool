@@ -20,6 +20,7 @@ import SentRequestModal from "../components/SentRequestModal";
 import ReceivedRequestModal from "../components/ReceivedRequestModal";
 import { getSession } from "next-auth/react";
 import AlreadyConnectedModal from "../components/AlreadyConnectedModal";
+import { emailSchema } from "../utils/email";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -142,26 +143,38 @@ const Home: NextPage<any> = () => {
     });
   };
 
-  const handleEmailConnect = (curUser: User, toUser: PublicUser) => {
-    connectEmail(toUser.email);
+  const handleEmailConnect = (
+    curUser: User,
+    toUser: PublicUser,
+    userMessage: string
+  ) => {
+    connectEmail(toUser.email, userMessage);
     createRequests({
       fromId: curUser.id,
       toId: toUser.id,
-      message: "Not sure if we need this",
+      message: userMessage,
     });
   };
-  const connectEmail = async (email: string | null) => {
-    const msg = {
-      to: email, // Replace with your recipient
-      from: "devashishsood9@gmail.com", // Replace with your verified sender
-      subject: "New Contact Message",
-      text: `Dior Dior`,
-    };
+  const connectEmail = async (email: string | null, message: string) => {
+    if (user && email) {
+      const msg: emailSchema = {
+        destination: email,
+        subject: "Carpool Connect Request",
+        body: message,
+      };
 
-    const result = await fetch(`/api/sendEmail`, {
-      method: "POST",
-      body: JSON.stringify(msg),
-    });
+      const result = await fetch(`/api/email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(msg),
+      });
+
+      console.log(result);
+    } else {
+      console.log("User email does not exist");
+    }
   };
 
   const handleSentRequests = (userToConnectTo: PublicUser) => {
@@ -275,7 +288,9 @@ const Home: NextPage<any> = () => {
               <ConnectModal
                 currentUser={user}
                 userToConnectTo={modalUser}
-                handleEmailConect={() => handleEmailConnect(user, modalUser)}
+                handleEmailConnect={(message) =>
+                  handleEmailConnect(user, modalUser, message)
+                }
                 closeModal={() => {
                   setModalUser(null);
                 }}
