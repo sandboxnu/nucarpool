@@ -11,7 +11,7 @@ import { trpc } from "../utils/trpc";
 import DropDownMenu from "../components/DropDownMenu";
 import { browserEnv } from "../utils/env/browser";
 import Header, { HeaderOptions } from "../components/Header";
-import { PublicUser, User } from "../utils/types";
+import { PublicUser, ResolvedRequest, User } from "../utils/types";
 import ConnectModal from "../components/ConnectModal";
 import { toast } from "react-toastify";
 import ExploreSidebar from "../components/ExploreSidebar";
@@ -49,37 +49,26 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 
 const Home: NextPage<any> = () => {
+  //tRPC queries to fetch user related data
   const utils = trpc.useContext();
-  const { data: geoJsonUsers } = trpc.mapbox.geoJsonUserList.useQuery();
-  const { data: user, refetch } = trpc.user.me.useQuery();
+  const { data: geoJsonUsers, refetch: refetchGeoJsonUsers } =
+    trpc.mapbox.geoJsonUserList.useQuery();
+  const { data: user, refetch: refetchMe } = trpc.user.me.useQuery();
+  const { data: recommendations, refetch: refetchRecs } =
+    trpc.user.recommendations.me.useQuery();
+  const { data: favorites, refetch: refetchFavs } =
+    trpc.user.favorites.me.useQuery();
+  const { data: requests, refetch: refetchRequests } =
+    trpc.user.requests.me.useQuery();
+  const { sent = [], received = [] } = requests ?? {};
 
-  const { data: recommendations } = trpc.user.recommendations.me.useQuery();
-  const { data: favorites } = trpc.user.favorites.me.useQuery();
-  const { data: requests } = trpc.user.requests.me.useQuery();
-
-  const [mapState, setMapState] = useState<mapboxgl.Map>();
-
-  const [modalUser, setModalUser] = useState<PublicUser | null>(null);
-  const [modalType, setModalType] = useState<string>("connect");
-  const [sidebarState, setSidebarState] = useState<HeaderOptions>("explore");
-  const [startingRequestsTab, setStartingRequestsTab] = useState<0 | 1>(0);
-
-  const handleConnect = (userToConnectTo: PublicUser) => {
-    setModalUser(userToConnectTo);
-    if (
-      requests?.received.find((req) => req.fromUserId === userToConnectTo.id)
-    ) {
-      setModalType("already-requested");
-    } else {
-      setModalType("connect");
-    }
-  };
-
-  const { mutate: mutateRequests } = trpc.user.requests.create.useMutation({
+  //tRPC mutations to update user related data
+  const { mutate: createRequests } = trpc.user.requests.create.useMutation({
     onError: (error: any) => {
       toast.error(`Something went wrong: ${error.message}`);
     },
     onSuccess() {
+      utils.user.recommendations.me.invalidate();
       utils.user.requests.me.invalidate();
     },
   });
@@ -93,14 +82,69 @@ const Home: NextPage<any> = () => {
     },
   });
 
+  const { mutate: deleteRequest } = trpc.user.requests.delete.useMutation({
+    onError: (error: any) => {
+      toast.error(`Something went wrong: ${error.message}`);
+    },
+    onSuccess() {
+      utils.user.requests.me.invalidate();
+      utils.user.recommendations.me.invalidate();
+    },
+  });
+
+  const [mapState, setMapState] = useState<mapboxgl.Map>();
+  const [modalUser, setModalUser] = useState<PublicUser | null>(null);
+  const [modalType, setModalType] = useState<string>("connect");
+  const [sidebarState, setSidebarState] = useState<HeaderOptions>("explore");
+  const [startingRequestsTab, setStartingRequestsTab] = useState<0 | 1>(0);
+
+  const handleConnect = (userToConnectTo: PublicUser) => {
+    setModalUser(userToConnectTo);
+    if (
+      requests?.received.find(
+        (req: { fromUserId: string }) => req.fromUserId === userToConnectTo.id
+      )
+    ) {
+      setModalType("already-requested");
+    } else {
+      setModalType("connect");
+    }
+  };
+
   const handleNavigateToRequests = (received: boolean) => {
     setSidebarState("requests");
     setStartingRequestsTab(received ? 1 : 0);
   };
 
+  const handleWithdrawRequest = (toUser: PublicUser) => {
+    const userRequest = sent.find(
+      (request) => request.toUser?.name === toUser.name
+    );
+    if (userRequest) {
+      handleDeleteRequest(userRequest);
+    }
+  };
+
+  const handleRejectRequest = (fromUser: PublicUser) => {
+    const userRequest = sent.find(
+      (request) => request.fromUser?.name === fromUser.name
+    );
+    if (userRequest) {
+      handleDeleteRequest(userRequest);
+    }
+  };
+
+  const handleAcceptRequest = (fromUser: PublicUser) => {};
+
+  const handleDeleteRequest = (request: ResolvedRequest) => {
+    deleteRequest({
+      invitationId: request.id,
+    });
+  };
+
   const handleEmailConnect = (curUser: User, toUser: PublicUser) => {
     connectEmail(toUser.email);
-    mutateRequests({
+    createRequests({
       fromId: curUser.id,
       toId: toUser.id,
       message: "Not sure if we need this",
@@ -149,7 +193,11 @@ const Home: NextPage<any> = () => {
   }, [user, geoJsonUsers]);
 
   useEffect(() => {
-    refetch();
+    refetchMe();
+    refetchRecs();
+    refetchRequests();
+    refetchFavs();
+    refetchGeoJsonUsers();
   }, []);
 
   const handleFavorite = (favoriteId: string, add: boolean) => {
@@ -169,7 +217,9 @@ const Home: NextPage<any> = () => {
             currentUser={user}
             reccs={recommendations ?? []}
             favs={favorites ?? []}
-            sent={requests?.sent.map((req) => req.toUser!) ?? []}
+            sent={
+              requests?.sent.map((req: { toUser: any }) => req.toUser!) ?? []
+            }
             map={mapState}
             handleConnect={handleConnect}
             handleFavorite={handleFavorite}
@@ -179,8 +229,10 @@ const Home: NextPage<any> = () => {
         return (
           <RequestSidebar
             currentUser={user}
-            sent={requests?.sent.map((req) => req.toUser!) ?? []}
-            received={requests?.received.map((req) => req.fromUser!) ?? []}
+            sent={sent.map((req: { toUser: any }) => req.toUser!) ?? []}
+            received={
+              received.map((req: { fromUser: any }) => req.fromUser!) ?? []
+            }
             favs={favorites ?? []}
             map={mapState}
             startingTab={startingRequestsTab}
@@ -243,6 +295,7 @@ const Home: NextPage<any> = () => {
               <SentRequestModal
                 currentUser={user}
                 userToConnectTo={modalUser}
+                handleWithdraw={() => handleWithdrawRequest(modalUser)}
                 closeModal={() => {
                   setModalUser(null);
                 }}
@@ -252,6 +305,8 @@ const Home: NextPage<any> = () => {
               <ReceivedRequestModal
                 currentUser={user}
                 userToConnectTo={modalUser}
+                handleReject={() => handleRejectRequest(modalUser)}
+                handleAccept={() => handleAcceptRequest(modalUser)}
                 closeModal={() => {
                   setModalUser(null);
                 }}
