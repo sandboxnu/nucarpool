@@ -80,7 +80,7 @@ model Request {
 model CarpoolGroup {
   id    String @id @default(cuid()) // primary key
   name  String
-  users User[] @relation("userCarpools")
+  users User[]
 
   @@map(name: "group")
 }
@@ -121,9 +121,11 @@ model User {
   favorites          User[]         @relation("Favorites")
   sentRequests       Request[]      @relation("sentRequests")
   receivedRequests   Request[]      @relation("receivedRequests")
-  carpools           CarpoolGroup[] @relation("userCarpools")
+  carpool            CarpoolGroup?   @relation(fields: [carpoolId], references: [id])
+  carpoolId          String?
 
   @@map(name: "user")
+  @@index([carpoolId])
 }
 
 // Represents a VerificationToken--need this for NextAuth.

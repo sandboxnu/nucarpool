@@ -21,7 +21,7 @@ const ControlledAddressCombobox = (props: ControlledAddressComboboxProps) => {
       control={props.control}
       render={({ field: { ref, ...fieldProps } }) => (
         <Combobox
-          className={`w-full`}
+          className={`relative w-full`}
           as="div"
           value={props.addressSelected}
           onChange={(val: CarpoolFeature) => {
@@ -56,7 +56,7 @@ const ControlledAddressCombobox = (props: ControlledAddressComboboxProps) => {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Combobox.Options className="w-full rounded-md bg-white text-base shadow-lg focus:outline-none ">
+            <Combobox.Options className="absolute w-full rounded-md bg-white text-base shadow-lg focus:outline-none ">
               {props.addressSuggestions.length === 0 ? (
                 <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
                   Nothing found.
@@ -66,7 +66,7 @@ const ControlledAddressCombobox = (props: ControlledAddressComboboxProps) => {
                   <Combobox.Option
                     key={feat.id}
                     className={({ active }) =>
-                      `w-full relative cursor-default select-none p-3 border-black ${
+                      `cursor-default select-none p-3 border-black ${
                         active ? "bg-blue-400 text-white" : "text-gray-900"
                       }`
                     }

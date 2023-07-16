@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Header from "../components/Header";
-import { z } from "zod";
+import { ZodIntersection, z } from "zod";
 import { trpc } from "../utils/trpc";
 import { Role, Status } from "@prisma/client";
 import { TextField } from "../components/TextField";
@@ -105,6 +105,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 const Profile: NextPage = () => {
   const router = useRouter();
+  const utils = trpc.useContext();
   const {
     register,
     formState: { errors },
@@ -235,6 +236,9 @@ const Profile: NextPage = () => {
       })
       .join(",");
 
+    utils.user.invalidate();
+    utils.mapbox.geoJsonUserList.invalidate();
+
     editUserMutation.mutate({
       role: userInfo.role,
       status: Status.ACTIVE,
@@ -337,7 +341,7 @@ const Profile: NextPage = () => {
                   <ProfileHeaderNoMB>
                     I am a... <span className="text-northeastern-red">*</span>
                   </ProfileHeaderNoMB>
-                  <div className="flex items-end space-x-4">
+                  <div className="flex items-end space-x-4 h-24">
                     <Radio
                       label="Rider"
                       id="rider"
@@ -373,13 +377,18 @@ const Profile: NextPage = () => {
                           type="number"
                           {...register("seatAvail", { valueAsNumber: true })}
                         />
-                        <Note>
-                          Registering 0 available seats will remove you from the
-                          app&apos;s recommendaiton generation.
-                        </Note>
                       </div>
                     )}
                   </div>
+                  <Note
+                    style={{
+                      visibility:
+                        watch("role") == Role.DRIVER ? "visible" : "hidden",
+                    }}
+                  >
+                    Registering 0 available seats will remove you from the
+                    app&apos;s recommendation generation.
+                  </Note>
                 </BottomProfileSection>
               </ProfileColumn>
 
@@ -413,9 +422,6 @@ const Profile: NextPage = () => {
                                 <DayBox day={day} isSelected={true} />
                               }
                               icon={<DayBox day={day} isSelected={false} />}
-                              defaultChecked={
-                                !!defaultValues?.daysWorking ? true : false
-                              }
                             />
                           )}
                         />
@@ -454,15 +460,12 @@ const Profile: NextPage = () => {
                       />
                     </div>
                   </div>
-                  <div className="flex flex-col space-y-2">
-                    <div className="flex flex-row items-center">
-                      <Note>
-                        If you don&apos;t have set times, communicate that on
-                        your own with potential riders/drivers. For start/end
-                        time, enter whatever best matches your work schedule.
-                      </Note>
-                    </div>
-                  </div>
+                  <Note className="md:w-96">
+                    If you don&apos;t have set times, communicate that on your
+                    own with potential riders/drivers. For start/end time, enter
+                    whatever best matches your work schedule.
+                  </Note>
+                  <div className="flex flex-col space-y-2"></div>
                 </CommutingScheduleSection>
 
                 <PersonalInfoSection>
