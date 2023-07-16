@@ -11,7 +11,6 @@ import { trpc } from "../utils/trpc";
 import { Role, Status } from "@prisma/client";
 import { TextField } from "../components/TextField";
 import Radio from "../components/Radio";
-import useSearch from "../utils/search";
 import Checkbox from "@mui/material/Checkbox";
 import DayBox from "../components/DayBox";
 import {
@@ -186,7 +185,6 @@ const Profile: NextPage = () => {
   const onSubmit = async (values: OnboardingFormInputs) => {
     const companyCoord: number[] = selectedCompanyAddress.center;
     const startCoord: number[] = selectedStartAddress.center;
-    console.log(values);
     const userInfo = {
       ...values,
       startCoordLng: startCoord[0],
@@ -209,7 +207,6 @@ const Profile: NextPage = () => {
     utils.user.invalidate();
     utils.mapbox.geoJsonUserList.invalidate();
 
-    console.log(userInfo);
     editUserMutation.mutate({
       role: userInfo.role,
       status: Status.ACTIVE,

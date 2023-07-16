@@ -39,7 +39,6 @@ const ControlledAddressCombobox = (props: ControlledAddressComboboxProps) => {
           as="div"
           value={props.selectedAddress}
           onChange={(val: CarpoolFeature) => {
-            console.log("onChange triggered");
             props.setSelectedAddress(val);
             fieldProps.onChange(val.place_name);
           }}
