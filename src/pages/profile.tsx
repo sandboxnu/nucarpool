@@ -12,7 +12,7 @@ import { Role, Status } from "@prisma/client";
 import { TextField } from "../components/TextField";
 import Radio from "../components/Radio";
 import Checkbox from "@mui/material/Checkbox";
-import WeekBox from "../components/WeekBox";
+import InteractiveDaysWorkingGrid from "../components/WeekBox";
 import {
   BottomProfileSection,
   CompleteProfileButton,
@@ -362,7 +362,10 @@ const Profile: NextPage = () => {
                   {/* Days working field  */}
                   <div className="mb-2 md:my-4 w-full aspect-[7/1] max-w-[360px]">
                     <div className="w-full h-full border-l flex justify-evenly items-center border-l-black">
-                      <WeekBox control={control} daysOfWeek={daysOfWeek} />
+                      <InteractiveDaysWorkingGrid
+                        control={control}
+                        daysOfWeek={daysOfWeek}
+                      />
                     </div>
 
                     {errors.daysWorking && (

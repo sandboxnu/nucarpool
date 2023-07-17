@@ -40,7 +40,7 @@ const DayBox = ({
   }
 };
 
-const WeekBox = (props: WeekBoxProps) => {
+const InteractiveDaysWorkingGrid = (props: WeekBoxProps) => {
   return (
     <React.Fragment>
       {props.daysOfWeek.map((day, index) => (
@@ -73,4 +73,4 @@ const WeekBox = (props: WeekBoxProps) => {
   );
 };
 
-export default WeekBox;
+export default InteractiveDaysWorkingGrid;
