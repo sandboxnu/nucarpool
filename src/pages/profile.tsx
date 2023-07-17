@@ -11,7 +11,6 @@ import { trpc } from "../utils/trpc";
 import { Role, Status } from "@prisma/client";
 import { TextField } from "../components/TextField";
 import Radio from "../components/Radio";
-import Checkbox from "@mui/material/Checkbox";
 import InteractiveDaysWorkingGrid from "../components/WeekBox";
 import {
   BottomProfileSection,
@@ -203,9 +202,6 @@ const Profile: NextPage = () => {
         }
       })
       .join(",");
-
-    utils.user.invalidate();
-    utils.mapbox.geoJsonUserList.invalidate();
 
     editUserMutation.mutate({
       role: userInfo.role,
