@@ -12,7 +12,7 @@ import { Role, Status } from "@prisma/client";
 import { TextField } from "../components/TextField";
 import Radio from "../components/Radio";
 import Checkbox from "@mui/material/Checkbox";
-import DayBox from "../components/DayBox";
+import WeekBox from "../components/WeekBox";
 import {
   BottomProfileSection,
   CompleteProfileButton,
@@ -29,7 +29,7 @@ import {
   ProfileHeaderNoMB,
 } from "../styles/profile";
 import ControlledTimePicker from "../components/ControlledTimePicker";
-import { CarpoolAddress, CarpoolFeature } from "../utils/types";
+import { CarpoolAddress } from "../utils/types";
 import { EntryLabel } from "../components/EntryLabel";
 import ControlledAddressCombobox from "../components/ControlledAddressCombobox";
 import { getSession } from "next-auth/react";
@@ -362,34 +362,7 @@ const Profile: NextPage = () => {
                   {/* Days working field  */}
                   <div className="mb-2 md:my-4 w-full aspect-[7/1] max-w-[360px]">
                     <div className="w-full h-full border-l flex justify-evenly items-center border-l-black">
-                      {daysOfWeek.map((day, index) => (
-                        <Controller
-                          key={day + index.toString()}
-                          name={`daysWorking.${index}`}
-                          control={control}
-                          render={({
-                            field: { onChange, value },
-                            formState: { defaultValues },
-                          }) => (
-                            <Checkbox
-                              key={day + index.toString()}
-                              sx={{
-                                input: { width: 1, height: 1 },
-                                aspectRatio: 1 / 1,
-                                width: 1,
-                                height: 1,
-                                padding: 0,
-                              }}
-                              checked={value}
-                              onChange={onChange}
-                              checkedIcon={
-                                <DayBox day={day} isSelected={true} />
-                              }
-                              icon={<DayBox day={day} isSelected={false} />}
-                            />
-                          )}
-                        />
-                      ))}
+                      <WeekBox control={control} daysOfWeek={daysOfWeek} />
                     </div>
 
                     {errors.daysWorking && (
@@ -431,7 +404,6 @@ const Profile: NextPage = () => {
                   </Note>
                   <div className="flex flex-col space-y-2"></div>
                 </CommutingScheduleSection>
-
                 <PersonalInfoSection>
                   <ProfileHeader>Personal Info</ProfileHeader>
                   <div className="flex flex-row space-x-6 w-full">

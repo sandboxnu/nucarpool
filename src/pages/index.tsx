@@ -11,7 +11,7 @@ import { trpc } from "../utils/trpc";
 import DropDownMenu from "../components/DropDownMenu";
 import { browserEnv } from "../utils/env/browser";
 import Header, { HeaderOptions } from "../components/Header";
-import { PublicUser, ResolvedRequest, User } from "../utils/types";
+import { PublicUser, ResolvedRequest } from "../utils/types";
 import ConnectModal from "../components/ConnectModal";
 import { toast } from "react-toastify";
 import ExploreSidebar from "../components/ExploreSidebar";
@@ -20,7 +20,7 @@ import SentRequestModal from "../components/SentRequestModal";
 import ReceivedRequestModal from "../components/ReceivedRequestModal";
 import { getSession } from "next-auth/react";
 import AlreadyConnectedModal from "../components/AlreadyConnectedModal";
-import { emailSchema } from "../utils/email";
+import { ModalRenderer } from "../components/ModalRenderer";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -61,18 +61,8 @@ const Home: NextPage<any> = () => {
     trpc.user.favorites.me.useQuery();
   const { data: requests, refetch: refetchRequests } =
     trpc.user.requests.me.useQuery();
-  const { sent = [], received = [] } = requests ?? {};
 
-  //tRPC mutations to update user related data
-  const { mutate: createRequests } = trpc.user.requests.create.useMutation({
-    onError: (error: any) => {
-      toast.error(`Something went wrong: ${error.message}`);
-    },
-    onSuccess() {
-      utils.user.recommendations.me.invalidate();
-      utils.user.requests.me.invalidate();
-    },
-  });
+  const { sent = [], received = [] } = requests ?? {};
 
   const { mutate: mutateFavorites } = trpc.user.favorites.edit.useMutation({
     onError: (error: any) => {
@@ -141,40 +131,6 @@ const Home: NextPage<any> = () => {
     deleteRequest({
       invitationId: request.id,
     });
-  };
-
-  const handleEmailConnect = (
-    curUser: User,
-    toUser: PublicUser,
-    userMessage: string
-  ) => {
-    connectEmail(toUser.email, userMessage);
-    createRequests({
-      fromId: curUser.id,
-      toId: toUser.id,
-      message: userMessage,
-    });
-  };
-  const connectEmail = async (email: string | null, message: string) => {
-    if (user && email) {
-      const msg: emailSchema = {
-        destination: email,
-        subject: "Carpool Connect Request",
-        body: message,
-      };
-
-      const result = await fetch(`/api/email`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(msg),
-      });
-
-      console.log(result);
-    } else {
-      console.log("User email does not exist");
-    }
   };
 
   const handleSentRequests = (userToConnectTo: PublicUser) => {
@@ -284,18 +240,12 @@ const Home: NextPage<any> = () => {
           {/* map wrapper */}
           <div className="relative flex-auto">
             <div id="map" className={"flex-auto w-full h-full"}></div>
-            {user && modalUser && modalType === "connect" && (
-              <ConnectModal
-                currentUser={user}
-                userToConnectTo={modalUser}
-                handleEmailConnect={(message) =>
-                  handleEmailConnect(user, modalUser, message)
-                }
-                closeModal={() => {
-                  setModalUser(null);
-                }}
-              />
-            )}
+            <ModalRenderer
+              curUser={user}
+              otherUser={modalUser}
+              setOtherUser={setModalUser}
+              modalType={modalType}
+            />
             {user && modalUser && modalType === "already-requested" && (
               <AlreadyConnectedModal
                 currentUser={user}

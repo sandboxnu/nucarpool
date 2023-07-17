@@ -8,7 +8,7 @@ export const generateParams = (schema: emailSchema): SendEmailCommandInput => {
       : "carpoolnu@gmail.com";
   return {
     Destination: {
-      CcAddresses: [],
+      CcAddresses: [schema.origin], // email must be verified in AWS sandbox to be cc'ed
       ToAddresses: [dest],
     },
     Message: {
@@ -29,6 +29,7 @@ export const generateParams = (schema: emailSchema): SendEmailCommandInput => {
 };
 
 export interface emailSchema {
+  origin: string;
   destination: string;
   subject: string;
   body: string;

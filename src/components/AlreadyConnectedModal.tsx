@@ -21,6 +21,7 @@ const AlreadyConnectedModal = (
     setIsOpen(false);
     props.closeModal();
   };
+
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
       {/* backdrop panel */}
