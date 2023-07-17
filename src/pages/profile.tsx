@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import _, { debounce } from "lodash";
+import _ from "lodash";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Header from "../components/Header";
