@@ -9,7 +9,7 @@ interface ModalRenderProps {
   modalType: string;
 }
 
-export const ModalRenderer = (props: ModalRenderProps) => {
+export const ModalRenderer = (props: ModalRenderProps): JSX.Element | null => {
   const setNullUser = () => {
     props.setOtherUser(null);
   };
@@ -25,38 +25,37 @@ export const ModalRenderer = (props: ModalRenderProps) => {
           />
         );
     }
-  } else {
-    return null;
+    // {user && modalUser && modalType === "already-requested" && (
+    //   <AlreadyConnectedModal
+    //     currentUser={user}
+    //     userToConnectTo={modalUser}
+    //     handleManageRequest={() => handleNavigateToRequests(true)}
+    //     closeModal={() => {
+    //       setModalUser(null);
+    //     }}
+    //   />
+    // )}
+    // {user && modalUser && modalType === "sent" && (
+    //   <SentRequestModal
+    //     currentUser={user}
+    //     userToConnectTo={modalUser}
+    //     handleWithdraw={() => handleWithdrawRequest(modalUser)}
+    //     closeModal={() => {
+    //       setModalUser(null);
+    //     }}
+    //   />
+    // )}
+    // {user && modalUser && modalType === "received" && (
+    //   <ReceivedRequestModal
+    //     currentUser={user}
+    //     userToConnectTo={modalUser}
+    //     handleReject={() => handleRejectRequest(modalUser)}
+    //     handleAccept={() => handleAcceptRequest(modalUser)}
+    //     closeModal={() => {
+    //       setModalUser(null);
+    //     }}
+    //   />
+    // )}
   }
-  // {user && modalUser && modalType === "already-requested" && (
-  //   <AlreadyConnectedModal
-  //     currentUser={user}
-  //     userToConnectTo={modalUser}
-  //     handleManageRequest={() => handleNavigateToRequests(true)}
-  //     closeModal={() => {
-  //       setModalUser(null);
-  //     }}
-  //   />
-  // )}
-  // {user && modalUser && modalType === "sent" && (
-  //   <SentRequestModal
-  //     currentUser={user}
-  //     userToConnectTo={modalUser}
-  //     handleWithdraw={() => handleWithdrawRequest(modalUser)}
-  //     closeModal={() => {
-  //       setModalUser(null);
-  //     }}
-  //   />
-  // )}
-  // {user && modalUser && modalType === "received" && (
-  //   <ReceivedRequestModal
-  //     currentUser={user}
-  //     userToConnectTo={modalUser}
-  //     handleReject={() => handleRejectRequest(modalUser)}
-  //     handleAccept={() => handleAcceptRequest(modalUser)}
-  //     closeModal={() => {
-  //       setModalUser(null);
-  //     }}
-  //   />
-  // )}
+  return null;
 };
