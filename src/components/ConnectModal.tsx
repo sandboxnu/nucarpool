@@ -10,7 +10,6 @@ interface ConnectModalProps {
   curUser: User;
   // represents the other user 'I' am trying to connect to.
   otherUser: PublicUser;
-
   closeModal: () => void;
 }
 

@@ -25,6 +25,8 @@ export const ModalRenderer = (props: ModalRenderProps) => {
           />
         );
     }
+  } else {
+    return null;
   }
   // {user && modalUser && modalType === "already-requested" && (
   //   <AlreadyConnectedModal
