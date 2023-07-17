@@ -41,32 +41,36 @@ const DayBox = ({
 };
 
 const WeekBox = (props: WeekBoxProps) => {
-  return props.daysOfWeek.map((day, index) => (
-    <Controller
-      key={day + index.toString()}
-      name={`daysWorking.${index}`}
-      control={props.control}
-      render={({
-        field: { onChange, value },
-        formState: { defaultValues },
-      }) => (
-        <Checkbox
+  return (
+    <React.Fragment>
+      {props.daysOfWeek.map((day, index) => (
+        <Controller
           key={day + index.toString()}
-          sx={{
-            input: { width: 1, height: 1 },
-            aspectRatio: 1 / 1,
-            width: 1,
-            height: 1,
-            padding: 0,
-          }}
-          checked={value}
-          onChange={onChange}
-          checkedIcon={<DayBox day={day} isSelected={true} />}
-          icon={<DayBox day={day} isSelected={false} />}
+          name={`daysWorking.${index}`}
+          control={props.control}
+          render={({
+            field: { onChange, value },
+            formState: { defaultValues },
+          }) => (
+            <Checkbox
+              key={day + index.toString()}
+              sx={{
+                input: { width: 1, height: 1 },
+                aspectRatio: 1 / 1,
+                width: 1,
+                height: 1,
+                padding: 0,
+              }}
+              checked={value}
+              onChange={onChange}
+              checkedIcon={<DayBox day={day} isSelected={true} />}
+              icon={<DayBox day={day} isSelected={false} />}
+            />
+          )}
         />
-      )}
-    />
-  ));
+      ))}
+    </React.Fragment>
+  );
 };
 
 export default WeekBox;
