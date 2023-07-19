@@ -3,6 +3,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import type { GetServerSidePropsContext, NextPage } from "next";
 import { useEffect, useState } from "react";
 import { RiFocus3Line } from "react-icons/ri";
+import { ToastProvider } from "react-toast-notifications";
 import addClusters from "../utils/map/addClusters";
 import addMapEvents from "../utils/map/addMapEvents";
 import addUserLocation from "../utils/map/addUserLocation";
@@ -282,52 +283,58 @@ const Home: NextPage<any> = () => {
           {/* This is where the Mapbox puts its stuff */}
 
           {/* map wrapper */}
-          <div className="relative flex-auto">
-            <div id="map" className={"flex-auto w-full h-full"}></div>
-            {user && modalUser && modalType === "connect" && (
-              <ConnectModal
-                currentUser={user}
-                userToConnectTo={modalUser}
-                handleEmailConnect={(message) =>
-                  handleEmailConnect(user, modalUser, message)
-                }
-                closeModal={() => {
-                  setModalUser(null);
-                }}
-              />
-            )}
-            {user && modalUser && modalType === "already-requested" && (
-              <AlreadyConnectedModal
-                currentUser={user}
-                userToConnectTo={modalUser}
-                handleManageRequest={() => handleNavigateToRequests(true)}
-                closeModal={() => {
-                  setModalUser(null);
-                }}
-              />
-            )}
-            {user && modalUser && modalType === "sent" && (
-              <SentRequestModal
-                currentUser={user}
-                userToConnectTo={modalUser}
-                handleWithdraw={() => handleWithdrawRequest(modalUser)}
-                closeModal={() => {
-                  setModalUser(null);
-                }}
-              />
-            )}
-            {user && modalUser && modalType === "received" && (
-              <ReceivedRequestModal
-                currentUser={user}
-                userToConnectTo={modalUser}
-                handleReject={() => handleRejectRequest(modalUser)}
-                handleAccept={() => handleAcceptRequest(modalUser)}
-                closeModal={() => {
-                  setModalUser(null);
-                }}
-              />
-            )}
-          </div>
+          <ToastProvider
+            placement="bottom-right"
+            autoDismiss={true}
+            newestOnTop={true}
+          >
+            <div className="relative flex-auto">
+              <div id="map" className={"flex-auto w-full h-full"}></div>
+              {user && modalUser && modalType === "connect" && (
+                <ConnectModal
+                  currentUser={user}
+                  userToConnectTo={modalUser}
+                  handleEmailConnect={(message) => {
+                    handleEmailConnect(user, modalUser, message);
+                  }}
+                  closeModal={() => {
+                    setModalUser(null);
+                  }}
+                />
+              )}
+              {user && modalUser && modalType === "already-requested" && (
+                <AlreadyConnectedModal
+                  currentUser={user}
+                  userToConnectTo={modalUser}
+                  handleManageRequest={() => handleNavigateToRequests(true)}
+                  closeModal={() => {
+                    setModalUser(null);
+                  }}
+                />
+              )}
+              {user && modalUser && modalType === "sent" && (
+                <SentRequestModal
+                  currentUser={user}
+                  userToConnectTo={modalUser}
+                  handleWithdraw={() => handleWithdrawRequest(modalUser)}
+                  closeModal={() => {
+                    setModalUser(null);
+                  }}
+                />
+              )}
+              {user && modalUser && modalType === "received" && (
+                <ReceivedRequestModal
+                  currentUser={user}
+                  userToConnectTo={modalUser}
+                  handleReject={() => handleRejectRequest(modalUser)}
+                  handleAccept={() => handleAcceptRequest(modalUser)}
+                  closeModal={() => {
+                    setModalUser(null);
+                  }}
+                />
+              )}
+            </div>
+          </ToastProvider>
         </div>
       </div>
     </>

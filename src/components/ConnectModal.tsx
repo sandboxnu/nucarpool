@@ -1,5 +1,6 @@
 import { Dialog } from "@headlessui/react";
 import { ChangeEvent, useState } from "react";
+import { useToasts } from "react-toast-notifications";
 import { PublicUser, User } from "../utils/types";
 
 interface ConnectModalProps {
@@ -14,6 +15,7 @@ interface ConnectModalProps {
 }
 
 const ConnectModal = (props: ConnectModalProps): JSX.Element => {
+  const { addToast } = useToasts();
   const [isOpen, setIsOpen] = useState(true);
   const [customMessage, setCustomMessage] = useState(
     props.currentUser.bio ?? ""
@@ -22,6 +24,15 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
   const onClose = () => {
     setIsOpen(false);
     props.closeModal();
+  };
+
+  const handleOnClick = () => {
+    props.handleEmailConnect(customMessage);
+    onClose();
+    addToast(
+      "A request to carpool has been sent to " + props.userToConnectTo.name,
+      { appearance: "success" }
+    );
   };
 
   const handleMessageChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -65,10 +76,7 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
               </button>
               <button
                 className="w-full p-1 text-slate-50 bg-red-700 border-2 border-red-700 rounded-md"
-                onClick={() => {
-                  props.handleEmailConnect(customMessage);
-                  onClose();
-                }}
+                onClick={handleOnClick}
               >
                 Send Email
               </button>
