@@ -1,9 +1,9 @@
 import { SetStateAction } from "react";
 import { PublicUser, User } from "../utils/types";
 import ConnectModal from "./ConnectModal";
+import AlreadyConnectedModal from "./AlreadyConnectedModal";
 
 interface ModalRenderProps {
-  curUser: User | undefined;
   otherUser: PublicUser | null;
   setOtherUser: (val: SetStateAction<PublicUser | null>) => void;
   modalType: string;
@@ -14,14 +14,21 @@ export const ModalRenderer = (props: ModalRenderProps): JSX.Element | null => {
     props.setOtherUser(null);
   };
 
-  if (props.curUser && props.otherUser) {
+  if (props.otherUser) {
     switch (props.modalType) {
       case "connect":
         return (
           <ConnectModal
-            curUser={props.curUser}
             otherUser={props.otherUser}
             closeModal={() => setNullUser()}
+          />
+        );
+      case "already-requested":
+        return (
+          <AlreadyConnectedModal
+            otherUser={props.otherUser}
+            closeModal={() => setNullUser()}
+            handleManageRequest={() => {}}
           />
         );
     }

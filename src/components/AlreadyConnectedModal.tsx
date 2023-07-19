@@ -1,13 +1,11 @@
 import { Dialog } from "@headlessui/react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { PublicUser, User } from "../utils/types";
+import { UserContext } from "../utils/userContext";
+import Spinner from "./Spinner";
 
 interface AlreadyConnectedModalProps {
-  // represents the 'me', the user trying to connect to someone
-  currentUser: User;
-  // represents the other user 'I' am trying to connect to.
-  userToConnectTo: PublicUser;
-
+  otherUser: PublicUser;
   closeModal: () => void;
   handleManageRequest: () => void;
 }
@@ -16,6 +14,11 @@ const AlreadyConnectedModal = (
   props: AlreadyConnectedModalProps
 ): JSX.Element => {
   const [isOpen, setIsOpen] = useState(true);
+  const curUser = useContext(UserContext);
+
+  if (!curUser) {
+    return <Spinner />;
+  }
 
   const onClose = () => {
     setIsOpen(false);
@@ -34,9 +37,9 @@ const AlreadyConnectedModal = (
               You already have a pending request from this user
             </Dialog.Title>
             <div className="text-sm">
-              {props.userToConnectTo.preferredName} has already sent you a
-              connection request. Click the manage request button below to
-              accept or decline the request!
+              {props.otherUser.preferredName} has already sent you a connection
+              request. Click the manage request button below to accept or
+              decline the request!
             </div>
             <div className="flex justify-center space-x-7">
               <button

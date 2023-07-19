@@ -12,7 +12,6 @@ import DropDownMenu from "../components/DropDownMenu";
 import { browserEnv } from "../utils/env/browser";
 import Header, { HeaderOptions } from "../components/Header";
 import { PublicUser, ResolvedRequest } from "../utils/types";
-import ConnectModal from "../components/ConnectModal";
 import { toast } from "react-toastify";
 import ExploreSidebar from "../components/ExploreSidebar";
 import RequestSidebar from "../components/RequestSidebar";
@@ -21,6 +20,7 @@ import ReceivedRequestModal from "../components/ReceivedRequestModal";
 import { getSession } from "next-auth/react";
 import AlreadyConnectedModal from "../components/AlreadyConnectedModal";
 import { ModalRenderer } from "../components/ModalRenderer";
+import { UserContext } from "../utils/userContext";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -55,14 +55,15 @@ const Home: NextPage<any> = () => {
   const { data: geoJsonUsers, refetch: refetchGeoJsonUsers } =
     trpc.mapbox.geoJsonUserList.useQuery();
   const { data: user, refetch: refetchMe } = trpc.user.me.useQuery();
-  const { data: recommendations, refetch: refetchRecs } =
+  const { data: recommendations = [], refetch: refetchRecs } =
     trpc.user.recommendations.me.useQuery();
-  const { data: favorites, refetch: refetchFavs } =
+  const { data: favorites = [], refetch: refetchFavs } =
     trpc.user.favorites.me.useQuery();
-  const { data: requests, refetch: refetchRequests } =
-    trpc.user.requests.me.useQuery();
-
-  const { sent = [], received = [] } = requests ?? {};
+  const {
+    data: requests = { sent: [], received: [] },
+    refetch: refetchRequests,
+  } = trpc.user.requests.me.useQuery();
+  const { sent, received } = requests;
 
   const { mutate: mutateFavorites } = trpc.user.favorites.edit.useMutation({
     onError: (error: any) => {
@@ -217,69 +218,60 @@ const Home: NextPage<any> = () => {
 
   return (
     <>
-      <Head>
-        <title>Home</title>
-      </Head>
-      <div className="max-h-screen w-full h-full m-0">
-        <Header
-          data={{ sidebarValue: sidebarState, setSidebar: setSidebarState }}
-        />
-        {/* <ProfileModal userInfo={userInfo!} user={user!}  /> */}
-        <div className="flex flex-auto h-[91.5%]">
-          <div className="w-96">{mapState && user && renderSidebar()}</div>
+      <UserContext.Provider value={user}>
+        <Head>
+          <title>Home</title>
+        </Head>
+        <div className="max-h-screen w-full h-full m-0">
+          <Header
+            data={{ sidebarValue: sidebarState, setSidebar: setSidebarState }}
+          />
+          {/* <ProfileModal userInfo={userInfo!} user={user!}  /> */}
+          <div className="flex flex-auto h-[91.5%]">
+            <div className="w-96">{mapState && user && renderSidebar()}</div>
 
-          <DropDownMenu />
-          <button
-            className="flex justify-center items-center w-8 h-8 absolute z-10 right-[8px] bottom-[150px] rounded-md bg-white border-2 border-solid border-gray-300 shadow-sm hover:bg-gray-200"
-            id="fly"
-          >
-            <RiFocus3Line />
-          </button>
-          {/* This is where the Mapbox puts its stuff */}
+            <DropDownMenu />
+            <button
+              className="flex justify-center items-center w-8 h-8 absolute z-10 right-[8px] bottom-[150px] rounded-md bg-white border-2 border-solid border-gray-300 shadow-sm hover:bg-gray-200"
+              id="fly"
+            >
+              <RiFocus3Line />
+            </button>
+            {/* This is where the Mapbox puts its stuff */}
 
-          {/* map wrapper */}
-          <div className="relative flex-auto">
-            <div id="map" className={"flex-auto w-full h-full"}></div>
-            <ModalRenderer
-              curUser={user}
-              otherUser={modalUser}
-              setOtherUser={setModalUser}
-              modalType={modalType}
-            />
-            {user && modalUser && modalType === "already-requested" && (
-              <AlreadyConnectedModal
-                currentUser={user}
-                userToConnectTo={modalUser}
-                handleManageRequest={() => handleNavigateToRequests(true)}
-                closeModal={() => {
-                  setModalUser(null);
-                }}
+            {/* map wrapper */}
+            <div className="relative flex-auto">
+              <div id="map" className={"flex-auto w-full h-full"}></div>
+              <ModalRenderer
+                otherUser={modalUser}
+                setOtherUser={setModalUser}
+                modalType={modalType}
               />
-            )}
-            {user && modalUser && modalType === "sent" && (
-              <SentRequestModal
-                currentUser={user}
-                userToConnectTo={modalUser}
-                handleWithdraw={() => handleWithdrawRequest(modalUser)}
-                closeModal={() => {
-                  setModalUser(null);
-                }}
-              />
-            )}
-            {user && modalUser && modalType === "received" && (
-              <ReceivedRequestModal
-                currentUser={user}
-                userToConnectTo={modalUser}
-                handleReject={() => handleRejectRequest(modalUser)}
-                handleAccept={() => handleAcceptRequest(modalUser)}
-                closeModal={() => {
-                  setModalUser(null);
-                }}
-              />
-            )}
+              {user && modalUser && modalType === "sent" && (
+                <SentRequestModal
+                  currentUser={user}
+                  userToConnectTo={modalUser}
+                  handleWithdraw={() => handleWithdrawRequest(modalUser)}
+                  closeModal={() => {
+                    setModalUser(null);
+                  }}
+                />
+              )}
+              {user && modalUser && modalType === "received" && (
+                <ReceivedRequestModal
+                  currentUser={user}
+                  userToConnectTo={modalUser}
+                  handleReject={() => handleRejectRequest(modalUser)}
+                  handleAccept={() => handleAcceptRequest(modalUser)}
+                  closeModal={() => {
+                    setModalUser(null);
+                  }}
+                />
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      </UserContext.Provider>
     </>
   );
 };

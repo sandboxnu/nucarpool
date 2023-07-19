@@ -1,22 +1,52 @@
 import { Dialog } from "@headlessui/react";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useContext, useState } from "react";
 import { PublicUser, User } from "../utils/types";
 import { toast } from "react-toastify";
 import { trpc } from "../utils/trpc";
 import { emailSchema } from "../utils/email";
+import { UserContext } from "../utils/userContext";
+import Spinner from "./Spinner";
 
 interface ConnectModalProps {
-  // represents the 'me', the user trying to connect to someone
-  curUser: User;
-  // represents the other user 'I' am trying to connect to.
   otherUser: PublicUser;
   closeModal: () => void;
 }
 
+const sendConnectEmail = async (
+  fromEmail: string | null,
+  toEmail: string | null,
+  message: string
+) => {
+  if (fromEmail && toEmail) {
+    const msg: emailSchema = {
+      origin: fromEmail,
+      destination: toEmail,
+      subject: "Carpool Connect Request",
+      body: message,
+    };
+
+    const result = await fetch(`/api/email`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(msg),
+    });
+
+    console.log(result);
+  } else {
+    console.log("User email does not exist");
+  }
+};
+
 const ConnectModal = (props: ConnectModalProps): JSX.Element => {
+  const curUser = useContext(UserContext);
+  if (!curUser) {
+    return <Spinner />;
+  }
   //Hooks
   const [isOpen, setIsOpen] = useState(true);
-  const [customMessage, setCustomMessage] = useState(props.curUser.bio ?? "");
+  const [customMessage, setCustomMessage] = useState(curUser.bio ?? "");
 
   //tRPC
   const utils = trpc.useContext();
@@ -40,39 +70,12 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
   };
 
   const handleEmailConnect = () => {
-    sendConnectEmail(props.curUser.email, props.otherUser.email, customMessage);
+    sendConnectEmail(curUser.email, props.otherUser.email, customMessage);
     createRequest({
-      fromId: props.curUser.id,
+      fromId: curUser.id,
       toId: props.otherUser.id,
       message: customMessage,
     });
-  };
-
-  const sendConnectEmail = async (
-    fromEmail: string | null,
-    toEmail: string | null,
-    message: string
-  ) => {
-    if (fromEmail && toEmail) {
-      const msg: emailSchema = {
-        origin: fromEmail,
-        destination: toEmail,
-        subject: "Carpool Connect Request",
-        body: message,
-      };
-
-      const result = await fetch(`/api/email`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(msg),
-      });
-
-      console.log(result);
-    } else {
-      console.log("User email does not exist");
-    }
   };
 
   return (
