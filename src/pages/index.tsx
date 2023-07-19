@@ -249,9 +249,7 @@ const Home: NextPage<any> = () => {
               />
               {user && modalUser && modalType === "sent" && (
                 <SentRequestModal
-                  currentUser={user}
                   userToConnectTo={modalUser}
-                  handleWithdraw={() => handleWithdrawRequest(modalUser)}
                   closeModal={() => {
                     setModalUser(null);
                   }}

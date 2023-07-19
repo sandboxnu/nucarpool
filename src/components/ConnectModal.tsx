@@ -41,12 +41,12 @@ const sendConnectEmail = async (
 
 const ConnectModal = (props: ConnectModalProps): JSX.Element => {
   const curUser = useContext(UserContext);
+  const [isOpen, setIsOpen] = useState(true);
+  const [customMessage, setCustomMessage] = useState(curUser?.bio ?? "");
+
   if (!curUser) {
     return <Spinner />;
   }
-  //Hooks
-  const [isOpen, setIsOpen] = useState(true);
-  const [customMessage, setCustomMessage] = useState(curUser.bio ?? "");
 
   //tRPC
   const utils = trpc.useContext();

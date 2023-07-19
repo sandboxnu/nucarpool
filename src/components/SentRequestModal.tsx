@@ -1,20 +1,21 @@
 import { Dialog } from "@headlessui/react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { PublicUser, User } from "../utils/types";
+import { UserContext } from "../utils/userContext";
+import Spinner from "./Spinner";
 
 interface SentModalProps {
-  // represents the 'me', the user trying to connect to someone
-  currentUser: User;
-  // represents the other user 'I' am trying to connect to.
   userToConnectTo: PublicUser;
-  // handle the withdrawing of a request
-  handleWithdraw: () => void;
-
   closeModal: () => void;
 }
 
 const SentRequestModal = (props: SentModalProps): JSX.Element => {
+  const curUser = useContext(UserContext);
   const [isOpen, setIsOpen] = useState(true);
+
+  if (!curUser) {
+    return <Spinner />;
+  }
 
   const onClose = () => {
     setIsOpen(false);
@@ -45,7 +46,6 @@ const SentRequestModal = (props: SentModalProps): JSX.Element => {
               </button>
               <button
                 onClick={() => {
-                  props.handleWithdraw();
                   onClose();
                 }}
                 className="w-full p-1 text-slate-50 bg-blue-900 border-2 border-blue-900 rounded-md"
