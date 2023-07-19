@@ -294,7 +294,7 @@ const Home: NextPage<any> = () => {
                 <ConnectModal
                   currentUser={user}
                   userToConnectTo={modalUser}
-                  handleEmailConect={(message) => {
+                  handleEmailConnect={(message) => {
                     handleEmailConnect(user, modalUser, message);
                   }}
                   closeModal={() => {

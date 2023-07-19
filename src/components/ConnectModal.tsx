@@ -26,16 +26,15 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
     props.closeModal();
   };
 
-
   const handleOnClick = () => {
-    props.handleEmailConect(customMessage);
+    props.handleEmailConnect(customMessage);
     onClose();
     addToast(
       "A request to carpool has been sent to " + props.userToConnectTo.name,
       { appearance: "success" }
     );
   };
-  
+
   const handleMessageChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setCustomMessage(event.target.value);
   };
