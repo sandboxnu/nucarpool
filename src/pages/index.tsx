@@ -128,7 +128,7 @@ const Home: NextPage<any> = () => {
   };
 
   const handleRejectRequest = (fromUser: PublicUser) => {
-    const userRequest = sent.find(
+    const userRequest = received.find(
       (request) => request.fromUser?.name === fromUser.name
     );
     if (userRequest) {
@@ -136,7 +136,14 @@ const Home: NextPage<any> = () => {
     }
   };
 
-  const handleAcceptRequest = (fromUser: PublicUser) => {};
+  const handleAcceptRequest = (fromUser: PublicUser) => {
+    const userRequest = received.find(
+      (request) => request.fromUser?.name === fromUser.name
+    );
+    if (userRequest) {
+      handleDeleteRequest(userRequest);
+    }
+  };
 
   const handleDeleteRequest = (request: ResolvedRequest) => {
     deleteRequest({
