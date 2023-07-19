@@ -22,6 +22,8 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.363.0",
+    "@aws-sdk/credential-provider-env": "^3.363.0",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@headlessui/react": "^1.6.5",
@@ -38,7 +40,7 @@
     "@trpc/react-query": "^10.33.0",
     "@trpc/server": "^10.33.0",
     "@types/styled-components": "^5.1.26",
-    "antd": "^5.1.6",
+    "antd": "^5.5.2",
     "axios": "^0.27.2",
     "dayjs": "^1.11.6",
     "envsafe": "^2.0.3",

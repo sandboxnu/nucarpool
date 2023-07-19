@@ -1,5 +1,5 @@
 import { Dialog } from "@headlessui/react";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useToasts } from "react-toast-notifications";
 import { PublicUser, User } from "../utils/types";
 
@@ -9,7 +9,7 @@ interface ConnectModalProps {
   // represents the other user 'I' am trying to connect to.
   userToConnectTo: PublicUser;
 
-  handleEmailConect: () => void;
+  handleEmailConnect: (message: string) => void;
 
   closeModal: () => void;
 }
@@ -17,19 +17,27 @@ interface ConnectModalProps {
 const ConnectModal = (props: ConnectModalProps): JSX.Element => {
   const { addToast } = useToasts();
   const [isOpen, setIsOpen] = useState(true);
+  const [customMessage, setCustomMessage] = useState(
+    props.currentUser.bio ?? ""
+  );
 
   const onClose = () => {
     setIsOpen(false);
     props.closeModal();
   };
 
+
   const handleOnClick = () => {
-    props.handleEmailConect();
+    props.handleEmailConect(customMessage);
     onClose();
     addToast(
       "A request to carpool has been sent to " + props.userToConnectTo.name,
       { appearance: "success" }
     );
+  };
+  
+  const handleMessageChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setCustomMessage(event.target.value);
   };
 
   return (
@@ -52,7 +60,8 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
             <textarea
               className={`resize-none form-input w-full shadow-sm rounded-md px-3 py-2`}
               maxLength={280}
-              defaultValue={props.currentUser.bio}
+              defaultValue={customMessage}
+              onChange={handleMessageChange}
             ></textarea>
             <div className="text-xs italic text-slate-400">
               Note: The information you’ve provided in your intro is written

@@ -21,6 +21,7 @@ import SentRequestModal from "../components/SentRequestModal";
 import ReceivedRequestModal from "../components/ReceivedRequestModal";
 import { getSession } from "next-auth/react";
 import AlreadyConnectedModal from "../components/AlreadyConnectedModal";
+import { emailSchema } from "../utils/email";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -52,11 +53,15 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 const Home: NextPage<any> = () => {
   //tRPC queries to fetch user related data
   const utils = trpc.useContext();
-  const { data: geoJsonUsers } = trpc.mapbox.geoJsonUserList.useQuery();
-  const { data: user, refetch } = trpc.user.me.useQuery();
-  const { data: recommendations } = trpc.user.recommendations.me.useQuery();
-  const { data: favorites } = trpc.user.favorites.me.useQuery();
-  const { data: requests } = trpc.user.requests.me.useQuery();
+  const { data: geoJsonUsers, refetch: refetchGeoJsonUsers } =
+    trpc.mapbox.geoJsonUserList.useQuery();
+  const { data: user, refetch: refetchMe } = trpc.user.me.useQuery();
+  const { data: recommendations, refetch: refetchRecs } =
+    trpc.user.recommendations.me.useQuery();
+  const { data: favorites, refetch: refetchFavs } =
+    trpc.user.favorites.me.useQuery();
+  const { data: requests, refetch: refetchRequests } =
+    trpc.user.requests.me.useQuery();
   const { sent = [], received = [] } = requests ?? {};
 
   //tRPC mutations to update user related data
@@ -65,6 +70,7 @@ const Home: NextPage<any> = () => {
       toast.error(`Something went wrong: ${error.message}`);
     },
     onSuccess() {
+      utils.user.recommendations.me.invalidate();
       utils.user.requests.me.invalidate();
     },
   });
@@ -84,6 +90,7 @@ const Home: NextPage<any> = () => {
     },
     onSuccess() {
       utils.user.requests.me.invalidate();
+      utils.user.recommendations.me.invalidate();
     },
   });
 
@@ -137,27 +144,38 @@ const Home: NextPage<any> = () => {
     });
   };
 
-  const handleEmailConnect = (curUser: User, toUser: PublicUser) => {
-    connectEmail(toUser.email);
+  const handleEmailConnect = (
+    curUser: User,
+    toUser: PublicUser,
+    userMessage: string
+  ) => {
+    connectEmail(toUser.email, userMessage);
     createRequests({
       fromId: curUser.id,
       toId: toUser.id,
-      message: "Not sure if we need this",
+      message: userMessage,
     });
-    utils.user.requests.me.invalidate();
   };
-  const connectEmail = async (email: string | null) => {
-    const msg = {
-      to: email, // Replace with your recipient
-      from: "devashishsood9@gmail.com", // Replace with your verified sender
-      subject: "New Contact Message",
-      text: `Dior Dior`,
-    };
+  const connectEmail = async (email: string | null, message: string) => {
+    if (user && email) {
+      const msg: emailSchema = {
+        destination: email,
+        subject: "Carpool Connect Request",
+        body: message,
+      };
 
-    const result = await fetch(`/api/sendEmail`, {
-      method: "POST",
-      body: JSON.stringify(msg),
-    });
+      const result = await fetch(`/api/email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(msg),
+      });
+
+      console.log(result);
+    } else {
+      console.log("User email does not exist");
+    }
   };
 
   const handleSentRequests = (userToConnectTo: PublicUser) => {
@@ -189,7 +207,11 @@ const Home: NextPage<any> = () => {
   }, [user, geoJsonUsers]);
 
   useEffect(() => {
-    refetch();
+    refetchMe();
+    refetchRecs();
+    refetchRequests();
+    refetchFavs();
+    refetchGeoJsonUsers();
   }, []);
 
   const handleFavorite = (favoriteId: string, add: boolean) => {
@@ -272,8 +294,8 @@ const Home: NextPage<any> = () => {
                 <ConnectModal
                   currentUser={user}
                   userToConnectTo={modalUser}
-                  handleEmailConect={() => {
-                    handleEmailConnect(user, modalUser);
+                  handleEmailConect={(message) => {
+                    handleEmailConnect(user, modalUser, message);
                   }}
                   closeModal={() => {
                     setModalUser(null);

@@ -26,5 +26,14 @@ export const serverEnv = {
     SENDGRID_API_KEY: str({
       input: process.env.SENDGRID_API_KEY,
     }),
+    AWS_ACCESS_KEY_ID: str({
+      input: process.env.AWS_ACCESS_KEY_ID,
+    }),
+    AWS_SECRET_ACCESS_KEY: str({
+      input: process.env.AWS_SECRET_ACCESS_KEY,
+    }),
+    AWS_REGION: str({
+      input: process.env.AWS_REGION,
+    }),
   }),
 };

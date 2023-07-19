@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Header from "../components/Header";
-import { ZodIntersection, z } from "zod";
+import { z } from "zod";
 import { trpc } from "../utils/trpc";
 import { Role, Status } from "@prisma/client";
 import { TextField } from "../components/TextField";
@@ -105,6 +105,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 const Profile: NextPage = () => {
   const router = useRouter();
+  const utils = trpc.useContext();
   const {
     register,
     formState: { errors },
@@ -234,6 +235,9 @@ const Profile: NextPage = () => {
         }
       })
       .join(",");
+
+    utils.user.invalidate();
+    utils.mapbox.geoJsonUserList.invalidate();
 
     editUserMutation.mutate({
       role: userInfo.role,
