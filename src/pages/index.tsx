@@ -137,6 +137,8 @@ const Home: NextPage<any> = () => {
   };
 
   const handleAcceptRequest = (fromUser: PublicUser) => {
+    // Must also handle group inclusion functionality here
+    // When the carpooling page is complete
     const userRequest = received.find(
       (request) => request.fromUser?.name === fromUser.name
     );
