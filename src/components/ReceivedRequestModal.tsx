@@ -1,5 +1,6 @@
 import { Dialog } from "@headlessui/react";
 import { useState } from "react";
+import { useToasts } from "react-toast-notifications";
 import { PublicUser, User } from "../utils/types";
 
 interface ReceivedModalProps {
@@ -16,12 +17,34 @@ interface ReceivedModalProps {
 }
 
 const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
+  const { addToast } = useToasts();
   const [isOpen, setIsOpen] = useState(true);
 
   const onClose = () => {
     setIsOpen(false);
     props.closeModal();
   };
+
+  const handleRejectClick = () => {
+    props.handleReject();
+    onClose();
+    addToast(
+      props.userToConnectTo.name +
+        "'s request to carpool with you has been rejected.",
+      { appearance: "success" }
+    );
+  };
+
+  const handleAcceptClick = () => {
+    props.handleAccept();
+    onClose();
+    addToast(
+      props.userToConnectTo.name +
+        "'s request to carpool with you has been accepted.",
+      { appearance: "success" }
+    );
+  };
+
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
       {/* backdrop panel */}
@@ -40,19 +63,13 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
             </div>
             <div className="flex justify-center space-x-7">
               <button
-                onClick={() => {
-                  props.handleReject();
-                  onClose();
-                }}
+                onClick={handleRejectClick}
                 className="w-full p-1 text-blue-900 bg-slate-50 border-2 border-blue-900 rounded-md"
               >
                 Decline
               </button>
               <button
-                onClick={() => {
-                  props.handleAccept();
-                  onClose();
-                }}
+                onClick={handleAcceptClick}
                 className="w-full p-1 text-slate-50 bg-blue-900 border-2 border-blue-900 rounded-md"
               >
                 Accept

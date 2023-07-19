@@ -1,5 +1,6 @@
 import { Dialog } from "@headlessui/react";
 import { useState } from "react";
+import { useToasts } from "react-toast-notifications";
 import { PublicUser, User } from "../utils/types";
 
 interface SentModalProps {
@@ -14,12 +15,25 @@ interface SentModalProps {
 }
 
 const SentRequestModal = (props: SentModalProps): JSX.Element => {
+  const { addToast } = useToasts();
   const [isOpen, setIsOpen] = useState(true);
 
   const onClose = () => {
     setIsOpen(false);
     props.closeModal();
   };
+
+  const handleWithdrawClick = () => {
+    props.handleWithdraw();
+    onClose();
+    addToast(
+      "Your request to carpool with " +
+        props.userToConnectTo.name +
+        " has been withdrawn.",
+      { appearance: "success" }
+    );
+  };
+
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
       {/* backdrop panel */}
@@ -44,10 +58,7 @@ const SentRequestModal = (props: SentModalProps): JSX.Element => {
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  props.handleWithdraw();
-                  onClose();
-                }}
+                onClick={handleWithdrawClick}
                 className="w-full p-1 text-slate-50 bg-blue-900 border-2 border-blue-900 rounded-md"
               >
                 Withdraw Request
