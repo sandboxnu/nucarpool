@@ -63,7 +63,11 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
             >
               Send an email to connect!
             </Dialog.Title>
-            <div className="text-xs text-center">
+            <div
+              className={
+                props.isDesktop ? "text-sm text-center" : "text-xs text-center"
+              }
+            >
               Use the space below to write out a message to{" "}
               {props.userToConnectTo.preferredName} and send a connection
               request. We recommend writing a bit about yourself, your schedule,
