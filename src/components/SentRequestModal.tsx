@@ -4,6 +4,7 @@ import { useToasts } from "react-toast-notifications";
 import { PublicUser, User } from "../utils/types";
 
 interface SentModalProps {
+  isDesktop: Boolean;
   // represents the 'me', the user trying to connect to someone
   currentUser: User;
   // represents the other user 'I' am trying to connect to.
@@ -41,8 +42,20 @@ const SentRequestModal = (props: SentModalProps): JSX.Element => {
         {/* Full-screen container to center the panel */}
         <div className="fixed inset-0 flex items-center justify-center p-4">
           {/* dialog panel container  */}
-          <Dialog.Panel className="justify-center rounded-md shadow-md bg-white h-3/6 w-3/6 content-center flex flex-col p-9 gap-4">
-            <Dialog.Title className="font-bold text-2xl text-center">
+          <Dialog.Panel
+            className={
+              props.isDesktop
+                ? "justify-center rounded-md shadow-md bg-white h-3/6 w-3/6 content-center flex flex-col p-9 gap-4"
+                : "justify-center rounded-md shadow-md bg-white h-2/6 w-5/6 content-center flex flex-col p-6 gap-4"
+            }
+          >
+            <Dialog.Title
+              className={
+                props.isDesktop
+                  ? "font-bold text-2xl text-center"
+                  : "font-bold text-xl text-center"
+              }
+            >
               Manage Sent Request
             </Dialog.Title>
             <div className="text-sm text-center">
@@ -50,16 +63,30 @@ const SentRequestModal = (props: SentModalProps): JSX.Element => {
               {props.userToConnectTo.preferredName} has not yet responded. If
               you&apos;d like to, you can withdraw your request.
             </div>
-            <div className="flex justify-center space-x-7">
+            <div
+              className={
+                props.isDesktop
+                  ? "flex justify-center space-x-7"
+                  : "flex justify-center space-x-4"
+              }
+            >
               <button
                 onClick={onClose}
-                className="w-full p-1 text-blue-900 bg-slate-50 border-2 border-blue-900 rounded-md"
+                className={
+                  props.isDesktop
+                    ? "w-full p-1 text-blue-900 bg-slate-50 border-2 border-blue-900 rounded-md"
+                    : "w-2/6 text-sm p-1 text-blue-900 bg-slate-50 border-2 border-blue-900 rounded-md"
+                }
               >
                 Cancel
               </button>
               <button
                 onClick={handleWithdrawClick}
-                className="w-full p-1 text-slate-50 bg-blue-900 border-2 border-blue-900 rounded-md"
+                className={
+                  props.isDesktop
+                    ? "w-full p-1 text-slate-50 bg-blue-900 border-2 border-blue-900 rounded-md"
+                    : "w-4/6 text-sm p-1 text-slate-50 bg-blue-900 border-2 border-blue-900 rounded-md"
+                }
               >
                 Withdraw Request
               </button>

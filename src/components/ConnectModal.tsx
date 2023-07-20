@@ -4,6 +4,7 @@ import { useToasts } from "react-toast-notifications";
 import { PublicUser, User } from "../utils/types";
 
 interface ConnectModalProps {
+  isDesktop: Boolean;
   // represents the 'me', the user trying to connect to someone
   currentUser: User;
   // represents the other user 'I' am trying to connect to.
@@ -46,18 +47,30 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
         {/* Full-screen container to center the panel */}
         <div className="fixed inset-0 flex items-center justify-center p-4">
           {/* dialog panel container  */}
-          <Dialog.Panel className="justify-center rounded-md shadow-md bg-white h-3/6 w-3/6 content-center flex flex-col p-9 gap-4">
-            <Dialog.Title className="font-bold text-2xl text-center">
+          <Dialog.Panel
+            className={
+              props.isDesktop
+                ? "justify-center rounded-md shadow-md bg-white h-3/6 w-3/6 content-center flex flex-col p-9 gap-4"
+                : "justify-center rounded-md shadow-md bg-white h-4/6 w-5/6 content-center flex flex-col p-6 gap-4"
+            }
+          >
+            <Dialog.Title
+              className={
+                props.isDesktop
+                  ? "font-bold text-2xl text-center"
+                  : "font-bold text-xl text-center"
+              }
+            >
               Send an email to connect!
             </Dialog.Title>
-            <div className="text-sm">
+            <div className="text-xs text-center">
               Use the space below to write out a message to{" "}
               {props.userToConnectTo.preferredName} and send a connection
               request. We recommend writing a bit about yourself, your schedule,
               and anything else you think would be good to know!
             </div>
             <textarea
-              className={`resize-none form-input w-full shadow-sm rounded-md px-3 py-2`}
+              className={`h-2/6 resize-none form-input w-full shadow-sm rounded-md px-3 py-2`}
               maxLength={280}
               defaultValue={customMessage}
               onChange={handleMessageChange}
@@ -67,15 +80,29 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
               here. Feel free to add or edit your intro message, or send it as
               is!
             </div>
-            <div className="flex justify-center space-x-7">
+            <div
+              className={
+                props.isDesktop
+                  ? "flex justify-center space-x-7"
+                  : "flex justify-center space-x-4"
+              }
+            >
               <button
                 onClick={onClose}
-                className="w-full p-1 text-red-700 bg-slate-50 border-2 border-red-700 rounded-md"
+                className={
+                  props.isDesktop
+                    ? "w-full p-1 text-red-700 bg-slate-50 border-2 border-red-700 rounded-md"
+                    : "w-full text-sm p-1 text-red-700 bg-slate-50 border-2 border-red-700 rounded-md"
+                }
               >
                 Cancel
               </button>
               <button
-                className="w-full p-1 text-slate-50 bg-red-700 border-2 border-red-700 rounded-md"
+                className={
+                  props.isDesktop
+                    ? "w-full p-1 text-slate-50 bg-red-700 border-2 border-red-700 rounded-md"
+                    : "w-full text-sm p-1 text-slate-50 bg-red-700 border-2 border-red-700 rounded-md"
+                }
                 onClick={handleOnClick}
               >
                 Send Email

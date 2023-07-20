@@ -66,3 +66,7 @@ export type ResolvedRequest = {
   toUser: User | PublicUser | null;
   id: string;
 };
+
+export type ActionType = {
+  type: string;
+};

@@ -5,7 +5,11 @@ import Link from "next/link";
 import React, { Fragment } from "react";
 import { AiOutlineUser } from "react-icons/ai";
 
-const DropDownMenu = () => {
+interface DropDownMenuProps {
+  isDesktop: Boolean;
+}
+
+const DropDownMenu = (props: DropDownMenuProps) => {
   const { data: session, status } = useSession();
   const loading = status === "loading";
 
@@ -14,10 +18,16 @@ const DropDownMenu = () => {
   };
 
   return (
-    <div className="fixed z-30 right-5 top-3 text-right">
+    <div
+      className={
+        props.isDesktop
+          ? "fixed z-30 right-5 top-3 text-right"
+          : "fixed z-30 right-6 top-8 text-right"
+      }
+    >
       <Menu>
         <Menu.Button className="rounded-full bg-gray-400 p-2">
-          <AiOutlineUser className="w-8 h-8" />
+          <AiOutlineUser className={props.isDesktop ? "w-8 h-8" : "w-8 h-8"} />
         </Menu.Button>
 
         <Transition

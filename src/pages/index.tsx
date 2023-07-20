@@ -15,13 +15,13 @@ import Header, { HeaderOptions } from "../components/Header";
 import { PublicUser, ResolvedRequest, User } from "../utils/types";
 import ConnectModal from "../components/ConnectModal";
 import { toast } from "react-toastify";
-import ExploreSidebar from "../components/ExploreSidebar";
-import RequestSidebar from "../components/RequestSidebar";
 import SentRequestModal from "../components/SentRequestModal";
 import ReceivedRequestModal from "../components/ReceivedRequestModal";
 import { getSession } from "next-auth/react";
 import AlreadyConnectedModal from "../components/AlreadyConnectedModal";
 import { emailSchema } from "../utils/email";
+import ImprovedExploreSidebar from "../components/SidebarExplore";
+import ImprovedRequestsSidebar from "../components/SidebarRequests";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -49,6 +49,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     props: {}, // will be passed to the page component as props
   };
 }
+
+const previousMarkers: mapboxgl.Marker[] = [];
+const clearMarkers = () => {
+  previousMarkers.forEach((marker) => marker.remove());
+  previousMarkers.length = 0;
+};
 
 const Home: NextPage<any> = () => {
   //tRPC queries to fetch user related data
@@ -98,7 +104,10 @@ const Home: NextPage<any> = () => {
   const [modalUser, setModalUser] = useState<PublicUser | null>(null);
   const [modalType, setModalType] = useState<string>("connect");
   const [sidebarState, setSidebarState] = useState<HeaderOptions>("explore");
-  const [startingRequestsTab, setStartingRequestsTab] = useState<0 | 1>(0);
+  const [startingRequestsTab, setStartingRequestsTab] = useState<
+    "sent" | "received"
+  >("sent");
+  const [isDesktop, setIsDesktop] = useState<Boolean>(true);
 
   const handleConnect = (userToConnectTo: PublicUser) => {
     setModalUser(userToConnectTo);
@@ -113,9 +122,15 @@ const Home: NextPage<any> = () => {
     }
   };
 
+  const changeSidebarState = (option: HeaderOptions) => {
+    setSidebarState(option);
+    setStartingRequestsTab("sent");
+    clearMarkers();
+  };
+
   const handleNavigateToRequests = (received: boolean) => {
     setSidebarState("requests");
-    setStartingRequestsTab(received ? 1 : 0);
+    setStartingRequestsTab("received");
   };
 
   const handleWithdrawRequest = (toUser: PublicUser) => {
@@ -128,7 +143,7 @@ const Home: NextPage<any> = () => {
   };
 
   const handleRejectRequest = (fromUser: PublicUser) => {
-    const userRequest = sent.find(
+    const userRequest = received.find(
       (request) => request.fromUser?.name === fromUser.name
     );
     if (userRequest) {
@@ -136,7 +151,16 @@ const Home: NextPage<any> = () => {
     }
   };
 
-  const handleAcceptRequest = (fromUser: PublicUser) => {};
+  const handleAcceptRequest = (fromUser: PublicUser) => {
+    // Must also handle group inclusion functionality here
+    // When the carpooling page is complete
+    const userRequest = received.find(
+      (request) => request.fromUser?.name === fromUser.name
+    );
+    if (userRequest) {
+      handleDeleteRequest(userRequest);
+    }
+  };
 
   const handleDeleteRequest = (request: ResolvedRequest) => {
     deleteRequest({
@@ -156,6 +180,7 @@ const Home: NextPage<any> = () => {
       message: userMessage,
     });
   };
+
   const connectEmail = async (email: string | null, message: string) => {
     if (user && email) {
       const msg: emailSchema = {
@@ -204,7 +229,7 @@ const Home: NextPage<any> = () => {
       });
       setMapState(newMap);
     }
-  }, [user, geoJsonUsers]);
+  }, [user, geoJsonUsers, sidebarState]);
 
   useEffect(() => {
     refetchMe();
@@ -223,38 +248,121 @@ const Home: NextPage<any> = () => {
     });
   };
 
-  const renderSidebar = () => {
-    if (mapState && user) {
-      if (sidebarState == "explore") {
+  useEffect(() => {
+    if (
+      navigator.userAgent.match(/Android/i) ||
+      navigator.userAgent.match(/webOS/i) ||
+      navigator.userAgent.match(/iPhone/i) ||
+      navigator.userAgent.match(/iPad/i) ||
+      navigator.userAgent.match(/iPod/i) ||
+      navigator.userAgent.match(/BlackBerry/i) ||
+      navigator.userAgent.match(/Windows Phone/i)
+    ) {
+      setIsDesktop(false);
+    } else {
+      setIsDesktop(true);
+    }
+  }, [isDesktop]);
+
+  const renderSidebar = (): JSX.Element => {
+    if (sidebarState === "explore") {
+      if (isDesktop) {
         return (
-          <ExploreSidebar
-            currentUser={user}
-            reccs={recommendations ?? []}
-            favs={favorites ?? []}
-            sent={
-              requests?.sent.map((req: { toUser: any }) => req.toUser!) ?? []
-            }
-            map={mapState}
-            handleConnect={handleConnect}
-            handleFavorite={handleFavorite}
-          />
+          <>
+            {user && mapState && (
+              <ImprovedExploreSidebar
+                currentUser={user}
+                map={mapState}
+                favs={favorites ?? []}
+                sent={
+                  requests?.sent.map((req: { toUser: any }) => req.toUser!) ??
+                  []
+                }
+                handleFavorite={handleFavorite}
+                isDesktop={isDesktop}
+                reccs={recommendations ?? []}
+                handleConnect={handleConnect}
+                previousMarkers={previousMarkers}
+                clearMarkers={clearMarkers}
+              />
+            )}
+          </>
         );
       } else {
         return (
-          <RequestSidebar
-            currentUser={user}
-            sent={sent.map((req: { toUser: any }) => req.toUser!) ?? []}
-            received={
-              received.map((req: { fromUser: any }) => req.fromUser!) ?? []
-            }
-            favs={favorites ?? []}
-            map={mapState}
-            startingTab={startingRequestsTab}
-            setStartingTab={setStartingRequestsTab}
-            handleSent={handleSentRequests}
-            handleReceived={handleReceivedRequests}
-            handleFavorite={handleFavorite}
-          />
+          <div className="bg-white w-screen h-80 flex">
+            {user && mapState && (
+              <ImprovedExploreSidebar
+                currentUser={user}
+                map={mapState}
+                favs={favorites ?? []}
+                sent={
+                  requests?.sent.map((req: { toUser: any }) => req.toUser!) ??
+                  []
+                }
+                handleFavorite={handleFavorite}
+                isDesktop={isDesktop}
+                reccs={recommendations ?? []}
+                handleConnect={handleConnect}
+                previousMarkers={previousMarkers}
+                clearMarkers={clearMarkers}
+              />
+            )}
+          </div>
+        );
+      }
+    } else {
+      if (isDesktop) {
+        return (
+          <>
+            {user && mapState && (
+              <ImprovedRequestsSidebar
+                currentUser={user}
+                map={mapState}
+                favs={favorites ?? []}
+                sent={
+                  requests?.sent.map((req: { toUser: any }) => req.toUser!) ??
+                  []
+                }
+                handleFavorite={handleFavorite}
+                isDesktop={isDesktop}
+                received={
+                  received.map((req: { fromUser: any }) => req.fromUser!) ?? []
+                }
+                startingTab={startingRequestsTab}
+                handleSent={handleSentRequests}
+                handleReceived={handleReceivedRequests}
+                previousMarkers={previousMarkers}
+                clearMarkers={clearMarkers}
+              />
+            )}
+          </>
+        );
+      } else {
+        return (
+          <div className="bg-white w-screen h-80 flex">
+            {user && mapState && (
+              <ImprovedRequestsSidebar
+                currentUser={user}
+                map={mapState}
+                favs={favorites ?? []}
+                sent={
+                  requests?.sent.map((req: { toUser: any }) => req.toUser!) ??
+                  []
+                }
+                handleFavorite={handleFavorite}
+                isDesktop={isDesktop}
+                received={
+                  received.map((req: { fromUser: any }) => req.fromUser!) ?? []
+                }
+                startingTab={startingRequestsTab}
+                handleSent={handleSentRequests}
+                handleReceived={handleReceivedRequests}
+                previousMarkers={previousMarkers}
+                clearMarkers={clearMarkers}
+              />
+            )}
+          </div>
         );
       }
     }
@@ -265,33 +373,52 @@ const Home: NextPage<any> = () => {
       <Head>
         <title>Home</title>
       </Head>
-      <div className="max-h-screen w-full h-full m-0">
+      <div
+        className={
+          isDesktop
+            ? "max-h-screen w-full h-full m-0 flex-col"
+            : "max-h-screen w-full h-full m-0 flex-row"
+        }
+      >
         <Header
-          data={{ sidebarValue: sidebarState, setSidebar: setSidebarState }}
+          isDesktop={isDesktop}
+          data={{ sidebarValue: sidebarState, setSidebar: changeSidebarState }}
         />
-        {/* <ProfileModal userInfo={userInfo!} user={user!}  /> */}
-        <div className="flex flex-auto h-[91.5%]">
-          <div className="w-96">{mapState && user && renderSidebar()}</div>
-
-          <DropDownMenu />
+        <div>
+          <DropDownMenu isDesktop={isDesktop} />
           <button
-            className="flex justify-center items-center w-8 h-8 absolute z-10 right-[8px] bottom-[150px] rounded-md bg-white border-2 border-solid border-gray-300 shadow-sm hover:bg-gray-200"
+            className={
+              isDesktop
+                ? "flex justify-center items-center w-8 h-8 absolute z-10 right-[8px] bottom-[150px] rounded-md bg-white border-2 border-solid border-gray-300 shadow-sm hover:bg-gray-200"
+                : "flex justify-center items-center w-8 h-8 absolute z-10 right-[8px] top-[120px] rounded-md bg-white border-2 border-solid border-gray-300 shadow-sm hover:bg-gray-200"
+            }
             id="fly"
           >
             <RiFocus3Line />
           </button>
-          {/* This is where the Mapbox puts its stuff */}
+        </div>
 
-          {/* map wrapper */}
+        <div
+          className={
+            isDesktop
+              ? "flex flex-auto h-[91.5%]"
+              : "flex flex-col-reverse h-[85.5%]"
+          }
+        >
+          <div className={isDesktop ? "w-96" : "w-screen"}>
+            {renderSidebar()}
+          </div>
+
           <ToastProvider
             placement="bottom-right"
             autoDismiss={true}
             newestOnTop={true}
           >
-            <div className="relative flex-auto">
+            <div className="flex-auto justify-center w-full">
               <div id="map" className={"flex-auto w-full h-full"}></div>
               {user && modalUser && modalType === "connect" && (
                 <ConnectModal
+                  isDesktop={isDesktop}
                   currentUser={user}
                   userToConnectTo={modalUser}
                   handleEmailConnect={(message) => {
@@ -304,6 +431,7 @@ const Home: NextPage<any> = () => {
               )}
               {user && modalUser && modalType === "already-requested" && (
                 <AlreadyConnectedModal
+                  isDesktop={isDesktop}
                   currentUser={user}
                   userToConnectTo={modalUser}
                   handleManageRequest={() => handleNavigateToRequests(true)}
@@ -314,6 +442,7 @@ const Home: NextPage<any> = () => {
               )}
               {user && modalUser && modalType === "sent" && (
                 <SentRequestModal
+                  isDesktop={isDesktop}
                   currentUser={user}
                   userToConnectTo={modalUser}
                   handleWithdraw={() => handleWithdrawRequest(modalUser)}
@@ -324,6 +453,7 @@ const Home: NextPage<any> = () => {
               )}
               {user && modalUser && modalType === "received" && (
                 <ReceivedRequestModal
+                  isDesktop={isDesktop}
                   currentUser={user}
                   userToConnectTo={modalUser}
                   handleReject={() => handleRejectRequest(modalUser)}
