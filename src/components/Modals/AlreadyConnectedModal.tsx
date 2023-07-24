@@ -1,6 +1,6 @@
 import { Dialog } from "@headlessui/react";
 import { useState } from "react";
-import { PublicUser, User } from "../utils/types";
+import { PublicUser, User } from "../../utils/types";
 
 interface AlreadyConnectedModalProps {
   // represents the 'me', the user trying to connect to someone

@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import mapboxgl from "mapbox-gl";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { PublicUser, User } from "../utils/types";
+import { PublicUser, User } from "../../utils/types";
 
 interface UserCardProps {
   // represents the other user 'I' am trying to connect to.

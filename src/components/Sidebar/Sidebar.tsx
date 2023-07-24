@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
-import { UserCard } from "./UserCard";
-import { PublicUser, User } from "../utils/types";
+import { UserCard } from "../UserCards/UserCard";
+import { PublicUser, User } from "../../utils/types";
+import { SidebarStateProps } from "../../utils/reducerFuncs";
 
 /**
  * TODO:
@@ -24,7 +25,7 @@ interface SideBarProps {
   handleFavorite: (otherUser: string, add: boolean) => void;
 }
 
-const Sidebar = (props: SideBarProps) => {
+const ughSidebar = (props: SideBarProps) => {
   const [curList, setCurList] = useState<PublicUser[]>(props.reccs ?? []);
 
   useEffect(() => {

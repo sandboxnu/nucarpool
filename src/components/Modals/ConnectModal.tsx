@@ -1,7 +1,7 @@
 import { Dialog } from "@headlessui/react";
 import { ChangeEvent, useState } from "react";
 import { useToasts } from "react-toast-notifications";
-import { PublicUser, User } from "../utils/types";
+import { PublicUser, User } from "../../utils/types";
 
 interface ConnectModalProps {
   // represents the 'me', the user trying to connect to someone

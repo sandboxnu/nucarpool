@@ -13,7 +13,7 @@ import { TextField } from "../components/TextField";
 import Radio from "../components/Radio";
 import useSearch from "../utils/search";
 import Checkbox from "@mui/material/Checkbox";
-import DayBox from "../components/DayBox";
+import DayBox from "../components/Profile/DayBox";
 import {
   BottomProfileSection,
   CompleteProfileButton,
@@ -29,10 +29,10 @@ import {
   ErrorDisplay,
   ProfileHeaderNoMB,
 } from "../styles/profile";
-import ControlledTimePicker from "../components/ControlledTimePicker";
+import ControlledTimePicker from "../components/Profile/ControlledTimePicker";
 import { CarpoolAddress, CarpoolFeature } from "../utils/types";
 import { EntryLabel } from "../components/EntryLabel";
-import ControlledAddressCombobox from "../components/ControlledAddressCombobox";
+import ControlledAddressCombobox from "../components/Profile/ControlledAddressCombobox";
 import { getSession } from "next-auth/react";
 
 // Inputs to the onboarding form.

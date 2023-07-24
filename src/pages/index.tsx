@@ -1,7 +1,7 @@
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import type { GetServerSidePropsContext, NextPage } from "next";
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { RiFocus3Line } from "react-icons/ri";
 import { ToastProvider } from "react-toast-notifications";
 import addClusters from "../utils/map/addClusters";
@@ -13,15 +13,19 @@ import DropDownMenu from "../components/DropDownMenu";
 import { browserEnv } from "../utils/env/browser";
 import Header, { HeaderOptions } from "../components/Header";
 import { PublicUser, ResolvedRequest, User } from "../utils/types";
-import ConnectModal from "../components/ConnectModal";
+import ConnectModal from "../components/Modals/ConnectModal";
 import { toast } from "react-toastify";
-import ExploreSidebar from "../components/ExploreSidebar";
-import RequestSidebar from "../components/RequestSidebar";
-import SentRequestModal from "../components/SentRequestModal";
-import ReceivedRequestModal from "../components/ReceivedRequestModal";
+import ExploreSidebar from "../components/Sidebar/ExploreSidebar";
+import RequestSidebar from "../components/Sidebar/RequestSidebar";
+import SentRequestModal from "../components/Modals/SentRequestModal";
+import ReceivedRequestModal from "../components/Modals/ReceivedRequestModal";
 import { getSession } from "next-auth/react";
-import AlreadyConnectedModal from "../components/AlreadyConnectedModal";
+import AlreadyConnectedModal from "../components/Modals/AlreadyConnectedModal";
 import { emailSchema } from "../utils/email";
+import { createPortal } from "react-dom";
+import Spinner from "../components/Spinner";
+import { SidebarStateProps, sidebarReducer } from "../utils/reducerFuncs";
+import { UserContext } from "../utils/userContext";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -55,14 +59,27 @@ const Home: NextPage<any> = () => {
   const utils = trpc.useContext();
   const { data: geoJsonUsers, refetch: refetchGeoJsonUsers } =
     trpc.mapbox.geoJsonUserList.useQuery();
-  const { data: user, refetch: refetchMe } = trpc.user.me.useQuery();
-  const { data: recommendations, refetch: refetchRecs } =
+  const { data: user = null, refetch: refetchMe } = trpc.user.me.useQuery();
+  const { data: recommendations = [], refetch: refetchRecs } =
     trpc.user.recommendations.me.useQuery();
-  const { data: favorites, refetch: refetchFavs } =
+  const { data: favorites = [], refetch: refetchFavs } =
     trpc.user.favorites.me.useQuery();
-  const { data: requests, refetch: refetchRequests } =
-    trpc.user.requests.me.useQuery();
-  const { sent = [], received = [] } = requests ?? {};
+  const {
+    data: requests = { sent: [], received: [] },
+    refetch: refetchRequests,
+  } = trpc.user.requests.me.useQuery();
+
+  const sent = requests.sent.map((request: { toUser: any }) => request.toUser!);
+  const received = requests.received.map(
+    (request: { fromUser: any }) => request.fromUser
+  );
+
+  const initialSidebarState = {
+    recommendations: recommendations,
+    favorites: favorites,
+    sent: sent,
+    received: received,
+  };
 
   //tRPC mutations to update user related data
   const { mutate: createRequests } = trpc.user.requests.create.useMutation({
@@ -97,8 +114,12 @@ const Home: NextPage<any> = () => {
   const [mapState, setMapState] = useState<mapboxgl.Map>();
   const [modalUser, setModalUser] = useState<PublicUser | null>(null);
   const [modalType, setModalType] = useState<string>("connect");
-  const [sidebarState, setSidebarState] = useState<HeaderOptions>("explore");
+  const [sideBarState, setSideBarState] = useState<HeaderOptions>("explore");
   const [startingRequestsTab, setStartingRequestsTab] = useState<0 | 1>(0);
+  const [sidebarState, sidebarDispatch] = useReducer(
+    sidebarReducer,
+    initialSidebarState
+  );
 
   const handleConnect = (userToConnectTo: PublicUser) => {
     setModalUser(userToConnectTo);
@@ -114,7 +135,7 @@ const Home: NextPage<any> = () => {
   };
 
   const handleNavigateToRequests = (received: boolean) => {
-    setSidebarState("requests");
+    setSideBarState("requests");
     setStartingRequestsTab(received ? 1 : 0);
   };
 
@@ -234,7 +255,7 @@ const Home: NextPage<any> = () => {
 
   const renderSidebar = () => {
     if (mapState && user) {
-      if (sidebarState == "explore") {
+      if (sideBarState == "explore") {
         return (
           <ExploreSidebar
             currentUser={user}
@@ -269,83 +290,88 @@ const Home: NextPage<any> = () => {
     }
   };
 
+  if (!mapState || !user) {
+    return <Spinner />;
+  }
+
   return (
     <>
-      <Head>
-        <title>Home</title>
-      </Head>
-      <div className="max-h-screen w-full h-full m-0">
-        <Header
-          data={{ sidebarValue: sidebarState, setSidebar: setSidebarState }}
-        />
-        {/* <ProfileModal userInfo={userInfo!} user={user!}  /> */}
-        <div className="flex flex-auto h-[91.5%]">
-          <div className="w-96">{mapState && user && renderSidebar()}</div>
+      <UserContext.Provider value={user}>
+        <Head>
+          <title>Home</title>
+        </Head>
+        <div className="max-h-screen w-full h-full m-0">
+          <Header
+            data={{ sidebarValue: sideBarState, setSidebar: setSideBarState }}
+          />
+          <div className="flex flex-auto h-[91.5%]">
+            <div className="w-96">{mapState && user && renderSidebar()}</div>
 
-          <DropDownMenu />
-          <button
-            className="flex justify-center items-center w-8 h-8 absolute z-10 right-[8px] bottom-[150px] rounded-md bg-white border-2 border-solid border-gray-300 shadow-sm hover:bg-gray-200"
-            id="fly"
-          >
-            <RiFocus3Line />
-          </button>
-          {/* This is where the Mapbox puts its stuff */}
+            <DropDownMenu />
+            <button
+              className="flex justify-center items-center w-8 h-8 absolute z-10 right-[8px] bottom-[150px] rounded-md bg-white border-2 border-solid border-gray-300 shadow-sm hover:bg-gray-200"
+              id="fly"
+            >
+              <RiFocus3Line />
+            </button>
+            {/* This is where the Mapbox puts its stuff */}
 
-          {/* map wrapper */}
-          <ToastProvider
-            placement="bottom-right"
-            autoDismiss={true}
-            newestOnTop={true}
-          >
-            <div className="relative flex-auto">
-              <div id="map" className={"flex-auto w-full h-full"}></div>
-              {user && modalUser && modalType === "connect" && (
-                <ConnectModal
-                  currentUser={user}
-                  userToConnectTo={modalUser}
-                  handleEmailConnect={(message) => {
-                    handleEmailConnect(user, modalUser, message);
-                  }}
-                  closeModal={() => {
-                    setModalUser(null);
-                  }}
-                />
-              )}
-              {user && modalUser && modalType === "already-requested" && (
-                <AlreadyConnectedModal
-                  currentUser={user}
-                  userToConnectTo={modalUser}
-                  handleManageRequest={() => handleNavigateToRequests(true)}
-                  closeModal={() => {
-                    setModalUser(null);
-                  }}
-                />
-              )}
-              {user && modalUser && modalType === "sent" && (
-                <SentRequestModal
-                  currentUser={user}
-                  userToConnectTo={modalUser}
-                  handleWithdraw={() => handleWithdrawRequest(modalUser)}
-                  closeModal={() => {
-                    setModalUser(null);
-                  }}
-                />
-              )}
-              {user && modalUser && modalType === "received" && (
-                <ReceivedRequestModal
-                  currentUser={user}
-                  userToConnectTo={modalUser}
-                  handleReject={() => handleRejectRequest(modalUser)}
-                  handleAccept={() => handleAcceptRequest(modalUser)}
-                  closeModal={() => {
-                    setModalUser(null);
-                  }}
-                />
-              )}
-            </div>
-          </ToastProvider>
+            {/* map wrapper */}
+            <ToastProvider
+              placement="bottom-right"
+              autoDismiss={true}
+              newestOnTop={true}
+            >
+              <div className="relative flex-auto">
+                <div id="map" className={"flex-auto w-full h-full"}></div>
+                {user && modalUser && modalType === "connect" && (
+                  <ConnectModal
+                    currentUser={user}
+                    userToConnectTo={modalUser}
+                    handleEmailConnect={(message) => {
+                      handleEmailConnect(user, modalUser, message);
+                    }}
+                    closeModal={() => {
+                      setModalUser(null);
+                    }}
+                  />
+                )}
+                {user && modalUser && modalType === "already-requested" && (
+                  <AlreadyConnectedModal
+                    currentUser={user}
+                    userToConnectTo={modalUser}
+                    handleManageRequest={() => handleNavigateToRequests(true)}
+                    closeModal={() => {
+                      setModalUser(null);
+                    }}
+                  />
+                )}
+                {user && modalUser && modalType === "sent" && (
+                  <SentRequestModal
+                    currentUser={user}
+                    userToConnectTo={modalUser}
+                    handleWithdraw={() => handleWithdrawRequest(modalUser)}
+                    closeModal={() => {
+                      setModalUser(null);
+                    }}
+                  />
+                )}
+                {user && modalUser && modalType === "received" && (
+                  <ReceivedRequestModal
+                    currentUser={user}
+                    userToConnectTo={modalUser}
+                    handleReject={() => handleRejectRequest(modalUser)}
+                    handleAccept={() => handleAcceptRequest(modalUser)}
+                    closeModal={() => {
+                      setModalUser(null);
+                    }}
+                  />
+                )}
+              </div>
+            </ToastProvider>
+          </div>
         </div>
-      </div>
+      </UserContext.Provider>
     </>
   );
 };

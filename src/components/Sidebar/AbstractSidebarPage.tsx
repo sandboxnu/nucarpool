@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
-import { ButtonInfo, PublicUser, User } from "../utils/types";
-import { AbstractUserCard } from "./AbstractUserCard";
+import { ButtonInfo, PublicUser, User } from "../../utils/types";
+import { AbstractUserCard } from "../UserCards/AbstractUserCard";
+import { SidebarStateProps } from "../../utils/reducerFuncs";
 
 /**
  * TODO:
@@ -25,6 +26,15 @@ interface AbstractSidebarPageProps {
   map: mapboxgl.Map;
   emptyMessage?: string;
 }
+
+interface SidebarProps {
+  sidebarState: SidebarStateProps;
+  sidebarDispatch: Dispatch<any>;
+}
+
+const Sidebar = (props: SidebarProps) => {
+  const [sidebarType, setSidebarType] = useState<String>("explore");
+};
 
 const AbstractSidebarPage = (props: AbstractSidebarPageProps) => {
   const [curList, setCurList] = useState<PublicUser[]>(

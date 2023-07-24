@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import mapboxgl from "mapbox-gl";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { ButtonInfo, PublicUser } from "../utils/types";
+import { ButtonInfo, PublicUser } from "../../utils/types";
 
 interface AbstractUserCardProps {
   userCardObj: PublicUser;
