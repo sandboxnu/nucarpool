@@ -1,7 +1,7 @@
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import type { GetServerSidePropsContext, NextPage } from "next";
-import { useEffect, useReducer, useState } from "react";
+import { createContext, useEffect, useReducer, useState } from "react";
 import { RiFocus3Line } from "react-icons/ri";
 import { ToastProvider } from "react-toast-notifications";
 import addClusters from "../utils/map/addClusters";
@@ -92,15 +92,6 @@ const Home: NextPage<any> = () => {
     },
   });
 
-  const { mutate: mutateFavorites } = trpc.user.favorites.edit.useMutation({
-    onError: (error: any) => {
-      toast.error(`Something went wrong: ${error.message}`);
-    },
-    onSuccess() {
-      utils.user.favorites.me.invalidate();
-    },
-  });
-
   const { mutate: deleteRequest } = trpc.user.requests.delete.useMutation({
     onError: (error: any) => {
       toast.error(`Something went wrong: ${error.message}`);
@@ -114,7 +105,7 @@ const Home: NextPage<any> = () => {
   const [mapState, setMapState] = useState<mapboxgl.Map>();
   const [modalUser, setModalUser] = useState<PublicUser | null>(null);
   const [modalType, setModalType] = useState<string>("connect");
-  const [sideBarState, setSideBarState] = useState<HeaderOptions>("explore");
+  const [sidebarType, setSidebarType] = useState<HeaderOptions>("explore");
   const [startingRequestsTab, setStartingRequestsTab] = useState<0 | 1>(0);
   const [sidebarState, sidebarDispatch] = useReducer(
     sidebarReducer,
@@ -135,7 +126,7 @@ const Home: NextPage<any> = () => {
   };
 
   const handleNavigateToRequests = (received: boolean) => {
-    setSideBarState("requests");
+    setSidebarType("requests");
     setStartingRequestsTab(received ? 1 : 0);
   };
 
@@ -244,21 +235,11 @@ const Home: NextPage<any> = () => {
     refetchGeoJsonUsers();
   }, []);
 
-  const handleFavorite = (favoriteId: string, add: boolean) => {
-    if (!user) return;
-    mutateFavorites({
-      userId: user.id,
-      favoriteId,
-      add,
-    });
-  };
-
   const renderSidebar = () => {
     if (mapState && user) {
-      if (sideBarState == "explore") {
+      if (sidebarType == "explore") {
         return (
           <ExploreSidebar
-            currentUser={user}
             reccs={recommendations ?? []}
             favs={favorites ?? []}
             sent={
@@ -293,6 +274,7 @@ const Home: NextPage<any> = () => {
   if (!mapState || !user) {
     return <Spinner />;
   }
+  const UserContext = createContext<User>(user);
 
   return (
     <>
@@ -302,7 +284,7 @@ const Home: NextPage<any> = () => {
         </Head>
         <div className="max-h-screen w-full h-full m-0">
           <Header
-            data={{ sidebarValue: sideBarState, setSidebar: setSideBarState }}
+            data={{ sidebarValue: sidebarType, setSidebar: setSidebarType }}
           />
           <div className="flex flex-auto h-[91.5%]">
             <div className="w-96">{mapState && user && renderSidebar()}</div>

@@ -3,6 +3,7 @@ import mapboxgl from "mapbox-gl";
 import { ButtonInfo, PublicUser, User } from "../../utils/types";
 import { AbstractUserCard } from "../UserCards/AbstractUserCard";
 import { SidebarStateProps } from "../../utils/reducerFuncs";
+import ExploreSidebar from "./ExploreSidebar";
 
 /**
  * TODO:
@@ -17,63 +18,100 @@ const clearMarkers = () => {
 };
 
 interface AbstractSidebarPageProps {
-  currentUser: User;
-  userCardList: PublicUser[];
-  favs: PublicUser[];
-  leftButton?: ButtonInfo;
-  rightButton: ButtonInfo;
   handleFavorite: (otherUser: string, add: boolean) => void;
   map: mapboxgl.Map;
   emptyMessage?: string;
 }
 
 interface SidebarProps {
+  sidebarType: string;
   sidebarState: SidebarStateProps;
   sidebarDispatch: Dispatch<any>;
 }
 
-const Sidebar = (props: SidebarProps) => {
-  const [sidebarType, setSidebarType] = useState<String>("explore");
-};
+// const Sidebar = (props: SidebarProps) => {
+//   switch (props.sidebarType) {
+//     case "explore":
+//       return
+//       <ExploreSidebar
 
-const AbstractSidebarPage = (props: AbstractSidebarPageProps) => {
-  const [curList, setCurList] = useState<PublicUser[]>(
-    props.userCardList ?? []
-  );
+//   }
+// };
 
-  useEffect(() => {
-    setCurList(props.userCardList ?? []);
-  }, [props.userCardList]);
+interface SidebarContentProps {
+  userCardList: PublicUser[];
+  emptyMessage: String;
+  cardType: JSX.Element;
+}
 
-  const favIds = props.favs.map((fav) => fav.id);
-
+// props.userCardList.map((otherUser: PublicUser) => (
+//   <AbstractUserCard
+//     userCardObj={otherUser}
+//     key={otherUser.id}
+//     isFavorited={favIds.includes(otherUser.id)}
+//     handleFavorite={(add: boolean) =>
+//       props.handleFavorite(otherUser.id, add)
+//     }
+//     leftButton={props.leftButton}
+//     rightButton={props.rightButton}
+//     inputProps={{ // We can use dispatch to reduce prop drilling here
+//       map: props.map, // All of this
+//       previousMarkers: previousMarkers,
+//       clearMarkers: clearMarkers,
+//     }}
+//   />
+const SidebarContent = (props: SidebarContentProps) => {
   return (
     <div id="scrollableDiv" className="overflow-auto">
-      {curList.length > 0 &&
-        curList.map((otherUser: PublicUser) => (
-          <AbstractUserCard
-            userCardObj={otherUser}
-            key={otherUser.id}
-            isFavorited={favIds.includes(otherUser.id)}
-            handleFavorite={(add: boolean) =>
-              props.handleFavorite(otherUser.id, add)
-            }
-            leftButton={props.leftButton}
-            rightButton={props.rightButton}
-            inputProps={{
-              map: props.map,
-              previousMarkers: previousMarkers,
-              clearMarkers: clearMarkers,
-            }}
-          />
-        ))}
-      {props.emptyMessage && curList.length === 0 && (
+      {props.userCardList.length == 0 ? (
         <div className="text-center text-lg font-light m-4">
           {props.emptyMessage}
         </div>
+      ) : (
+        <div>Test</div>
       )}
     </div>
   );
 };
 
-export default AbstractSidebarPage;
+// const AbstractSidebarPage = (props: AbstractSidebarPageProps) => {
+//   const [curList, setCurList] = useState<PublicUser[]>(
+//     props.userCardList ?? []
+//   );
+
+//   useEffect(() => {
+//     setCurList(props.userCardList ?? []);
+//   }, [props.userCardList]);
+
+//   const favIds = props.favs.map((fav) => fav.id);
+
+//   return (
+//     <div id="scrollableDiv" className="overflow-auto">
+//       {curList.length > 0 &&
+//         curList.map((otherUser: PublicUser) => (
+//           <AbstractUserCard
+//             userCardObj={otherUser}
+//             key={otherUser.id}
+//             isFavorited={favIds.includes(otherUser.id)}
+//             handleFavorite={(add: boolean) =>
+//               props.handleFavorite(otherUser.id, add)
+//             }
+//             leftButton={props.leftButton}
+//             rightButton={props.rightButton}
+//             inputProps={{ // We can use dispatch to reduce prop drilling here
+//               map: props.map, // All of this
+//               previousMarkers: previousMarkers,
+//               clearMarkers: clearMarkers,
+//             }}
+//           />
+//         ))}
+//       {props.emptyMessage && curList.length === 0 && (
+//         <div className="text-center text-lg font-light m-4">
+//           {props.emptyMessage}
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default AbstractSidebarPage;

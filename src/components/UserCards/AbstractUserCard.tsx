@@ -4,11 +4,14 @@ import mapboxgl from "mapbox-gl";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { ButtonInfo, PublicUser } from "../../utils/types";
+import { trpc } from "../../utils/trpc";
+import { toast } from "react-toastify";
+import { useContext } from "react";
+import { UserContext } from "../../utils/userContext";
 
 interface AbstractUserCardProps {
   userCardObj: PublicUser;
   isFavorited: boolean;
-  handleFavorite: (add: boolean) => void;
   leftButton?: ButtonInfo;
   rightButton: ButtonInfo;
   inputProps?: {
@@ -18,30 +21,61 @@ interface AbstractUserCardProps {
   };
 }
 
-export const AbstractUserCard = (props: AbstractUserCardProps): JSX.Element => {
-  /**
-   * https://stackoverflow.com/questions/69687530/dynamically-build-classnames-in-tailwindcss
-   * Because Tailwind does not support dynnamic CSS, the returns of the two functions below
-   * need to be their complete full className in order to be rendered correctly, hence the lack
-   * of abstraction. Perhaps there is a better way of doing this though.
-   */
-  const backgroundColorCSS = (seatAvail: number): string => {
-    if (seatAvail === 1) {
-      return " bg-busy-red";
-    } else if (seatAvail === 2) {
-      return " bg-okay-yellow";
-    } else {
-      return " bg-good-green";
-    }
-  };
+const backgroundColorCSS = (seatAvail: number): string => {
+  if (seatAvail === 1) {
+    return " bg-busy-red";
+  } else if (seatAvail === 2) {
+    return " bg-okay-yellow";
+  } else {
+    return " bg-good-green";
+  }
+};
 
-  const borderLColorCSS = (seatAvail: number): string => {
-    if (seatAvail === 1) {
-      return " border-l-busy-red";
-    } else if (seatAvail === 2) {
-      return " border-l-okay-yellow";
+const borderLColorCSS = (seatAvail: number): string => {
+  if (seatAvail === 1) {
+    return " border-l-busy-red";
+  } else if (seatAvail === 2) {
+    return " border-l-okay-yellow";
+  } else {
+    return " border-l-good-green";
+  }
+};
+
+const getButtonClassName = (
+  withFill: boolean,
+  button: ButtonInfo | undefined
+): string => {
+  if (withFill) {
+    if (button == undefined || button.color == undefined) {
+      return "bg-northeastern-red w-1/2 hover:bg-red-700 rounded-md p-1 my-1 text-center text-white";
     } else {
-      return " border-l-good-green";
+      return "bg-sky-900 w-1/2 hover:bg-sky-900 rounded-md p-1 my-1 text-center text-white";
+    }
+  } else {
+    return "w-1/2 hover:bg-stone-200 rounded-md p-1 my-1 text-center border-black border";
+  }
+};
+
+const trpcUtils = trpc.useContext();
+const user = useContext(UserContext);
+const { mutate: mutateFavorites } = trpc.user.favorites.edit.useMutation({
+  onError: (error: any) => {
+    toast.error(`Something went wrong: ${error.message}`);
+  },
+  onSuccess() {
+    trpcUtils.user.favorites.me.invalidate();
+  },
+});
+
+export const AbstractUserCard = (props: AbstractUserCardProps): JSX.Element => {
+  const user = useContext(UserContext);
+  const handleFavorite = (favoriteId: string, add: boolean) => {
+    if (user) {
+      mutateFavorites({
+        userId: user.id,
+        favoriteId,
+        add,
+      });
     }
   };
 
@@ -124,21 +158,6 @@ export const AbstractUserCard = (props: AbstractUserCardProps): JSX.Element => {
     }
   };
 
-  const getButtonClassName = (
-    withFill: boolean,
-    button: ButtonInfo | undefined
-  ): string => {
-    if (withFill) {
-      if (button == undefined || button.color == undefined) {
-        return "bg-northeastern-red w-1/2 hover:bg-red-700 rounded-md p-1 my-1 text-center text-white";
-      } else {
-        return "bg-sky-900 w-1/2 hover:bg-sky-900 rounded-md p-1 my-1 text-center text-white";
-      }
-    } else {
-      return "w-1/2 hover:bg-stone-200 rounded-md p-1 my-1 text-center border-black border";
-    }
-  };
-
   return (
     <div
       className={
@@ -157,7 +176,7 @@ export const AbstractUserCard = (props: AbstractUserCardProps): JSX.Element => {
         <Rating
           name=""
           size="large"
-          onChange={(_, value) => props.handleFavorite(!!value)}
+          onChange={(_, value) => handleFavorite(props.userCardObj.id, !!value)}
           value={props.isFavorited ? 1 : 0}
           max={1}
         />
