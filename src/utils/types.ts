@@ -63,7 +63,7 @@ export type CarpoolFeature = Feature & CarpoolAddress;
 export type ButtonInfo = {
   text: string;
   onPress: (user: PublicUser) => void;
-  color?: string;
+  color: string;
 };
 
 export type ResolvedRequest = {

@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import mapboxgl from "mapbox-gl";
-import { PublicUser, User } from "../../utils/types";
+import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
 import _ from "lodash";
-import { ConnectCard } from "../UserCards/ConnectCard";
 import { SidebarContent } from "./SidebarContent";
-import { favoritesRouter } from "../../server/router/user/favorites";
 
 /**
  * TODO:
@@ -19,8 +17,9 @@ const clearMarkers = () => {
 };
 
 interface ExploreSidebarProps {
-  recs: PublicUser[];
-  favs: PublicUser[];
+  recs: EnhancedPublicUser[];
+  favs: EnhancedPublicUser[];
+  viewRoute: (user: User, otherUser: PublicUser) => void;
 }
 
 const ExploreSidebar = (props: ExploreSidebarProps) => {
@@ -60,9 +59,9 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
         </div>
       </div>
       <SidebarContent
-        favoriteIds={props.favs.map((fav) => fav.id)}
         userCardList={curOption == "recommendations" ? props.recs : props.favs}
         card={"connect"}
+        onViewRouteClick={props.viewRoute}
       />
     </div>
   );

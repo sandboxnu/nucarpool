@@ -8,16 +8,15 @@ import { trpc } from "../../utils/trpc";
 import { toast } from "react-toastify";
 import { useContext } from "react";
 import { UserContext } from "../../utils/userContext";
+import { viewRoute } from "../../utils/map/viewRoute";
+import Spinner from "../Spinner";
+import { classNames } from "../../utils/classNames";
+import { User } from "@prisma/client";
 
 interface AbstractUserCardProps {
-  userCardObj: EnhancedPublicUser;
-  leftButton: ButtonInfo;
+  otherUser: EnhancedPublicUser;
   rightButton: ButtonInfo;
-  inputProps?: {
-    map: mapboxgl.Map;
-    previousMarkers: mapboxgl.Marker[];
-    clearMarkers: () => void;
-  };
+  onViewRouteClick: (user: User, otherUser: PublicUser) => void;
 }
 
 const backgroundColorCSS = (seatAvail: number): string => {
@@ -40,33 +39,29 @@ const borderLColorCSS = (seatAvail: number): string => {
   }
 };
 
-const getButtonClassName = (
-  withFill: boolean,
-  button: ButtonInfo | undefined
-): string => {
+const getButtonClassName = (withFill: boolean, button: ButtonInfo): string => {
+  const bColor = button.color;
   if (withFill) {
-    if (button == undefined || button.color == undefined) {
-      return "bg-northeastern-red w-1/2 hover:bg-red-700 rounded-md p-1 my-1 text-center text-white";
-    } else {
-      return "bg-sky-900 w-1/2 hover:bg-sky-900 rounded-md p-1 my-1 text-center text-white";
-    }
+    return classNames(
+      `${bColor} w-1/2 hover:${
+        bColor === "bg-northeastern.red" ? "bg-red-700" : "bg-sky-900"
+      } rounded-md p-1 my-1 text-center text-white`
+    );
   } else {
     return "w-1/2 hover:bg-stone-200 rounded-md p-1 my-1 text-center border-black border";
   }
 };
 
-const trpcUtils = trpc.useContext();
-const user = useContext(UserContext);
-const { mutate: mutateFavorites } = trpc.user.favorites.edit.useMutation({
-  onError: (error: any) => {
-    toast.error(`Something went wrong: ${error.message}`);
-  },
-  onSuccess() {
-    trpcUtils.user.favorites.me.invalidate();
-  },
-});
-
 export const AbstractUserCard = (props: AbstractUserCardProps): JSX.Element => {
+  const trpcUtils = trpc.useContext();
+  const { mutate: mutateFavorites } = trpc.user.favorites.edit.useMutation({
+    onError: (error: any) => {
+      toast.error(`Something went wrong: ${error.message}`);
+    },
+    onSuccess() {
+      trpcUtils.user.favorites.me.invalidate();
+    },
+  });
   const user = useContext(UserContext);
   const handleFavorite = (favoriteId: string, add: boolean) => {
     if (user) {
@@ -108,120 +103,73 @@ export const AbstractUserCard = (props: AbstractUserCardProps): JSX.Element => {
     return <div className="flex border-l border-black h-min">{boxes}</div>;
   };
 
-  // Creates MapBox markers showing user's start address and the start area of the other user.
-  const onViewRouteClick = (userCardObj: PublicUser) => {
-    if (props.inputProps) {
-      if (props.inputProps.map !== undefined) {
-        props.inputProps.clearMarkers();
-
-        const startMarker = new mapboxgl.Marker({ color: "#2ae916" })
-          .setLngLat([
-            props.userCardObj.startPOICoordLng,
-            userCardObj.startPOICoordLat,
-          ])
-          .addTo(props.inputProps.map);
-
-        const endMarker = new mapboxgl.Marker({ color: "#f0220f" })
-          .setLngLat([
-            userCardObj.companyPOICoordLng,
-            userCardObj.companyPOICoordLat,
-          ])
-          .addTo(props.inputProps.map);
-
-        props.inputProps.previousMarkers.push(startMarker);
-        props.inputProps.previousMarkers.push(endMarker);
-
-        props.inputProps.map.fitBounds([
-          [
-            Math.min(
-              userCardObj.startPOICoordLng,
-              userCardObj.companyPOICoordLng
-            ) - 0.125,
-            Math.max(
-              userCardObj.startPOICoordLat,
-              userCardObj.companyPOICoordLat
-            ) + 0.05,
-          ],
-          [
-            Math.max(
-              userCardObj.startPOICoordLng,
-              userCardObj.companyPOICoordLng
-            ) + 0.05,
-            Math.min(
-              userCardObj.startPOICoordLat,
-              userCardObj.companyPOICoordLat
-            ) - 0.05,
-          ],
-        ]);
-      }
-    }
-  };
+  if (!user) {
+    return <Spinner />;
+  }
 
   return (
     <div
       className={
         "bg-stone-100 text-left px-6 py-4 rounded-xl m-3.5 align-center flex flex-col border-l-[13px] gap-2 shadow-md" +
-        borderLColorCSS(props.userCardObj.seatAvail)
+        borderLColorCSS(props.otherUser.seatAvail)
       }
     >
       <div className="flex justify-between">
         {/* top row */}
         <div className="flex">
           <div className="text-lg">
-            <p className="font-semibold">{props.userCardObj.name}</p>
-            <p className="font-light">{props.userCardObj.companyName}</p>
+            <p className="font-semibold">{props.otherUser.name}</p>
+            <p className="font-light">{props.otherUser.companyName}</p>
           </div>
         </div>
         <Rating
           name=""
           size="large"
-          onChange={(_, value) => handleFavorite(props.userCardObj.id, !!value)}
-          value={props.userCardObj.isFavorited ? 1 : 0}
+          onChange={(_, value) => handleFavorite(props.otherUser.id, !!value)}
+          value={props.otherUser.isFavorited ? 1 : 0}
           max={1}
         />
       </div>
       {/* second row */}
-      <p className="font-semibold">{props.userCardObj.startPOILocation}</p>
+      <p className="font-semibold">{props.otherUser.startPOILocation}</p>
       {/* third row */}
       <div className="w-full flex gap-4 items-center">
-        {DaysWorkingDisplay(props.userCardObj.daysWorking)}
-        <div
-          className={
-            "w-7 h-7 flex justify-center items-center rounded-md font-semibold" +
-            backgroundColorCSS(props.userCardObj.seatAvail)
-          }
-        >
-          {props.userCardObj.seatAvail}
-        </div>
+        {DaysWorkingDisplay(props.otherUser.daysWorking)}
+        {props.otherUser.role === "DRIVER" && (
+          <div
+            className={
+              "w-7 h-7 flex justify-center items-center rounded-md font-semibold" +
+              backgroundColorCSS(props.otherUser.seatAvail)
+            }
+          >
+            {props.otherUser.seatAvail}
+          </div>
+        )}
       </div>
       {/* fourth row */}
       <div className="w-full m-0 flex justify-between align-middle">
         <div className="font-normal text-sm flex">
           <p className="pr-1">Start:</p>
           <p className="font-semibold">
-            {dayjs.tz(props.userCardObj.startTime, "UTC").format("h:mm")} am
+            {dayjs.tz(props.otherUser.startTime, "UTC").format("h:mm")} am
           </p>
           <p className="font-semibold px-2"> | </p>
           <p className="pr-1">End:</p>
           <p className="font-semibold">
-            {dayjs.tz(props.userCardObj.endTime, "UTC").format("h:mm")} pm
+            {dayjs.tz(props.otherUser.endTime, "UTC").format("h:mm")} pm
           </p>
         </div>
       </div>
       {/* last row */}
       <div className="flex flex-row gap-2 justify-between">
         <button
-          onClick={() =>
-            props.leftButton
-              ? props.leftButton.onPress(props.userCardObj)
-              : onViewRouteClick(props.userCardObj)
-          }
+          onClick={() => props.onViewRouteClick(user, props.otherUser)}
           className={getButtonClassName(false, props.leftButton)}
         >
-          {props.leftButton ? props.leftButton.text : "View Route"}
+          View Route
         </button>
         <button
-          onClick={() => props.rightButton.onPress(props.userCardObj)}
+          onClick={() => props.rightButton.onPress(props.otherUser)}
           className={getButtonClassName(true, props.rightButton)}
         >
           {props.rightButton.text}

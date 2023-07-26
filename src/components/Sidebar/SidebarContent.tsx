@@ -1,6 +1,7 @@
 import React, { Dispatch, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
-import { PublicUser } from "../../utils/types";
+import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
+import { renderUserCard } from "../UserCards/UserCard";
 
 /**
  * TODO:
@@ -8,16 +9,10 @@ import { PublicUser } from "../../utils/types";
  * 5. onClick StarButton with Favorites
  */
 
-const previousMarkers: mapboxgl.Marker[] = [];
-const clearMarkers = () => {
-  previousMarkers.forEach((marker) => marker.remove());
-  previousMarkers.length = 0;
-};
-
 interface SidebarContentProps {
-  favoriteIds: string[];
   card: string;
-  userCardList: PublicUser[];
+  userCardList: EnhancedPublicUser[];
+  onViewRouteClick: (user: User, otherUser: PublicUser) => void;
 }
 
 const emptyMessages = {
@@ -47,17 +42,13 @@ const emptyMessage = (card: string): string => {
 export const SidebarContent = (props: SidebarContentProps) => {
   return (
     <div id="scrollableDiv" className="overflow-auto">
-      {props.userCardList.length == 0 ? (
+      {props.userCardList.length === 0 ? (
         <div className="text-center text-lg font-light m-4">
           {emptyMessage(props.card)}
         </div>
       ) : (
-        props.userCardList.map((otherUser: PublicUser) =>
-          renderUserCard(
-            props.card,
-            otherUser,
-            props.favoriteIds.includes(otherUser.id)
-          )
+        props.userCardList.map((otherUser: EnhancedPublicUser) =>
+          renderUserCard(props.card, otherUser, props.onViewRouteClick)
         )
       )}
     </div>

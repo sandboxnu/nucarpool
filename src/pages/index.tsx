@@ -21,6 +21,9 @@ import Spinner from "../components/Spinner";
 import { UserContext } from "../utils/userContext";
 import _ from "lodash";
 import { SidebarPage } from "../components/Sidebar/Sidebar";
+import ConnectModal from "../components/Modals/ConnectModal";
+import SentRequestModal from "../components/Modals/SentRequestModal";
+import ReceivedRequestModal from "../components/Modals/ReceivedRequestModal";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -101,19 +104,6 @@ const Home: NextPage<any> = () => {
   //   initialSidebarState
   // );
 
-  const handleConnect = (userToConnectTo: PublicUser) => {
-    setModalUser(userToConnectTo);
-    if (
-      requests?.received.find(
-        (req: { fromUserId: string }) => req.fromUserId === userToConnectTo.id
-      )
-    ) {
-      setModalType("already-requested");
-    } else {
-      setModalType("connect");
-    }
-  };
-
   const handleNavigateToRequests = (received: boolean) => {
     setSidebarType("requests");
     setStartingRequestsTab(received ? 1 : 0);
@@ -188,16 +178,6 @@ const Home: NextPage<any> = () => {
     }
   };
 
-  const handleSentRequests = (userToConnectTo: PublicUser) => {
-    setModalUser(userToConnectTo);
-    setModalType("sent");
-  };
-
-  const handleReceivedRequests = (userToConnectTo: PublicUser) => {
-    setModalUser(userToConnectTo);
-    setModalType("received");
-  };
-
   useEffect(() => {
     if (mapState === undefined && user && geoJsonUsers) {
       const newMap = new mapboxgl.Map({
@@ -247,6 +227,7 @@ const Home: NextPage<any> = () => {
                 favorites={favorites}
                 sent={sent}
                 received={received}
+                map={mapState}
               />
             </div>
 
