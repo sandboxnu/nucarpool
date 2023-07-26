@@ -1,16 +1,12 @@
 import { Dialog } from "@headlessui/react";
 import { useState } from "react";
 import { useToasts } from "react-toast-notifications";
-import { PublicUser, User } from "../../utils/types";
+import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
 
 interface SentModalProps {
-  // represents the 'me', the user trying to connect to someone
-  currentUser: User;
-  // represents the other user 'I' am trying to connect to.
-  userToConnectTo: PublicUser;
-  // handle the withdrawing of a request
+  user: User;
+  otherUser: EnhancedPublicUser;
   handleWithdraw: () => void;
-
   closeModal: () => void;
 }
 

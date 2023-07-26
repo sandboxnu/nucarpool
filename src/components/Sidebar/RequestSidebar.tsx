@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
 import { SidebarContent } from "./SidebarContent";

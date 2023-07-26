@@ -1,12 +1,10 @@
-import React, { Dispatch, useEffect, useState } from "react";
-import mapboxgl from "mapbox-gl";
+import React, { Dispatch, SetStateAction } from "react";
 import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
 import { renderUserCard } from "../UserCards/UserCard";
 
 /**
  * TODO:
  * 2. Add Prettier Tailwind omg please
- * 5. onClick StarButton with Favorites
  */
 
 interface SidebarContentProps {
@@ -54,20 +52,3 @@ export const SidebarContent = (props: SidebarContentProps) => {
     </div>
   );
 };
-
-// props.userCardList.map((otherUser: PublicUser) => (
-//   <AbstractUserCard
-//     userCardObj={otherUser}
-//     key={otherUser.id}
-//     isFavorited={favIds.includes(otherUser.id)}
-//     handleFavorite={(add: boolean) =>
-//       props.handleFavorite(otherUser.id, add)
-//     }
-//     leftButton={props.leftButton}
-//     rightButton={props.rightButton}
-//     inputProps={{ // We can use dispatch to reduce prop drilling here
-//       map: props.map, // All of this
-//       previousMarkers: previousMarkers,
-//       clearMarkers: clearMarkers,
-//     }}
-//   />

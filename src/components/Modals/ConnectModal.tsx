@@ -1,38 +1,83 @@
 import { Dialog } from "@headlessui/react";
 import { ChangeEvent, useState } from "react";
 import { useToasts } from "react-toast-notifications";
-import { PublicUser, User } from "../../utils/types";
+import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
+import { toast } from "react-toastify";
+import { emailSchema } from "../../utils/email";
+import { trpc } from "../../utils/trpc";
 
 interface ConnectModalProps {
-  // represents the 'me', the user trying to connect to someone
-  currentUser: User;
-  // represents the other user 'I' am trying to connect to.
-  userToConnectTo: PublicUser;
-
-  handleEmailConnect: (message: string) => void;
-
-  closeModal: () => void;
+  user: User;
+  otherUser: EnhancedPublicUser;
+  onClose: () => void;
 }
+
+const sendEmail = async (
+  sendingEmail: string,
+  receivingEmail: string,
+  message: string
+) => {
+  const msg: emailSchema = {
+    sendingUser: sendingEmail,
+    receivingUser: receivingEmail,
+    subject: "Carpool Connect Request",
+    body: message,
+  };
+
+  const result = await fetch(`/api/email`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(msg),
+  });
+
+  console.log(result);
+};
 
 const ConnectModal = (props: ConnectModalProps): JSX.Element => {
   const { addToast } = useToasts();
   const [isOpen, setIsOpen] = useState(true);
-  const [customMessage, setCustomMessage] = useState(
-    props.currentUser.bio ?? ""
-  );
+  const [customMessage, setCustomMessage] = useState(props.user.bio ?? "");
 
   const onClose = () => {
     setIsOpen(false);
-    props.closeModal();
+    props.onClose();
   };
 
+  const utils = trpc.useContext();
+  const { mutate: createRequests } = trpc.user.requests.create.useMutation({
+    onError: (error: any) => {
+      toast.error(`Something went wrong: ${error.message}`);
+    },
+    onSuccess() {
+      utils.user.recommendations.me.invalidate();
+      utils.user.requests.me.invalidate();
+    },
+  });
+
   const handleOnClick = () => {
-    props.handleEmailConnect(customMessage);
-    onClose();
-    addToast(
-      "A request to carpool has been sent to " + props.userToConnectTo.name,
-      { appearance: "success" }
-    );
+    if (props.user.email && props.otherUser.email) {
+      sendEmail(props.user.email, props.otherUser.email, customMessage);
+      createRequests({
+        fromId: props.user.id,
+        toId: props.otherUser.id,
+        message: customMessage,
+      });
+      onClose();
+      addToast(
+        "A request to carpool has been sent to " + props.otherUser.name,
+        { appearance: "success" }
+      );
+    } else {
+      onClose();
+      addToast(
+        "A request from " +
+          props.otherUser.name +
+          "already exists. Navigate to your received requests tab to connect with them!",
+        { appearance: "info" }
+      );
+    }
   };
 
   const handleMessageChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -52,9 +97,9 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
             </Dialog.Title>
             <div className="text-sm">
               Use the space below to write out a message to{" "}
-              {props.userToConnectTo.preferredName} and send a connection
-              request. We recommend writing a bit about yourself, your schedule,
-              and anything else you think would be good to know!
+              {props.otherUser.preferredName} and send a connection request. We
+              recommend writing a bit about yourself, your schedule, and
+              anything else you think would be good to know!
             </div>
             <textarea
               className={`resize-none form-input w-full shadow-sm rounded-md px-3 py-2`}

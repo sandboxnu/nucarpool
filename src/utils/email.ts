@@ -4,11 +4,11 @@ export const generateParams = (schema: emailSchema): SendEmailCommandInput => {
   //TODO: When the AWS account is moved out of the sandbox env, we remove this check
   const dest: string =
     process.env.NODE_ENV === "production"
-      ? schema.destination
+      ? schema.sendingUser
       : "carpoolnu@gmail.com";
   return {
     Destination: {
-      CcAddresses: [],
+      CcAddresses: [schema.receivingUser],
       ToAddresses: [dest],
     },
     Message: {
@@ -29,7 +29,8 @@ export const generateParams = (schema: emailSchema): SendEmailCommandInput => {
 };
 
 export interface emailSchema {
-  destination: string;
+  sendingUser: string;
+  receivingUser: string;
   subject: string;
   body: string;
 }

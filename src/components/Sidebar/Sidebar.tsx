@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import ExploreSidebar from "./ExploreSidebar";
 import RequestSidebar from "./RequestSidebar";
 import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
@@ -12,6 +12,8 @@ import _ from "lodash";
 interface SidebarProps {
   sidebarType: HeaderOptions;
   map: mapboxgl.Map;
+  setModalType: Dispatch<SetStateAction<string>>;
+  setModalUser: Dispatch<SetStateAction<PublicUser | null>>;
 }
 
 const extendPublicUser = (
