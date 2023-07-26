@@ -1,7 +1,6 @@
 import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
 import Spinner from "../Spinner";
 import { ButtonInfo } from "../../utils/types";
-import { trpc } from "../../utils/trpc";
 import { AbstractUserCard } from "./AbstractUserCard";
 interface CardProps {
   otherUser: EnhancedPublicUser;
@@ -44,9 +43,9 @@ export const ConnectCard = (props: CardProps): JSX.Element => {
 
 export const ReceivedCard = (props: CardProps): JSX.Element => {
   const connectButtonInfo: ButtonInfo = {
-    text: "Connect",
+    text: "Manage",
     onPress: () => handleManageReceived(props.otherUser),
-    color: "bg-sky-800",
+    color: "bg-sky-900",
   };
   return (
     <AbstractUserCard
@@ -59,9 +58,9 @@ export const ReceivedCard = (props: CardProps): JSX.Element => {
 
 export const SentCard = (props: CardProps): JSX.Element => {
   const connectButtonInfo: ButtonInfo = {
-    text: "Connect",
+    text: "Manage",
     onPress: () => handleManageSent(props.otherUser),
-    color: "bg-sky-800",
+    color: "bg-sky-900",
   };
   return (
     <AbstractUserCard

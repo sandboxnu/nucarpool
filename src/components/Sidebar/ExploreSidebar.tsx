@@ -3,18 +3,11 @@ import mapboxgl from "mapbox-gl";
 import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
 import _ from "lodash";
 import { SidebarContent } from "./SidebarContent";
+import { clearMarkers } from "../../utils/map/viewRoute";
 
 /**
- * TODO:
- * 2. Add Prettier Tailwind omg please
- * 5. onClick StarButton with Favorites
+ * TODO: Add Prettier Tailwind omg please
  */
-
-const previousMarkers: mapboxgl.Marker[] = [];
-const clearMarkers = () => {
-  previousMarkers.forEach((marker) => marker.remove());
-  previousMarkers.length = 0;
-};
 
 interface ExploreSidebarProps {
   recs: EnhancedPublicUser[];

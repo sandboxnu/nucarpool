@@ -2,7 +2,7 @@ import mapboxgl from "mapbox-gl";
 import { PublicUser, User } from "../types";
 
 const previousMarkers: mapboxgl.Marker[] = [];
-const clearMarkers = () => {
+export const clearMarkers = () => {
   previousMarkers.forEach((marker) => marker.remove());
   previousMarkers.length = 0;
 };
@@ -16,11 +16,11 @@ export const viewRoute = (
   clearMarkers();
 
   const selfStartMarker = new mapboxgl.Marker({ color: "#00008B" })
-    .setLngLat([user.startPOICoordLng, user.startPOICoordLat])
+    .setLngLat([user.startCoordLng, user.startCoordLat])
     .addTo(map);
 
   const selfEndMarker = new mapboxgl.Marker({ color: "#FFA500" })
-    .setLngLat([user.companyPOICoordLng, user.companyPOICoordLat])
+    .setLngLat([user.companyCoordLng, user.companyCoordLat])
     .addTo(map);
 
   const otherUserStartMarker = new mapboxgl.Marker({ color: "#2ae916" })

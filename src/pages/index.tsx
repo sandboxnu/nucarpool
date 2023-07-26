@@ -58,20 +58,6 @@ const Home: NextPage<any> = () => {
   const { data: geoJsonUsers, refetch: refetchGeoJsonUsers } =
     trpc.mapbox.geoJsonUserList.useQuery();
   const { data: user = null, refetch: refetchMe } = trpc.user.me.useQuery();
-  const { data: recommendations = [], refetch: refetchRecs } =
-    trpc.user.recommendations.me.useQuery();
-  const { data: favorites = [], refetch: refetchFavs } =
-    trpc.user.favorites.me.useQuery();
-  const {
-    data: requests = { sent: [], received: [] },
-    refetch: refetchRequests,
-  } = trpc.user.requests.me.useQuery();
-
-  const sent = requests.sent.map((request: { toUser: any }) => request.toUser!);
-  const received = requests.received.map(
-    (request: { fromUser: any }) => request.fromUser
-  );
-  const filteredRecs = _.differenceBy(recommendations, sent, "id");
 
   //tRPC mutations to update user related data
   const { mutate: createRequests } = trpc.user.requests.create.useMutation({
@@ -98,12 +84,10 @@ const Home: NextPage<any> = () => {
   const [modalUser, setModalUser] = useState<PublicUser | null>(null);
   const [modalType, setModalType] = useState<string>("connect");
   const [sidebarType, setSidebarType] = useState<HeaderOptions>("explore");
-  const [startingRequestsTab, setStartingRequestsTab] = useState<0 | 1>(0);
   const mapContainerRef = useRef(null);
 
   const handleNavigateToRequests = (received: boolean) => {
     setSidebarType("requests");
-    setStartingRequestsTab(received ? 1 : 0);
   };
 
   const handleWithdrawRequest = (toUser: PublicUser) => {
@@ -200,9 +184,6 @@ const Home: NextPage<any> = () => {
 
   useEffect(() => {
     refetchMe();
-    refetchRecs();
-    refetchRequests();
-    refetchFavs();
     refetchGeoJsonUsers();
   }, []);
 
@@ -224,17 +205,9 @@ const Home: NextPage<any> = () => {
           <div className="flex flex-auto h-[91.5%]">
             <div className="w-96">
               {mapState && (
-                <SidebarPage
-                  sidebarType={sidebarType}
-                  reccomendations={filteredRecs}
-                  favorites={favorites}
-                  sent={sent}
-                  received={received}
-                  map={mapState}
-                />
+                <SidebarPage sidebarType={sidebarType} map={mapState} />
               )}
             </div>
-
             <DropDownMenu />
             <button
               className="flex justify-center items-center w-8 h-8 absolute z-10 right-[8px] bottom-[150px] rounded-md bg-white border-2 border-solid border-gray-300 shadow-sm hover:bg-gray-200"
@@ -242,9 +215,7 @@ const Home: NextPage<any> = () => {
             >
               <RiFocus3Line />
             </button>
-            {/* This is where the Mapbox puts its stuff */}
 
-            {/* map wrapper */}
             <ToastProvider
               placement="bottom-right"
               autoDismiss={true}

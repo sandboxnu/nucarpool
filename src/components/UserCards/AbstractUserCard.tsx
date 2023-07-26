@@ -39,17 +39,13 @@ const borderLColorCSS = (seatAvail: number): string => {
   }
 };
 
-const getButtonClassName = (withFill: boolean, button: ButtonInfo): string => {
+const getButtonClassName = (button: ButtonInfo): string => {
   const bColor = button.color;
-  if (withFill) {
-    return classNames(
-      `${bColor} w-1/2 hover:${
-        bColor === "bg-northeastern.red" ? "bg-red-700" : "bg-sky-900"
-      } rounded-md p-1 my-1 text-center text-white`
-    );
-  } else {
-    return "w-1/2 hover:bg-stone-200 rounded-md p-1 my-1 text-center border-black border";
-  }
+  return classNames(
+    `${bColor} w-1/2 hover:${
+      bColor === "bg-northeastern.red" ? "bg-red-700" : "bg-sky-900"
+    } rounded-md p-1 my-1 text-center text-white`
+  );
 };
 
 export const AbstractUserCard = (props: AbstractUserCardProps): JSX.Element => {
@@ -164,13 +160,13 @@ export const AbstractUserCard = (props: AbstractUserCardProps): JSX.Element => {
       <div className="flex flex-row gap-2 justify-between">
         <button
           onClick={() => props.onViewRouteClick(user, props.otherUser)}
-          className={getButtonClassName(false, props.rightButton)}
+          className="w-1/2 hover:bg-stone-200 rounded-md p-1 my-1 text-center border-black border"
         >
           View Route
         </button>
         <button
           onClick={() => props.rightButton.onPress(props.otherUser)}
-          className={getButtonClassName(true, props.rightButton)}
+          className={getButtonClassName(props.rightButton)}
         >
           {props.rightButton.text}
         </button>
