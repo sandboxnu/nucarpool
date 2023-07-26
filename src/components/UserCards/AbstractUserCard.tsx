@@ -164,7 +164,7 @@ export const AbstractUserCard = (props: AbstractUserCardProps): JSX.Element => {
       <div className="flex flex-row gap-2 justify-between">
         <button
           onClick={() => props.onViewRouteClick(user, props.otherUser)}
-          className={getButtonClassName(false, props.leftButton)}
+          className={getButtonClassName(false, props.rightButton)}
         >
           View Route
         </button>

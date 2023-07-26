@@ -1,7 +1,7 @@
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import type { GetServerSidePropsContext, NextPage } from "next";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { RiFocus3Line } from "react-icons/ri";
 import { ToastProvider } from "react-toast-notifications";
 import addClusters from "../utils/map/addClusters";
@@ -99,10 +99,7 @@ const Home: NextPage<any> = () => {
   const [modalType, setModalType] = useState<string>("connect");
   const [sidebarType, setSidebarType] = useState<HeaderOptions>("explore");
   const [startingRequestsTab, setStartingRequestsTab] = useState<0 | 1>(0);
-  // const [sidebarState, sidebarDispatch] = useReducer(
-  //   sidebarReducer,
-  //   initialSidebarState
-  // );
+  const mapContainerRef = useRef(null);
 
   const handleNavigateToRequests = (received: boolean) => {
     setSidebarType("requests");
@@ -179,7 +176,12 @@ const Home: NextPage<any> = () => {
   };
 
   useEffect(() => {
-    if (mapState === undefined && user && geoJsonUsers) {
+    if (
+      mapState === undefined &&
+      user &&
+      geoJsonUsers &&
+      mapContainerRef.current
+    ) {
       const newMap = new mapboxgl.Map({
         container: "map",
         style: "mapbox://styles/mapbox/light-v10",
@@ -206,7 +208,7 @@ const Home: NextPage<any> = () => {
 
   // Don't forget about mapState
 
-  if (!mapState || !user) {
+  if (!user) {
     return <Spinner />;
   }
   return (
@@ -221,14 +223,16 @@ const Home: NextPage<any> = () => {
           />
           <div className="flex flex-auto h-[91.5%]">
             <div className="w-96">
-              <SidebarPage
-                sidebarType={sidebarType}
-                reccomendations={filteredRecs}
-                favorites={favorites}
-                sent={sent}
-                received={received}
-                map={mapState}
-              />
+              {mapState && (
+                <SidebarPage
+                  sidebarType={sidebarType}
+                  reccomendations={filteredRecs}
+                  favorites={favorites}
+                  sent={sent}
+                  received={received}
+                  map={mapState}
+                />
+              )}
             </div>
 
             <DropDownMenu />
@@ -247,7 +251,11 @@ const Home: NextPage<any> = () => {
               newestOnTop={true}
             >
               <div className="relative flex-auto">
-                <div id="map" className={"flex-auto w-full h-full"}></div>
+                <div
+                  ref={mapContainerRef}
+                  id="map"
+                  className={"flex-auto w-full h-full"}
+                ></div>
                 {user && modalUser && modalType === "connect" && (
                   <ConnectModal
                     currentUser={user}

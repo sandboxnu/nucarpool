@@ -20,7 +20,7 @@ export const viewRoute = (
     .addTo(map);
 
   const selfEndMarker = new mapboxgl.Marker({ color: "#FFA500" })
-    .setLngLat([user.companyCoordLng, user.companyPOICoordLat])
+    .setLngLat([user.companyPOICoordLng, user.companyPOICoordLat])
     .addTo(map);
 
   const otherUserStartMarker = new mapboxgl.Marker({ color: "#2ae916" })
