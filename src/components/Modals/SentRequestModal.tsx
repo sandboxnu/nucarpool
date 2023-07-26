@@ -6,8 +6,7 @@ import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
 interface SentModalProps {
   user: User;
   otherUser: EnhancedPublicUser;
-  handleWithdraw: () => void;
-  closeModal: () => void;
+  onClose: () => void;
 }
 
 const SentRequestModal = (props: SentModalProps): JSX.Element => {
@@ -16,15 +15,16 @@ const SentRequestModal = (props: SentModalProps): JSX.Element => {
 
   const onClose = () => {
     setIsOpen(false);
-    props.closeModal();
+    props.onClose();
   };
 
+  const handleWithdraw = () => {};
+
   const handleWithdrawClick = () => {
-    props.handleWithdraw();
     onClose();
     addToast(
       "Your request to carpool with " +
-        props.userToConnectTo.name +
+        props.otherUser.name +
         " has been withdrawn.",
       { appearance: "success" }
     );
@@ -43,7 +43,7 @@ const SentRequestModal = (props: SentModalProps): JSX.Element => {
             </Dialog.Title>
             <div className="text-sm text-center">
               {" "}
-              {props.userToConnectTo.preferredName} has not yet responded. If
+              {props.otherUser.preferredName} has not yet responded. If
               you&apos;d like to, you can withdraw your request.
             </div>
             <div className="flex justify-center space-x-7">
