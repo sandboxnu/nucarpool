@@ -3,16 +3,15 @@ import dayjs from "dayjs";
 import mapboxgl from "mapbox-gl";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { ButtonInfo, PublicUser } from "../../utils/types";
+import { ButtonInfo, EnhancedPublicUser, PublicUser } from "../../utils/types";
 import { trpc } from "../../utils/trpc";
 import { toast } from "react-toastify";
 import { useContext } from "react";
 import { UserContext } from "../../utils/userContext";
 
 interface AbstractUserCardProps {
-  userCardObj: PublicUser;
-  isFavorited: boolean;
-  leftButton?: ButtonInfo;
+  userCardObj: EnhancedPublicUser;
+  leftButton: ButtonInfo;
   rightButton: ButtonInfo;
   inputProps?: {
     map: mapboxgl.Map;
@@ -177,7 +176,7 @@ export const AbstractUserCard = (props: AbstractUserCardProps): JSX.Element => {
           name=""
           size="large"
           onChange={(_, value) => handleFavorite(props.userCardObj.id, !!value)}
-          value={props.isFavorited ? 1 : 0}
+          value={props.userCardObj.isFavorited ? 1 : 0}
           max={1}
         />
       </div>

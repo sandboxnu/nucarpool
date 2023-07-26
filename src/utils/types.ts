@@ -46,6 +46,11 @@ export type PublicUser = {
   endTime: Date | null;
 };
 
+export type EnhancedPublicUser = PublicUser & {
+  isFavorited: boolean;
+  incomingRequest: boolean;
+};
+
 export type User = RouterOutput["user"]["me"];
 export type GeoJsonUsers = RouterOutput["mapbox"]["geoJsonUserList"];
 

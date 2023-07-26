@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import { PublicUser, User } from "../../utils/types";
-import AbstractSidebarPage from "./AbstractSidebarPage";
 import _ from "lodash";
+import { ConnectCard } from "../UserCards/ConnectCard";
+import { SidebarContent } from "./SidebarContent";
+import { favoritesRouter } from "../../server/router/user/favorites";
 
 /**
  * TODO:
@@ -17,36 +19,14 @@ const clearMarkers = () => {
 };
 
 interface ExploreSidebarProps {
-  currentUser: User;
-  reccs: PublicUser[];
+  recs: PublicUser[];
   favs: PublicUser[];
-  sent: PublicUser[];
-  map: mapboxgl.Map;
-  handleConnect: (modalUser: PublicUser) => void;
-  handleFavorite: (otherUser: string, add: boolean) => void;
 }
 
-const emptyMessages = {
-  recommendations: `We're unable to find any recommendations for you right now.
-  We recommend reviewing your profile to make sure all information you've entered is accurate!`,
-  favorites: `You have no users currently favorited.
-  Click the star icon on the upper-right side of a user's card to add them to your favorites!`,
-};
-
 const ExploreSidebar = (props: ExploreSidebarProps) => {
-  const [curList, setCurList] = useState<PublicUser[]>([]);
   const [curOption, setCurOption] = useState<"recommendations" | "favorites">(
     "recommendations"
   );
-
-  const filteredRecs = (): PublicUser[] => {
-    return _.differenceBy(props.reccs, props.sent, "id");
-  };
-
-  useEffect(() => {
-    setCurList(curOption == "recommendations" ? filteredRecs : props.favs);
-  }, [props.reccs, props.favs, curOption]);
-
   return (
     <div className="flex flex-col px-5 flex-shrink-0 h-full z-10 text-left bg-white">
       <div className="flex-row py-3">
@@ -79,18 +59,10 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
           </button>
         </div>
       </div>
-      <AbstractSidebarPage
-        currentUser={props.currentUser}
-        userCardList={curList}
-        rightButton={{
-          text: "Connect",
-          onPress: props.handleConnect,
-          color: undefined,
-        }}
-        handleFavorite={props.handleFavorite}
-        favs={props.favs}
-        map={props.map}
-        emptyMessage={emptyMessages[curOption]}
+      <SidebarContent
+        favoriteIds={props.favs.map((fav) => fav.id)}
+        userCardList={curOption == "recommendations" ? props.recs : props.favs}
+        card={"connect"}
       />
     </div>
   );

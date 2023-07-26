@@ -1,89 +1,80 @@
-import React, { Dispatch, useEffect, useState } from "react";
-import mapboxgl from "mapbox-gl";
-import { UserCard } from "../UserCards/UserCard";
-import { PublicUser, User } from "../../utils/types";
+import { Dispatch, useState } from "react";
 import { SidebarStateProps } from "../../utils/reducerFuncs";
+import ExploreSidebar from "./ExploreSidebar";
+import RequestSidebar from "./RequestSidebar";
+import { PublicUser } from "../../utils/types";
 
-/**
- * TODO:
- * 2. Add Prettier Tailwind omg please
- * 5. onClick StarButton with Favorites
- */
-
-const previousMarkers: mapboxgl.Marker[] = [];
-const clearMarkers = () => {
-  previousMarkers.forEach((marker) => marker.remove());
-  previousMarkers.length = 0;
-};
-
-interface SideBarProps {
-  currentUser: User;
-  reccs: PublicUser[];
-  favs: PublicUser[];
-  map: mapboxgl.Map;
-  handleConnect: (modalUser: PublicUser) => void;
-  handleFavorite: (otherUser: string, add: boolean) => void;
+interface SidebarProps {
+  sidebarType: string;
+  reccomendations: PublicUser[];
+  favorites: PublicUser[];
+  sent: PublicUser[];
+  received: PublicUser[];
 }
 
-const ughSidebar = (props: SideBarProps) => {
-  const [curList, setCurList] = useState<PublicUser[]>(props.reccs ?? []);
+export type EnhancedPublicUser = PublicUser & {
+  isFavorited: boolean;
+  incomingRequest: boolean;
+};
+
+export const SidebarPage = (props: SidebarProps) => {
+  const extendPublicUser = (user: PublicUser): EnhancedPublicUser => {
+    return {
+      ...user,
+      isFavorited: props.favorites.some((favs) => favs.id === user.id),
+      incomingRequest: props.received.some((req) => req.id === user.id),
+    };
+  };
+
+  const enhancedRecs = props.reccomendations.map((user) =>
+    extendPublicUser(user)
+  );
+  if (props.sidebarType === "explore") {
+    return <ExploreSidebar />;
+  } else {
+    return <RequestSidebar />;
+  }
+};
+
+const AbstractSidebarPage = (props: AbstractSidebarPageProps) => {
+  const [curList, setCurList] = useState<PublicUser[]>(
+    props.userCardList ?? []
+  );
 
   useEffect(() => {
-    setCurList(props.reccs ?? []);
-  }, [props.reccs]);
+    setCurList(props.userCardList ?? []);
+  }, [props.userCardList]);
 
   const favIds = props.favs.map((fav) => fav.id);
 
   return (
-    <div className="flex flex-col px-5 flex-shrink-0 h-full z-10 text-left bg-white">
-      <div className="flex-row py-3">
-        <div className="flex justify-center gap-3">
-          <button
-            className={
-              curList == props.reccs
-                ? "bg-northeastern-red rounded-xl p-2 font-semibold text-xl text-white"
-                : "rounded-xl p-2 font-semibold text-xl text-black"
-            }
-            onClick={() => {
-              setCurList(props.reccs ?? []);
-              clearMarkers();
-            }}
-          >
-            Recommendations
-          </button>
-          <button
-            className={
-              curList == props.favs
-                ? "bg-northeastern-red rounded-xl p-2 font-semibold text-xl text-white"
-                : "rounded-xl p-2 font-semibold text-xl text-black"
-            }
-            onClick={() => {
-              setCurList(props.favs ?? []);
-              clearMarkers();
-            }}
-          >
-            Favorites
-          </button>
-        </div>
-      </div>
-      <div id="scrollableDiv" className="overflow-auto">
-        {curList.map((otherUser: PublicUser) => (
-          <UserCard
-            userToConnectTo={otherUser}
+    <div id="scrollableDiv" className="overflow-auto">
+      {curList.length > 0 &&
+        curList.map((otherUser: PublicUser) => (
+          <AbstractUserCard
+            userCardObj={otherUser}
             key={otherUser.id}
+            isFavorited={favIds.includes(otherUser.id)}
+            handleFavorite={(add: boolean) =>
+              props.handleFavorite(otherUser.id, add)
+            }
+            leftButton={props.leftButton}
+            rightButton={props.rightButton}
             inputProps={{
-              map: props.map,
+              // We can use dispatch to reduce prop drilling here
+              map: props.map, // All of this
               previousMarkers: previousMarkers,
               clearMarkers: clearMarkers,
             }}
-            isFavorited={favIds.includes(otherUser.id)}
-            handleConnect={props.handleConnect}
-            handleFavorite={(add) => props.handleFavorite(otherUser.id, add)}
           />
         ))}
-      </div>
+      {props.emptyMessage && curList.length === 0 && (
+        <div className="text-center text-lg font-light m-4">
+          {props.emptyMessage}
+        </div>
+      )}
     </div>
   );
 };
 
-export default Sidebar;
+export default AbstractSidebarPage;

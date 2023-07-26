@@ -1,7 +1,7 @@
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import type { GetServerSidePropsContext, NextPage } from "next";
-import { createContext, useEffect, useReducer, useState } from "react";
+import { useEffect, useState } from "react";
 import { RiFocus3Line } from "react-icons/ri";
 import { ToastProvider } from "react-toast-notifications";
 import addClusters from "../utils/map/addClusters";
@@ -13,19 +13,14 @@ import DropDownMenu from "../components/DropDownMenu";
 import { browserEnv } from "../utils/env/browser";
 import Header, { HeaderOptions } from "../components/Header";
 import { PublicUser, ResolvedRequest, User } from "../utils/types";
-import ConnectModal from "../components/Modals/ConnectModal";
 import { toast } from "react-toastify";
-import ExploreSidebar from "../components/Sidebar/ExploreSidebar";
-import RequestSidebar from "../components/Sidebar/RequestSidebar";
-import SentRequestModal from "../components/Modals/SentRequestModal";
-import ReceivedRequestModal from "../components/Modals/ReceivedRequestModal";
 import { getSession } from "next-auth/react";
 import AlreadyConnectedModal from "../components/Modals/AlreadyConnectedModal";
 import { emailSchema } from "../utils/email";
-import { createPortal } from "react-dom";
 import Spinner from "../components/Spinner";
-import { SidebarStateProps, sidebarReducer } from "../utils/reducerFuncs";
 import { UserContext } from "../utils/userContext";
+import _ from "lodash";
+import { SidebarPage } from "../components/Sidebar/Sidebar";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -73,13 +68,7 @@ const Home: NextPage<any> = () => {
   const received = requests.received.map(
     (request: { fromUser: any }) => request.fromUser
   );
-
-  const initialSidebarState = {
-    recommendations: recommendations,
-    favorites: favorites,
-    sent: sent,
-    received: received,
-  };
+  const filteredRecs = _.differenceBy(recommendations, sent, "id");
 
   //tRPC mutations to update user related data
   const { mutate: createRequests } = trpc.user.requests.create.useMutation({
@@ -107,10 +96,10 @@ const Home: NextPage<any> = () => {
   const [modalType, setModalType] = useState<string>("connect");
   const [sidebarType, setSidebarType] = useState<HeaderOptions>("explore");
   const [startingRequestsTab, setStartingRequestsTab] = useState<0 | 1>(0);
-  const [sidebarState, sidebarDispatch] = useReducer(
-    sidebarReducer,
-    initialSidebarState
-  );
+  // const [sidebarState, sidebarDispatch] = useReducer(
+  //   sidebarReducer,
+  //   initialSidebarState
+  // );
 
   const handleConnect = (userToConnectTo: PublicUser) => {
     setModalUser(userToConnectTo);
@@ -235,47 +224,11 @@ const Home: NextPage<any> = () => {
     refetchGeoJsonUsers();
   }, []);
 
-  const renderSidebar = () => {
-    if (mapState && user) {
-      if (sidebarType == "explore") {
-        return (
-          <ExploreSidebar
-            reccs={recommendations ?? []}
-            favs={favorites ?? []}
-            sent={
-              requests?.sent.map((req: { toUser: any }) => req.toUser!) ?? []
-            }
-            map={mapState}
-            handleConnect={handleConnect}
-            handleFavorite={handleFavorite}
-          />
-        );
-      } else {
-        return (
-          <RequestSidebar
-            currentUser={user}
-            sent={sent.map((req: { toUser: any }) => req.toUser!) ?? []}
-            received={
-              received.map((req: { fromUser: any }) => req.fromUser!) ?? []
-            }
-            favs={favorites ?? []}
-            map={mapState}
-            startingTab={startingRequestsTab}
-            setStartingTab={setStartingRequestsTab}
-            handleSent={handleSentRequests}
-            handleReceived={handleReceivedRequests}
-            handleFavorite={handleFavorite}
-          />
-        );
-      }
-    }
-  };
+  // Don't forget about mapState
 
   if (!mapState || !user) {
     return <Spinner />;
   }
-  const UserContext = createContext<User>(user);
-
   return (
     <>
       <UserContext.Provider value={user}>
@@ -287,7 +240,15 @@ const Home: NextPage<any> = () => {
             data={{ sidebarValue: sidebarType, setSidebar: setSidebarType }}
           />
           <div className="flex flex-auto h-[91.5%]">
-            <div className="w-96">{mapState && user && renderSidebar()}</div>
+            <div className="w-96">
+              <SidebarPage
+                sidebarType={sidebarType}
+                reccomendations={filteredRecs}
+                favorites={favorites}
+                sent={sent}
+                received={received}
+              />
+            </div>
 
             <DropDownMenu />
             <button
