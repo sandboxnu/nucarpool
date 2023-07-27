@@ -49,39 +49,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 
 const Home: NextPage<any> = () => {
-  //tRPC queries to fetch user related data
-  const utils = trpc.useContext();
   const { data: geoJsonUsers, refetch: refetchGeoJsonUsers } =
     trpc.mapbox.geoJsonUserList.useQuery();
   const { data: user = null, refetch: refetchMe } = trpc.user.me.useQuery();
-
-  //tRPC mutations to update user related data
-
   const [mapState, setMapState] = useState<mapboxgl.Map>();
-  const [modalUser, setModalUser] = useState<PublicUser | null>(null);
-  const [modalType, setModalType] = useState<string>("connect");
   const [sidebarType, setSidebarType] = useState<HeaderOptions>("explore");
   const mapContainerRef = useRef(null);
-
-  // const handleRejectRequest = (fromUser: PublicUser) => {
-  //   const userRequest = received.find(
-  //     (request) => request.fromUser?.name === fromUser.name
-  //   );
-  //   if (userRequest) {
-  //     handleDeleteRequest(userRequest);
-  //   }
-  // };
-
-  // const handleAcceptRequest = (fromUser: PublicUser) => {
-  //   // Must also handle group inclusion functionality here
-  //   // When the carpooling page is complete
-  //   const userRequest = received.find(
-  //     (request) => request.fromUser?.name === fromUser.name
-  //   );
-  //   if (userRequest) {
-  //     handleDeleteRequest(userRequest);
-  //   }
-  // };
 
   useEffect(() => {
     if (
@@ -110,8 +83,6 @@ const Home: NextPage<any> = () => {
     refetchMe();
     refetchGeoJsonUsers();
   }, []);
-
-  // Don't forget about mapState
 
   if (!user) {
     return <Spinner />;

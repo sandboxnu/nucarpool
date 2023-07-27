@@ -17,7 +17,6 @@ export default async function handler(
   try {
     const emailData: emailSchema = req.body;
     const params = generateParams(emailData);
-    console.log(params);
     const data = await sesClient.send(new SendEmailCommand(params));
     res.status(200).json({ message: "Email sent successfully", data: data });
   } catch (err) {
