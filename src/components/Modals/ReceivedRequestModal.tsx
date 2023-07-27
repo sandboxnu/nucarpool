@@ -43,7 +43,7 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
     handleDelete();
     onClose();
     addToast(
-      props.otherUser.name +
+      props.otherUser.preferredName +
         "'s request to carpool with you has been rejected.",
       { appearance: "success" }
     );
@@ -53,7 +53,7 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
     handleDelete();
     onClose();
     addToast(
-      props.otherUser.name +
+      props.otherUser.preferredName +
         "'s request to carpool with you has been accepted.",
       { appearance: "success" }
     );

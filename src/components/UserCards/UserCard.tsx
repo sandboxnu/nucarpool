@@ -149,7 +149,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         {/* top row */}
         <div className="flex">
           <div className="text-lg">
-            <p className="font-semibold">{props.otherUser.name}</p>
+            <p className="font-semibold">{props.otherUser.preferredName}</p>
             <p className="font-light">{props.otherUser.companyName}</p>
           </div>
         </div>

@@ -44,7 +44,7 @@ const SentRequestModal = (props: SentModalProps): JSX.Element => {
     onClose();
     addToast(
       "Your request to carpool with " +
-        props.otherUser.name +
+        props.otherUser.preferredName +
         " has been withdrawn.",
       { appearance: "success" }
     );
