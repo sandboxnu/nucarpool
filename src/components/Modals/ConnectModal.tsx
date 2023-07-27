@@ -69,14 +69,6 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
         "A request to carpool has been sent to " + props.otherUser.name,
         { appearance: "success" }
       );
-    } else {
-      onClose();
-      addToast(
-        "A request from " +
-          props.otherUser.name +
-          "already exists. Navigate to your received requests tab to connect with them!",
-        { appearance: "info" }
-      );
     }
   };
 

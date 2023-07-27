@@ -14,18 +14,18 @@ import { ConnectCard } from "./ConnectCard";
 import { SentCard } from "./SentCard";
 import { ReceivedCard } from "./ReceivedCard";
 
-interface AbstractUserCardProps {
+interface UserCardProps {
   otherUser: EnhancedPublicUser;
   rightButton: ButtonInfo;
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
 }
 
 export const renderUserCard = (
-  cardType: string,
+  subType: string,
   otherUser: EnhancedPublicUser,
   onViewRouteClick: (user: User, otherUser: PublicUser) => void
 ): JSX.Element => {
-  switch (cardType) {
+  switch (subType) {
     case "recommendations":
     case "favorites":
       return (
@@ -83,7 +83,7 @@ const getButtonClassName = (button: ButtonInfo): string => {
   );
 };
 
-export const AbstractUserCard = (props: AbstractUserCardProps): JSX.Element => {
+export const UserCard = (props: UserCardProps): JSX.Element => {
   const trpcUtils = trpc.useContext();
   const { mutate: mutateFavorites } = trpc.user.favorites.edit.useMutation({
     onError: (error: any) => {

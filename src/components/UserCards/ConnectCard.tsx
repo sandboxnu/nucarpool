@@ -5,18 +5,18 @@ import {
   PublicUser,
   ButtonInfo,
 } from "../../utils/types";
-import { AbstractUserCard } from "./UserCard";
+import { UserCard } from "./UserCard";
 import { useContext, useState } from "react";
 import { createPortal } from "react-dom";
 import ConnectModal from "../Modals/ConnectModal";
 import { UserContext } from "../../utils/userContext";
 
-export interface CardProps {
+interface ConnectCardProps {
   otherUser: EnhancedPublicUser;
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
 }
 
-export const ConnectCard = (props: CardProps): JSX.Element => {
+export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
   const user = useContext(UserContext);
   const [showModal, setShowModal] = useState(false);
   const { addToast } = useToasts();
@@ -24,7 +24,7 @@ export const ConnectCard = (props: CardProps): JSX.Element => {
   const handleExistingRequest = () => {
     addToast(
       "You already have an incoming carpool request from " +
-        props.otherUser +
+        props.otherUser.name +
         ". Navigate to the received requests tab to connect with them!",
       { appearance: "info" }
     );
@@ -45,7 +45,7 @@ export const ConnectCard = (props: CardProps): JSX.Element => {
   };
   return (
     <>
-      <AbstractUserCard
+      <UserCard
         otherUser={props.otherUser}
         rightButton={connectButtonInfo}
         onViewRouteClick={props.onViewRouteClick}

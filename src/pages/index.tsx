@@ -100,7 +100,7 @@ const Home: NextPage<any> = () => {
           <div className="flex flex-auto h-[91.5%]">
             <div className="w-96">
               <ToastProvider
-                placement="bottom-right"
+                placement="top-right"
                 autoDismiss={true}
                 newestOnTop={true}
               >

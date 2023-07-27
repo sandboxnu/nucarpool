@@ -1,15 +1,20 @@
-import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
-import Spinner from "../Spinner";
-import { ButtonInfo } from "../../utils/types";
-import { AbstractUserCard } from "./UserCard";
-import { CardProps, ConnectCard } from "./ConnectCard";
-import { SentCard } from "./SentCard";
+import {
+  ButtonInfo,
+  EnhancedPublicUser,
+  PublicUser,
+  User,
+} from "../../utils/types";
+import { UserCard } from "./UserCard";
 import { useContext, useState } from "react";
 import { UserContext } from "../../utils/userContext";
 import { createPortal } from "react-dom";
 import ReceivedRequestModal from "../Modals/ReceivedRequestModal";
 
-export const ReceivedCard = (props: CardProps): JSX.Element => {
+interface ReceivedCardProps {
+  otherUser: EnhancedPublicUser;
+  onViewRouteClick: (user: User, otherUser: PublicUser) => void;
+}
+export const ReceivedCard = (props: ReceivedCardProps): JSX.Element => {
   const user = useContext(UserContext);
   const [showModal, setShowModal] = useState(false);
 
@@ -24,7 +29,7 @@ export const ReceivedCard = (props: CardProps): JSX.Element => {
   };
   return (
     <>
-      <AbstractUserCard
+      <UserCard
         otherUser={props.otherUser}
         rightButton={connectButtonInfo}
         onViewRouteClick={props.onViewRouteClick}

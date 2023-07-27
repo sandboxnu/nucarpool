@@ -1,13 +1,17 @@
 import { useContext, useState } from "react";
-import { ButtonInfo, EnhancedPublicUser } from "../../utils/types";
+import { ButtonInfo, EnhancedPublicUser, PublicUser } from "../../utils/types";
 import { UserContext } from "../../utils/userContext";
-import { AbstractUserCard } from "./UserCard";
-import { CardProps } from "./ConnectCard";
+import { UserCard } from "./UserCard";
 import SentRequestModal from "../Modals/SentRequestModal";
 import { createPortal } from "react-dom";
-import { Request } from "@prisma/client";
+import { User } from "@prisma/client";
 
-export const SentCard = (props: CardProps): JSX.Element => {
+interface SentCardProps {
+  otherUser: EnhancedPublicUser;
+  onViewRouteClick: (user: User, otherUser: PublicUser) => void;
+}
+
+export const SentCard = (props: SentCardProps): JSX.Element => {
   const user = useContext(UserContext);
   const [showModal, setShowModal] = useState(false);
 
@@ -22,7 +26,7 @@ export const SentCard = (props: CardProps): JSX.Element => {
   };
   return (
     <>
-      <AbstractUserCard
+      <UserCard
         otherUser={props.otherUser}
         rightButton={connectButtonInfo}
         onViewRouteClick={props.onViewRouteClick}
