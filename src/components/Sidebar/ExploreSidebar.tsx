@@ -53,7 +53,7 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
       </div>
       <SidebarContent
         userCardList={curOption == "recommendations" ? props.recs : props.favs}
-        card={"connect"}
+        subType={curOption}
         onViewRouteClick={props.viewRoute}
       />
     </div>

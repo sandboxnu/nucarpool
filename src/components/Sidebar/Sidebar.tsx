@@ -8,6 +8,7 @@ import { extend } from "lodash";
 import { HeaderOptions } from "../Header";
 import { trpc } from "../../utils/trpc";
 import _ from "lodash";
+import { Request } from "@prisma/client";
 
 interface SidebarProps {
   sidebarType: HeaderOptions;
@@ -17,12 +18,14 @@ interface SidebarProps {
 const extendPublicUser = (
   user: PublicUser,
   favorites: PublicUser[],
-  received: PublicUser[]
+  received: Request[],
+  sent: Request[]
 ): EnhancedPublicUser => {
   return {
     ...user,
     isFavorited: favorites.some((favs) => favs.id === user.id),
-    incomingRequest: received.some((req) => req.id === user.id),
+    incomingRequest: received.find((req) => req.fromUserId === user.id),
+    outgoingRequest: sent.find((req) => req.toUserId === user.id),
   };
 };
 
@@ -42,20 +45,21 @@ export const SidebarPage = (props: SidebarProps) => {
     refetchFavs();
   }, []);
 
-  const sent = requests.sent.map((request: { toUser: any }) => request.toUser!);
-  const received = requests.received.map(
-    (request: { fromUser: any }) => request.fromUser
-  );
-  const filteredRecs = _.differenceBy(recommendations, sent, "id");
-
   const extendPublicUserArray = (users: PublicUser[]): EnhancedPublicUser[] => {
-    return users.map((user) => extendPublicUser(user, favorites, received));
+    return users.map((user) =>
+      extendPublicUser(user, favorites, requests.received, requests.sent)
+    );
   };
 
+  const enhancedSentUsers = extendPublicUserArray(
+    requests.sent.map((request: { toUser: any }) => request.toUser!)
+  );
+  const enhancedReceivedUsers = extendPublicUserArray(
+    requests.received.map((request: { fromUser: any }) => request.fromUser!)
+  );
+  const filteredRecs = _.differenceBy(recommendations, enhancedSentUsers, "id");
   const enhancedRecs = extendPublicUserArray(filteredRecs);
   const enhancedFavs = extendPublicUserArray(favorites);
-  const enhancedSent = extendPublicUserArray(sent);
-  const enhancedReceived = extendPublicUserArray(received);
 
   const onViewRouteClick = (user: User, otherUser: PublicUser) => {
     return viewRoute(user, otherUser, props.map);
@@ -72,8 +76,8 @@ export const SidebarPage = (props: SidebarProps) => {
   } else {
     return (
       <RequestSidebar
-        received={enhancedReceived}
-        sent={enhancedSent}
+        received={enhancedReceivedUsers}
+        sent={enhancedSentUsers}
         viewRoute={onViewRouteClick}
       />
     );

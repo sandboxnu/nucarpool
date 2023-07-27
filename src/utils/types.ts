@@ -48,7 +48,8 @@ export type PublicUser = {
 
 export type EnhancedPublicUser = PublicUser & {
   isFavorited: boolean;
-  incomingRequest: boolean;
+  incomingRequest?: Request;
+  outgoingRequest?: Request;
 };
 
 export type User = RouterOutput["user"]["me"];

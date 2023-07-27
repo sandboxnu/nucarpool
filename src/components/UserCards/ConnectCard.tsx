@@ -5,7 +5,7 @@ import {
   PublicUser,
   ButtonInfo,
 } from "../../utils/types";
-import { AbstractUserCard } from "./AbstractUserCard";
+import { AbstractUserCard } from "./UserCard";
 import { useContext, useState } from "react";
 import { createPortal } from "react-dom";
 import ConnectModal from "../Modals/ConnectModal";

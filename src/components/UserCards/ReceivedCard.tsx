@@ -1,23 +1,25 @@
-import { useContext, useState } from "react";
-import { ButtonInfo, EnhancedPublicUser } from "../../utils/types";
-import { UserContext } from "../../utils/userContext";
+import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
+import Spinner from "../Spinner";
+import { ButtonInfo } from "../../utils/types";
 import { AbstractUserCard } from "./UserCard";
-import { CardProps } from "./ConnectCard";
-import SentRequestModal from "../Modals/SentRequestModal";
+import { CardProps, ConnectCard } from "./ConnectCard";
+import { SentCard } from "./SentCard";
+import { useContext, useState } from "react";
+import { UserContext } from "../../utils/userContext";
 import { createPortal } from "react-dom";
-import { Request } from "@prisma/client";
+import ReceivedRequestModal from "../Modals/ReceivedRequestModal";
 
-export const SentCard = (props: CardProps): JSX.Element => {
+export const ReceivedCard = (props: CardProps): JSX.Element => {
   const user = useContext(UserContext);
   const [showModal, setShowModal] = useState(false);
 
-  const handleManageSent = () => {
+  const handleManageReceived = () => {
     setShowModal(true);
   };
 
   const connectButtonInfo: ButtonInfo = {
     text: "Manage",
-    onPress: () => handleManageSent(),
+    onPress: () => handleManageReceived(),
     color: "bg-sky-900",
   };
   return (
@@ -29,13 +31,13 @@ export const SentCard = (props: CardProps): JSX.Element => {
       />
       {showModal &&
         user &&
-        props.otherUser.outgoingRequest &&
+        props.otherUser.incomingRequest &&
         createPortal(
-          <SentRequestModal
+          <ReceivedRequestModal
             user={user}
             otherUser={props.otherUser}
             onClose={() => setShowModal(false)}
-            req={props.otherUser.outgoingRequest}
+            req={props.otherUser.incomingRequest}
           />,
           document.body
         )}

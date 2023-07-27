@@ -58,7 +58,7 @@ const RequestSidebar = (props: RequestSidebarProps) => {
       </div>
       <SidebarContent
         userCardList={curOption === "received" ? props.received : props.sent}
-        card={curOption}
+        subType={curOption}
         onViewRouteClick={props.viewRoute}
       />
     </div>

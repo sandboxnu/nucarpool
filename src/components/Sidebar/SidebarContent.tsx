@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React from "react";
 import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
 import { renderUserCard } from "../UserCards/UserCard";
 
@@ -8,7 +8,7 @@ import { renderUserCard } from "../UserCards/UserCard";
  */
 
 interface SidebarContentProps {
-  card: string;
+  subType: string;
   userCardList: EnhancedPublicUser[];
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
 }
@@ -24,9 +24,9 @@ const emptyMessages = {
 
 const emptyMessage = (card: string): string => {
   switch (card) {
-    case "connect":
+    case "recommendations":
       return emptyMessages.recommendations;
-    case "favorite":
+    case "favorites":
       return emptyMessages.favorites;
     case "sent":
       return emptyMessages.sent;
@@ -42,11 +42,11 @@ export const SidebarContent = (props: SidebarContentProps) => {
     <div id="scrollableDiv" className="overflow-auto">
       {props.userCardList.length === 0 ? (
         <div className="text-center text-lg font-light m-4">
-          {emptyMessage(props.card)}
+          {emptyMessage(props.subType)}
         </div>
       ) : (
         props.userCardList.map((otherUser: EnhancedPublicUser) =>
-          renderUserCard(props.card, otherUser, props.onViewRouteClick)
+          renderUserCard(props.subType, otherUser, props.onViewRouteClick)
         )
       )}
     </div>

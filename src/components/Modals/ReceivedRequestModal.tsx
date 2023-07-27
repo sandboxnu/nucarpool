@@ -1,19 +1,16 @@
 import { Dialog } from "@headlessui/react";
 import { useState } from "react";
 import { useToasts } from "react-toast-notifications";
-import { PublicUser, User } from "../../utils/types";
+import { EnhancedPublicUser, User } from "../../utils/types";
+import { Request } from "@prisma/client";
+import { trpc } from "../../utils/trpc";
+import { toast } from "react-toastify";
 
 interface ReceivedModalProps {
-  // represents the 'me', the user trying to connect to someone
-  currentUser: User;
-  // represents the other user 'I' am trying to connect to.
-  userToConnectTo: PublicUser;
-
-  handleReject: () => void;
-
-  handleAccept: () => void;
-
-  closeModal: () => void;
+  user: User;
+  otherUser: EnhancedPublicUser;
+  req: Request;
+  onClose: () => void;
 }
 
 const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
@@ -22,24 +19,41 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
 
   const onClose = () => {
     setIsOpen(false);
-    props.closeModal();
+    props.onClose();
+  };
+
+  const utils = trpc.useContext();
+  const { mutate: deleteRequest } = trpc.user.requests.delete.useMutation({
+    onError: (error: any) => {
+      toast.error(`Something went wrong: ${error.message}`);
+    },
+    onSuccess() {
+      utils.user.requests.me.invalidate();
+      utils.user.recommendations.me.invalidate();
+    },
+  });
+
+  const handleDelete = () => {
+    deleteRequest({
+      invitationId: props.req.id,
+    });
   };
 
   const handleRejectClick = () => {
-    props.handleReject();
+    handleDelete();
     onClose();
     addToast(
-      props.userToConnectTo.name +
+      props.otherUser.name +
         "'s request to carpool with you has been rejected.",
       { appearance: "success" }
     );
   };
 
   const handleAcceptClick = () => {
-    props.handleAccept();
+    handleDelete();
     onClose();
     addToast(
-      props.userToConnectTo.name +
+      props.otherUser.name +
         "'s request to carpool with you has been accepted.",
       { appearance: "success" }
     );
@@ -57,9 +71,9 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
               Manage Received Request
             </Dialog.Title>
             <div className="text-sm">
-              We think you and {props.userToConnectTo.preferredName} would be a
-              good carpool match! Have a look at their profile, and connect with
-              them if they fit into your carpooling schedule!
+              {props.otherUser.preferredName} thinks they would be a good
+              carpool match for you! Have a look at their profile, and connect
+              with them if they fit into your carpooling schedule!
             </div>
             <div className="flex justify-center space-x-7">
               <button

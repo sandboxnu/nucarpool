@@ -126,6 +126,30 @@ export const requestsRouter = router({
       });
     }),
 
+  delete: protectedRouter
+    .input(
+      z.object({
+        invitationId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const invitation = await ctx.prisma.request.findUnique({
+        where: { id: input.invitationId },
+      });
+
+      if (!invitation) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `No invitation with id '${input.invitationId}'`,
+        });
+      }
+
+      await ctx.prisma.request.delete({
+        where: {
+          id: input.invitationId,
+        },
+      });
+    }),
   deleteByUserIds: protectedRouter
     .input(
       z.object({
@@ -155,7 +179,6 @@ export const requestsRouter = router({
 
       Promise.all(invitations.map(deleteRequest));
     }),
-
   edit: protectedRouter
     .input(
       z.object({

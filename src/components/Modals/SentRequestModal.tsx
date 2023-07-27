@@ -1,13 +1,15 @@
 import { Dialog } from "@headlessui/react";
 import { useState } from "react";
 import { useToasts } from "react-toast-notifications";
-import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
+import { EnhancedPublicUser, User } from "../../utils/types";
 import { toast } from "react-toastify";
 import { trpc } from "../../utils/trpc";
+import { Request } from "@prisma/client";
 
 interface SentModalProps {
   user: User;
   otherUser: EnhancedPublicUser;
+  req: Request;
   onClose: () => void;
 }
 
@@ -21,21 +23,19 @@ const SentRequestModal = (props: SentModalProps): JSX.Element => {
   };
 
   const utils = trpc.useContext();
-  const { mutate: deleteRequest } =
-    trpc.user.requests.deleteByUserIds.useMutation({
-      onError: (error: any) => {
-        toast.error(`Something went wrong: ${error.message}`);
-      },
-      onSuccess() {
-        utils.user.requests.me.invalidate();
-        utils.user.recommendations.me.invalidate();
-      },
-    });
+  const { mutate: deleteRequest } = trpc.user.requests.delete.useMutation({
+    onError: (error: any) => {
+      toast.error(`Something went wrong: ${error.message}`);
+    },
+    onSuccess() {
+      utils.user.requests.me.invalidate();
+      utils.user.recommendations.me.invalidate();
+    },
+  });
 
   const handleWithdrawRequest = () => {
     deleteRequest({
-      fromId: props.user.id,
-      toId: props.otherUser.id,
+      invitationId: props.req.id,
     });
   };
 
