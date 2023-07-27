@@ -126,29 +126,34 @@ export const requestsRouter = router({
       });
     }),
 
-  delete: protectedRouter
+  deleteByUserIds: protectedRouter
     .input(
       z.object({
-        invitationId: z.string(),
+        fromId: z.string(),
+        toId: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const invitation = await ctx.prisma.request.findUnique({
-        where: { id: input.invitationId },
+      const invitations = await ctx.prisma.request.findMany({
+        where: { fromUserId: input.fromId, toUserId: input.toId },
       });
 
-      if (!invitation) {
+      if (!invitations) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: `No invitation with id '${input.invitationId}'`,
+          message: `No request exists between '${input.fromId}' and '${input.toId}'`,
         });
       }
 
-      await ctx.prisma.request.delete({
-        where: {
-          id: input.invitationId,
-        },
-      });
+      const deleteRequest = async (req: Request) => {
+        await ctx.prisma.request.delete({
+          where: {
+            id: req.id,
+          },
+        });
+      };
+
+      Promise.all(invitations.map(deleteRequest));
     }),
 
   edit: protectedRouter

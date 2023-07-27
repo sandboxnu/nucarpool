@@ -12,7 +12,7 @@ export const generateParams = (schema: emailSchema): SendEmailCommandInput => {
       : "devashishsood9@gmail.com";
   return {
     Destination: {
-      CcAddresses: [schema.receivingUser],
+      CcAddresses: [cc],
       ToAddresses: [dest],
     },
     Message: {

@@ -57,30 +57,11 @@ const Home: NextPage<any> = () => {
 
   //tRPC mutations to update user related data
 
-  const { mutate: deleteRequest } = trpc.user.requests.delete.useMutation({
-    onError: (error: any) => {
-      toast.error(`Something went wrong: ${error.message}`);
-    },
-    onSuccess() {
-      utils.user.requests.me.invalidate();
-      utils.user.recommendations.me.invalidate();
-    },
-  });
-
   const [mapState, setMapState] = useState<mapboxgl.Map>();
   const [modalUser, setModalUser] = useState<PublicUser | null>(null);
   const [modalType, setModalType] = useState<string>("connect");
   const [sidebarType, setSidebarType] = useState<HeaderOptions>("explore");
   const mapContainerRef = useRef(null);
-
-  // const handleWithdrawRequest = (toUser: PublicUser) => {
-  //   const userRequest = sent.find(
-  //     (request) => request.toUser?.name === toUser.name
-  //   );
-  //   if (userRequest) {
-  //     handleDeleteRequest(userRequest);
-  //   }
-  // };
 
   // const handleRejectRequest = (fromUser: PublicUser) => {
   //   const userRequest = received.find(
@@ -100,12 +81,6 @@ const Home: NextPage<any> = () => {
   //   if (userRequest) {
   //     handleDeleteRequest(userRequest);
   //   }
-  // };
-
-  // const handleDeleteRequest = (request: ResolvedRequest) => {
-  //   deleteRequest({
-  //     invitationId: request.id,
-  //   });
   // };
 
   useEffect(() => {
@@ -159,12 +134,7 @@ const Home: NextPage<any> = () => {
                 newestOnTop={true}
               >
                 {mapState && (
-                  <SidebarPage
-                    sidebarType={sidebarType}
-                    map={mapState}
-                    setModalType={setModalType}
-                    setModalUser={setModalUser}
-                  />
+                  <SidebarPage sidebarType={sidebarType} map={mapState} />
                 )}
               </ToastProvider>
             </div>

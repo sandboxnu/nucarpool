@@ -12,8 +12,6 @@ import _ from "lodash";
 interface SidebarProps {
   sidebarType: HeaderOptions;
   map: mapboxgl.Map;
-  setModalType: Dispatch<SetStateAction<string>>;
-  setModalUser: Dispatch<SetStateAction<PublicUser | null>>;
 }
 
 const extendPublicUser = (

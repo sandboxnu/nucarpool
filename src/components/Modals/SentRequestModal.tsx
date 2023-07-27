@@ -2,6 +2,8 @@ import { Dialog } from "@headlessui/react";
 import { useState } from "react";
 import { useToasts } from "react-toast-notifications";
 import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
+import { toast } from "react-toastify";
+import { trpc } from "../../utils/trpc";
 
 interface SentModalProps {
   user: User;
@@ -18,9 +20,27 @@ const SentRequestModal = (props: SentModalProps): JSX.Element => {
     props.onClose();
   };
 
-  const handleWithdraw = () => {};
+  const utils = trpc.useContext();
+  const { mutate: deleteRequest } =
+    trpc.user.requests.deleteByUserIds.useMutation({
+      onError: (error: any) => {
+        toast.error(`Something went wrong: ${error.message}`);
+      },
+      onSuccess() {
+        utils.user.requests.me.invalidate();
+        utils.user.recommendations.me.invalidate();
+      },
+    });
+
+  const handleWithdrawRequest = () => {
+    deleteRequest({
+      fromId: props.user.id,
+      toId: props.otherUser.id,
+    });
+  };
 
   const handleWithdrawClick = () => {
+    handleWithdrawRequest();
     onClose();
     addToast(
       "Your request to carpool with " +
