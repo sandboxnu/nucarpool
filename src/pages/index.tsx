@@ -72,11 +72,6 @@ const Home: NextPage<any> = () => {
     }
   }, [user, geoJsonUsers]);
 
-  useEffect(() => {
-    refetchGeoJsonUsers();
-    refetchMe();
-  }, []);
-
   if (!user) {
     return <Spinner />;
   }
@@ -86,11 +81,11 @@ const Home: NextPage<any> = () => {
         <Head>
           <title>Home</title>
         </Head>
-        <div className="max-h-screen w-full h-full m-0">
+        <div className="m-0 h-full max-h-screen w-full">
           <Header
             data={{ sidebarValue: sidebarType, setSidebar: setSidebarType }}
           />
-          <div className="flex flex-auto h-[91.5%]">
+          <div className="flex h-[91.5%] flex-auto">
             <div className="w-96">
               <ToastProvider
                 placement="top-right"
@@ -104,7 +99,7 @@ const Home: NextPage<any> = () => {
             </div>
             <DropDownMenu />
             <button
-              className="flex justify-center items-center w-8 h-8 absolute z-10 right-[8px] bottom-[150px] rounded-md bg-white border-2 border-solid border-gray-300 shadow-sm hover:bg-gray-200"
+              className="absolute bottom-[150px] right-[8px] z-10 flex h-8 w-8 items-center justify-center rounded-md border-2 border-solid border-gray-300 bg-white shadow-sm hover:bg-gray-200"
               id="fly"
             >
               <RiFocus3Line />
@@ -113,7 +108,7 @@ const Home: NextPage<any> = () => {
               <div
                 ref={mapContainerRef}
                 id="map"
-                className={"flex-auto w-full h-full"}
+                className={"h-full w-full flex-auto"}
               />
               <MapLegend role={user.role === "DRIVER" ? "Rider" : "Driver"} />
             </div>

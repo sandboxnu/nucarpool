@@ -38,12 +38,6 @@ export const SidebarPage = (props: SidebarProps) => {
     refetch: refetchRequests,
   } = trpc.user.requests.me.useQuery();
 
-  useEffect(() => {
-    refetchRecs();
-    refetchRequests();
-    refetchFavs();
-  }, []);
-
   const extendPublicUserArray = (users: PublicUser[]): EnhancedPublicUser[] => {
     return users.map((user) =>
       extendPublicUser(user, favorites, requests.received, requests.sent)
