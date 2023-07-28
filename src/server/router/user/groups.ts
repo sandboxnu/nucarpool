@@ -2,7 +2,6 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { router, protectedRouter } from "../createRouter";
 import _ from "lodash";
-import { User } from "@prisma/client";
 
 // use this router to manage invitations
 export const groupsRouter = router({

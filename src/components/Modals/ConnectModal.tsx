@@ -1,7 +1,7 @@
 import { Dialog } from "@headlessui/react";
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
 import { useToasts } from "react-toast-notifications";
-import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
+import { EnhancedPublicUser, User } from "../../utils/types";
 import { toast } from "react-toastify";
 import { emailSchema } from "../../utils/email";
 import { trpc } from "../../utils/trpc";
@@ -80,8 +80,8 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
         {/* Full-screen container to center the panel */}
         <div className="fixed inset-0 flex items-center justify-center p-4">
           {/* dialog panel container  */}
-          <Dialog.Panel className="justify-center rounded-md shadow-md bg-white h-3/6 w-3/6 content-center flex flex-col p-9 gap-4">
-            <Dialog.Title className="font-bold text-2xl text-center">
+          <Dialog.Panel className="flex h-3/6 w-3/6 flex-col content-center justify-center gap-4 rounded-md bg-white p-9 shadow-md">
+            <Dialog.Title className="text-center text-2xl font-bold">
               Send an email to connect!
             </Dialog.Title>
             <div className="text-sm">
@@ -91,7 +91,7 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
               anything else you think would be good to know!
             </div>
             <textarea
-              className={`resize-none form-input w-full shadow-sm rounded-md px-3 py-2`}
+              className={`form-input w-full resize-none rounded-md px-3 py-2 shadow-sm`}
               maxLength={280}
               defaultValue={customMessage}
               onChange={(e) => setCustomMessage(e.target.value)}
@@ -104,12 +104,12 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
             <div className="flex justify-center space-x-7">
               <button
                 onClick={onClose}
-                className="w-full p-1 text-red-700 bg-slate-50 border-2 border-red-700 rounded-md"
+                className="w-full rounded-md border-2 border-red-700 bg-slate-50 p-1 text-red-700"
               >
                 Cancel
               </button>
               <button
-                className="w-full p-1 text-slate-50 bg-red-700 border-2 border-red-700 rounded-md"
+                className="w-full rounded-md border-2 border-red-700 bg-red-700 p-1 text-slate-50"
                 onClick={handleOnClick}
               >
                 Send Email

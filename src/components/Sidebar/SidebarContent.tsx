@@ -6,7 +6,6 @@ import { renderUserCard } from "../UserCards/UserCard";
  * TODO:
  * 2. Add Prettier Tailwind omg please
  */
-
 interface SidebarContentProps {
   subType: string;
   userCardList: EnhancedPublicUser[];
@@ -41,7 +40,7 @@ export const SidebarContent = (props: SidebarContentProps) => {
   return (
     <div id="scrollableDiv" className="overflow-auto">
       {props.userCardList.length === 0 ? (
-        <div className="text-center text-lg font-light m-4">
+        <div className="m-4 text-center text-lg font-light">
           {emptyMessage(props.subType)}
         </div>
       ) : (

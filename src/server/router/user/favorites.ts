@@ -3,7 +3,6 @@ import { z } from "zod";
 import { router, protectedRouter } from "../createRouter";
 import _ from "lodash";
 import { convertToPublic } from "../../../utils/publicUser";
-import { disconnect } from "process";
 
 export const favoritesRouter = router({
   me: protectedRouter.query(async ({ ctx }) => {

@@ -1,14 +1,13 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import ExploreSidebar from "./ExploreSidebar";
 import RequestSidebar from "./RequestSidebar";
 import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
 import mapboxgl from "mapbox-gl";
 import { viewRoute } from "../../utils/map/viewRoute";
-import { extend } from "lodash";
 import { HeaderOptions } from "../Header";
 import { trpc } from "../../utils/trpc";
 import _ from "lodash";
 import { Request } from "@prisma/client";
+import { useEffect } from "react";
 
 interface SidebarProps {
   sidebarType: HeaderOptions;
