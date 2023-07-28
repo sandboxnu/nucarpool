@@ -76,8 +76,8 @@ export const SidebarPage = (props: SidebarProps) => {
   } else {
     return (
       <RequestSidebar
-        received={enhancedReceivedUsers}
-        sent={enhancedSentUsers}
+        received={enhancedReceivedUsers.reverse()}
+        sent={enhancedSentUsers.reverse()}
         viewRoute={onViewRouteClick}
       />
     );
