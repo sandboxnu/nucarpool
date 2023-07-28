@@ -35,5 +35,14 @@ export const serverEnv = {
     AWS_REGION: str({
       input: process.env.AWS_REGION,
     }),
+    COGNITO_CLIENT_ID: str({
+      input: process.env.COGNITO_CLIENT_ID,
+    }),
+    COGNITO_CLIENT_SECRET: str({
+      input: process.env.COGNITO_CLIENT_SECRET,
+    }),
+    COGNITO_ISSUER: str({
+      input: process.env.COGNITO_ISSUER,
+    }),
   }),
 };

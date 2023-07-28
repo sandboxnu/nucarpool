@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { NextAuthOptions } from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
+import CognitoProvider from "next-auth/providers/cognito";
 import { prisma } from "../../../server/db/client";
 import { serverEnv } from "../../../utils/env/server";
 
@@ -30,9 +30,10 @@ export const authOptions: NextAuthOptions = {
   },
   adapter: PrismaAdapter(prisma),
   providers: [
-    GoogleProvider({
-      clientId: serverEnv.GOOGLE_CLIENT_ID!,
-      clientSecret: serverEnv.GOOGLE_CLIENT_SECRET!,
+    CognitoProvider({
+      clientId: serverEnv.COGNITO_CLIENT_ID,
+      clientSecret: serverEnv.COGNITO_CLIENT_SECRET,
+      issuer: serverEnv.COGNITO_ISSUER,
     }),
   ],
   pages: {

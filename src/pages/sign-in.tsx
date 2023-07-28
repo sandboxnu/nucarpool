@@ -1,13 +1,8 @@
-import {
-  GetServerSidePropsContext,
-  InferGetServerSidePropsType,
-  NextPage,
-} from "next";
+import { GetServerSidePropsContext, NextPage } from "next";
 import { getSession, signIn } from "next-auth/react";
 import React from "react";
 import Head from "next/head";
 import Header from "../components/Header";
-import { authOptions } from "./api/auth/[...nextauth]";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getSession(context);
@@ -37,8 +32,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 const SignIn: NextPage = () => {
   const handleOnclick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    signIn("google", {
-      callbackUrl: "/",
+    signIn("cognito", {
+      callbackUrl:
+        "https://carpoolnu.auth.us-east-2.amazoncognito.com/oauth2/authorize?client_id=k3hdffsadnft8vcuds2b2uimc&response_type=code&scope=email+openid+phone&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth%2Fcallback%2Fcognito",
     });
   };
 
