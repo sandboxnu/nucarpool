@@ -17,7 +17,7 @@ const cutoffs = {
   endDistance: 4, // miles
   startTime: 60, // minutes
   endTime: 60, // minutes
-  days: 3,
+  days: 5,
 };
 
 /** Weights for each portion of the recommendation score */
@@ -69,8 +69,9 @@ const calculateScore = (
     );
 
     const userDays = dayConversion(user);
+    // get the number of days that both user A AND user B are NOT going in
     const days = currentUserDays
-      .map((day, index) => day && !userDays[index])
+      .map((day, index) => !(day && userDays[index]))
       .reduce((prev, curr) => (curr ? prev + 1 : prev), 0);
 
     let startTime: number | undefined;
@@ -81,14 +82,16 @@ const calculateScore = (
       user.startTime &&
       user.endTime
     ) {
-      startTime = Math.abs(
-        (currentUser.startTime.getHours() - user.startTime.getHours()) * 60 +
-          (currentUser.startTime.getMinutes() - user.startTime.getMinutes())
-      );
-      endTime = Math.abs(
-        (currentUser.endTime.getHours() - user.endTime.getHours()) * 60 +
-          (currentUser.endTime.getMinutes() - user.endTime.getMinutes())
-      );
+      startTime =
+        Math.abs(currentUser.startTime.getHours() - user.startTime.getHours()) *
+          60 +
+        Math.abs(
+          currentUser.startTime.getMinutes() - user.startTime.getMinutes()
+        );
+      endTime =
+        Math.abs(currentUser.endTime.getHours() - user.endTime.getHours()) *
+          60 +
+        Math.abs(currentUser.endTime.getMinutes() - user.endTime.getMinutes());
       if (startTime > cutoffs.startTime || endTime > cutoffs.endTime) {
         return undefined;
       }
@@ -102,21 +105,17 @@ const calculateScore = (
       return undefined;
     }
 
-    const deprioritizationFactor =
-      currentUser.role === "DRIVER" && user.role === "DRIVER" ? 0.1 : 0;
-
     let finalScore =
       (startDistance / cutoffs.startDistance) * weights.startDistance +
       (endDistance / cutoffs.endDistance) * weights.endDistance +
-      (days / cutoffs.days) * weights.days +
-      deprioritizationFactor;
+      (days / cutoffs.days) * weights.days;
 
     if (startTime !== undefined && endTime !== undefined) {
       finalScore +=
         (startTime / cutoffs.startTime) * weights.startTime +
         (endTime / cutoffs.endTime) * weights.endTime;
     } else {
-      finalScore *= 1 / (weights.startTime + weights.endTime);
+      finalScore += weights.startTime + weights.endTime;
     }
 
     return {
