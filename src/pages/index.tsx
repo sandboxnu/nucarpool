@@ -56,6 +56,7 @@ const Home: NextPage<any> = () => {
   const mapContainerRef = useRef(null);
 
   useEffect(() => {
+    console.log(geoJsonUsers);
     if (
       mapState === undefined &&
       user &&
@@ -68,7 +69,6 @@ const Home: NextPage<any> = () => {
         center: [user.companyCoordLng, user.companyCoordLat],
         zoom: 10,
       });
-
       newMap.on("load", () => {
         addClusters(newMap, geoJsonUsers);
         addUserLocation(newMap, user);

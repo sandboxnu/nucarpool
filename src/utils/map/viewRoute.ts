@@ -15,19 +15,19 @@ export const viewRoute = (
 ) => {
   clearMarkers();
 
-  const selfStartMarker = new mapboxgl.Marker({ color: "#00008B" })
+  const selfStartMarker = new mapboxgl.Marker({ color: "#2ae916" })
     .setLngLat([user.startCoordLng, user.startCoordLat])
     .addTo(map);
 
-  const selfEndMarker = new mapboxgl.Marker({ color: "#FFA500" })
+  const selfEndMarker = new mapboxgl.Marker({ color: "#f0220f" })
     .setLngLat([user.companyCoordLng, user.companyCoordLat])
     .addTo(map);
 
-  const otherUserStartMarker = new mapboxgl.Marker({ color: "#2ae916" })
+  const otherUserStartMarker = new mapboxgl.Marker({ color: "#00008B" })
     .setLngLat([otherUser.startPOICoordLng, otherUser.startPOICoordLat])
     .addTo(map);
 
-  const otherUserEndMarker = new mapboxgl.Marker({ color: "#f0220f" })
+  const otherUserEndMarker = new mapboxgl.Marker({ color: "#FFA500" })
     .setLngLat([otherUser.companyPOICoordLng, otherUser.companyPOICoordLat])
     .addTo(map);
 
