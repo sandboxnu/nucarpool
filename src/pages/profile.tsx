@@ -207,6 +207,8 @@ const Profile: NextPage = () => {
 
   const editUserMutation = trpc.user.edit.useMutation({
     onSuccess: () => {
+      utils.mapbox.geoJsonUserList.invalidate();
+      utils.user.invalidate();
       router.push("/");
     },
     onError: (error) => {
@@ -235,9 +237,6 @@ const Profile: NextPage = () => {
         }
       })
       .join(",");
-
-    utils.user.invalidate();
-    utils.mapbox.geoJsonUserList.invalidate();
 
     editUserMutation.mutate({
       role: userInfo.role,

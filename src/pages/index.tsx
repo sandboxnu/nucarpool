@@ -3,7 +3,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import type { GetServerSidePropsContext, NextPage } from "next";
 import { useEffect, useRef, useState } from "react";
 import { RiFocus3Line } from "react-icons/ri";
-import { ToastProvider, useToasts } from "react-toast-notifications";
+import { ToastProvider } from "react-toast-notifications";
 import addClusters from "../utils/map/addClusters";
 import addMapEvents from "../utils/map/addMapEvents";
 import addUserLocation from "../utils/map/addUserLocation";
@@ -12,14 +12,12 @@ import { trpc } from "../utils/trpc";
 import DropDownMenu from "../components/DropDownMenu";
 import { browserEnv } from "../utils/env/browser";
 import Header, { HeaderOptions } from "../components/Header";
-import { PublicUser, User } from "../utils/types";
-import { toast, useToast } from "react-toastify";
 import { getSession } from "next-auth/react";
-import { emailSchema } from "../utils/email";
 import Spinner from "../components/Spinner";
 import { UserContext } from "../utils/userContext";
 import _ from "lodash";
 import { SidebarPage } from "../components/Sidebar/Sidebar";
+import { MapLegend } from "../components/MapLegend";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -44,11 +42,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
 
   return {
-    props: {}, // will be passed to the page component as props
+    props: {},
   };
 }
 
 const Home: NextPage<any> = () => {
+  const utils = trpc.useContext();
   const { data: geoJsonUsers, refetch: refetchGeoJsonUsers } =
     trpc.mapbox.geoJsonUserList.useQuery();
   const { data: user = null, refetch: refetchMe } = trpc.user.me.useQuery();
@@ -80,8 +79,8 @@ const Home: NextPage<any> = () => {
   }, [user, geoJsonUsers]);
 
   useEffect(() => {
-    refetchMe();
     refetchGeoJsonUsers();
+    refetchMe();
   }, []);
 
   if (!user) {
@@ -121,7 +120,8 @@ const Home: NextPage<any> = () => {
                 ref={mapContainerRef}
                 id="map"
                 className={"flex-auto w-full h-full"}
-              ></div>
+              />
+              <MapLegend role={user.role === "DRIVER" ? "Rider" : "Driver"} />
             </div>
           </div>
         </div>

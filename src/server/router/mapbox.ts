@@ -3,7 +3,7 @@ import { z } from "zod";
 import { router, protectedRouter } from "./createRouter";
 import { Feature, FeatureCollection } from "geojson";
 import { serverEnv } from "../../utils/env/server";
-import { Status } from "@prisma/client";
+import { Role, Status } from "@prisma/client";
 
 // TODO: implement router everywhere axios is currently being used
 
@@ -40,6 +40,13 @@ export const mapboxRouter = router({
   //queries all other users and locations besides current user
   geoJsonUserList: protectedRouter.query(async ({ ctx }) => {
     const id = ctx.session.user?.id;
+    const currentUser = await ctx.prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    const oppRole =
+      currentUser?.role === Role.DRIVER ? Role.RIDER : Role.DRIVER;
     const users = await ctx.prisma.user.findMany({
       where: {
         id: {
@@ -47,6 +54,7 @@ export const mapboxRouter = router({
         },
         isOnboarded: true, // only include user that have finished onboarding
         status: Status.ACTIVE, // only include active users
+        role: oppRole,
       },
       select: {
         id: true,
