@@ -73,10 +73,6 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
     }
   };
 
-  const handleMessageChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    setCustomMessage(event.target.value);
-  };
-
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
       {/* backdrop panel */}
@@ -98,7 +94,7 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
               className={`resize-none form-input w-full shadow-sm rounded-md px-3 py-2`}
               maxLength={280}
               defaultValue={customMessage}
-              onChange={handleMessageChange}
+              onChange={(e) => setCustomMessage(e.target.value)}
             ></textarea>
             <div className="text-xs italic text-slate-400">
               Note: The information you’ve provided in your intro is written

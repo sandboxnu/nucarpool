@@ -56,13 +56,7 @@ const Home: NextPage<any> = () => {
   const mapContainerRef = useRef(null);
 
   useEffect(() => {
-    console.log(geoJsonUsers);
-    if (
-      mapState === undefined &&
-      user &&
-      geoJsonUsers &&
-      mapContainerRef.current
-    ) {
+    if (user && geoJsonUsers && mapContainerRef.current) {
       const newMap = new mapboxgl.Map({
         container: "map",
         style: "mapbox://styles/mapbox/light-v10",
