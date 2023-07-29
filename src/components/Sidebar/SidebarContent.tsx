@@ -42,6 +42,12 @@ const renderUserCard = (
 ): JSX.Element => {
   switch (subType) {
     case "recommendations":
+      return (
+        <ConnectCard
+          otherUser={otherUser}
+          onViewRouteClick={onViewRouteClick}
+        />
+      );
     case "favorites":
       return (
         <ConnectCard
