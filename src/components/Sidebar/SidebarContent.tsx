@@ -1,11 +1,10 @@
 import React from "react";
 import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
-import { renderUserCard } from "../UserCards/UserCard";
+import Spinner from "../Spinner";
+import { ConnectCard } from "../UserCards/ConnectCard";
+import { ReceivedCard } from "../UserCards/ReceivedCard";
+import { SentCard } from "../UserCards/SentCard";
 
-/**
- * TODO:
- * 2. Add Prettier Tailwind omg please
- */
 interface SidebarContentProps {
   subType: string;
   userCardList: EnhancedPublicUser[];
@@ -33,6 +32,40 @@ const emptyMessage = (card: string): string => {
       return emptyMessages.received;
     default:
       return "";
+  }
+};
+
+const renderUserCard = (
+  subType: string,
+  otherUser: EnhancedPublicUser,
+  onViewRouteClick: (user: User, otherUser: PublicUser) => void
+): JSX.Element => {
+  switch (subType) {
+    case "recommendations":
+    case "favorites":
+      return (
+        <ConnectCard
+          otherUser={otherUser}
+          onViewRouteClick={onViewRouteClick}
+        />
+      );
+    case "sent":
+      if (otherUser.outgoingRequest) {
+        return (
+          <SentCard otherUser={otherUser} onViewRouteClick={onViewRouteClick} />
+        );
+      }
+    case "received":
+      if (otherUser.incomingRequest) {
+        return (
+          <ReceivedCard
+            otherUser={otherUser}
+            onViewRouteClick={onViewRouteClick}
+          />
+        );
+      }
+    default:
+      return <Spinner />;
   }
 };
 

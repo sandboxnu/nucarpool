@@ -10,49 +10,12 @@ import { UserContext } from "../../utils/userContext";
 import Spinner from "../Spinner";
 import { classNames } from "../../utils/classNames";
 import { User } from "@prisma/client";
-import { ConnectCard } from "./ConnectCard";
-import { SentCard } from "./SentCard";
-import { ReceivedCard } from "./ReceivedCard";
 
 interface UserCardProps {
   otherUser: EnhancedPublicUser;
   rightButton: ButtonInfo;
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
 }
-
-export const renderUserCard = (
-  subType: string,
-  otherUser: EnhancedPublicUser,
-  onViewRouteClick: (user: User, otherUser: PublicUser) => void
-): JSX.Element => {
-  switch (subType) {
-    case "recommendations":
-    case "favorites":
-      return (
-        <ConnectCard
-          otherUser={otherUser}
-          onViewRouteClick={onViewRouteClick}
-        />
-      );
-    case "sent":
-      if (otherUser.outgoingRequest) {
-        return (
-          <SentCard otherUser={otherUser} onViewRouteClick={onViewRouteClick} />
-        );
-      }
-    case "received":
-      if (otherUser.incomingRequest) {
-        return (
-          <ReceivedCard
-            otherUser={otherUser}
-            onViewRouteClick={onViewRouteClick}
-          />
-        );
-      }
-    default:
-      return <Spinner />;
-  }
-};
 
 const backgroundColorCSS = (seatAvail: number): string => {
   if (seatAvail === 1) {
@@ -123,7 +86,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         <div
           key={i}
           className={
-            "w-6 h-6 border-l-0 border border-black text-center font-heavy text-sm pl-auto pt-0.5" +
+            "font-heavy pl-auto h-6 w-6 border border-l-0 border-black pt-0.5 text-center text-sm" +
             backgroundColor
           }
         >
@@ -131,7 +94,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         </div>
       );
     }
-    return <div className="flex border-l border-black h-min">{boxes}</div>;
+    return <div className="flex h-min border-l border-black">{boxes}</div>;
   };
 
   if (!user) {
@@ -141,7 +104,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
   return (
     <div
       className={
-        "bg-stone-100 text-left px-6 py-4 rounded-xl m-3.5 align-center flex flex-col border-l-[13px] gap-2 shadow-md" +
+        "align-center m-3.5 flex flex-col gap-2 rounded-xl border-l-[13px] bg-stone-100 px-6 py-4 text-left shadow-md" +
         borderLColorCSS(props.otherUser.seatAvail)
       }
     >
@@ -164,12 +127,12 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       {/* second row */}
       <p className="font-semibold">{props.otherUser.startPOILocation}</p>
       {/* third row */}
-      <div className="w-full flex gap-4 items-center">
+      <div className="flex w-full items-center gap-4">
         {DaysWorkingDisplay(props.otherUser.daysWorking)}
         {props.otherUser.role === "DRIVER" && (
           <div
             className={
-              "w-7 h-7 flex justify-center items-center rounded-md font-semibold" +
+              "flex h-7 w-7 items-center justify-center rounded-md font-semibold" +
               backgroundColorCSS(props.otherUser.seatAvail)
             }
           >
@@ -178,13 +141,13 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         )}
       </div>
       {/* fourth row */}
-      <div className="w-full m-0 flex justify-between align-middle">
-        <div className="font-normal text-sm flex">
+      <div className="m-0 flex w-full justify-between align-middle">
+        <div className="flex text-sm font-normal">
           <p className="pr-1">Start:</p>
           <p className="font-semibold">
             {dayjs.tz(props.otherUser.startTime, "UTC").format("h:mm")} am
           </p>
-          <p className="font-semibold px-2"> | </p>
+          <p className="px-2 font-semibold"> | </p>
           <p className="pr-1">End:</p>
           <p className="font-semibold">
             {dayjs.tz(props.otherUser.endTime, "UTC").format("h:mm")} pm
@@ -192,10 +155,10 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         </div>
       </div>
       {/* last row */}
-      <div className="flex flex-row gap-2 justify-between">
+      <div className="flex flex-row justify-between gap-2">
         <button
           onClick={() => props.onViewRouteClick(user, props.otherUser)}
-          className="w-1/2 hover:bg-stone-200 rounded-md p-1 my-1 text-center border-black border"
+          className="my-1 w-1/2 rounded-md border border-black p-1 text-center hover:bg-stone-200"
         >
           View Route
         </button>
