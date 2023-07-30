@@ -7,7 +7,6 @@ import { HeaderOptions } from "../Header";
 import { trpc } from "../../utils/trpc";
 import _ from "lodash";
 import { Request } from "@prisma/client";
-import { useEffect } from "react";
 
 interface SidebarProps {
   sidebarType: HeaderOptions;
@@ -29,14 +28,11 @@ const extendPublicUser = (
 };
 
 export const SidebarPage = (props: SidebarProps) => {
-  const { data: recommendations = [], refetch: refetchRecs } =
+  const { data: recommendations = [] } =
     trpc.user.recommendations.me.useQuery();
-  const { data: favorites = [], refetch: refetchFavs } =
-    trpc.user.favorites.me.useQuery();
-  const {
-    data: requests = { sent: [], received: [] },
-    refetch: refetchRequests,
-  } = trpc.user.requests.me.useQuery();
+  const { data: favorites = [] } = trpc.user.favorites.me.useQuery();
+  const { data: requests = { sent: [], received: [] } } =
+    trpc.user.requests.me.useQuery();
 
   const extendPublicUserArray = (users: PublicUser[]): EnhancedPublicUser[] => {
     return users.map((user) =>

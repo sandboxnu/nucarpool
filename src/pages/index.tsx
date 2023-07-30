@@ -47,10 +47,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 
 const Home: NextPage<any> = () => {
-  const utils = trpc.useContext();
-  const { data: geoJsonUsers, refetch: refetchGeoJsonUsers } =
-    trpc.mapbox.geoJsonUserList.useQuery();
-  const { data: user = null, refetch: refetchMe } = trpc.user.me.useQuery();
+  const { data: geoJsonUsers } = trpc.mapbox.geoJsonUserList.useQuery();
+  const { data: user = null } = trpc.user.me.useQuery();
   const [mapState, setMapState] = useState<mapboxgl.Map>();
   const [sidebarType, setSidebarType] = useState<HeaderOptions>("explore");
   const mapContainerRef = useRef(null);

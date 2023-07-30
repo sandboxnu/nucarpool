@@ -100,7 +100,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
 
   return {
-    props: {}, // will be passed to the page component as props
+    props: {},
   };
 }
 const Profile: NextPage = () => {
