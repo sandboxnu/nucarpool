@@ -31,7 +31,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   if (!session?.user) {
     return {
       redirect: {
-        destination: "/sign-in",
+        destination: "/api/auth/signin",
         permanent: false,
       },
     };
@@ -274,17 +274,17 @@ const Home: NextPage<any> = () => {
       <Head>
         <title>Home</title>
       </Head>
-      <div className="max-h-screen w-full h-full m-0">
+      <div className="m-0 h-full max-h-screen w-full">
         <Header
           data={{ sidebarValue: sidebarState, setSidebar: setSidebarState }}
         />
         {/* <ProfileModal userInfo={userInfo!} user={user!}  /> */}
-        <div className="flex flex-auto h-[91.5%]">
+        <div className="flex h-[91.5%] flex-auto">
           <div className="w-96">{mapState && user && renderSidebar()}</div>
 
           <DropDownMenu />
           <button
-            className="flex justify-center items-center w-8 h-8 absolute z-10 right-[8px] bottom-[150px] rounded-md bg-white border-2 border-solid border-gray-300 shadow-sm hover:bg-gray-200"
+            className="absolute bottom-[150px] right-[8px] z-10 flex h-8 w-8 items-center justify-center rounded-md border-2 border-solid border-gray-300 bg-white shadow-sm hover:bg-gray-200"
             id="fly"
           >
             <RiFocus3Line />
@@ -298,7 +298,7 @@ const Home: NextPage<any> = () => {
             newestOnTop={true}
           >
             <div className="relative flex-auto">
-              <div id="map" className={"flex-auto w-full h-full"}></div>
+              <div id="map" className={"h-full w-full flex-auto"}></div>
               {user && modalUser && modalType === "connect" && (
                 <ConnectModal
                   currentUser={user}

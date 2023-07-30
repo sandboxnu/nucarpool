@@ -36,9 +36,6 @@ export const authOptions: NextAuthOptions = {
       issuer: serverEnv.COGNITO_ISSUER,
     }),
   ],
-  pages: {
-    signIn: "/sign-in",
-  },
 };
 
 export default NextAuth(authOptions);

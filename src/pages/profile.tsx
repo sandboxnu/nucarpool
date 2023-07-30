@@ -93,7 +93,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   if (!session?.user) {
     return {
       redirect: {
-        destination: "/sign-in",
+        destination: "/api/auth/signin",
         permanent: false,
       },
     };
@@ -262,11 +262,11 @@ const Profile: NextPage = () => {
 
   return (
     <>
-      <div className="flex flex-col h-full w-full items-center">
+      <div className="flex h-full w-full flex-col items-center">
         <Header />
         <ProfileContainer onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex flex-col justify-center items-center md:w-10/12">
-            <div className="flex flex-col gap-8 md:gap-12 lg:flex-row lg:items-start justify-center items-center">
+          <div className="flex flex-col items-center justify-center md:w-10/12">
+            <div className="flex flex-col items-center justify-center gap-8 md:gap-12 lg:flex-row lg:items-start">
               <ProfileColumn>
                 <TopProfileSection>
                   <ProfileHeader>Locations</ProfileHeader>
@@ -341,7 +341,7 @@ const Profile: NextPage = () => {
                   <ProfileHeaderNoMB>
                     I am a... <span className="text-northeastern-red">*</span>
                   </ProfileHeaderNoMB>
-                  <div className="flex items-end space-x-4 h-24">
+                  <div className="flex h-24 items-end space-x-4">
                     <Radio
                       label="Rider"
                       id="rider"
@@ -362,7 +362,7 @@ const Profile: NextPage = () => {
                     />
 
                     {watch("role") == Role.DRIVER && (
-                      <div className="flex flex-col flex-1">
+                      <div className="flex flex-1 flex-col">
                         <EntryLabel
                           required={true}
                           error={errors.seatAvail}
@@ -370,7 +370,7 @@ const Profile: NextPage = () => {
                         />
                         <TextField
                           inputClassName="py-[14px] h-14 text-lg"
-                          className="self-end w-full"
+                          className="w-full self-end"
                           label="Seat Availability"
                           id="seatAvail"
                           error={errors.seatAvail}
@@ -396,8 +396,8 @@ const Profile: NextPage = () => {
                 <CommutingScheduleSection>
                   <ProfileHeader>Commuting Schedule</ProfileHeader>
                   {/* Days working field  */}
-                  <div className="mb-2 md:my-4 w-full aspect-[7/1] max-w-[360px]">
-                    <div className="w-full h-full border-l flex justify-evenly items-center border-l-black">
+                  <div className="mb-2 aspect-[7/1] w-full max-w-[360px] md:my-4">
+                    <div className="flex h-full w-full items-center justify-evenly border-l border-l-black">
                       {daysOfWeek.map((day, index) => (
                         <Controller
                           key={day + index.toString()}
@@ -434,8 +434,8 @@ const Profile: NextPage = () => {
                   </div>
 
                   {/* Start/End Time Fields  */}
-                  <div className="flex w-full md:w-96 gap-6 pb-4 justify-between">
-                    <div className="flex flex-col gap-2 flex-1">
+                  <div className="flex w-full justify-between gap-6 pb-4 md:w-96">
+                    <div className="flex flex-1 flex-col gap-2">
                       <EntryLabel
                         required={true}
                         error={errors.startTime}
@@ -447,7 +447,7 @@ const Profile: NextPage = () => {
                         value={user?.startTime ? user.startTime : undefined}
                       />
                     </div>
-                    <div className="flex flex-col gap-2 flex-1">
+                    <div className="flex flex-1 flex-col gap-2">
                       <EntryLabel
                         required={true}
                         error={errors.endTime}
@@ -470,9 +470,9 @@ const Profile: NextPage = () => {
 
                 <PersonalInfoSection>
                   <ProfileHeader>Personal Info</ProfileHeader>
-                  <div className="flex flex-row space-x-6 w-full">
+                  <div className="flex w-full flex-row space-x-6">
                     {/* Preferred Name field  */}
-                    <div className="flex flex-col w-3/5">
+                    <div className="flex w-3/5 flex-col">
                       <LightEntryLabel error={!!errors.preferredName}>
                         Preferred Name
                       </LightEntryLabel>
@@ -500,14 +500,14 @@ const Profile: NextPage = () => {
                     </div>
                   </div>
                   {/* Bio field */}
-                  <div className="py-4 w-full">
+                  <div className="w-full py-4">
                     <EntryLabel
                       required
                       error={errors.companyAddress}
                       label="About Me"
                     />
                     <textarea
-                      className={`resize-none form-input w-full rounded-md px-3 py-2 border-black`}
+                      className={`form-input w-full resize-none rounded-md border-black px-3 py-2`}
                       maxLength={300}
                       {...register("bio")}
                     />
