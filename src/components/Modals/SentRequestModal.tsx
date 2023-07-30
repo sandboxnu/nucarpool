@@ -1,17 +1,16 @@
 import { Dialog } from "@headlessui/react";
 import { useState } from "react";
 import { useToasts } from "react-toast-notifications";
-import { PublicUser, User } from "../utils/types";
+import { EnhancedPublicUser, User } from "../../utils/types";
+import { toast } from "react-toastify";
+import { trpc } from "../../utils/trpc";
+import { Request } from "@prisma/client";
 
 interface SentModalProps {
-  // represents the 'me', the user trying to connect to someone
-  currentUser: User;
-  // represents the other user 'I' am trying to connect to.
-  userToConnectTo: PublicUser;
-  // handle the withdrawing of a request
-  handleWithdraw: () => void;
-
-  closeModal: () => void;
+  user: User;
+  otherUser: EnhancedPublicUser;
+  req: Request;
+  onClose: () => void;
 }
 
 const SentRequestModal = (props: SentModalProps): JSX.Element => {
@@ -20,15 +19,32 @@ const SentRequestModal = (props: SentModalProps): JSX.Element => {
 
   const onClose = () => {
     setIsOpen(false);
-    props.closeModal();
+    props.onClose();
+  };
+
+  const utils = trpc.useContext();
+  const { mutate: deleteRequest } = trpc.user.requests.delete.useMutation({
+    onError: (error: any) => {
+      toast.error(`Something went wrong: ${error.message}`);
+    },
+    onSuccess() {
+      utils.user.requests.me.invalidate();
+      utils.user.recommendations.me.invalidate();
+    },
+  });
+
+  const handleWithdrawRequest = () => {
+    deleteRequest({
+      invitationId: props.req.id,
+    });
   };
 
   const handleWithdrawClick = () => {
-    props.handleWithdraw();
+    handleWithdrawRequest();
     onClose();
     addToast(
       "Your request to carpool with " +
-        props.userToConnectTo.name +
+        props.otherUser.preferredName +
         " has been withdrawn.",
       { appearance: "success" }
     );
@@ -47,7 +63,7 @@ const SentRequestModal = (props: SentModalProps): JSX.Element => {
             </Dialog.Title>
             <div className="text-sm text-center">
               {" "}
-              {props.userToConnectTo.preferredName} has not yet responded. If
+              {props.otherUser.preferredName} has not yet responded. If
               you&apos;d like to, you can withdraw your request.
             </div>
             <div className="flex justify-center space-x-7">

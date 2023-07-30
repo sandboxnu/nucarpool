@@ -46,6 +46,12 @@ export type PublicUser = {
   endTime: Date | null;
 };
 
+export type EnhancedPublicUser = PublicUser & {
+  isFavorited: boolean;
+  incomingRequest?: Request;
+  outgoingRequest?: Request;
+};
+
 export type User = RouterOutput["user"]["me"];
 export type GeoJsonUsers = RouterOutput["mapbox"]["geoJsonUserList"];
 
@@ -58,7 +64,7 @@ export type CarpoolFeature = Feature & CarpoolAddress;
 export type ButtonInfo = {
   text: string;
   onPress: (user: PublicUser) => void;
-  color?: string;
+  color: string;
 };
 
 export type ResolvedRequest = {

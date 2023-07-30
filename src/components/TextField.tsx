@@ -7,7 +7,6 @@ type TextFieldOwnProps = {
   label?: string;
   error?: FieldError;
   charLimit?: number;
-  // classnames passed to the Input HTML element for styling purposes
   inputClassName?: string;
 };
 
@@ -29,7 +28,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
     },
     forwardedRef
   ) => (
-    <div className={classNames(`flex flex-col space-y-2 w-full`, className)}>
+    <div className={classNames(`flex w-full flex-col space-y-2`, className)}>
       <input
         {...rest}
         ref={forwardedRef}
@@ -38,7 +37,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
         type={type}
         maxLength={charLimit}
         className={classNames(
-          `form-input w-full shadow-sm rounded-md px-3 py-2 ${
+          `form-input w-full rounded-md px-3 py-2 shadow-sm ${
             error ? "border-northeastern-red" : "border-black"
           }`,
           inputClassName
