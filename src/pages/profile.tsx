@@ -93,7 +93,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   if (!session?.user) {
     return {
       redirect: {
-        destination: "/api/auth/signin",
+        destination: "/sign-in",
         permanent: false,
       },
     };
