@@ -82,6 +82,7 @@ const Home: NextPage<any> = () => {
         <div className="m-0 h-full max-h-screen w-full">
           <Header
             data={{ sidebarValue: sidebarType, setSidebar: setSidebarType }}
+            dropdownMenu={true}
           />
           <div className="flex h-[91.5%] flex-auto">
             <div className="w-96">
@@ -95,7 +96,7 @@ const Home: NextPage<any> = () => {
                 )}
               </ToastProvider>
             </div>
-            <DropDownMenu />
+
             <button
               className="absolute bottom-[150px] right-[8px] z-10 flex h-8 w-8 items-center justify-center rounded-md border-2 border-solid border-gray-300 bg-white shadow-sm hover:bg-gray-200"
               id="fly"

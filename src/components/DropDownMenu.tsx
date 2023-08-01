@@ -6,18 +6,17 @@ import React, { Fragment } from "react";
 import { AiOutlineUser } from "react-icons/ai";
 
 const DropDownMenu = () => {
-  const { data: session, status } = useSession();
-  const loading = status === "loading";
+  const { data: session } = useSession();
 
   const logout = () => {
     signOut();
   };
 
   return (
-    <div className="fixed z-30 right-5 top-3 text-right">
+    <div className="z-30">
       <Menu>
         <Menu.Button className="rounded-full bg-gray-400 p-2">
-          <AiOutlineUser className="w-8 h-8" />
+          <AiOutlineUser className="w-7 h-7" />
         </Menu.Button>
 
         <Transition

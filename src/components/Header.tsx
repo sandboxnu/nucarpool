@@ -1,5 +1,6 @@
 import React, { Dispatch, SetStateAction } from "react";
 import styled from "styled-components";
+import DropDownMenu from "./DropDownMenu";
 
 const HeaderDiv = styled.div`
   display: flex;
@@ -45,6 +46,7 @@ interface HeaderProps {
     sidebarValue: string;
     setSidebar: Dispatch<SetStateAction<HeaderOptions>>;
   };
+  dropdownMenu?: boolean;
 }
 
 export type HeaderOptions = "explore" | "requests";
@@ -96,7 +98,10 @@ const Header = (props: HeaderProps) => {
   return (
     <HeaderDiv>
       <Logo>CarPool</Logo>
-      {props.data && renderSidebarOptions(props.data)}
+      <div className="flex items-center">
+        {props.data && renderSidebarOptions(props.data)}
+        {props.dropdownMenu && <DropDownMenu />}
+      </div>
     </HeaderDiv>
   );
 };
