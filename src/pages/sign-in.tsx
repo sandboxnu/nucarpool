@@ -33,7 +33,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 const SignIn: NextPage = () => {
   const handleOnclick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    signIn();
+    signIn("cognito", {
+      callbackUrl: "/",
+    });
   };
   return (
     <>
