@@ -23,12 +23,13 @@ export const MapConnectPortal = (props: ConnectPortalProps) => {
         <div className="fixed inset-0 flex items-center justify-center p-10">
           <Dialog.Panel>
             <div>
-              <div tabIndex={0}></div>
-              <ConnectCard
-                otherUser={props.otherUser}
-                onViewRouteClick={props.onViewRouteClick}
-                onClose={onClose}
-              />
+              <div tabIndex={0} className="w-96">
+                <ConnectCard
+                  otherUser={props.otherUser}
+                  onViewRouteClick={props.onViewRouteClick}
+                  onClose={onClose}
+                />
+              </div>
             </div>
           </Dialog.Panel>
         </div>
