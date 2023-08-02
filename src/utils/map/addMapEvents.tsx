@@ -39,6 +39,7 @@ const addMapEvents = (
 
     const coordinates = e.features[0]!.geometry.coordinates;
     const otherUser = e.features[0]!.properties as PublicUser;
+    console.log(otherUser);
 
     while (Math.abs(e.lngLat.lng - coordinates[0]!) > 180) {
       coordinates[0] += e.lngLat.lng > coordinates[0]! ? 360 : -360;

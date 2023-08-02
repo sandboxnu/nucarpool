@@ -164,20 +164,21 @@ const Home: NextPage<any> = () => {
                   ref={mapContainerRef}
                   id="map"
                   className={"h-full w-full flex-auto"}
-                />
-              </div>
-              {popupUser && (
-                <MapConnectPortal
-                  otherUser={extendPublicUser(
-                    popupUser,
-                    favorites,
-                    requests.received,
-                    requests.sent
+                >
+                  {popupUser && (
+                    <MapConnectPortal
+                      otherUser={extendPublicUser(
+                        popupUser,
+                        favorites,
+                        requests.received,
+                        requests.sent
+                      )}
+                      onViewRouteClick={onViewRouteClick}
+                      setPopupUser={setPopupUser}
+                    />
                   )}
-                  onViewRouteClick={onViewRouteClick}
-                  setPopupUser={setPopupUser}
-                />
-              )}
+                </div>
+              </div>
             </div>
           </div>
         </ToastProvider>

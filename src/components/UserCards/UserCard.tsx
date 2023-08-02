@@ -101,6 +101,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
     return <Spinner />;
   }
 
+  console.log(props.otherUser.preferredName);
   return (
     <div
       className={
