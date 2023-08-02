@@ -16,13 +16,9 @@ import Spinner from "../components/Spinner";
 import { UserContext } from "../utils/userContext";
 import _ from "lodash";
 import { SidebarPage } from "../components/Sidebar/Sidebar";
-import { MapLegend } from "../components/MapLegend";
 import { EnhancedPublicUser, PublicUser } from "../utils/types";
 import { Request, User } from "@prisma/client";
-import { createPortal } from "react-dom";
-import { ConnectCard } from "../components/UserCards/ConnectCard";
 import { viewRoute } from "../utils/map/viewRoute";
-import { doc } from "prettier";
 import { MapConnectPortal } from "../components/MapConnectPortal";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -52,20 +48,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   };
 }
 
-const extendPublicUser = (
-  user: PublicUser,
-  favorites: PublicUser[],
-  received: Request[],
-  sent: Request[]
-): EnhancedPublicUser => {
-  return {
-    ...user,
-    isFavorited: favorites.some((favs) => favs.id === user.id),
-    incomingRequest: received.find((req) => req.fromUserId === user.id),
-    outgoingRequest: sent.find((req) => req.toUserId === user.id),
-  };
-};
-
 const Home: NextPage<any> = () => {
   const { data: geoJsonUsers } = trpc.mapbox.geoJsonUserList.useQuery();
   const { data: user = null } = trpc.user.me.useQuery();
@@ -80,10 +62,15 @@ const Home: NextPage<any> = () => {
   const [popupUser, setPopupUser] = useState<PublicUser | null>(null);
   const mapContainerRef = useRef(null);
 
-  const extendPublicUserArray = (users: PublicUser[]): EnhancedPublicUser[] => {
-    return users.map((user) =>
-      extendPublicUser(user, favorites, requests.received, requests.sent)
-    );
+  const extendPublicUser = (user: PublicUser): EnhancedPublicUser => {
+    return {
+      ...user,
+      isFavorited: favorites.some((favs) => favs.id === user.id),
+      incomingRequest: requests.received.find(
+        (req) => req.fromUserId === user.id
+      ),
+      outgoingRequest: requests.sent.find((req) => req.toUserId === user.id),
+    };
   };
 
   const onViewRouteClick = (user: User, otherUser: PublicUser) => {
@@ -92,15 +79,18 @@ const Home: NextPage<any> = () => {
       setPopupUser(null);
     }
   };
-  const enhancedSentUsers = extendPublicUserArray(
-    requests.sent.map((request: { toUser: any }) => request.toUser!)
+  const enhancedSentUsers = requests.sent.map((request: { toUser: any }) =>
+    extendPublicUser(request.toUser!)
   );
-  const enhancedReceivedUsers = extendPublicUserArray(
-    requests.received.map((request: { fromUser: any }) => request.fromUser!)
+  const enhancedReceivedUsers = requests.received.map(
+    (request: { fromUser: any }) => extendPublicUser(request.fromUser!)
   );
-  const filteredRecs = _.differenceBy(recommendations, enhancedSentUsers, "id");
-  const enhancedRecs = extendPublicUserArray(filteredRecs);
-  const enhancedFavs = extendPublicUserArray(favorites);
+  const enhancedRecs = _.differenceBy(
+    recommendations,
+    enhancedSentUsers,
+    "id"
+  ).map(extendPublicUser);
+  const enhancedFavs = favorites.map(extendPublicUser);
 
   useEffect(() => {
     if (user && geoJsonUsers && mapContainerRef.current) {
@@ -167,12 +157,7 @@ const Home: NextPage<any> = () => {
                 >
                   {popupUser && (
                     <MapConnectPortal
-                      otherUser={extendPublicUser(
-                        popupUser,
-                        favorites,
-                        requests.received,
-                        requests.sent
-                      )}
+                      otherUser={extendPublicUser(popupUser)}
                       onViewRouteClick={onViewRouteClick}
                       setPopupUser={setPopupUser}
                     />

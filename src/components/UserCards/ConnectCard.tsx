@@ -14,6 +14,7 @@ import { UserContext } from "../../utils/userContext";
 interface ConnectCardProps {
   otherUser: EnhancedPublicUser;
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
+  onClose?: () => void;
 }
 
 export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
@@ -38,6 +39,11 @@ export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
     }
   };
 
+  const onClose = () => {
+    props.onClose?.();
+    setShowModal(false);
+  };
+
   const connectButtonInfo: ButtonInfo = {
     text: "Connect",
     onPress: () => handleConnect(props.otherUser),
@@ -56,7 +62,7 @@ export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
           <ConnectModal
             user={user}
             otherUser={props.otherUser}
-            onClose={() => setShowModal(false)}
+            onClose={onClose}
           />,
           document.body
         )}
