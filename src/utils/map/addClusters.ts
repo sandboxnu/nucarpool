@@ -64,22 +64,21 @@ const addClusters = (map: Map, geoJsonUsers: GeoJsonUsers) => {
     source: "company-locations",
     filter: ["!", ["has", "point_count"]],
     paint: {
-      "circle-color": [
-        "case",
-        [
-          "all",
-          ["==", ["get", "status"], Status.ACTIVE], // active user
-          ["==", ["get", "role"], Role.RIDER], // also a rider
-        ],
-        "#0ea5e9", // blue-ish color
-        [
-          "all",
-          ["==", ["get", "status"], Status.ACTIVE], // active user
-          ["==", ["get", "role"], Role.DRIVER], // also a driver
-        ],
-        "#f97316", // red-ish color
-        "#808080", // gray for inactive user
-      ],
+      "circle-color": "#f97316",
+      //   "case",
+      //   [
+      //     "all",
+      //     ["==", ["get", "status"], Status.ACTIVE], // active user
+      //     ["==", ["get", "role"], Role.RIDER], // also a rider
+      //   ],
+      //   "#0ea5e9", // blue-ish color
+      //   [
+      //     "all",
+      //     ["==", ["get", "status"], Status.ACTIVE], // active user
+      //     ["==", ["get", "role"], Role.DRIVER], // also a driver
+      //   ],
+      //   "#f97316", // red-ish color
+      // "#808080", // gray for inactive user
       "circle-radius": 10,
       "circle-stroke-width": 2,
       "circle-stroke-color": "#fff",

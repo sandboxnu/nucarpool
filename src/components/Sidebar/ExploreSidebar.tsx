@@ -4,10 +4,6 @@ import _ from "lodash";
 import { SidebarContent } from "./SidebarContent";
 import { clearMarkers } from "../../utils/map/viewRoute";
 
-/**
- * TODO: Add Prettier Tailwind omg please
- */
-
 interface ExploreSidebarProps {
   recs: EnhancedPublicUser[];
   favs: EnhancedPublicUser[];

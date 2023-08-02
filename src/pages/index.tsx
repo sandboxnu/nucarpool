@@ -9,7 +9,6 @@ import addMapEvents from "../utils/map/addMapEvents";
 import addUserLocation from "../utils/map/addUserLocation";
 import Head from "next/head";
 import { trpc } from "../utils/trpc";
-import DropDownMenu from "../components/DropDownMenu";
 import { browserEnv } from "../utils/env/browser";
 import Header, { HeaderOptions } from "../components/Header";
 import { getSession } from "next-auth/react";
@@ -18,6 +17,13 @@ import { UserContext } from "../utils/userContext";
 import _ from "lodash";
 import { SidebarPage } from "../components/Sidebar/Sidebar";
 import { MapLegend } from "../components/MapLegend";
+import { EnhancedPublicUser, PublicUser } from "../utils/types";
+import { Request, User } from "@prisma/client";
+import { createPortal } from "react-dom";
+import { ConnectCard } from "../components/UserCards/ConnectCard";
+import { viewRoute } from "../utils/map/viewRoute";
+import { doc } from "prettier";
+import { MapConnectPortal } from "../components/MapConnectPortal";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -46,12 +52,55 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   };
 }
 
+const extendPublicUser = (
+  user: PublicUser,
+  favorites: PublicUser[],
+  received: Request[],
+  sent: Request[]
+): EnhancedPublicUser => {
+  return {
+    ...user,
+    isFavorited: favorites.some((favs) => favs.id === user.id),
+    incomingRequest: received.find((req) => req.fromUserId === user.id),
+    outgoingRequest: sent.find((req) => req.toUserId === user.id),
+  };
+};
+
 const Home: NextPage<any> = () => {
   const { data: geoJsonUsers } = trpc.mapbox.geoJsonUserList.useQuery();
   const { data: user = null } = trpc.user.me.useQuery();
+  const { data: recommendations = [] } =
+    trpc.user.recommendations.me.useQuery();
+  const { data: favorites = [] } = trpc.user.favorites.me.useQuery();
+  const { data: requests = { sent: [], received: [] } } =
+    trpc.user.requests.me.useQuery();
+
   const [mapState, setMapState] = useState<mapboxgl.Map>();
   const [sidebarType, setSidebarType] = useState<HeaderOptions>("explore");
+  const [popupUser, setPopupUser] = useState<PublicUser | null>(null);
   const mapContainerRef = useRef(null);
+
+  const extendPublicUserArray = (users: PublicUser[]): EnhancedPublicUser[] => {
+    return users.map((user) =>
+      extendPublicUser(user, favorites, requests.received, requests.sent)
+    );
+  };
+
+  const onViewRouteClick = (user: User, otherUser: PublicUser) => {
+    if (mapState) {
+      viewRoute(user, otherUser, mapState);
+      setPopupUser(null);
+    }
+  };
+  const enhancedSentUsers = extendPublicUserArray(
+    requests.sent.map((request: { toUser: any }) => request.toUser!)
+  );
+  const enhancedReceivedUsers = extendPublicUserArray(
+    requests.received.map((request: { fromUser: any }) => request.fromUser!)
+  );
+  const filteredRecs = _.differenceBy(recommendations, enhancedSentUsers, "id");
+  const enhancedRecs = extendPublicUserArray(filteredRecs);
+  const enhancedFavs = extendPublicUserArray(favorites);
 
   useEffect(() => {
     if (user && geoJsonUsers && mapContainerRef.current) {
@@ -64,7 +113,7 @@ const Home: NextPage<any> = () => {
       newMap.on("load", () => {
         addClusters(newMap, geoJsonUsers);
         addUserLocation(newMap, user);
-        addMapEvents(newMap, user);
+        addMapEvents(newMap, user, setPopupUser);
       });
       setMapState(newMap);
     }
@@ -73,46 +122,65 @@ const Home: NextPage<any> = () => {
   if (!user) {
     return <Spinner />;
   }
+
   return (
     <>
       <UserContext.Provider value={user}>
-        <Head>
-          <title>Home</title>
-        </Head>
-        <div className="m-0 h-full max-h-screen w-full">
-          <Header
-            data={{ sidebarValue: sidebarType, setSidebar: setSidebarType }}
-            dropdownMenu={true}
-          />
-          <div className="flex h-[91.5%] flex-auto">
-            <div className="w-96">
-              <ToastProvider
-                placement="top-right"
-                autoDismiss={true}
-                newestOnTop={true}
-              >
+        <ToastProvider
+          placement="top-right"
+          autoDismiss={true}
+          newestOnTop={true}
+        >
+          <Head>
+            <title>Home</title>
+          </Head>
+          <div className="m-0 h-full max-h-screen w-full">
+            <Header
+              data={{ sidebarValue: sidebarType, setSidebar: setSidebarType }}
+              dropdownMenu={true}
+            />
+            <div className="flex h-[91.5%] flex-auto">
+              <div className="w-96">
                 {mapState && (
-                  <SidebarPage sidebarType={sidebarType} map={mapState} />
+                  <SidebarPage
+                    sidebarType={sidebarType}
+                    map={mapState}
+                    recs={enhancedRecs}
+                    favs={enhancedFavs}
+                    received={enhancedReceivedUsers}
+                    sent={enhancedSentUsers}
+                  />
                 )}
-              </ToastProvider>
-            </div>
+              </div>
 
-            <button
-              className="absolute bottom-[150px] right-[8px] z-10 flex h-8 w-8 items-center justify-center rounded-md border-2 border-solid border-gray-300 bg-white shadow-sm hover:bg-gray-200"
-              id="fly"
-            >
-              <RiFocus3Line />
-            </button>
-            <div className="relative flex-auto">
-              <div
-                ref={mapContainerRef}
-                id="map"
-                className={"h-full w-full flex-auto"}
-              />
-              <MapLegend role={user.role === "DRIVER" ? "Rider" : "Driver"} />
+              <button
+                className="absolute bottom-[150px] right-[8px] z-10 flex h-8 w-8 items-center justify-center rounded-md border-2 border-solid border-gray-300 bg-white shadow-sm hover:bg-gray-200"
+                id="fly"
+              >
+                <RiFocus3Line />
+              </button>
+              <div className="relative flex-auto">
+                <div
+                  ref={mapContainerRef}
+                  id="map"
+                  className={"h-full w-full flex-auto"}
+                />
+              </div>
+              {popupUser && (
+                <MapConnectPortal
+                  otherUser={extendPublicUser(
+                    popupUser,
+                    favorites,
+                    requests.received,
+                    requests.sent
+                  )}
+                  onViewRouteClick={onViewRouteClick}
+                  setPopupUser={setPopupUser}
+                />
+              )}
             </div>
           </div>
-        </div>
+        </ToastProvider>
       </UserContext.Provider>
     </>
   );
