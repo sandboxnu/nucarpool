@@ -70,9 +70,20 @@ const calculateScore = (
 
     const userDays = dayConversion(user);
     // get the number of days that both user A AND user B are NOT going in
-    const days = currentUserDays
+    let days = currentUserDays
       .map((day, index) => !(day && userDays[index]))
       .reduce((prev, curr) => (curr ? prev + 1 : prev), 0);
+
+    // if both users are going in all 5 days of the week, then weekend days off should not affect score
+    if (
+      days === 2 &&
+      !currentUserDays[0] &&
+      !currentUserDays[6] &&
+      !userDays[0] &&
+      !userDays[6]
+    ) {
+      days = 0;
+    }
 
     let startTime: number | undefined;
     let endTime: number | undefined;
