@@ -22,7 +22,16 @@ export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
   const [showModal, setShowModal] = useState(false);
   const { addToast } = useToasts();
 
-  const handleExistingRequest = () => {
+  const handleExistingReceivedRequest = () => {
+    addToast(
+      "You already have an incoming carpool request from " +
+        props.otherUser.preferredName +
+        ". Navigate to the received requests tab to connect with them!",
+      { appearance: "info" }
+    );
+  };
+
+  const handleExistingSentRequest = () => {
     addToast(
       "You already have an incoming carpool request from " +
         props.otherUser.preferredName +
@@ -33,7 +42,9 @@ export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
 
   const handleConnect = (otherUser: EnhancedPublicUser) => {
     if (otherUser.incomingRequest) {
-      handleExistingRequest();
+      handleExistingReceivedRequest();
+    } else if (otherUser.outgoingRequest) {
+      handleExistingSentRequest();
     } else {
       setShowModal(true);
     }

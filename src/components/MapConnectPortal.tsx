@@ -3,6 +3,7 @@ import { EnhancedPublicUser, PublicUser } from "../utils/types";
 import { User } from "@prisma/client";
 import { ConnectCard } from "./UserCards/ConnectCard";
 import { Dialog } from "@headlessui/react";
+import { useToasts } from "react-toast-notifications";
 
 interface ConnectPortalProps {
   otherUser: EnhancedPublicUser;

@@ -33,7 +33,7 @@ export const viewRoute = (
     .setPopup(selfStartPopup)
     .addTo(map);
 
-  const selfEndPopup = createPopup("My Dest");
+  const selfEndPopup = createPopup("My Dest.");
   const selfEndMarker = new mapboxgl.Marker({ color: "#f0220f" })
     .setLngLat([user.companyCoordLng, user.companyCoordLat])
     .setPopup(selfEndPopup)
@@ -45,7 +45,7 @@ export const viewRoute = (
     .setPopup(otherUserStartPopup)
     .addTo(map);
 
-  const otherUserEndPopup = createPopup(otherRole + " Dest");
+  const otherUserEndPopup = createPopup(otherRole + " Dest.");
   const otherUserEndMarker = new mapboxgl.Marker({ color: "#FFA500" })
     .setLngLat([otherUser.companyPOICoordLng, otherUser.companyPOICoordLat])
     .setPopup(otherUserEndPopup)

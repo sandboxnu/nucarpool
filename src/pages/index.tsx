@@ -93,6 +93,7 @@ const Home: NextPage<any> = () => {
   const enhancedFavs = favorites.map(extendPublicUser);
 
   useEffect(() => {
+    console.log("map being re-rendered");
     if (user && geoJsonUsers && mapContainerRef.current) {
       const newMap = new mapboxgl.Map({
         container: "map",
@@ -116,19 +117,19 @@ const Home: NextPage<any> = () => {
   return (
     <>
       <UserContext.Provider value={user}>
-        <ToastProvider
-          placement="top-right"
-          autoDismiss={true}
-          newestOnTop={true}
-        >
-          <Head>
-            <title>Home</title>
-          </Head>
-          <div className="m-0 h-full max-h-screen w-full">
-            <Header
-              data={{ sidebarValue: sidebarType, setSidebar: setSidebarType }}
-              dropdownMenu={true}
-            />
+        <Head>
+          <title>Home</title>
+        </Head>
+        <div className="m-0 h-full max-h-screen w-full">
+          <Header
+            data={{ sidebarValue: sidebarType, setSidebar: setSidebarType }}
+            dropdownMenu={true}
+          />
+          <ToastProvider
+            placement="top-right"
+            autoDismiss={true}
+            newestOnTop={true}
+          >
             <div className="flex h-[91.5%] flex-auto">
               <div className="w-96">
                 {mapState && (
@@ -165,8 +166,8 @@ const Home: NextPage<any> = () => {
                 </div>
               </div>
             </div>
-          </div>
-        </ToastProvider>
+          </ToastProvider>
+        </div>
       </UserContext.Provider>
     </>
   );
