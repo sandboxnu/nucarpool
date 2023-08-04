@@ -19,7 +19,7 @@ export const MapConnectPortal = (props: ConnectPortalProps) => {
     props.setPopupUser(null);
   };
   return (
-    <Dialog open={isOpen} onClose={onClose} className="z-75 relative">
+    <Dialog open={isOpen} onClose={onClose} className="relative z-50">
       <div className="fixed inset-0 backdrop-blur-sm" aria-hidden="true">
         <div className="fixed inset-0 flex items-center justify-center p-10">
           <Dialog.Panel>
