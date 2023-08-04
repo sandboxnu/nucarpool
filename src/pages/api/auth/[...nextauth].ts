@@ -1,9 +1,9 @@
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { NextAuthOptions } from "next-auth";
-import CognitoProvider from "next-auth/providers/cognito";
 import { prisma } from "../../../server/db/client";
 import { serverEnv } from "../../../utils/env/server";
+import AzureADProvider from "next-auth/providers/azure-ad";
 
 export const authOptions: NextAuthOptions = {
   callbacks: {
@@ -30,10 +30,10 @@ export const authOptions: NextAuthOptions = {
   },
   adapter: PrismaAdapter(prisma),
   providers: [
-    CognitoProvider({
-      clientId: serverEnv.COGNITO_CLIENT_ID,
-      clientSecret: serverEnv.COGNITO_CLIENT_SECRET,
-      issuer: serverEnv.COGNITO_ISSUER,
+    AzureADProvider({
+      clientId: serverEnv.AZURE_CLIENT_ID,
+      clientSecret: serverEnv.AZURE_CLIENT_SECRET,
+      tenantId: serverEnv.AZURE_TENANT_ID,
     }),
   ],
 };
