@@ -100,8 +100,6 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
   if (!user) {
     return <Spinner />;
   }
-
-  console.log(props.otherUser.preferredName);
   return (
     <div
       className={

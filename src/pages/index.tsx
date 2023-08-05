@@ -93,7 +93,6 @@ const Home: NextPage<any> = () => {
   const enhancedFavs = favorites.map(extendPublicUser);
 
   useEffect(() => {
-    console.log("map being re-rendered");
     if (user && geoJsonUsers && mapContainerRef.current) {
       const newMap = new mapboxgl.Map({
         container: "map",
