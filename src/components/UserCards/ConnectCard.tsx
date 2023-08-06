@@ -33,9 +33,9 @@ export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
 
   const handleExistingSentRequest = () => {
     addToast(
-      "You already have an outgoing carpool request from " +
+      "You already have an outgoing carpool request to " +
         props.otherUser.preferredName +
-        ". Navigate to the received requests tab to connect with them!",
+        ". Please wait for them to respond to your request!",
       { appearance: "info" }
     );
   };
