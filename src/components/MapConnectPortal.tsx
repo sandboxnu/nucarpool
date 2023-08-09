@@ -3,7 +3,6 @@ import { EnhancedPublicUser, PublicUser } from "../utils/types";
 import { User } from "@prisma/client";
 import { ConnectCard } from "./UserCards/ConnectCard";
 import { Dialog } from "@headlessui/react";
-import { useToasts } from "react-toast-notifications";
 
 interface ConnectPortalProps {
   otherUser: EnhancedPublicUser;
@@ -20,8 +19,8 @@ export const MapConnectPortal = (props: ConnectPortalProps) => {
   };
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
-      <div className="fixed inset-0 backdrop-blur-sm" aria-hidden="true">
-        <div className="fixed inset-0 flex items-center justify-center p-10">
+      <div className="fixed inset-0" aria-hidden="true">
+        <div className="fixed inset-0 mt-16 flex items-start justify-end pt-2">
           <Dialog.Panel>
             <div>
               <div tabIndex={0} className="w-96">

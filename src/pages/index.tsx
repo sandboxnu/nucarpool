@@ -76,7 +76,6 @@ const Home: NextPage<any> = () => {
   const onViewRouteClick = (user: User, otherUser: PublicUser) => {
     if (mapState) {
       viewRoute(user, otherUser, mapState);
-      setPopupUser(null);
     }
   };
   const enhancedSentUsers = requests.sent.map((request: { toUser: any }) =>
