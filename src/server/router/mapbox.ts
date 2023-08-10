@@ -65,6 +65,8 @@ export const mapboxRouter = router({
         status: true,
         seatAvail: true,
         companyName: true,
+        daysWorking: true,
+        preferredName: true,
         companyPOIAddress: true,
         companyPOICoordLng: true,
         companyPOICoordLat: true,

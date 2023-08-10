@@ -6,3 +6,13 @@
   width: 100vw;
   height: 100vh;
 }
+
+.custom-marker-popup .mapboxgl-popup-content {
+  background-color: rgb(220, 220, 220, 0.7);
+  padding: 3px;
+  pointer-events: none;
+}
+
+.custom-marker-popup .mapboxgl-popup-tip {
+  border: 0px;
+}

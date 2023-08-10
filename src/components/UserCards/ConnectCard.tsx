@@ -14,6 +14,7 @@ import { UserContext } from "../../utils/userContext";
 interface ConnectCardProps {
   otherUser: EnhancedPublicUser;
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
+  onClose?: () => void;
 }
 
 export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
@@ -21,7 +22,7 @@ export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
   const [showModal, setShowModal] = useState(false);
   const { addToast } = useToasts();
 
-  const handleExistingRequest = () => {
+  const handleExistingReceivedRequest = () => {
     addToast(
       "You already have an incoming carpool request from " +
         props.otherUser.preferredName +
@@ -30,12 +31,28 @@ export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
     );
   };
 
+  const handleExistingSentRequest = () => {
+    addToast(
+      "You already have an outgoing carpool request to " +
+        props.otherUser.preferredName +
+        ". Please wait for them to respond to your request!",
+      { appearance: "info" }
+    );
+  };
+
   const handleConnect = (otherUser: EnhancedPublicUser) => {
     if (otherUser.incomingRequest) {
-      handleExistingRequest();
+      handleExistingReceivedRequest();
+    } else if (otherUser.outgoingRequest) {
+      handleExistingSentRequest();
     } else {
       setShowModal(true);
     }
+  };
+
+  const onClose = () => {
+    props.onClose?.();
+    setShowModal(false);
   };
 
   const connectButtonInfo: ButtonInfo = {
@@ -56,7 +73,7 @@ export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
           <ConnectModal
             user={user}
             otherUser={props.otherUser}
-            onClose={() => setShowModal(false)}
+            onClose={onClose}
           />,
           document.body
         )}
