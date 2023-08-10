@@ -60,6 +60,7 @@ const Home: NextPage<any> = () => {
   const [mapState, setMapState] = useState<mapboxgl.Map>();
   const [sidebarType, setSidebarType] = useState<HeaderOptions>("explore");
   const [popupUser, setPopupUser] = useState<PublicUser | null>(null);
+  const [groupPage, setGroupPage] = useState<Boolean>(false);
   const mapContainerRef = useRef(null);
 
   const extendPublicUser = (user: PublicUser): EnhancedPublicUser => {
@@ -122,6 +123,7 @@ const Home: NextPage<any> = () => {
           <Header
             data={{ sidebarValue: sidebarType, setSidebar: setSidebarType }}
             dropdownMenu={true}
+            setGroupPage={setGroupPage}
           />
           <ToastProvider
             placement="top-right"
@@ -161,6 +163,7 @@ const Home: NextPage<any> = () => {
                       setPopupUser={setPopupUser}
                     />
                   )}
+                  {groupPage}
                 </div>
               </div>
             </div>
