@@ -13,9 +13,6 @@ interface ConnectPortalProps {
 }
 
 export const MapConnectPortal = (props: ConnectPortalProps) => {
-  if (!props.otherUser) {
-    return <Spinner />;
-  }
   return (
     <Dialog
       open={!!props.otherUser}
@@ -27,13 +24,15 @@ export const MapConnectPortal = (props: ConnectPortalProps) => {
           <Dialog.Panel>
             <div>
               <div tabIndex={0} className="w-96">
-                <ConnectCard
-                  otherUser={props.extendUser(props.otherUser)}
-                  onViewRouteClick={props.onViewRouteClick}
-                  onClose={(string) => {
-                    string == "connect" ? props.onClose() : {};
-                  }}
-                />
+                {props.otherUser && (
+                  <ConnectCard
+                    otherUser={props.extendUser(props.otherUser)}
+                    onViewRouteClick={props.onViewRouteClick}
+                    onClose={(string) => {
+                      string == "connect" ? props.onClose() : {};
+                    }}
+                  />
+                )}
               </div>
             </div>
           </Dialog.Panel>

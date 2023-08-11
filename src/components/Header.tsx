@@ -47,7 +47,7 @@ interface HeaderProps {
     setSidebar: Dispatch<SetStateAction<HeaderOptions>>;
   };
   dropdownMenu?: boolean;
-  setGroupPage: Dispatch<SetStateAction<boolean>>;
+  setGroupPage?: Dispatch<SetStateAction<boolean>>;
 }
 
 export type HeaderOptions = "explore" | "requests";
@@ -101,7 +101,7 @@ const Header = (props: HeaderProps) => {
       <Logo>CarPool</Logo>
       <div className="flex items-center">
         {props.data && renderSidebarOptions(props.data)}
-        {props.dropdownMenu && (
+        {props.dropdownMenu && props.setGroupPage && (
           <DropDownMenu setGroupPage={props.setGroupPage} />
         )}
       </div>
