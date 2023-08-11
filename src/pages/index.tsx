@@ -20,6 +20,7 @@ import { EnhancedPublicUser, PublicUser } from "../utils/types";
 import { Request, User } from "@prisma/client";
 import { viewRoute } from "../utils/map/viewRoute";
 import { MapConnectPortal } from "../components/MapConnectPortal";
+import { GroupPage } from "../components/GroupPage";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -60,7 +61,7 @@ const Home: NextPage<any> = () => {
   const [mapState, setMapState] = useState<mapboxgl.Map>();
   const [sidebarType, setSidebarType] = useState<HeaderOptions>("explore");
   const [popupUser, setPopupUser] = useState<PublicUser | null>(null);
-  const [groupPage, setGroupPage] = useState<Boolean>(false);
+  const [groupPage, setGroupPage] = useState<boolean>(false);
   const mapContainerRef = useRef(null);
 
   const extendPublicUser = (user: PublicUser): EnhancedPublicUser => {
@@ -156,14 +157,20 @@ const Home: NextPage<any> = () => {
                   id="map"
                   className={"h-full w-full flex-auto"}
                 >
-                  {popupUser && (
-                    <MapConnectPortal
-                      otherUser={extendPublicUser(popupUser)}
-                      onViewRouteClick={onViewRouteClick}
-                      setPopupUser={setPopupUser}
-                    />
-                  )}
-                  {groupPage}
+                  <MapConnectPortal
+                    otherUser={popupUser}
+                    extendUser={extendPublicUser}
+                    onViewRouteClick={onViewRouteClick}
+                    onClose={() => {
+                      setPopupUser(null);
+                    }}
+                  />
+                  <GroupPage
+                    groupPage={groupPage}
+                    onClose={() => {
+                      setGroupPage(false);
+                    }}
+                  />
                 </div>
               </div>
             </div>

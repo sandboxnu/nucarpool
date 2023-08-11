@@ -6,7 +6,7 @@ import React, { Dispatch, Fragment, SetStateAction } from "react";
 import { AiOutlineUser } from "react-icons/ai";
 
 interface DropDownMenuProps {
-  setGroupPage: Dispatch<SetStateAction<Boolean>>;
+  setGroupPage: Dispatch<SetStateAction<boolean>>;
 }
 const DropDownMenu = (props: DropDownMenuProps) => {
   const { data: session } = useSession();

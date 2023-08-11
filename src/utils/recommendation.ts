@@ -50,7 +50,7 @@ const calculateScore = (
       (currentUser.role === "RIDER" &&
         (user.role === "RIDER" || user.seatAvail === 0)) ||
       (currentUser.role === "DRIVER" && user.role === "DRIVER") ||
-      (currentUser.role === "DRIVER" && user.seatAvail === 0)
+      (currentUser.role === "DRIVER" && currentUser.seatAvail === 0)
     ) {
       return undefined;
     }

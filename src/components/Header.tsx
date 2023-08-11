@@ -47,7 +47,7 @@ interface HeaderProps {
     setSidebar: Dispatch<SetStateAction<HeaderOptions>>;
   };
   dropdownMenu?: boolean;
-  setGroupPage: Dispatch<SetStateAction<Boolean>>;
+  setGroupPage: Dispatch<SetStateAction<boolean>>;
 }
 
 export type HeaderOptions = "explore" | "requests";

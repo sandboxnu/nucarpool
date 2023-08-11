@@ -9,7 +9,7 @@ import { trpc } from "../../utils/trpc";
 interface ConnectModalProps {
   user: User;
   otherUser: EnhancedPublicUser;
-  onClose: () => void;
+  onClose: (action: string) => void;
 }
 
 const sendEmail = async (
@@ -40,9 +40,9 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
   const [isOpen, setIsOpen] = useState(true);
   const [customMessage, setCustomMessage] = useState(props.user.bio ?? "");
 
-  const onClose = () => {
+  const onClose = (action: string) => {
     setIsOpen(false);
-    props.onClose();
+    props.onClose(action);
   };
 
   const utils = trpc.useContext();
@@ -64,7 +64,7 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
         toId: props.otherUser.id,
         message: customMessage,
       });
-      onClose();
+      onClose("connect");
       addToast(
         "A request to carpool has been sent to " +
           props.otherUser.preferredName,
@@ -74,13 +74,17 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
   };
 
   return (
-    <Dialog open={isOpen} onClose={onClose} className="relative z-50">
+    <Dialog
+      open={isOpen}
+      onClose={() => onClose("close")}
+      className="relative z-50"
+    >
       {/* backdrop panel */}
       <div className="fixed inset-0 backdrop-blur-sm" aria-hidden="true">
         {/* Full-screen container to center the panel */}
         <div className="fixed inset-0 flex items-center justify-center p-4">
           {/* dialog panel container  */}
-          <Dialog.Panel className="flex h-4/6 sm:h-4/6 md:h-3/6 w-5/6 sm:w-4/6 md:w-3/6 flex-col content-center justify-center gap-4 rounded-md bg-white p-9 shadow-md">
+          <Dialog.Panel className="flex h-4/6 w-5/6 flex-col content-center justify-center gap-4 rounded-md bg-white p-9 shadow-md sm:h-4/6 sm:w-4/6 md:h-3/6 md:w-3/6">
             <Dialog.Title className="text-center text-2xl font-bold">
               Send an email to connect!
             </Dialog.Title>
@@ -91,7 +95,7 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
               anything else you think would be good to know!
             </div>
             <textarea
-              className={`form-input w-full resize-none h-24 min-h-[120px] rounded-md px-3 py-2 shadow-sm`}
+              className={`form-input h-24 min-h-[120px] w-full resize-none rounded-md px-3 py-2 shadow-sm`}
               maxLength={280}
               defaultValue={customMessage}
               onChange={(e) => setCustomMessage(e.target.value)}
@@ -103,7 +107,7 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
             </div>
             <div className="flex justify-center space-x-7">
               <button
-                onClick={onClose}
+                onClick={() => onClose("close")}
                 className="w-full rounded-md border-2 border-red-700 bg-slate-50 p-1 text-red-700"
               >
                 Cancel
