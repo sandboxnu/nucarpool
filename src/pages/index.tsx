@@ -156,22 +156,21 @@ const Home: NextPage<any> = () => {
                   ref={mapContainerRef}
                   id="map"
                   className={"h-full w-full flex-auto"}
-                >
-                  <MapConnectPortal
-                    otherUser={popupUser}
-                    extendUser={extendPublicUser}
-                    onViewRouteClick={onViewRouteClick}
-                    onClose={() => {
-                      setPopupUser(null);
-                    }}
-                  />
-                  <GroupPage
-                    groupPage={groupPage}
-                    onClose={() => {
-                      setGroupPage(false);
-                    }}
-                  />
-                </div>
+                ></div>
+                <MapConnectPortal
+                  otherUser={popupUser}
+                  extendUser={extendPublicUser}
+                  onViewRouteClick={onViewRouteClick}
+                  onClose={() => {
+                    setPopupUser(null);
+                  }}
+                />
+                <GroupPage
+                  groupPage={groupPage}
+                  onClose={() => {
+                    setGroupPage(false);
+                  }}
+                />
               </div>
             </div>
           </ToastProvider>
