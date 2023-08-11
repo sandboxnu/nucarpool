@@ -3,6 +3,7 @@ import { EnhancedPublicUser, PublicUser } from "../utils/types";
 import { User } from "@prisma/client";
 import { ConnectCard } from "./UserCards/ConnectCard";
 import { Dialog } from "@headlessui/react";
+import Spinner from "./Spinner";
 
 interface ConnectPortalProps {
   otherUser: PublicUser | null;
@@ -13,7 +14,7 @@ interface ConnectPortalProps {
 
 export const MapConnectPortal = (props: ConnectPortalProps) => {
   if (!props.otherUser) {
-    return;
+    return <Spinner />;
   }
   return (
     <Dialog
