@@ -21,6 +21,7 @@ export const GroupPage = (props: GroupPageProps) => {
             <Dialog.Title className="text-center text-2xl font-bold">
               GroupPage
             </Dialog.Title>
+            <div className="flex flex-grow"></div>
           </Dialog.Panel>
         </div>
       </div>
