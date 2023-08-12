@@ -17,7 +17,7 @@ import { UserContext } from "../utils/userContext";
 import _ from "lodash";
 import { SidebarPage } from "../components/Sidebar/Sidebar";
 import { EnhancedPublicUser, PublicUser } from "../utils/types";
-import { Request, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import { viewRoute } from "../utils/map/viewRoute";
 import { MapConnectPortal } from "../components/MapConnectPortal";
 import { GroupPage } from "../components/GroupPage";
@@ -61,7 +61,6 @@ const Home: NextPage<any> = () => {
   const [mapState, setMapState] = useState<mapboxgl.Map>();
   const [sidebarType, setSidebarType] = useState<HeaderOptions>("explore");
   const [popupUser, setPopupUser] = useState<PublicUser | null>(null);
-  const [groupPage, setGroupPage] = useState<boolean>(false);
   const mapContainerRef = useRef(null);
 
   const extendPublicUser = (user: PublicUser): EnhancedPublicUser => {
@@ -123,8 +122,6 @@ const Home: NextPage<any> = () => {
         <div className="m-0 h-full max-h-screen w-full">
           <Header
             data={{ sidebarValue: sidebarType, setSidebar: setSidebarType }}
-            dropdownMenu={true}
-            setGroupPage={setGroupPage}
           />
           <ToastProvider
             placement="top-right"
@@ -156,21 +153,16 @@ const Home: NextPage<any> = () => {
                   ref={mapContainerRef}
                   id="map"
                   className={"h-full w-full flex-auto"}
-                ></div>
-                <MapConnectPortal
-                  otherUser={popupUser}
-                  extendUser={extendPublicUser}
-                  onViewRouteClick={onViewRouteClick}
-                  onClose={() => {
-                    setPopupUser(null);
-                  }}
-                />
-                <GroupPage
-                  groupPage={groupPage}
-                  onClose={() => {
-                    setGroupPage(false);
-                  }}
-                />
+                >
+                  <MapConnectPortal
+                    otherUser={popupUser}
+                    extendUser={extendPublicUser}
+                    onViewRouteClick={onViewRouteClick}
+                    onClose={() => {
+                      setPopupUser(null);
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </ToastProvider>

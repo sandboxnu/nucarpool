@@ -27,27 +27,11 @@ const Logo = styled.h1`
   color: #f4f4f4;
 `;
 
-const PageName = styled.h1`
-  height: 64px;
-  font-family: "Lato", sans-serif;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 40px;
-  line-height: 48px;
-  display: flex;
-  align-items: center;
-  text-align: center;
-
-  color: #f4f4f4;
-`;
-
 interface HeaderProps {
   data?: {
     sidebarValue: string;
     setSidebar: Dispatch<SetStateAction<HeaderOptions>>;
   };
-  dropdownMenu?: boolean;
-  setGroupPage?: Dispatch<SetStateAction<boolean>>;
 }
 
 export type HeaderOptions = "explore" | "requests";
@@ -99,12 +83,12 @@ const Header = (props: HeaderProps) => {
   return (
     <HeaderDiv>
       <Logo>CarPool</Logo>
-      <div className="flex items-center">
-        {props.data && renderSidebarOptions(props.data)}
-        {props.dropdownMenu && props.setGroupPage && (
-          <DropDownMenu setGroupPage={props.setGroupPage} />
-        )}
-      </div>
+      {props.data && (
+        <div className="flex items-center">
+          {renderSidebarOptions(props.data)}
+          <DropDownMenu />
+        </div>
+      )}
     </HeaderDiv>
   );
 };

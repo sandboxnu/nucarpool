@@ -2,14 +2,15 @@ import { Menu, Transition } from "@headlessui/react";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { Dispatch, Fragment, SetStateAction } from "react";
+import React, { Dispatch, Fragment, SetStateAction, useState } from "react";
 import { AiOutlineUser } from "react-icons/ai";
+import { GroupPage } from "./GroupPage";
+import { render } from "@headlessui/react/dist/utils/render";
+import { createPortal } from "react-dom";
 
-interface DropDownMenuProps {
-  setGroupPage: Dispatch<SetStateAction<boolean>>;
-}
-const DropDownMenu = (props: DropDownMenuProps) => {
+const DropDownMenu = () => {
   const { data: session } = useSession();
+  const [displayGroup, setDisplayGroup] = useState<boolean>(false);
 
   const logout = () => {
     signOut();
@@ -55,7 +56,7 @@ const DropDownMenu = (props: DropDownMenuProps) => {
                 </Link>
                 <button
                   className="mt-4 w-4/5 rounded-2xl border border-gray-300 bg-white px-3 py-2 text-center hover:bg-gray-100"
-                  onClick={() => props.setGroupPage(true)}
+                  onClick={() => setDisplayGroup(true)}
                 >
                   My Group
                 </button>
@@ -75,6 +76,13 @@ const DropDownMenu = (props: DropDownMenuProps) => {
           )}
         </Transition>
       </Menu>
+      <>
+        {displayGroup &&
+          createPortal(
+            <GroupPage onClose={() => setDisplayGroup(false)} />,
+            document.body
+          )}
+      </>
     </div>
   );
 };

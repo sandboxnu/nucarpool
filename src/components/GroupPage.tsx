@@ -1,17 +1,18 @@
 import { Dialog } from "@headlessui/react";
+import { useState } from "react";
 
 interface GroupPageProps {
-  groupPage: boolean;
   onClose: () => void;
 }
-
 export const GroupPage = (props: GroupPageProps) => {
+  const [isOpen, setIsOpen] = useState<boolean>(true);
+
+  const onClose = () => {
+    setIsOpen(false);
+    props.onClose();
+  };
   return (
-    <Dialog
-      open={props.groupPage}
-      onClose={props.onClose}
-      className="relative z-50"
-    >
+    <Dialog open={isOpen} onClose={onClose} className="relative z-50">
       <div className="fixed inset-0 backdrop-blur-sm" aria-hidden="true">
         {/* Full-screen container to center the panel */}
         <div className="fixed inset-0 flex items-center justify-center p-4">
