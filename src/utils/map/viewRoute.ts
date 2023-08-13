@@ -144,7 +144,10 @@ export function useGetDirections({
     }
   );
   useEffect(() => {
-    if (points) {
+    // This check is here to ensure that it doesn't run on page load.
+    if (points.length !== 0) {
+      console.log("yeh points");
+      console.log(points);
       query.refetch();
     }
   }, [points]);
