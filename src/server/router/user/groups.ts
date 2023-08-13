@@ -33,20 +33,26 @@ export const groupsRouter = router({
     .input(
       z.object({
         userId: z.string(),
-        groupName: z.string(),
+        otherUserId: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const group = await ctx.prisma.carpoolGroup.create({
         data: {
-          name: input.groupName,
           users: {
             connect: { id: input.userId },
           },
         },
       });
+      const nGroup = await ctx.prisma.carpoolGroup.update({
+        where: { id: group.id },
+        data: {
+          users: {
+            connect: { id: input.otherUserId },
+          },
+        },
+      });
       return group;
-      //maybe adjust the user.carpoolId here? Do we even have to do that manually?
     }),
 
   delete: protectedRouter

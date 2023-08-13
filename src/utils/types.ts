@@ -44,6 +44,7 @@ export type PublicUser = {
   daysWorking: string;
   startTime: Date | null;
   endTime: Date | null;
+  carpoolId: string | null;
 };
 
 export type EnhancedPublicUser = PublicUser & {
