@@ -5,11 +5,21 @@ import { trpc } from "../trpc";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 import polyline from "@mapbox/polyline";
+import { LineString } from "geojson";
 
 const previousMarkers: mapboxgl.Marker[] = [];
 export const clearMarkers = () => {
   previousMarkers.forEach((marker) => marker.remove());
   previousMarkers.length = 0;
+};
+
+export const clearDirections = (map: mapboxgl.Map) => {
+  if (map.getLayer("route")) {
+    map.removeLayer("route");
+  }
+  if (map.getSource("route")) {
+    map.removeSource("route");
+  }
 };
 
 const createPopup = (text: string) => {
@@ -28,10 +38,7 @@ export const viewRoute = (
   map: mapboxgl.Map
 ) => {
   clearMarkers();
-  map.removeLayer("route");
-  if (map.getSource("route")) {
-    map.removeSource("route");
-  }
+  clearDirections(map);
 
   const otherRole = user.role === Role.DRIVER ? "Rider" : "Driver";
 
@@ -107,12 +114,9 @@ export function useGetDirections({
         ]);
 
         // Create a GeoJSON LineString feature
-        const lineStringFeature = {
-          type: "Feature",
-          geometry: {
-            type: "LineString",
-            coordinates: geoJsonCoordinates,
-          },
+        const lineStringFeature: LineString = {
+          coordinates: geoJsonCoordinates,
+          type: "LineString",
         };
 
         map.addLayer({
