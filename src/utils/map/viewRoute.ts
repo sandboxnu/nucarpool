@@ -1,6 +1,10 @@
 import mapboxgl from "mapbox-gl";
 import { PublicUser, User } from "../types";
 import { Role } from "@prisma/client";
+import { trpc } from "../trpc";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
+import polyline from "@mapbox/polyline";
 
 const previousMarkers: mapboxgl.Marker[] = [];
 export const clearMarkers = () => {
@@ -24,6 +28,10 @@ export const viewRoute = (
   map: mapboxgl.Map
 ) => {
   clearMarkers();
+  map.removeLayer("route");
+  if (map.getSource("route")) {
+    map.removeSource("route");
+  }
 
   const otherRole = user.role === Role.DRIVER ? "Rider" : "Driver";
 
@@ -73,3 +81,67 @@ export const viewRoute = (
     ],
   ]);
 };
+
+export function useGetDirections({
+  points,
+  map,
+}: {
+  points: [number, number][];
+  map: mapboxgl.Map;
+}) {
+  const query = trpc.mapbox.getDirections.useQuery(
+    {
+      points: points,
+    },
+    {
+      onSuccess: (response) => {
+        const coordinates = response.routes[0].geometry;
+
+        // Decode the encoded polyline into an array of coordinates
+        const decodedCoordinates = polyline.decode(coordinates);
+
+        // Convert the decoded coordinates into GeoJSON format
+        const geoJsonCoordinates = decodedCoordinates.map(([lat, lon]) => [
+          lon,
+          lat,
+        ]);
+
+        // Create a GeoJSON LineString feature
+        const lineStringFeature = {
+          type: "Feature",
+          geometry: {
+            type: "LineString",
+            coordinates: geoJsonCoordinates,
+          },
+        };
+
+        map.addLayer({
+          id: "route",
+          type: "line",
+          source: {
+            type: "geojson",
+            data: lineStringFeature,
+          },
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-color": "#C8102E",
+            "line-width": 8,
+          },
+        });
+      },
+      onError: (error) => {
+        toast.error(`Something went wrong: ${error}`);
+      },
+      enabled: false,
+      retry: false,
+    }
+  );
+  useEffect(() => {
+    if (points) {
+      query.refetch();
+    }
+  }, [points]);
+}
