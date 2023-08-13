@@ -3,6 +3,7 @@ import { User, EnhancedPublicUser } from "./types";
 import { trpc } from "./trpc";
 import { toast } from "react-toastify";
 
+// comment to just re-run commit workflow
 function initiateGroup(user: User, otherUser: EnhancedPublicUser): void {
   const utils = trpc.useContext();
 
