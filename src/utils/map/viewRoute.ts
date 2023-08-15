@@ -131,8 +131,8 @@ export function useGetDirections({
             "line-cap": "round",
           },
           paint: {
-            "line-color": "#C8102E",
-            "line-width": 8,
+            "line-color": "#4A89F3",
+            "line-width": 6,
           },
         });
       },
