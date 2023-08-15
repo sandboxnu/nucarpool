@@ -2,10 +2,9 @@ import { Dialog } from "@headlessui/react";
 import { useState } from "react";
 import { useToasts } from "react-toast-notifications";
 import { EnhancedPublicUser, User } from "../../utils/types";
-import { Request } from "@prisma/client";
+import { Request, Role } from "@prisma/client";
 import { trpc } from "../../utils/trpc";
 import { toast } from "react-toastify";
-import initiateGroup from "../../utils/group";
 
 interface ReceivedModalProps {
   user: User;
@@ -31,6 +30,26 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
     onSuccess() {
       utils.user.requests.me.invalidate();
       utils.user.recommendations.me.invalidate();
+    },
+  });
+
+  const { mutate: mutateGroup } = trpc.user.groups.edit.useMutation({
+    onError: (error: any) => {
+      toast.error(`Something went wrong: ${error.message}`);
+    },
+    onSuccess() {
+      utils.user.requests.me.invalidate();
+      utils.user.me.invalidate();
+    },
+  });
+
+  const { mutate: createGroup } = trpc.user.groups.create.useMutation({
+    onError: (error: any) => {
+      toast.error(`Something went wrong: ${error.message}`);
+    },
+    onSuccess() {
+      utils.user.requests.me.invalidate();
+      utils.user.me.invalidate();
     },
   });
 
@@ -80,9 +99,35 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
     }
   };
 
+  const initiateGroup = () => {
+    if (props.user.role === Role.DRIVER) {
+      if (props.user.carpoolId) {
+        mutateGroup({
+          driverId: props.user.id,
+          riderId: props.otherUser.id,
+          add: true,
+          groupId: props.user.carpoolId,
+        });
+      } else {
+        createGroup({ driverId: props.user.id, riderId: props.otherUser.id });
+      }
+    } else {
+      if (props.otherUser.carpoolId) {
+        mutateGroup({
+          driverId: props.otherUser.id,
+          riderId: props.user.id,
+          add: true,
+          groupId: props.otherUser.carpoolId,
+        });
+      } else {
+        createGroup({ driverId: props.otherUser.id, riderId: props.user.id });
+      }
+    }
+  };
+
   const handleAcceptClick = () => {
     if (validateRequestAcceptance()) {
-      initiateGroup(props.user, props.otherUser);
+      initiateGroup();
       handleDelete();
       onClose();
       addToast(
