@@ -6,6 +6,57 @@ import { serverEnv } from "../../utils/env/server";
 import { Role, Status } from "@prisma/client";
 
 // TODO: implement router everywhere axios is currently being used
+type Admin = {
+  iso_3166_1_alpha3: string;
+  iso_3166_1: string;
+};
+
+type Notification = {
+  details: {
+    message: string;
+  };
+  subtype: string;
+  type: string;
+  geometry_index_end: number;
+  geometry_index_start: number;
+};
+
+type Leg = {
+  via_waypoints: any[]; // Replace with appropriate type
+  admins: Admin[];
+  notifications: Notification[];
+  weight_typical: number;
+  duration_typical: number;
+  weight: number;
+  duration: number;
+  steps: any[]; // Replace with appropriate type
+  distance: number;
+  summary: string;
+};
+
+type Waypoint = {
+  distance: number;
+  name: string;
+  location: [number, number];
+};
+
+type Route = {
+  weight_typical: number;
+  duration_typical: number;
+  weight_name: string;
+  weight: number;
+  duration: number;
+  distance: number;
+  legs: Leg[];
+  geometry: string;
+};
+
+type DirectionsResponse = {
+  routes: Route[];
+  waypoints: Waypoint[];
+  code: string;
+  uuid: string;
+};
 
 // router for interacting with the Mapbox API
 export const mapboxRouter = router({
@@ -98,4 +149,40 @@ export const mapboxRouter = router({
 
     return featureCollection;
   }),
+
+  getDirections: protectedRouter
+    .input(
+      z.object({
+        points: z.array(z.tuple([z.number(), z.number()])), // Array of tuples containing longitude and latitude
+      })
+    )
+    .query(async ({ ctx, input }): Promise<DirectionsResponse> => {
+      // Convert input to a string in the format required by the Mapbox API
+      const coordinates = input.points
+        .map(([lng, lat]) => `${lng},${lat}`)
+        .join(";");
+
+      const endpoint = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${coordinates}?access_token=${serverEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`;
+      const data = await fetch(endpoint)
+        .then((response) => response.json())
+        .then((json) => {
+          if (json.code != "Ok") {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: json.message,
+              cause: json,
+            });
+          } else {
+            return json;
+          }
+        })
+        .catch((err) => {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Unexpected error. Please try again.",
+            cause: err,
+          });
+        });
+      return data;
+    }),
 });

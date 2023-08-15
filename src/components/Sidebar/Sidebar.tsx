@@ -15,19 +15,16 @@ interface SidebarProps {
   favs: EnhancedPublicUser[];
   received: EnhancedPublicUser[];
   sent: EnhancedPublicUser[];
+  onViewRouteClick: (user: User, otherUser: PublicUser) => void;
 }
 
 export const SidebarPage = (props: SidebarProps) => {
-  const onViewRouteClick = (user: User, otherUser: PublicUser) => {
-    return viewRoute(user, otherUser, props.map);
-  };
-
   if (props.sidebarType === "explore") {
     return (
       <ExploreSidebar
         recs={props.recs}
         favs={props.favs}
-        viewRoute={onViewRouteClick}
+        viewRoute={props.onViewRouteClick}
       />
     );
   } else {
@@ -35,7 +32,7 @@ export const SidebarPage = (props: SidebarProps) => {
       <RequestSidebar
         received={props.received.reverse()}
         sent={props.sent.reverse()}
-        viewRoute={onViewRouteClick}
+        viewRoute={props.onViewRouteClick}
       />
     );
   }
