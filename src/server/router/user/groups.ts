@@ -3,6 +3,7 @@ import { z } from "zod";
 import { router, protectedRouter } from "../createRouter";
 import _ from "lodash";
 import { Role } from "@prisma/client";
+import { convertToPublic } from "../../../utils/publicUser";
 
 // use this router to create and manage groups
 export const groupsRouter = router({
@@ -25,11 +26,18 @@ export const groupsRouter = router({
         where: {
           id: user.carpoolId,
         },
+        include: {
+          users: true,
+        },
       });
-      return group;
+
+      const updatedGroup = {
+        ...group,
+        users: group?.users.map(convertToPublic),
+      };
+      return updatedGroup;
     }
   }),
-
   create: protectedRouter
     .input(
       z.object({
@@ -74,7 +82,6 @@ export const groupsRouter = router({
       });
       return nGroup;
     }),
-
   delete: protectedRouter
     .input(
       z.object({
