@@ -18,7 +18,7 @@ import _ from "lodash";
 import { SidebarPage } from "../components/Sidebar/Sidebar";
 import { EnhancedPublicUser, PublicUser } from "../utils/types";
 import { User } from "@prisma/client";
-import { viewRoute } from "../utils/map/viewRoute";
+import { useGetDirections, viewRoute } from "../utils/map/viewRoute";
 import { MapConnectPortal } from "../components/MapConnectPortal";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -61,6 +61,9 @@ const Home: NextPage<any> = () => {
   const [sidebarType, setSidebarType] = useState<HeaderOptions>("explore");
   const [popupUser, setPopupUser] = useState<PublicUser | null>(null);
   const mapContainerRef = useRef(null);
+  const [points, setPoints] = useState<[number, number][]>([]);
+
+  useGetDirections({ points: points, map: mapState! });
 
   const extendPublicUser = (user: PublicUser): EnhancedPublicUser => {
     return {
@@ -76,6 +79,13 @@ const Home: NextPage<any> = () => {
   const onViewRouteClick = (user: User, otherUser: PublicUser) => {
     if (mapState) {
       viewRoute(user, otherUser, mapState);
+      const points: [number, number][] = [
+        [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
+        [user.startCoordLng, user.startCoordLat],
+        [user.companyCoordLng, user.companyCoordLat],
+        [otherUser.companyPOICoordLng, otherUser.companyPOICoordLat],
+      ];
+      setPoints(points);
     }
   };
   const enhancedSentUsers = requests.sent.map((request: { toUser: any }) =>
@@ -137,6 +147,7 @@ const Home: NextPage<any> = () => {
                     favs={enhancedFavs}
                     received={enhancedReceivedUsers}
                     sent={enhancedSentUsers}
+                    onViewRouteClick={onViewRouteClick}
                   />
                 )}
               </div>
