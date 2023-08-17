@@ -71,7 +71,7 @@ export const GroupMembers = (props: GroupMembersProps) => {
     }
   };
 
-  const DriverGroupMembers = ({ users }: { users: PublicUser[] }) => {
+  const DriverGroupMembers = () => {
     return (
       <>
         <GroupMemberCard
@@ -91,13 +91,7 @@ export const GroupMembers = (props: GroupMembersProps) => {
     );
   };
 
-  const RiderGroupMembers = ({
-    users,
-    self,
-  }: {
-    users: PublicUser[];
-    self: string;
-  }) => {
+  const RiderGroupMembers = () => {
     return (
       <>
         <GroupMemberCard user={driver} />
@@ -114,9 +108,9 @@ export const GroupMembers = (props: GroupMembersProps) => {
   };
 
   if (curUser.role === Role.DRIVER) {
-    return <DriverGroupMembers users={props.users} />;
+    return <DriverGroupMembers />;
   } else {
-    return <RiderGroupMembers users={props.users} self={curUser.id} />;
+    return <RiderGroupMembers />;
   }
 };
 

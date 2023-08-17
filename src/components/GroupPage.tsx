@@ -22,10 +22,10 @@ export const GroupPage = (props: GroupPageProps) => {
         <div className="fixed inset-0 flex items-center justify-center p-4">
           {/* dialog panel container  */}
           <Dialog.Panel className="flex h-4/6 w-4/6 flex-col content-center justify-center gap-4 rounded-md bg-white py-9 shadow-md">
-            <Dialog.Title className="text-center text-2xl font-bold">
+            <Dialog.Title className="text-center text-3xl font-bold">
               Group Page
             </Dialog.Title>
-            <div className="flex flex-grow flex-col divide-y-2 overflow-auto px-20 py-10">
+            <div className="mx-10 mt-5 flex flex-grow flex-col divide-y-2 overflow-auto rounded-md border px-10 py-10">
               <GroupMembers users={users} onClose={onClose} />
             </div>
           </Dialog.Panel>
