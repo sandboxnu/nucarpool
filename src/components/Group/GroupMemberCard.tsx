@@ -121,8 +121,8 @@ interface GroupMemberCardProps {
 }
 export const GroupMemberCard = (props: GroupMemberCardProps) => {
   return (
-    <div className="flex items-center py-2">
-      <div className="flex-1">
+    <div className="flex items-center py-3">
+      <div className="mx-2 flex-1">
         <div className="flex flex-row">
           <h1 className="text-xl font-bold">{props.user.preferredName}</h1>
           <p className="text-xl">
@@ -135,7 +135,7 @@ export const GroupMemberCard = (props: GroupMemberCardProps) => {
       </div>
       {props.buttonText && props.buttonFunc && (
         <button
-          className="h-full w-[150px] rounded-md bg-red-700 text-white"
+          className="mx-2 h-full w-[150px] rounded-md bg-red-700 text-white"
           onClick={() => props.buttonFunc && props.buttonFunc(props.user.id)}
         >
           {props.buttonText}

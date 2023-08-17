@@ -25,7 +25,7 @@ export const GroupPage = (props: GroupPageProps) => {
             <Dialog.Title className="text-center text-3xl font-bold">
               Group Page
             </Dialog.Title>
-            <div className="mx-10 mt-5 flex flex-grow flex-col divide-y-2 overflow-auto rounded-md border px-10 py-10">
+            <div className="mx-14 mt-4 flex flex-grow flex-col divide-y-2 overflow-auto rounded-md border px-10">
               <GroupMembers users={users} onClose={onClose} />
             </div>
           </Dialog.Panel>
