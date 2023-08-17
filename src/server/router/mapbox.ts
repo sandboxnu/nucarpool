@@ -5,8 +5,6 @@ import { Feature, FeatureCollection } from "geojson";
 import { serverEnv } from "../../utils/env/server";
 import { Role, Status } from "@prisma/client";
 
-// TODO: implement router everywhere axios is currently being used
-
 // router for interacting with the Mapbox API
 export const mapboxRouter = router({
   //search address query

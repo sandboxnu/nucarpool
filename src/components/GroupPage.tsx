@@ -3,10 +3,6 @@ import { useState } from "react";
 import { GroupMemberCard, GroupMembers } from "./Group/GroupMemberCard";
 import { trpc } from "../utils/trpc";
 
-/* TODO: 
-2. Fix the group member card component to correctly display all information
-3. Appropriately hit endpoints
-*/
 interface GroupPageProps {
   onClose: () => void;
 }
