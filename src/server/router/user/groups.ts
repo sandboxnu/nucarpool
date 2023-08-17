@@ -126,14 +126,38 @@ export const groupsRouter = router({
         },
       });
 
-      await ctx.prisma.user.update({
-        where: { id: input.driverId },
-        data: {
-          seatAvail: {
-            decrement: 1,
-          },
+      const updatedGroup = await ctx.prisma.carpoolGroup.findUnique({
+        where: { id: group.id },
+        include: {
+          users: true,
         },
       });
-      return group;
+
+      if (updatedGroup?.users.length === 1) {
+        await ctx.prisma.carpoolGroup.delete({
+          where: { id: updatedGroup.id },
+        });
+      }
+
+      if (input.add) {
+        await ctx.prisma.user.update({
+          where: { id: input.driverId },
+          data: {
+            seatAvail: {
+              decrement: 1,
+            },
+          },
+        });
+      } else {
+        await ctx.prisma.user.update({
+          where: { id: input.driverId },
+          data: {
+            seatAvail: {
+              increment: 1,
+            },
+          },
+        });
+      }
+      return updatedGroup;
     }),
 });

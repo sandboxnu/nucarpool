@@ -11,7 +11,6 @@ import { UserContext } from "../utils/userContext";
 const DropDownMenu = () => {
   const { data: session } = useSession();
   const [displayGroup, setDisplayGroup] = useState<boolean>(false);
-
   const user = useContext(UserContext);
   const logout = () => {
     signOut();
