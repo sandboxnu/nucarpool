@@ -54,7 +54,6 @@ const DropDownMenu = () => {
                     Profile
                   </a>
                 </Link>
-                {/* Do not forget to uncomment */}
                 {user?.carpoolId && (
                   <button
                     className="mt-4 w-4/5 rounded-2xl border border-gray-300 bg-white px-3 py-2 text-center hover:bg-gray-100"
