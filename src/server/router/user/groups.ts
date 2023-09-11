@@ -21,22 +21,27 @@ export const groupsRouter = router({
       });
     }
 
-    if (user.carpoolId) {
-      const group = await ctx.prisma.carpoolGroup.findUnique({
-        where: {
-          id: user.carpoolId,
-        },
-        include: {
-          users: true,
-        },
+    if (!user.carpoolId) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "User does not have a carpool group",
       });
-
-      const updatedGroup = {
-        ...group,
-        users: group?.users.map(convertToPublic),
-      };
-      return updatedGroup;
     }
+
+    const group = await ctx.prisma.carpoolGroup.findUnique({
+      where: {
+        id: user.carpoolId,
+      },
+      include: {
+        users: true,
+      },
+    });
+
+    const updatedGroup = {
+      ...group,
+      users: group?.users.map(convertToPublic),
+    };
+    return updatedGroup;
   }),
   create: protectedRouter
     .input(
@@ -156,6 +161,12 @@ export const groupsRouter = router({
               increment: 1,
             },
           },
+        });
+      }
+      if (!updatedGroup) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Group does not exist",
         });
       }
       return updatedGroup;

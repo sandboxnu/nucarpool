@@ -2,7 +2,7 @@ import { Menu, Transition } from "@headlessui/react";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { Fragment, useContext, useState } from "react";
+import React, { Fragment, useCallback, useContext, useState } from "react";
 import { AiOutlineUser } from "react-icons/ai";
 import { GroupPage } from "./GroupPage";
 import { createPortal } from "react-dom";

@@ -27,7 +27,6 @@ export const GroupMembers = (props: GroupMembersProps) => {
       toast.error(`Something went wrong: ${error.message}`);
     },
     onSuccess() {
-      utils.user.groups.me.invalidate();
       utils.user.me.invalidate();
       props.onClose();
       addToast("Group has been successfully deleted");
@@ -39,9 +38,12 @@ export const GroupMembers = (props: GroupMembersProps) => {
       toast.error(`Something went wrong: ${error.message}`);
     },
     onSuccess() {
-      utils.user.groups.me.invalidate();
+      if (riders.length === 1) {
+        props.onClose();
+      } else {
+        utils.user.groups.me.invalidate();
+      }
       utils.user.me.invalidate();
-      props.onClose();
       addToast("Removed from group");
     },
   });

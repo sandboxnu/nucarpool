@@ -1,6 +1,6 @@
 import { Dialog } from "@headlessui/react";
 import { useState } from "react";
-import { GroupMemberCard, GroupMembers } from "./Group/GroupMemberCard";
+import { GroupMembers } from "./Group/GroupMemberCard";
 import { trpc } from "../utils/trpc";
 
 interface GroupPageProps {
