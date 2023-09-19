@@ -4,59 +4,7 @@ import { router, protectedRouter } from "./createRouter";
 import { Feature, FeatureCollection } from "geojson";
 import { serverEnv } from "../../utils/env/server";
 import { Role, Status } from "@prisma/client";
-
-// TODO: implement router everywhere axios is currently being used
-type Admin = {
-  iso_3166_1_alpha3: string;
-  iso_3166_1: string;
-};
-
-type Notification = {
-  details: {
-    message: string;
-  };
-  subtype: string;
-  type: string;
-  geometry_index_end: number;
-  geometry_index_start: number;
-};
-
-type Leg = {
-  via_waypoints: any[]; // Replace with appropriate type
-  admins: Admin[];
-  notifications: Notification[];
-  weight_typical: number;
-  duration_typical: number;
-  weight: number;
-  duration: number;
-  steps: any[]; // Replace with appropriate type
-  distance: number;
-  summary: string;
-};
-
-type Waypoint = {
-  distance: number;
-  name: string;
-  location: [number, number];
-};
-
-type Route = {
-  weight_typical: number;
-  duration_typical: number;
-  weight_name: string;
-  weight: number;
-  duration: number;
-  distance: number;
-  legs: Leg[];
-  geometry: string;
-};
-
-type DirectionsResponse = {
-  routes: Route[];
-  waypoints: Waypoint[];
-  code: string;
-  uuid: string;
-};
+import { DirectionsResponse } from "../../utils/types";
 
 // router for interacting with the Mapbox API
 export const mapboxRouter = router({

@@ -7,7 +7,6 @@ import { AiOutlineUser } from "react-icons/ai";
 
 const DropDownMenu = () => {
   const { data: session } = useSession();
-
   const logout = () => {
     signOut();
   };
@@ -16,7 +15,7 @@ const DropDownMenu = () => {
     <div className="z-30">
       <Menu>
         <Menu.Button className="rounded-full bg-gray-400 p-2">
-          <AiOutlineUser className="w-7 h-7" />
+          <AiOutlineUser className="h-7 w-7" />
         </Menu.Button>
 
         <Transition
@@ -32,32 +31,32 @@ const DropDownMenu = () => {
             <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-300 rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
               <Menu.Item
                 as="div"
-                className="flex flex-col justify-center items-center p-6"
+                className="flex flex-col items-center justify-center p-6"
               >
                 <Image
                   alt="avatar"
                   src={session.user.image!}
                   width="100px"
                   height="100px"
-                  className="rounded-full mb-2"
+                  className="mb-2 rounded-full"
                 />
-                <h1 className="font-bold text-lg">{session.user.name}</h1>
-                <p className="font-light text-sm text-gray-500">
+                <h1 className="text-lg font-bold">{session.user.name}</h1>
+                <p className="text-sm font-light text-gray-500">
                   {session.user.email}
                 </p>
                 <Link href="/profile">
-                  <a className="w-4/5 rounded-2xl text-center bg-white border border-gray-300 px-3 py-2 hover:bg-gray-100 mt-4">
+                  <a className="mt-4 w-4/5 rounded-2xl border border-gray-300 bg-white px-3 py-2 text-center hover:bg-gray-100">
                     Profile
                   </a>
                 </Link>
               </Menu.Item>
               <Menu.Item
                 as="div"
-                className="flex flex-col justify-center items-center py-4 px-2"
+                className="flex flex-col items-center justify-center px-2 py-4"
               >
                 <button
                   onClick={logout}
-                  className="w-4/5 rounded text-center bg-white border border-gray-300 px-3 py-2 hover:bg-gray-100"
+                  className="w-4/5 rounded border border-gray-300 bg-white px-3 py-2 text-center hover:bg-gray-100"
                 >
                   Sign Out
                 </button>

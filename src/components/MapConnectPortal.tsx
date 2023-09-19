@@ -3,32 +3,36 @@ import { EnhancedPublicUser, PublicUser } from "../utils/types";
 import { User } from "@prisma/client";
 import { ConnectCard } from "./UserCards/ConnectCard";
 import { Dialog } from "@headlessui/react";
+import Spinner from "./Spinner";
 
 interface ConnectPortalProps {
-  otherUser: EnhancedPublicUser;
+  otherUser: PublicUser | null;
+  extendUser: (user: PublicUser) => EnhancedPublicUser;
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
-  setPopupUser: Dispatch<SetStateAction<PublicUser | null>>;
+  onClose: () => void;
 }
 
 export const MapConnectPortal = (props: ConnectPortalProps) => {
-  const [isOpen, setIsOpen] = useState(true);
-
-  const onClose = () => {
-    setIsOpen(false);
-    props.setPopupUser(null);
-  };
   return (
-    <Dialog open={isOpen} onClose={onClose} className="relative z-50">
+    <Dialog
+      open={!!props.otherUser}
+      onClose={props.onClose}
+      className="relative z-50"
+    >
       <div className="fixed inset-0" aria-hidden="true">
         <div className="fixed inset-0 mt-16 flex items-start justify-end pt-2">
           <Dialog.Panel>
             <div>
               <div tabIndex={0} className="w-96">
-                <ConnectCard
-                  otherUser={props.otherUser}
-                  onViewRouteClick={props.onViewRouteClick}
-                  onClose={onClose}
-                />
+                {props.otherUser && (
+                  <ConnectCard
+                    otherUser={props.extendUser(props.otherUser)}
+                    onViewRouteClick={props.onViewRouteClick}
+                    onClose={(string) => {
+                      string == "connect" ? props.onClose() : {};
+                    }}
+                  />
+                )}
               </div>
             </div>
           </Dialog.Panel>

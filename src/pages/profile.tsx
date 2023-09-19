@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import _, { debounce } from "lodash";
-import { GetServerSidePropsContext, NextPage } from "next";
+import { GetServerSideProps, GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -33,7 +33,7 @@ import ControlledTimePicker from "../components/Profile/ControlledTimePicker";
 import { CarpoolAddress, CarpoolFeature } from "../utils/types";
 import { EntryLabel } from "../components/EntryLabel";
 import ControlledAddressCombobox from "../components/Profile/ControlledAddressCombobox";
-import { getSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 
 // Inputs to the onboarding form.
 export type OnboardingFormInputs = {
@@ -106,6 +106,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 const Profile: NextPage = () => {
   const router = useRouter();
   const utils = trpc.useContext();
+  const { data: session } = useSession();
   const {
     register,
     formState: { errors },
@@ -240,6 +241,8 @@ const Profile: NextPage = () => {
       })
       .join(",");
 
+    const sessionName = session?.user?.name ?? "";
+
     editUserMutation.mutate({
       role: userInfo.role,
       status: Status.ACTIVE,
@@ -252,7 +255,9 @@ const Profile: NextPage = () => {
       startCoordLng: userInfo.startCoordLng!,
       startCoordLat: userInfo.startCoordLat!,
       isOnboarded: true,
-      preferredName: userInfo.preferredName,
+      preferredName: userInfo.preferredName
+        ? userInfo.preferredName
+        : sessionName,
       pronouns: userInfo.pronouns,
       daysWorking: daysWorkingParsed,
       startTime: userInfo.startTime?.toISOString(),

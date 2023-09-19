@@ -78,8 +78,7 @@ export const viewRoute = (
 
   map.fitBounds([
     [
-      Math.min(otherUser.startPOICoordLng, otherUser.companyPOICoordLng) -
-        0.125,
+      Math.min(otherUser.startPOICoordLng, otherUser.companyPOICoordLng) - 0.05,
       Math.max(otherUser.startPOICoordLat, otherUser.companyPOICoordLat) + 0.05,
     ],
     [

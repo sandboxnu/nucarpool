@@ -79,7 +79,6 @@ model Request {
 // Represents a group of users
 model CarpoolGroup {
   id    String @id @default(cuid()) // primary key
-  name  String
   users User[]
 
   @@map(name: "group")

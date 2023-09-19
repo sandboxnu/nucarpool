@@ -44,6 +44,7 @@ const renderUserCard = (
     case "recommendations":
       return (
         <ConnectCard
+          key={otherUser.id}
           otherUser={otherUser}
           onViewRouteClick={onViewRouteClick}
         />
@@ -51,6 +52,7 @@ const renderUserCard = (
     case "favorites":
       return (
         <ConnectCard
+          key={otherUser.id}
           otherUser={otherUser}
           onViewRouteClick={onViewRouteClick}
         />
@@ -58,13 +60,18 @@ const renderUserCard = (
     case "sent":
       if (otherUser.outgoingRequest) {
         return (
-          <SentCard otherUser={otherUser} onViewRouteClick={onViewRouteClick} />
+          <SentCard
+            key={otherUser.id}
+            otherUser={otherUser}
+            onViewRouteClick={onViewRouteClick}
+          />
         );
       }
     case "received":
       if (otherUser.incomingRequest) {
         return (
           <ReceivedCard
+            key={otherUser.id}
             otherUser={otherUser}
             onViewRouteClick={onViewRouteClick}
           />

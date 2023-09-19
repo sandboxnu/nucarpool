@@ -31,6 +31,7 @@ export const convertToPublic = (user: User): PublicUser => {
     companyPOIAddress: user.companyPOIAddress,
     companyPOICoordLng: user.companyPOICoordLng,
     companyPOICoordLat: user.companyPOICoordLat,
+    carpoolId: user.carpoolId,
   };
 };
 

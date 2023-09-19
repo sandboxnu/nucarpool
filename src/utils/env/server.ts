@@ -23,9 +23,6 @@ export const serverEnv = {
     GOOGLE_CLIENT_SECRET: str({
       input: process.env.GOOGLE_CLIENT_SECRET,
     }),
-    SENDGRID_API_KEY: str({
-      input: process.env.SENDGRID_API_KEY,
-    }),
     AWS_ACCESS_KEY_ID: str({
       input: process.env.AWS_ACCESS_KEY_ID,
     }),

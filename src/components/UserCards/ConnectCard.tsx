@@ -10,11 +10,12 @@ import { useContext, useState } from "react";
 import { createPortal } from "react-dom";
 import ConnectModal from "../Modals/ConnectModal";
 import { UserContext } from "../../utils/userContext";
+import { Role } from "@prisma/client";
 
 interface ConnectCardProps {
   otherUser: EnhancedPublicUser;
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
-  onClose?: () => void;
+  onClose?: (action: string) => void;
 }
 
 export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
@@ -40,18 +41,29 @@ export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
     );
   };
 
+  const handleNoSeatAvailability = () => {
+    addToast(
+      "You do not have any seats available in your car to connect with " +
+        props.otherUser.preferredName +
+        ".",
+      { appearance: "info" }
+    );
+  };
+
   const handleConnect = (otherUser: EnhancedPublicUser) => {
     if (otherUser.incomingRequest) {
       handleExistingReceivedRequest();
     } else if (otherUser.outgoingRequest) {
       handleExistingSentRequest();
+    } else if (user?.role === Role.DRIVER && user.seatAvail === 0) {
+      handleNoSeatAvailability();
     } else {
       setShowModal(true);
     }
   };
 
-  const onClose = () => {
-    props.onClose?.();
+  const onClose = (action: string) => {
+    props.onClose?.(action);
     setShowModal(false);
   };
 

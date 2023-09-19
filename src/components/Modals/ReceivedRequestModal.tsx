@@ -2,7 +2,7 @@ import { Dialog } from "@headlessui/react";
 import { useState } from "react";
 import { useToasts } from "react-toast-notifications";
 import { EnhancedPublicUser, User } from "../../utils/types";
-import { Request } from "@prisma/client";
+import { Request, Role } from "@prisma/client";
 import { trpc } from "../../utils/trpc";
 import { toast } from "react-toastify";
 
@@ -33,6 +33,26 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
     },
   });
 
+  const { mutate: mutateGroup } = trpc.user.groups.edit.useMutation({
+    onError: (error: any) => {
+      toast.error(`Something went wrong: ${error.message}`);
+    },
+    onSuccess() {
+      utils.user.requests.me.invalidate();
+      utils.user.me.invalidate();
+    },
+  });
+
+  const { mutate: createGroup } = trpc.user.groups.create.useMutation({
+    onError: (error: any) => {
+      toast.error(`Something went wrong: ${error.message}`);
+    },
+    onSuccess() {
+      utils.user.requests.me.invalidate();
+      utils.user.me.invalidate();
+    },
+  });
+
   const handleDelete = () => {
     deleteRequest({
       invitationId: props.req.id,
@@ -44,19 +64,79 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
     onClose();
     addToast(
       props.otherUser.preferredName +
-        "'s request to carpool with you has been rejected.",
+        "'s request to carpool with you has been deleted.",
       { appearance: "success" }
     );
   };
 
+  const validateRequestAcceptance = () => {
+    if (props.user.role == "DRIVER") {
+      if (props.user.seatAvail === 0) {
+        addToast(
+          "You do not have any space in your car to accept " +
+            props.otherUser.preferredName +
+            "."
+        );
+        return false;
+      }
+      if (props.otherUser.carpoolId) {
+        addToast(
+          props.otherUser.preferredName +
+            " is already in an existing carpool group. Ask them to leave that group before attempting to join yours."
+        );
+        return false;
+      }
+      return true;
+    } else {
+      if (props.user.carpoolId) {
+        addToast(
+          "You cannot join " +
+            props.otherUser.preferredName +
+            "'s group until leaving your current carpool group."
+        );
+        return false;
+      }
+      return true;
+    }
+  };
+
+  const initiateGroup = () => {
+    if (props.user.role === Role.DRIVER) {
+      if (props.user.carpoolId) {
+        mutateGroup({
+          driverId: props.user.id,
+          riderId: props.otherUser.id,
+          add: true,
+          groupId: props.user.carpoolId,
+        });
+      } else {
+        createGroup({ driverId: props.user.id, riderId: props.otherUser.id });
+      }
+    } else {
+      if (props.otherUser.carpoolId) {
+        mutateGroup({
+          driverId: props.otherUser.id,
+          riderId: props.user.id,
+          add: true,
+          groupId: props.otherUser.carpoolId,
+        });
+      } else {
+        createGroup({ driverId: props.otherUser.id, riderId: props.user.id });
+      }
+    }
+  };
+
   const handleAcceptClick = () => {
-    handleDelete();
-    onClose();
-    addToast(
-      props.otherUser.preferredName +
-        "'s request to carpool with you has been accepted.",
-      { appearance: "success" }
-    );
+    if (validateRequestAcceptance()) {
+      initiateGroup();
+      handleDelete();
+      onClose();
+      addToast(
+        props.otherUser.preferredName +
+          "'s request to carpool with you has been accepted.",
+        { appearance: "success" }
+      );
+    }
   };
 
   return (
@@ -66,8 +146,8 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
         {/* Full-screen container to center the panel */}
         <div className="fixed inset-0 flex items-center justify-center p-4">
           {/* dialog panel container  */}
-          <Dialog.Panel className="justify-center rounded-md shadow-md bg-white h-3/6 w-3/6 content-center flex flex-col p-9 gap-4">
-            <Dialog.Title className="font-bold text-2xl text-center">
+          <Dialog.Panel className="flex h-3/6 w-3/6 flex-col content-center justify-center gap-4 rounded-md bg-white p-9 shadow-md">
+            <Dialog.Title className="text-center text-2xl font-bold">
               Manage Received Request
             </Dialog.Title>
             <div className="text-sm">
@@ -78,13 +158,13 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
             <div className="flex justify-center space-x-7">
               <button
                 onClick={handleRejectClick}
-                className="w-full p-1 text-blue-900 bg-slate-50 border-2 border-blue-900 rounded-md"
+                className="w-full rounded-md border-2 border-blue-900 bg-slate-50 p-1 text-blue-900"
               >
                 Decline
               </button>
               <button
                 onClick={handleAcceptClick}
-                className="w-full p-1 text-slate-50 bg-blue-900 border-2 border-blue-900 rounded-md"
+                className="w-full rounded-md border-2 border-blue-900 bg-blue-900 p-1 text-slate-50"
               >
                 Accept
               </button>
