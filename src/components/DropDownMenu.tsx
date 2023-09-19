@@ -2,16 +2,11 @@ import { Menu, Transition } from "@headlessui/react";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { Fragment, useCallback, useContext, useState } from "react";
+import React, { Fragment } from "react";
 import { AiOutlineUser } from "react-icons/ai";
-import { GroupPage } from "./GroupPage";
-import { createPortal } from "react-dom";
-import { UserContext } from "../utils/userContext";
 
 const DropDownMenu = () => {
   const { data: session } = useSession();
-  const [displayGroup, setDisplayGroup] = useState<boolean>(false);
-  const user = useContext(UserContext);
   const logout = () => {
     signOut();
   };
@@ -54,14 +49,6 @@ const DropDownMenu = () => {
                     Profile
                   </a>
                 </Link>
-                {user?.carpoolId && (
-                  <button
-                    className="mt-4 w-4/5 rounded-2xl border border-gray-300 bg-white px-3 py-2 text-center hover:bg-gray-100"
-                    onClick={() => setDisplayGroup(true)}
-                  >
-                    My Group
-                  </button>
-                )}
               </Menu.Item>
               <Menu.Item
                 as="div"
@@ -78,13 +65,6 @@ const DropDownMenu = () => {
           )}
         </Transition>
       </Menu>
-      <>
-        {displayGroup &&
-          createPortal(
-            <GroupPage onClose={() => setDisplayGroup(false)} />,
-            document.body
-          )}
-      </>
     </div>
   );
 };

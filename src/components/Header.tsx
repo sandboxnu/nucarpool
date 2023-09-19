@@ -1,6 +1,9 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, useContext, useState } from "react";
 import styled from "styled-components";
 import DropDownMenu from "./DropDownMenu";
+import { UserContext } from "../utils/userContext";
+import { createPortal } from "react-dom";
+import { GroupPage } from "./GroupPage";
 
 const HeaderDiv = styled.div`
   display: flex;
@@ -37,6 +40,8 @@ interface HeaderProps {
 export type HeaderOptions = "explore" | "requests";
 
 const Header = (props: HeaderProps) => {
+  const [displayGroup, setDisplayGroup] = useState<boolean>(false);
+  const user = useContext(UserContext);
   const renderClassName = (sidebarValue: string, sidebarText: string) => {
     if (sidebarValue == "explore" && sidebarText == "explore") {
       return "underline underline-offset-8 rounded-xl p-4 font-medium text-xl text-white";
@@ -47,6 +52,12 @@ const Header = (props: HeaderProps) => {
     if (sidebarValue == "requests" && sidebarText == "requests") {
       return "underline underline-offset-8 rounded-xl p-4 font-medium text-xl text-white";
     } else if (sidebarValue == "explore" && sidebarText == "requests") {
+      return "rounded-xl p-4 font-medium text-xl text-white";
+    }
+
+    if (displayGroup) {
+      return "underline underline-offset-8 rounded-xl p-4 font-medium text-xl text-white";
+    } else {
       return "rounded-xl p-4 font-medium text-xl text-white";
     }
   };
@@ -76,6 +87,14 @@ const Header = (props: HeaderProps) => {
         >
           Requests
         </button>
+        {user?.carpoolId && (
+          <button
+            onClick={() => setDisplayGroup(true)}
+            className={renderClassName(sidebarValue, "filler")}
+          >
+            My Group
+          </button>
+        )}
       </div>
     );
   };
@@ -87,6 +106,13 @@ const Header = (props: HeaderProps) => {
         <div className="flex items-center">
           {renderSidebarOptions(props.data)}
           <DropDownMenu />
+          <>
+            {displayGroup &&
+              createPortal(
+                <GroupPage onClose={() => setDisplayGroup(false)} />,
+                document.body
+              )}
+          </>
         </div>
       )}
     </HeaderDiv>
