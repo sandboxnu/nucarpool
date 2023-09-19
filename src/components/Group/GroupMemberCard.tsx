@@ -19,6 +19,8 @@ export const GroupMembers = (props: GroupMembersProps) => {
   const riders = props.users.filter(
     (user) => user.id !== driver?.id && user.id !== curUser?.id
   );
+  console.log(riders);
+  console.log(riders.length);
   const utils = trpc.useContext();
   const { addToast } = useToasts();
 
@@ -38,7 +40,7 @@ export const GroupMembers = (props: GroupMembersProps) => {
       toast.error(`Something went wrong: ${error.message}`);
     },
     onSuccess() {
-      if (riders.length === 1) {
+      if (riders.length <= 1) {
         props.onClose();
       } else {
         utils.user.groups.me.invalidate();
