@@ -94,12 +94,31 @@ export const groupsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const group = await ctx.prisma.carpoolGroup.delete({
+      const group = await ctx.prisma.carpoolGroup.findUnique({
+        where: {
+          id: input.groupId,
+        },
+        include: {
+          users: true,
+        },
+      });
+      const usrLength = group ? group.users.length - 1 : 0;
+
+      await ctx.prisma.user.update({
+        where: { id: ctx.session.user?.id },
+        data: {
+          seatAvail: {
+            increment: usrLength,
+          },
+        },
+      });
+
+      const deleteResult = await ctx.prisma.carpoolGroup.delete({
         where: {
           id: input.groupId,
         },
       });
-      return group;
+      return deleteResult;
     }),
   edit: protectedRouter
     .input(
@@ -115,7 +134,7 @@ export const groupsRouter = router({
         where: { id: input.driverId },
       });
 
-      if (driver?.seatAvail === 0) {
+      if (driver?.seatAvail === 0 && input.add) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Driver does not have space available in their car",
