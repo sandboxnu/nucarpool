@@ -117,18 +117,6 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       {/* third row */}
       <div className="flex w-full items-center gap-4">
         {DaysWorkingDisplay(props.otherUser.daysWorking)}
-        {props.otherUser.role === "DRIVER" && (
-          <>
-            <div
-              className={
-                "ml-2 flex h-7 w-7 items-center justify-center rounded-md font-semibold"
-              }
-            >
-              Seats:{" "}
-            </div>
-            <p>{props.otherUser.seatAvail}</p>
-          </>
-        )}
       </div>
       {/* fourth row */}
       <div className="m-0 flex w-full justify-between align-middle">
@@ -144,7 +132,12 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
           </p>
         </div>
       </div>
-      {/* last row */}
+      {props.otherUser.role === "DRIVER" && (
+        <div className="flex flex-row text-sm">
+          <div className="mr-1">Seats: </div>
+          <div className="font-semibold">{props.otherUser.seatAvail}</div>
+        </div>
+      )}
       <div className="flex flex-row justify-between gap-2">
         <button
           onClick={() => props.onViewRouteClick(user, props.otherUser)}
