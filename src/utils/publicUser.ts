@@ -51,7 +51,7 @@ export const generatePoiData = async (
     longitude,
     ", ",
     latitude,
-    ".json?types=poi,locality&access_token=",
+    ".json?types=poi&access_token=",
     serverEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN,
   ].join("");
 
@@ -65,8 +65,10 @@ export const generatePoiData = async (
       });
     });
 
+  console.log(data.features[0].text);
+
   return {
-    location: data.features[0]?.place_name || "NOT FOUND",
+    location: data.features[0]?.text || "NOT FOUND",
     coordLng: data.features[0]?.center[0] ?? -999,
     coordLat: data.features[0]?.center[1] ?? -999,
   };
