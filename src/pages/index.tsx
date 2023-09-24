@@ -111,9 +111,6 @@ const Home: NextPage<any> = () => {
         zoom: 10,
       });
       newMap.on("load", () => {
-        geoJsonUsers.features.map((user) => {
-          console.log(user.properties);
-        });
         addClusters(newMap, geoJsonUsers);
         addUserLocation(newMap, user);
         addMapEvents(newMap, user, setPopupUser);

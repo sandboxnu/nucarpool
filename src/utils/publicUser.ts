@@ -69,8 +69,6 @@ export const generatePoiData = async (
       });
     });
 
-  console.log(data.features[0].text);
-
   return {
     location: data.features[0]?.text || "NOT FOUND",
     coordLng: data.features[0]?.center[0] ?? -999,

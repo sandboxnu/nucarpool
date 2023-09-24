@@ -40,8 +40,6 @@ const addMapEvents = (
     while (Math.abs(e.lngLat.lng - coordinates[0]!) > 180) {
       coordinates[0] += e.lngLat.lng > coordinates[0]! ? 360 : -360;
     }
-    console.log("mapbox event");
-    console.log(coordinates);
     setPopupUser(otherUser);
   });
 

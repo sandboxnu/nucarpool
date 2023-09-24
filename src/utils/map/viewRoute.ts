@@ -87,8 +87,6 @@ export const viewRoute = (
     .setLngLat([otherUser.companyCoordLng, otherUser.companyCoordLat])
     .setPopup(otherUserEndPopup)
     .addTo(map);
-  console.log("marker code");
-  console.log(otherUser.companyCoordLng, otherUser.companyCoordLat);
 
   selfStartMarker.togglePopup();
   selfEndMarker.togglePopup();
