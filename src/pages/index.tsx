@@ -79,11 +79,12 @@ const Home: NextPage<any> = () => {
   const onViewRouteClick = (user: User, otherUser: PublicUser) => {
     if (mapState) {
       viewRoute(user, otherUser, mapState);
+
       const points: [number, number][] = [
         [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
         [user.startCoordLng, user.startCoordLat],
         [user.companyCoordLng, user.companyCoordLat],
-        [otherUser.companyPOICoordLng, otherUser.companyPOICoordLat],
+        [otherUser.companyCoordLng, otherUser.companyCoordLat],
       ];
       setPoints(points);
     }
@@ -110,6 +111,9 @@ const Home: NextPage<any> = () => {
         zoom: 10,
       });
       newMap.on("load", () => {
+        geoJsonUsers.features.map((user) => {
+          console.log(user.properties);
+        });
         addClusters(newMap, geoJsonUsers);
         addUserLocation(newMap, user);
         addMapEvents(newMap, user, setPopupUser);

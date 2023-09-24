@@ -28,11 +28,15 @@ export const convertToPublic = (user: User): PublicUser => {
     startPOILocation: user.startPOILocation,
     startPOICoordLng: user.startPOICoordLng,
     startPOICoordLat: user.startPOICoordLat,
-    companyPOIAddress: user.companyPOIAddress,
-    companyPOICoordLng: user.companyPOICoordLng,
-    companyPOICoordLat: user.companyPOICoordLat,
+    companyAddress: user.companyAddress,
+    companyCoordLng: user.companyCoordLng,
+    companyCoordLat: user.companyCoordLat,
     carpoolId: user.carpoolId,
   };
+};
+
+export const roundCoord = (coord: number) => {
+  return Math.round((coord + Number.EPSILON) * 100000) / 100000;
 };
 
 /**

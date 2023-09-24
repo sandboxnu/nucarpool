@@ -1,10 +1,7 @@
 import { GeoJSONSource, Map, NavigationControl, Popup } from "mapbox-gl";
-import { EnhancedPublicUser, PublicUser } from "../types";
+import { PublicUser } from "../types";
 import { User } from "../types";
 import { Dispatch, SetStateAction } from "react";
-import ReactDOM, { createPortal } from "react-dom";
-import { ConnectCard } from "../../components/UserCards/ConnectCard";
-import { viewRoute } from "./viewRoute";
 
 const addMapEvents = (
   map: Map,
@@ -43,7 +40,8 @@ const addMapEvents = (
     while (Math.abs(e.lngLat.lng - coordinates[0]!) > 180) {
       coordinates[0] += e.lngLat.lng > coordinates[0]! ? 360 : -360;
     }
-
+    console.log("mapbox event");
+    console.log(coordinates);
     setPopupUser(otherUser);
   });
 

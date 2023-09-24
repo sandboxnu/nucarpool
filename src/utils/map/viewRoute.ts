@@ -56,7 +56,10 @@ export const viewRoute = (
 
   const redCircle = createMarkerEl(RedStart);
   const selfStartPopup = createPopup("My Start");
-  const selfStartMarker = new mapboxgl.Marker({ element: redCircle })
+  const selfStartMarker = new mapboxgl.Marker({
+    element: redCircle,
+    anchor: "bottom",
+  })
     .setLngLat([user.startCoordLng, user.startCoordLat])
     .setPopup(selfStartPopup)
     .addTo(map);
@@ -77,10 +80,15 @@ export const viewRoute = (
 
   const blueSquare = createMarkerEl(BlueEnd);
   const otherUserEndPopup = createPopup(otherRole + " Dest.");
-  const otherUserEndMarker = new mapboxgl.Marker({ element: blueSquare })
-    .setLngLat([otherUser.companyPOICoordLng, otherUser.companyPOICoordLat])
+  const otherUserEndMarker = new mapboxgl.Marker({
+    element: blueSquare,
+    anchor: "bottom",
+  })
+    .setLngLat([otherUser.companyCoordLng, otherUser.companyCoordLat])
     .setPopup(otherUserEndPopup)
     .addTo(map);
+  console.log("marker code");
+  console.log(otherUser.companyCoordLng, otherUser.companyCoordLat);
 
   selfStartMarker.togglePopup();
   selfEndMarker.togglePopup();
@@ -94,12 +102,12 @@ export const viewRoute = (
 
   map.fitBounds([
     [
-      Math.min(otherUser.startPOICoordLng, otherUser.companyPOICoordLng) - 0.05,
-      Math.max(otherUser.startPOICoordLat, otherUser.companyPOICoordLat) + 0.05,
+      Math.min(otherUser.startPOICoordLng, otherUser.companyCoordLng) - 0.05,
+      Math.max(otherUser.startPOICoordLat, otherUser.companyCoordLat) + 0.05,
     ],
     [
-      Math.max(otherUser.startPOICoordLng, otherUser.companyPOICoordLng) + 0.05,
-      Math.min(otherUser.startPOICoordLat, otherUser.companyPOICoordLat) - 0.05,
+      Math.max(otherUser.startPOICoordLng, otherUser.companyCoordLng) + 0.05,
+      Math.min(otherUser.startPOICoordLat, otherUser.companyCoordLat) - 0.05,
     ],
   ]);
 };
