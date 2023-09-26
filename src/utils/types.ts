@@ -38,9 +38,9 @@ export type PublicUser = {
   startPOILocation: string;
   startPOICoordLng: number;
   startPOICoordLat: number;
-  companyPOIAddress: string;
-  companyPOICoordLng: number;
-  companyPOICoordLat: number;
+  companyAddress: string;
+  companyCoordLng: number;
+  companyCoordLat: number;
   daysWorking: string;
   startTime: Date | null;
   endTime: Date | null;

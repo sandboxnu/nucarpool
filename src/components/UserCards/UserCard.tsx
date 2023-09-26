@@ -17,16 +17,6 @@ interface UserCardProps {
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
 }
 
-const backgroundColorCSS = (seatAvail: number): string => {
-  if (seatAvail === 1) {
-    return " bg-busy-red";
-  } else if (seatAvail === 2) {
-    return " bg-okay-yellow";
-  } else {
-    return " bg-good-green";
-  }
-};
-
 const borderLColorCSS = (seatAvail: number): string => {
   if (seatAvail === 1) {
     return " border-l-busy-red";
@@ -103,8 +93,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
   return (
     <div
       className={
-        "align-center m-3.5 flex flex-col gap-2 rounded-xl border-l-[13px] bg-stone-100 px-6 py-4 text-left shadow-md" +
-        borderLColorCSS(props.otherUser.seatAvail)
+        "align-center m-3.5 flex flex-col gap-2 rounded-xl border-l-[13px] border-l-busy-red bg-stone-100 px-6 py-4 text-left shadow-md"
       }
     >
       <div className="flex justify-between">
@@ -128,16 +117,6 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       {/* third row */}
       <div className="flex w-full items-center gap-4">
         {DaysWorkingDisplay(props.otherUser.daysWorking)}
-        {props.otherUser.role === "DRIVER" && (
-          <div
-            className={
-              "flex h-7 w-7 items-center justify-center rounded-md font-semibold" +
-              backgroundColorCSS(props.otherUser.seatAvail)
-            }
-          >
-            {props.otherUser.seatAvail}
-          </div>
-        )}
       </div>
       {/* fourth row */}
       <div className="m-0 flex w-full justify-between align-middle">
@@ -153,7 +132,12 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
           </p>
         </div>
       </div>
-      {/* last row */}
+      {props.otherUser.role === "DRIVER" && (
+        <div className="flex flex-row text-sm">
+          <div className="mr-1">Seats: </div>
+          <div className="font-semibold">{props.otherUser.seatAvail}</div>
+        </div>
+      )}
       <div className="flex flex-row justify-between gap-2">
         <button
           onClick={() => props.onViewRouteClick(user, props.otherUser)}

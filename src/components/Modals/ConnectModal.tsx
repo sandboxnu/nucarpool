@@ -32,7 +32,7 @@ const sendEmail = async (
     body: JSON.stringify(msg),
   });
 
-  console.log(result);
+  // console.log(result);
 };
 
 const ConnectModal = (props: ConnectModalProps): JSX.Element => {

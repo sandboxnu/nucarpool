@@ -87,14 +87,12 @@ const Header = (props: HeaderProps) => {
         >
           Requests
         </button>
-        {user?.carpoolId && (
-          <button
-            onClick={() => setDisplayGroup(true)}
-            className={renderClassName(sidebarValue, "filler")}
-          >
-            My Group
-          </button>
-        )}
+        <button
+          onClick={() => setDisplayGroup(true)}
+          className={renderClassName(sidebarValue, "filler")}
+        >
+          My Group
+        </button>
       </div>
     );
   };

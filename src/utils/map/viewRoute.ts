@@ -6,6 +6,11 @@ import { useEffect } from "react";
 import { toast } from "react-toastify";
 import polyline from "@mapbox/polyline";
 import { LineString } from "geojson";
+import { StaticImageData } from "next/image";
+import RedStart from "../../../public/red-circle.png";
+import RedEnd from "../../../public/red-square.png";
+import BlueEnd from "../../../public/blue-square.png";
+import orangeCircle from "../../../public/orange-circle.png";
 
 const previousMarkers: mapboxgl.Marker[] = [];
 export const clearMarkers = () => {
@@ -31,6 +36,12 @@ const createPopup = (text: string) => {
   return popup;
 };
 
+const createMarkerEl = (img: StaticImageData) => {
+  const el = document.createElement("img");
+  el.src = img.src;
+  el.style.marginTop = "1em";
+  return el;
+};
 // Creates MapBox markers showing user's start address and the start area of the other user.
 export const viewRoute = (
   user: User,
@@ -42,27 +53,38 @@ export const viewRoute = (
 
   const otherRole = user.role === Role.DRIVER ? "Rider" : "Driver";
 
+  const redCircle = createMarkerEl(RedStart);
+  redCircle.style.opacity = "0";
   const selfStartPopup = createPopup("My Start");
-  const selfStartMarker = new mapboxgl.Marker({ color: "#2ae916" })
+  const selfStartMarker = new mapboxgl.Marker({
+    element: redCircle,
+    anchor: "bottom",
+  })
     .setLngLat([user.startCoordLng, user.startCoordLat])
     .setPopup(selfStartPopup)
     .addTo(map);
 
+  const blueSquare = createMarkerEl(BlueEnd);
   const selfEndPopup = createPopup("My Dest.");
-  const selfEndMarker = new mapboxgl.Marker({ color: "#f0220f" })
+  const selfEndMarker = new mapboxgl.Marker({ element: blueSquare })
     .setLngLat([user.companyCoordLng, user.companyCoordLat])
     .setPopup(selfEndPopup)
     .addTo(map);
 
+  const orangeStart = createMarkerEl(orangeCircle);
   const otherUserStartPopup = createPopup(otherRole + " Start");
-  const otherUserStartMarker = new mapboxgl.Marker({ color: "#00008B" })
+  const otherUserStartMarker = new mapboxgl.Marker({ element: orangeStart })
     .setLngLat([otherUser.startPOICoordLng, otherUser.startPOICoordLat])
     .setPopup(otherUserStartPopup)
     .addTo(map);
 
+  const redSquare = createMarkerEl(RedEnd);
+  redSquare.style.opacity = "0";
   const otherUserEndPopup = createPopup(otherRole + " Dest.");
-  const otherUserEndMarker = new mapboxgl.Marker({ color: "#FFA500" })
-    .setLngLat([otherUser.companyPOICoordLng, otherUser.companyPOICoordLat])
+  const otherUserEndMarker = new mapboxgl.Marker({
+    element: redSquare,
+  })
+    .setLngLat([otherUser.companyCoordLng, otherUser.companyCoordLat])
     .setPopup(otherUserEndPopup)
     .addTo(map);
 
@@ -78,12 +100,12 @@ export const viewRoute = (
 
   map.fitBounds([
     [
-      Math.min(otherUser.startPOICoordLng, otherUser.companyPOICoordLng) - 0.05,
-      Math.max(otherUser.startPOICoordLat, otherUser.companyPOICoordLat) + 0.05,
+      Math.min(otherUser.startPOICoordLng, otherUser.companyCoordLng) - 0.0075,
+      Math.max(otherUser.startPOICoordLat, otherUser.companyCoordLat) + 0.0075,
     ],
     [
-      Math.max(otherUser.startPOICoordLng, otherUser.companyPOICoordLng) + 0.05,
-      Math.min(otherUser.startPOICoordLat, otherUser.companyPOICoordLat) - 0.05,
+      Math.max(otherUser.startPOICoordLng, otherUser.companyCoordLng) + 0.0075,
+      Math.min(otherUser.startPOICoordLat, otherUser.companyCoordLat) - 0.0075,
     ],
   ]);
 };
@@ -118,6 +140,10 @@ export function useGetDirections({
           type: "LineString",
         };
 
+        map.on("load", () => {
+          clearDirections(map);
+        });
+
         map.addLayer({
           id: "route",
           type: "line",
@@ -130,7 +156,7 @@ export function useGetDirections({
             "line-cap": "round",
           },
           paint: {
-            "line-color": "#4A89F3",
+            "line-color": "#61666b",
             "line-width": 6,
           },
         });

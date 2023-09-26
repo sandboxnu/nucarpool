@@ -5,6 +5,7 @@ import { Feature, FeatureCollection } from "geojson";
 import { serverEnv } from "../../utils/env/server";
 import { Role, Status } from "@prisma/client";
 import { DirectionsResponse } from "../../utils/types";
+import { roundCoord } from "../../utils/publicUser";
 
 // router for interacting with the Mapbox API
 export const mapboxRouter = router({
@@ -66,9 +67,9 @@ export const mapboxRouter = router({
         companyName: true,
         daysWorking: true,
         preferredName: true,
-        companyPOIAddress: true,
-        companyPOICoordLng: true,
-        companyPOICoordLat: true,
+        companyAddress: true,
+        companyCoordLat: true,
+        companyCoordLng: true,
         startPOICoordLng: true,
         startPOICoordLat: true,
         startPOILocation: true,
@@ -81,7 +82,10 @@ export const mapboxRouter = router({
         type: "Feature" as "Feature",
         geometry: {
           type: "Point" as "Point",
-          coordinates: [u.companyPOICoordLng, u.companyPOICoordLat],
+          coordinates: [
+            roundCoord(u.companyCoordLng),
+            roundCoord(u.companyCoordLat),
+          ],
         },
         properties: {
           ...u,
