@@ -24,13 +24,13 @@ export const serverEnv = {
       input: process.env.GOOGLE_CLIENT_SECRET,
     }),
     AWS_ACCESS_KEY_ID: str({
-      input: process.env.AWS_ACCESS_KEY_ID,
+      input: process.env.ACCESS_KEY_ID_AWS,
     }),
     AWS_SECRET_ACCESS_KEY: str({
-      input: process.env.AWS_SECRET_ACCESS_KEY,
+      input: process.env.SECRET_ACCESS_KEY_AWS,
     }),
     AWS_REGION: str({
-      input: process.env.AWS_REGION,
+      input: process.env.REGION_AWS,
     }),
   }),
 };
