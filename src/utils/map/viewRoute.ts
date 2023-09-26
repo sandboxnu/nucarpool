@@ -6,12 +6,11 @@ import { useEffect } from "react";
 import { toast } from "react-toastify";
 import polyline from "@mapbox/polyline";
 import { LineString } from "geojson";
-import Image, { StaticImageData } from "next/image";
+import { StaticImageData } from "next/image";
 import RedStart from "../../../public/red-circle.png";
 import RedEnd from "../../../public/red-square.png";
-import BlueStart from "../../../public/blue-circle.png";
 import BlueEnd from "../../../public/blue-square.png";
-import { red } from "@mui/material/colors";
+import orangeCircle from "../../../public/orange-circle.png";
 
 const previousMarkers: mapboxgl.Marker[] = [];
 export const clearMarkers = () => {
@@ -55,6 +54,7 @@ export const viewRoute = (
   const otherRole = user.role === Role.DRIVER ? "Rider" : "Driver";
 
   const redCircle = createMarkerEl(RedStart);
+  redCircle.style.opacity = "0";
   const selfStartPopup = createPopup("My Start");
   const selfStartMarker = new mapboxgl.Marker({
     element: redCircle,
@@ -64,25 +64,25 @@ export const viewRoute = (
     .setPopup(selfStartPopup)
     .addTo(map);
 
-  const redSquare = createMarkerEl(RedEnd);
+  const blueSquare = createMarkerEl(BlueEnd);
   const selfEndPopup = createPopup("My Dest.");
-  const selfEndMarker = new mapboxgl.Marker({ element: redSquare })
+  const selfEndMarker = new mapboxgl.Marker({ element: blueSquare })
     .setLngLat([user.companyCoordLng, user.companyCoordLat])
     .setPopup(selfEndPopup)
     .addTo(map);
 
-  const blueCircle = createMarkerEl(BlueStart);
+  const orangeStart = createMarkerEl(orangeCircle);
   const otherUserStartPopup = createPopup(otherRole + " Start");
-  const otherUserStartMarker = new mapboxgl.Marker({ element: blueCircle })
+  const otherUserStartMarker = new mapboxgl.Marker({ element: orangeStart })
     .setLngLat([otherUser.startPOICoordLng, otherUser.startPOICoordLat])
     .setPopup(otherUserStartPopup)
     .addTo(map);
 
-  const blueSquare = createMarkerEl(BlueEnd);
+  const redSquare = createMarkerEl(RedEnd);
+  redSquare.style.opacity = "0";
   const otherUserEndPopup = createPopup(otherRole + " Dest.");
   const otherUserEndMarker = new mapboxgl.Marker({
-    element: blueSquare,
-    anchor: "bottom",
+    element: redSquare,
   })
     .setLngLat([otherUser.companyCoordLng, otherUser.companyCoordLat])
     .setPopup(otherUserEndPopup)
@@ -100,12 +100,12 @@ export const viewRoute = (
 
   map.fitBounds([
     [
-      Math.min(otherUser.startPOICoordLng, otherUser.companyCoordLng) - 0.05,
-      Math.max(otherUser.startPOICoordLat, otherUser.companyCoordLat) + 0.05,
+      Math.min(otherUser.startPOICoordLng, otherUser.companyCoordLng) - 0.005,
+      Math.max(otherUser.startPOICoordLat, otherUser.companyCoordLat) + 0.005,
     ],
     [
-      Math.max(otherUser.startPOICoordLng, otherUser.companyCoordLng) + 0.05,
-      Math.min(otherUser.startPOICoordLat, otherUser.companyCoordLat) - 0.05,
+      Math.max(otherUser.startPOICoordLng, otherUser.companyCoordLng) + 0.005,
+      Math.min(otherUser.startPOICoordLat, otherUser.companyCoordLat) - 0.005,
     ],
   ]);
 };
@@ -139,6 +139,10 @@ export function useGetDirections({
           coordinates: geoJsonCoordinates,
           type: "LineString",
         };
+
+        map.on("load", () => {
+          clearDirections(map);
+        });
 
         map.addLayer({
           id: "route",
