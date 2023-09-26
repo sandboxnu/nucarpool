@@ -100,12 +100,12 @@ export const viewRoute = (
 
   map.fitBounds([
     [
-      Math.min(otherUser.startPOICoordLng, otherUser.companyCoordLng) - 0.005,
-      Math.max(otherUser.startPOICoordLat, otherUser.companyCoordLat) + 0.005,
+      Math.min(otherUser.startPOICoordLng, otherUser.companyCoordLng) - 0.0075,
+      Math.max(otherUser.startPOICoordLat, otherUser.companyCoordLat) + 0.0075,
     ],
     [
-      Math.max(otherUser.startPOICoordLng, otherUser.companyCoordLng) + 0.005,
-      Math.min(otherUser.startPOICoordLat, otherUser.companyCoordLat) - 0.005,
+      Math.max(otherUser.startPOICoordLng, otherUser.companyCoordLng) + 0.0075,
+      Math.min(otherUser.startPOICoordLat, otherUser.companyCoordLat) - 0.0075,
     ],
   ]);
 };
