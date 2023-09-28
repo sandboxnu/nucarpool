@@ -111,6 +111,7 @@ const Home: NextPage<any> = () => {
         zoom: 10,
       });
       newMap.scrollZoom.disable();
+      newMap.setMaxZoom(13);
       newMap.on("load", () => {
         addClusters(newMap, geoJsonUsers);
         addUserLocation(newMap, user);
