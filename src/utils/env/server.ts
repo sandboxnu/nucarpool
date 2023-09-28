@@ -32,5 +32,14 @@ export const serverEnv = {
     AWS_REGION: str({
       input: process.env.REGION_AWS,
     }),
+    AZURE_CLIENT_ID: str({
+      input: process.env.AZURE_CLIENT_ID,
+    }),
+    AZURE_CLIENT_SECRET: str({
+      input: process.env.AZURE_CLIENT_SECRET,
+    }),
+    AZURE_TENANT_ID: str({
+      input: process.env.AZURE_TENANT_ID,
+    }),
   }),
 };
