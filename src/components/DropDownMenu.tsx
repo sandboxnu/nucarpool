@@ -33,13 +33,6 @@ const DropDownMenu = () => {
                 as="div"
                 className="flex flex-col items-center justify-center p-6"
               >
-                <Image
-                  alt="avatar"
-                  src={session.user.image!}
-                  width="100px"
-                  height="100px"
-                  className="mb-2 rounded-full"
-                />
                 <h1 className="text-lg font-bold">{session.user.name}</h1>
                 <p className="text-sm font-light text-gray-500">
                   {session.user.email}
