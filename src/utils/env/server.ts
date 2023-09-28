@@ -17,12 +17,6 @@ export const serverEnv = {
       input: process.env.NEXTAUTH_SECRET,
       devDefault: "xxx",
     }),
-    GOOGLE_CLIENT_ID: str({
-      input: process.env.GOOGLE_CLIENT_ID,
-    }),
-    GOOGLE_CLIENT_SECRET: str({
-      input: process.env.GOOGLE_CLIENT_SECRET,
-    }),
     AWS_ACCESS_KEY_ID: str({
       input: process.env.ACCESS_KEY_ID_AWS,
     }),
