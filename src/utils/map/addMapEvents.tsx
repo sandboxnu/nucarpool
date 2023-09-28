@@ -1,10 +1,13 @@
 import { GeoJSONSource, Map, NavigationControl, Popup } from "mapbox-gl";
-import { createRoot } from "react-dom/client";
-import CustomPopUp from "../../components/CustomPopUp";
 import { PublicUser } from "../types";
 import { User } from "../types";
+import { Dispatch, SetStateAction } from "react";
 
-const addMapEvents = (map: Map, user: User) => {
+const addMapEvents = (
+  map: Map,
+  user: User,
+  setPopupUser: Dispatch<SetStateAction<PublicUser | null>>
+) => {
   map.addControl(new NavigationControl(), "bottom-right");
 
   map.on("click", "clusters", (e) => {
@@ -32,19 +35,12 @@ const addMapEvents = (map: Map, user: User) => {
     if (e.features[0]!.geometry.type != "Point") return;
 
     const coordinates = e.features[0]!.geometry.coordinates;
-    const properties = e.features[0]!.properties as PublicUser;
+    const otherUser = e.features[0]!.properties as PublicUser;
 
     while (Math.abs(e.lngLat.lng - coordinates[0]!) > 180) {
       coordinates[0] += e.lngLat.lng > coordinates[0]! ? 360 : -360;
     }
-    const popupNode = document.createElement("div");
-    const root = createRoot(popupNode);
-    root.render(<CustomPopUp {...properties} />);
-
-    new Popup({ closeButton: false, maxWidth: "75%" })
-      .setLngLat(e.lngLat)
-      .setDOMContent(popupNode)
-      .addTo(map);
+    setPopupUser(otherUser);
   });
 
   map.on("mouseenter", "clusters", () => {

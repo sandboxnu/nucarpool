@@ -1,7 +1,6 @@
-import { Role, Status } from "@prisma/client";
-import { Feature, FeatureCollection } from "geojson";
 import { Map } from "mapbox-gl";
 import { GeoJsonUsers } from "../types";
+import OrangeCircle from "../../../public/orange-square.png";
 /**
  * Filter Expression: https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/
  * Clusters example with filter expression: https://docs.mapbox.com/mapbox-gl-js/example/cluster-html/
@@ -13,7 +12,7 @@ const addClusters = (map: Map, geoJsonUsers: GeoJsonUsers) => {
     type: "geojson",
     data: geoJsonUsers,
     cluster: true,
-    clusterMaxZoom: 14,
+    clusterMaxZoom: 10,
     clusterRadius: 50,
   });
 
@@ -58,32 +57,22 @@ const addClusters = (map: Map, geoJsonUsers: GeoJsonUsers) => {
     },
   });
 
-  map.addLayer({
-    id: "unclustered-point",
-    type: "circle",
-    source: "company-locations",
-    filter: ["!", ["has", "point_count"]],
-    paint: {
-      "circle-color": [
-        "case",
-        [
-          "all",
-          ["==", ["get", "status"], Status.ACTIVE], // active user
-          ["==", ["get", "role"], Role.RIDER], // also a rider
-        ],
-        "#0ea5e9", // blue-ish color
-        [
-          "all",
-          ["==", ["get", "status"], Status.ACTIVE], // active user
-          ["==", ["get", "role"], Role.DRIVER], // also a driver
-        ],
-        "#f97316", // red-ish color
-        "#808080", // gray for inactive user
-      ],
-      "circle-radius": 10,
-      "circle-stroke-width": 2,
-      "circle-stroke-color": "#fff",
-    },
+  map.loadImage(OrangeCircle.src, (error, image) => {
+    if (error || !image) throw error;
+
+    // Add the image to the map style.
+    map.addImage("end_locs", image);
+
+    map.addLayer({
+      id: "unclustered-point",
+      type: "symbol",
+      source: "company-locations",
+      filter: ["!", ["has", "point_count"]],
+      layout: {
+        "icon-image": "end_locs",
+        "icon-size": 0.35,
+      },
+    });
   });
 };
 

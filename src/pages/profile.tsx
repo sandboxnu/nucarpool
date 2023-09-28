@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import _, { debounce } from "lodash";
-import { GetServerSidePropsContext, NextPage } from "next";
+import { GetServerSideProps, GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -13,7 +13,7 @@ import { TextField } from "../components/TextField";
 import Radio from "../components/Radio";
 import useSearch from "../utils/search";
 import Checkbox from "@mui/material/Checkbox";
-import DayBox from "../components/DayBox";
+import DayBox from "../components/Profile/DayBox";
 import {
   BottomProfileSection,
   CompleteProfileButton,
@@ -29,11 +29,11 @@ import {
   ErrorDisplay,
   ProfileHeaderNoMB,
 } from "../styles/profile";
-import ControlledTimePicker from "../components/ControlledTimePicker";
+import ControlledTimePicker from "../components/Profile/ControlledTimePicker";
 import { CarpoolAddress, CarpoolFeature } from "../utils/types";
 import { EntryLabel } from "../components/EntryLabel";
-import ControlledAddressCombobox from "../components/ControlledAddressCombobox";
-import { getSession } from "next-auth/react";
+import ControlledAddressCombobox from "../components/Profile/ControlledAddressCombobox";
+import { getSession, useSession } from "next-auth/react";
 
 // Inputs to the onboarding form.
 export type OnboardingFormInputs = {
@@ -100,12 +100,13 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
 
   return {
-    props: {}, // will be passed to the page component as props
+    props: {},
   };
 }
 const Profile: NextPage = () => {
   const router = useRouter();
   const utils = trpc.useContext();
+  const { data: session } = useSession();
   const {
     register,
     formState: { errors },
@@ -207,6 +208,10 @@ const Profile: NextPage = () => {
 
   const editUserMutation = trpc.user.edit.useMutation({
     onSuccess: () => {
+      utils.mapbox.geoJsonUserList.invalidate();
+      utils.user.invalidate();
+      utils.user.recommendations.me.refetch();
+      utils.mapbox.geoJsonUserList.refetch();
       router.push("/");
     },
     onError: (error) => {
@@ -236,8 +241,7 @@ const Profile: NextPage = () => {
       })
       .join(",");
 
-    utils.user.invalidate();
-    utils.mapbox.geoJsonUserList.invalidate();
+    const sessionName = session?.user?.name ?? "";
 
     editUserMutation.mutate({
       role: userInfo.role,
@@ -251,7 +255,9 @@ const Profile: NextPage = () => {
       startCoordLng: userInfo.startCoordLng!,
       startCoordLat: userInfo.startCoordLat!,
       isOnboarded: true,
-      preferredName: userInfo.preferredName,
+      preferredName: userInfo.preferredName
+        ? userInfo.preferredName
+        : sessionName,
       pronouns: userInfo.pronouns,
       daysWorking: daysWorkingParsed,
       startTime: userInfo.startTime?.toISOString(),

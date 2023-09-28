@@ -1,4 +1,3 @@
-import superjson from "superjson";
 import { router } from "./createRouter";
 import { mapboxRouter } from "./mapbox";
 import { userRouter } from "./user";

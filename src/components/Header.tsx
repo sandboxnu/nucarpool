@@ -1,6 +1,9 @@
-import React, { Dispatch, SetStateAction } from "react";
-import { Type } from "react-toastify/dist/utils";
+import React, { Dispatch, SetStateAction, useContext, useState } from "react";
 import styled from "styled-components";
+import DropDownMenu from "./DropDownMenu";
+import { UserContext } from "../utils/userContext";
+import { createPortal } from "react-dom";
+import { GroupPage } from "./GroupPage";
 
 const HeaderDiv = styled.div`
   display: flex;
@@ -27,20 +30,6 @@ const Logo = styled.h1`
   color: #f4f4f4;
 `;
 
-const PageName = styled.h1`
-  height: 64px;
-  font-family: "Lato", sans-serif;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 40px;
-  line-height: 48px;
-  display: flex;
-  align-items: center;
-  text-align: center;
-
-  color: #f4f4f4;
-`;
-
 interface HeaderProps {
   data?: {
     sidebarValue: string;
@@ -51,6 +40,8 @@ interface HeaderProps {
 export type HeaderOptions = "explore" | "requests";
 
 const Header = (props: HeaderProps) => {
+  const [displayGroup, setDisplayGroup] = useState<boolean>(false);
+  const user = useContext(UserContext);
   const renderClassName = (sidebarValue: string, sidebarText: string) => {
     if (sidebarValue == "explore" && sidebarText == "explore") {
       return "underline underline-offset-8 rounded-xl p-4 font-medium text-xl text-white";
@@ -61,6 +52,12 @@ const Header = (props: HeaderProps) => {
     if (sidebarValue == "requests" && sidebarText == "requests") {
       return "underline underline-offset-8 rounded-xl p-4 font-medium text-xl text-white";
     } else if (sidebarValue == "explore" && sidebarText == "requests") {
+      return "rounded-xl p-4 font-medium text-xl text-white";
+    }
+
+    if (displayGroup) {
+      return "underline underline-offset-8 rounded-xl p-4 font-medium text-xl text-white";
+    } else {
       return "rounded-xl p-4 font-medium text-xl text-white";
     }
   };
@@ -90,6 +87,12 @@ const Header = (props: HeaderProps) => {
         >
           Requests
         </button>
+        <button
+          onClick={() => setDisplayGroup(true)}
+          className={renderClassName(sidebarValue, "filler")}
+        >
+          My Group
+        </button>
       </div>
     );
   };
@@ -97,7 +100,19 @@ const Header = (props: HeaderProps) => {
   return (
     <HeaderDiv>
       <Logo>CarPool</Logo>
-      {props.data && renderSidebarOptions(props.data)}
+      {props.data && (
+        <div className="flex items-center">
+          {renderSidebarOptions(props.data)}
+          <DropDownMenu />
+          <>
+            {displayGroup &&
+              createPortal(
+                <GroupPage onClose={() => setDisplayGroup(false)} />,
+                document.body
+              )}
+          </>
+        </div>
+      )}
     </HeaderDiv>
   );
 };

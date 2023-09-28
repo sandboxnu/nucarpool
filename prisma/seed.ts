@@ -137,20 +137,8 @@ const generateGroups = async (users: User[]) => {
       i++;
     }
   }
-  const groupNames = [
-    "Apple",
-    "Banana",
-    "Carpoolers of the Year",
-    "Devashish",
-    "Estrogen",
-    "French People",
-    "Gary",
-    "Hello World",
-    "Iguanas",
-    "Jun",
-  ];
   await prisma.carpoolGroup.createMany({
-    data: groupNames.map((name, idx) => ({ id: idx.toString(), name })),
+    data: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((idx) => ({ id: idx.toString() })),
   });
 
   await Promise.all(

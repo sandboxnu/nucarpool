@@ -28,10 +28,15 @@ export const convertToPublic = (user: User): PublicUser => {
     startPOILocation: user.startPOILocation,
     startPOICoordLng: user.startPOICoordLng,
     startPOICoordLat: user.startPOICoordLat,
-    companyPOIAddress: user.companyPOIAddress,
-    companyPOICoordLng: user.companyPOICoordLng,
-    companyPOICoordLat: user.companyPOICoordLat,
+    companyAddress: user.companyAddress,
+    companyCoordLng: user.companyCoordLng,
+    companyCoordLat: user.companyCoordLat,
+    carpoolId: user.carpoolId,
   };
+};
+
+export const roundCoord = (coord: number) => {
+  return Math.round((coord + Number.EPSILON) * 100000) / 100000;
 };
 
 /**
@@ -50,7 +55,7 @@ export const generatePoiData = async (
     longitude,
     ", ",
     latitude,
-    ".json?types=poi,locality&access_token=",
+    ".json?types=poi&access_token=",
     serverEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN,
   ].join("");
 
@@ -65,7 +70,7 @@ export const generatePoiData = async (
     });
 
   return {
-    location: data.features[0]?.place_name || "NOT FOUND",
+    location: data.features[0]?.text || "NOT FOUND",
     coordLng: data.features[0]?.center[0] ?? -999,
     coordLat: data.features[0]?.center[1] ?? -999,
   };

@@ -2,9 +2,10 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { router, protectedRouter } from "../createRouter";
 import _ from "lodash";
-import { User } from "@prisma/client";
+import { Role } from "@prisma/client";
+import { convertToPublic } from "../../../utils/publicUser";
 
-// use this router to manage invitations
+// use this router to create and manage groups
 export const groupsRouter = router({
   me: protectedRouter.query(async ({ ctx }) => {
     const id = ctx.session.user?.id;
@@ -20,36 +21,72 @@ export const groupsRouter = router({
       });
     }
 
-    if (user.carpoolId) {
-      const group = await ctx.prisma.carpoolGroup.findUnique({
-        where: {
-          id: user.carpoolId,
-        },
+    if (!user.carpoolId) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "User does not have a carpool group",
       });
-      return group;
     }
-  }),
 
+    const group = await ctx.prisma.carpoolGroup.findUnique({
+      where: {
+        id: user.carpoolId,
+      },
+      include: {
+        users: true,
+      },
+    });
+
+    const updatedGroup = {
+      ...group,
+      users: group?.users.map(convertToPublic),
+    };
+    return updatedGroup;
+  }),
   create: protectedRouter
     .input(
       z.object({
-        userId: z.string(),
-        groupName: z.string(),
+        driverId: z.string(),
+        riderId: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const driver = await ctx.prisma.user.findUnique({
+        where: { id: input.driverId },
+      });
+
+      if (driver?.seatAvail === 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Driver does not have space available in their car",
+        });
+      }
       const group = await ctx.prisma.carpoolGroup.create({
         data: {
-          name: input.groupName,
           users: {
-            connect: { id: input.userId },
+            connect: { id: input.driverId },
           },
         },
       });
-      return group;
-      //maybe adjust the user.carpoolId here? Do we even have to do that manually?
-    }),
+      const nGroup = await ctx.prisma.carpoolGroup.update({
+        where: { id: group.id },
+        data: {
+          users: {
+            connect: { id: input.riderId },
+          },
+        },
+      });
 
+      await ctx.prisma.user.update({
+        where: { id: input.driverId },
+        data: {
+          seatAvail: {
+            decrement: 1,
+          },
+        },
+      });
+      return nGroup;
+    }),
   delete: protectedRouter
     .input(
       z.object({
@@ -57,31 +94,100 @@ export const groupsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const group = await ctx.prisma.carpoolGroup.delete({
+      const group = await ctx.prisma.carpoolGroup.findUnique({
+        where: {
+          id: input.groupId,
+        },
+        include: {
+          users: true,
+        },
+      });
+      const usrLength = group ? group.users.length - 1 : 0;
+
+      await ctx.prisma.user.update({
+        where: { id: ctx.session.user?.id },
+        data: {
+          seatAvail: {
+            increment: usrLength,
+          },
+        },
+      });
+
+      const deleteResult = await ctx.prisma.carpoolGroup.delete({
         where: {
           id: input.groupId,
         },
       });
-      return group;
+      return deleteResult;
     }),
-
   edit: protectedRouter
     .input(
       z.object({
-        userId: z.string(),
+        driverId: z.string(),
+        riderId: z.string(),
         groupId: z.string(),
         add: z.boolean(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const user = await ctx.prisma.carpoolGroup.update({
+      const driver = await ctx.prisma.user.findUnique({
+        where: { id: input.driverId },
+      });
+
+      if (driver?.seatAvail === 0 && input.add) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Driver does not have space available in their car",
+        });
+      }
+
+      const group = await ctx.prisma.carpoolGroup.update({
         where: { id: input.groupId },
         data: {
           users: {
-            [input.add ? "connect" : "disconnect"]: { id: input.userId },
+            [input.add ? "connect" : "disconnect"]: { id: input.riderId },
           },
         },
       });
-      return user;
+
+      const updatedGroup = await ctx.prisma.carpoolGroup.findUnique({
+        where: { id: group.id },
+        include: {
+          users: true,
+        },
+      });
+
+      if (updatedGroup?.users.length === 1) {
+        await ctx.prisma.carpoolGroup.delete({
+          where: { id: updatedGroup.id },
+        });
+      }
+
+      if (input.add) {
+        await ctx.prisma.user.update({
+          where: { id: input.driverId },
+          data: {
+            seatAvail: {
+              decrement: 1,
+            },
+          },
+        });
+      } else {
+        await ctx.prisma.user.update({
+          where: { id: input.driverId },
+          data: {
+            seatAvail: {
+              increment: 1,
+            },
+          },
+        });
+      }
+      if (!updatedGroup) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Group does not exist",
+        });
+      }
+      return updatedGroup;
     }),
 });

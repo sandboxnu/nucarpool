@@ -3,9 +3,9 @@ import { z } from "zod";
 import { router, protectedRouter } from "./createRouter";
 import { Feature, FeatureCollection } from "geojson";
 import { serverEnv } from "../../utils/env/server";
-import { Status } from "@prisma/client";
-
-// TODO: implement router everywhere axios is currently being used
+import { Role, Status } from "@prisma/client";
+import { DirectionsResponse } from "../../utils/types";
+import { roundCoord } from "../../utils/publicUser";
 
 // router for interacting with the Mapbox API
 export const mapboxRouter = router({
@@ -40,6 +40,13 @@ export const mapboxRouter = router({
   //queries all other users and locations besides current user
   geoJsonUserList: protectedRouter.query(async ({ ctx }) => {
     const id = ctx.session.user?.id;
+    const currentUser = await ctx.prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    const oppRole =
+      currentUser?.role === Role.DRIVER ? Role.RIDER : Role.DRIVER;
     const users = await ctx.prisma.user.findMany({
       where: {
         id: {
@@ -47,6 +54,7 @@ export const mapboxRouter = router({
         },
         isOnboarded: true, // only include user that have finished onboarding
         status: Status.ACTIVE, // only include active users
+        role: oppRole,
       },
       select: {
         id: true,
@@ -57,9 +65,11 @@ export const mapboxRouter = router({
         status: true,
         seatAvail: true,
         companyName: true,
-        companyPOIAddress: true,
-        companyPOICoordLng: true,
-        companyPOICoordLat: true,
+        daysWorking: true,
+        preferredName: true,
+        companyAddress: true,
+        companyCoordLat: true,
+        companyCoordLng: true,
         startPOICoordLng: true,
         startPOICoordLat: true,
         startPOILocation: true,
@@ -72,7 +82,10 @@ export const mapboxRouter = router({
         type: "Feature" as "Feature",
         geometry: {
           type: "Point" as "Point",
-          coordinates: [u.companyPOICoordLng, u.companyPOICoordLat],
+          coordinates: [
+            roundCoord(u.companyCoordLng),
+            roundCoord(u.companyCoordLat),
+          ],
         },
         properties: {
           ...u,
@@ -88,4 +101,40 @@ export const mapboxRouter = router({
 
     return featureCollection;
   }),
+
+  getDirections: protectedRouter
+    .input(
+      z.object({
+        points: z.array(z.tuple([z.number(), z.number()])), // Array of tuples containing longitude and latitude
+      })
+    )
+    .query(async ({ ctx, input }): Promise<DirectionsResponse> => {
+      // Convert input to a string in the format required by the Mapbox API
+      const coordinates = input.points
+        .map(([lng, lat]) => `${lng},${lat}`)
+        .join(";");
+
+      const endpoint = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${coordinates}?access_token=${serverEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`;
+      const data = await fetch(endpoint)
+        .then((response) => response.json())
+        .then((json) => {
+          if (json.code != "Ok") {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: json.message,
+              cause: json,
+            });
+          } else {
+            return json;
+          }
+        })
+        .catch((err) => {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Unexpected error. Please try again.",
+            cause: err,
+          });
+        });
+      return data;
+    }),
 });
