@@ -32,7 +32,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 const SignIn: NextPage = () => {
   const handleOnclick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    signIn("azure-ad", {
+    signIn("google", {
       callbackUrl: "/",
     });
   };

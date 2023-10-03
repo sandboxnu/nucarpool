@@ -4,6 +4,7 @@ import { NextAuthOptions } from "next-auth";
 import { prisma } from "../../../server/db/client";
 import { serverEnv } from "../../../utils/env/server";
 import AzureADProvider from "next-auth/providers/azure-ad";
+import GoogleProvider from "next-auth/providers/google";
 
 export const authOptions: NextAuthOptions = {
   callbacks: {
@@ -30,11 +31,15 @@ export const authOptions: NextAuthOptions = {
   },
   adapter: PrismaAdapter(prisma),
   providers: [
-    AzureADProvider({
-      clientId: serverEnv.AZURE_CLIENT_ID,
-      clientSecret: serverEnv.AZURE_CLIENT_SECRET,
-      tenantId: serverEnv.AZURE_TENANT_ID,
+    GoogleProvider({
+      clientId: serverEnv.GOOGLE_CLIENT_ID,
+      clientSecret: serverEnv.GOOGLE_CLIENT_SECRET,
     }),
+    // AzureADProvider({
+    //   clientId: serverEnv.AZURE_CLIENT_ID,
+    //   clientSecret: serverEnv.AZURE_CLIENT_SECRET,
+    //   tenantId: serverEnv.AZURE_TENANT_ID,
+    // }),
   ],
 };
 
