@@ -3,6 +3,8 @@ import { useContext, useState, useEffect } from "react";
 import { GroupMembers } from "./Group/GroupMemberCard";
 import { trpc } from "../utils/trpc";
 import { UserContext } from "../utils/userContext";
+import { User } from "@prisma/client";
+import Spinner from "./Spinner";
 
 interface GroupPageProps {
   onClose: () => void;
@@ -10,27 +12,16 @@ interface GroupPageProps {
 
 export const GroupPage = (props: GroupPageProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(true);
-  const { data: group } = trpc.user.groups.me.useQuery();
-  const users = group?.users ?? [];
-  const { mutate: updateMessage } =
-    trpc.user.groups.updateMessage.useMutation();
   const curUser = useContext(UserContext);
-  const [groupMessage, setGroupMessage] = useState(group?.message ?? "");
-
-  useEffect(() => {
-    setGroupMessage(group?.message ?? "");
-  }, [group]);
 
   const onClose = () => {
     setIsOpen(false);
     props.onClose();
   };
 
-  const handleMessageSubmit = async () => {
-    if (group?.id && curUser?.role === "DRIVER") {
-      await updateMessage({ groupId: group.id, message: groupMessage });
-    }
-  };
+  if (!curUser) {
+    return <Spinner />;
+  }
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
@@ -41,50 +32,93 @@ export const GroupPage = (props: GroupPageProps) => {
             <Dialog.Title className="text-center text-3xl font-bold">
               Group Page
             </Dialog.Title>
-            {!curUser.carpoolId ? (
-              <div className="flex flex-grow items-center justify-center text-xl font-light">
-                You are not currently part of a carpool group
-              </div>
-            ) : (
-              <>
-                {curUser.role === "DRIVER" ? (
-                  <div className="mx-14 flex flex-col py-1">
-                    <div className="my-1 text-xs italic text-slate-400">
-                      Use this text box to share important communication with
-                      your riders!
-                    </div>
-                    <div className="flex flex-row divide-y-2 overflow-auto">
-                      <textarea
-                        className="form-input h-10 min-h-[50px] flex-grow resize-none rounded-md py-2 shadow-sm"
-                        maxLength={140}
-                        value={groupMessage}
-                        onChange={(e) => setGroupMessage(e.target.value)}
-                      />
-                      <button
-                        className="ml-8 h-full w-[150px] rounded-md bg-red-700 text-white"
-                        onClick={handleMessageSubmit}
-                      >
-                        Submit
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="mx-14 flex flex-col py-1">
-                    <p className="flex-1 rounded-md border px-3 py-2 text-sm shadow-sm">
-                      {groupMessage != ""
-                        ? groupMessage
-                        : "Your driver has not shared a message yet."}
-                    </p>
-                  </div>
-                )}
-                <div className="mx-14 mt-2 flex flex-grow flex-col divide-y-2 overflow-auto rounded-md border px-10">
-                  <GroupMembers users={users} onClose={onClose} />
-                </div>
-              </>
-            )}
+            <GroupBody curUser={curUser} onClose={onClose} />
           </Dialog.Panel>
         </div>
       </div>
     </Dialog>
+  );
+};
+
+const GroupBody = ({
+  curUser,
+  onClose,
+}: {
+  curUser: User;
+  onClose: () => void;
+}) => {
+  return !curUser?.carpoolId ? (
+    <NoGroupInfo />
+  ) : (
+    <GroupInfo curUser={curUser} onClose={onClose} />
+  );
+};
+
+const NoGroupInfo = () => {
+  return (
+    <div className="flex flex-grow items-center justify-center text-xl font-light">
+      You are not currently part of a carpool group
+    </div>
+  );
+};
+
+const GroupInfo = ({
+  curUser,
+  onClose,
+}: {
+  curUser: User;
+  onClose: () => void;
+}) => {
+  const { data: group } = trpc.user.groups.me.useQuery();
+  const users = group?.users ?? [];
+  const [groupMessage, setGroupMessage] = useState(group?.message ?? "");
+  const { mutate: updateMessage } =
+    trpc.user.groups.updateMessage.useMutation();
+
+  useEffect(() => {
+    setGroupMessage(group?.message ?? "");
+  }, [group]);
+
+  const handleMessageSubmit = async () => {
+    if (group?.id && curUser?.role === "DRIVER") {
+      await updateMessage({ groupId: group.id, message: groupMessage });
+    }
+  };
+
+  return (
+    <>
+      {curUser?.role === "DRIVER" ? (
+        <div className="mx-14 flex flex-col py-1">
+          <div className="my-1 text-xs italic text-slate-400">
+            Use this text box to share important communication with your riders!
+          </div>
+          <div className="flex flex-row divide-y-2 overflow-auto">
+            <textarea
+              className="form-input h-10 min-h-[50px] flex-grow resize-none rounded-md py-2 shadow-sm"
+              maxLength={140}
+              value={groupMessage}
+              onChange={(e) => setGroupMessage(e.target.value)}
+            />
+            <button
+              className="ml-8 h-full w-[150px] rounded-md bg-red-700 text-white"
+              onClick={handleMessageSubmit}
+            >
+              Submit
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="mx-14 flex flex-col py-1">
+          <p className="flex-1 rounded-md border px-3 py-2 text-sm shadow-sm">
+            {groupMessage != ""
+              ? groupMessage
+              : "Your driver has not shared a message yet."}
+          </p>
+        </div>
+      )}
+      <div className="mx-14 mt-2 flex flex-grow flex-col divide-y-2 overflow-auto rounded-md border px-10">
+        <GroupMembers users={users} onClose={onClose} />
+      </div>
+    </>
   );
 };
