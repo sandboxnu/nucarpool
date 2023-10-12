@@ -34,6 +34,8 @@ import { CarpoolAddress, CarpoolFeature } from "../utils/types";
 import { EntryLabel } from "../components/EntryLabel";
 import ControlledAddressCombobox from "../components/Profile/ControlledAddressCombobox";
 import { getSession, useSession } from "next-auth/react";
+import { createPortal } from "react-dom";
+import { ComplianceModal } from "../components/CompliancePortal";
 
 // Inputs to the onboarding form.
 export type OnboardingFormInputs = {
@@ -263,11 +265,13 @@ const Profile: NextPage = () => {
       startTime: userInfo.startTime?.toISOString(),
       endTime: userInfo.endTime?.toISOString(),
       bio: userInfo.bio,
+      licenseSigned: true,
     });
   };
 
   return (
     <>
+      {!user?.licenseSigned && <ComplianceModal />}
       <div className="flex h-full w-full flex-col items-center">
         <Header />
         <ProfileContainer onSubmit={handleSubmit(onSubmit)}>
