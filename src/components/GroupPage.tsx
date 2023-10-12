@@ -41,39 +41,47 @@ export const GroupPage = (props: GroupPageProps) => {
             <Dialog.Title className="text-center text-3xl font-bold">
               Group Page
             </Dialog.Title>
-            {curUser?.role === "DRIVER" ? (
-              <div className="mx-14 flex flex-col py-1">
-                <div className="my-1 text-xs italic text-slate-400">
-                  Use this text box to share important communication with your
-                  riders!
-                </div>
-                <div className="flex flex-row divide-y-2 overflow-auto">
-                  <textarea
-                    className="form-input h-10 min-h-[50px] flex-grow resize-none rounded-md py-2 shadow-sm"
-                    maxLength={140}
-                    value={groupMessage}
-                    onChange={(e) => setGroupMessage(e.target.value)}
-                  />
-                  <button
-                    className="ml-8 h-full w-[150px] rounded-md bg-red-700 text-white"
-                    onClick={handleMessageSubmit}
-                  >
-                    Submit
-                  </button>
-                </div>
+            {!curUser.carpoolId ? (
+              <div className="flex flex-grow items-center justify-center text-xl font-light">
+                You are not currently part of a carpool group
               </div>
             ) : (
-              <div className="mx-14 flex flex-col py-1">
-                <p className="flex-1 rounded-md border px-3 py-2 text-sm shadow-sm">
-                  {groupMessage != ""
-                    ? groupMessage
-                    : "Your driver has not shared a message yet."}
-                </p>
-              </div>
+              <>
+                {curUser.role === "DRIVER" ? (
+                  <div className="mx-14 flex flex-col py-1">
+                    <div className="my-1 text-xs italic text-slate-400">
+                      Use this text box to share important communication with
+                      your riders!
+                    </div>
+                    <div className="flex flex-row divide-y-2 overflow-auto">
+                      <textarea
+                        className="form-input h-10 min-h-[50px] flex-grow resize-none rounded-md py-2 shadow-sm"
+                        maxLength={140}
+                        value={groupMessage}
+                        onChange={(e) => setGroupMessage(e.target.value)}
+                      />
+                      <button
+                        className="ml-8 h-full w-[150px] rounded-md bg-red-700 text-white"
+                        onClick={handleMessageSubmit}
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mx-14 flex flex-col py-1">
+                    <p className="flex-1 rounded-md border px-3 py-2 text-sm shadow-sm">
+                      {groupMessage != ""
+                        ? groupMessage
+                        : "Your driver has not shared a message yet."}
+                    </p>
+                  </div>
+                )}
+                <div className="mx-14 mt-2 flex flex-grow flex-col divide-y-2 overflow-auto rounded-md border px-10">
+                  <GroupMembers users={users} onClose={onClose} />
+                </div>
+              </>
             )}
-            <div className="mx-14 mt-2 flex flex-grow flex-col divide-y-2 overflow-auto rounded-md border px-10">
-              <GroupMembers users={users} onClose={onClose} />
-            </div>
           </Dialog.Panel>
         </div>
       </div>
