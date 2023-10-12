@@ -66,6 +66,7 @@ export const groupsRouter = router({
           users: {
             connect: { id: input.driverId },
           },
+          message: "",
         },
       });
       const nGroup = await ctx.prisma.carpoolGroup.update({
@@ -188,6 +189,22 @@ export const groupsRouter = router({
           message: "Group does not exist",
         });
       }
+      return updatedGroup;
+    }),
+  updateMessage: protectedRouter
+    .input(
+      z.object({
+        groupId: z.string(),
+        message: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const updatedGroup = await ctx.prisma.carpoolGroup.update({
+        where: { id: input.groupId },
+        data: {
+          message: input.message,
+        },
+      });
       return updatedGroup;
     }),
 });

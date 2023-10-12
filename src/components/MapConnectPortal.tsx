@@ -1,9 +1,7 @@
-import { Dispatch, SetStateAction, useState } from "react";
 import { EnhancedPublicUser, PublicUser } from "../utils/types";
 import { User } from "@prisma/client";
 import { ConnectCard } from "./UserCards/ConnectCard";
 import { Dialog } from "@headlessui/react";
-import Spinner from "./Spinner";
 
 interface ConnectPortalProps {
   otherUser: PublicUser | null;

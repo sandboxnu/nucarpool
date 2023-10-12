@@ -80,6 +80,7 @@ model Request {
 // Represents a group of users
 model CarpoolGroup {
   id    String @id @default(cuid()) // primary key
+  message String
   users User[]
 
   @@map(name: "group")
@@ -114,6 +115,7 @@ model User {
   startPOICoordLng   Float          @default(0) @map("start_poi_coord_lng")
   startPOICoordLat   Float          @default(0) @map("start_poi_coord_lat")
   isOnboarded        Boolean        @default(false) @map("is_onboarded")
+  licenseSigned      Boolean        @default(false) @map("license_signed")
   daysWorking        String         @default("") @map("days_working")
   startTime          DateTime?      @map("start_time") @db.Time(0)
   endTime            DateTime?      @map("end_time") @db.Time(0)

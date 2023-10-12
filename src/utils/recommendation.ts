@@ -171,10 +171,6 @@ export const generateUser = ({
   companyCoordLat,
   startCoordLng,
   startCoordLat,
-  companyPOICoordLng,
-  companyPOICoordLat,
-  startPOICoordLng,
-  startPOICoordLat,
   daysWorking,
   startTime,
   endTime,
@@ -227,6 +223,7 @@ export const generateUser = ({
     startTime: startDate,
     endTime: endDate,
     carpoolId: null,
+    licenseSigned: true,
   };
   return {
     where: { id: id },

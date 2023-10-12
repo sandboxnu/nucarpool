@@ -1,8 +1,8 @@
-import * as React from "react";
+import { useState } from "react";
 import Checkbox from "@mui/material/Checkbox";
 
 export default function ControlledCheckbox() {
-  const [checked, setChecked] = React.useState(true);
+  const [checked, setChecked] = useState<boolean>(false);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(event.target.checked);

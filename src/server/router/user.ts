@@ -48,6 +48,7 @@ export const userRouter = router({
         startTime: z.optional(z.string()),
         endTime: z.optional(z.string()),
         bio: z.string(),
+        licenseSigned: z.boolean(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -89,6 +90,7 @@ export const userRouter = router({
           startTime: startTimeDate,
           endTime: endTimeDate,
           bio: input.bio,
+          licenseSigned: input.licenseSigned,
         },
       });
 
