@@ -35,11 +35,5 @@ export const serverEnv = {
     AZURE_TENANT_ID: str({
       input: process.env.AZURE_TENANT_ID,
     }),
-    GOOGLE_CLIENT_ID: str({
-      input: process.env.GOOGLE_CLIENT_ID,
-    }),
-    GOOGLE_CLIENT_SECRET: str({
-      input: process.env.GOOGLE_CLIENT_SECRET,
-    }),
   }),
 };
