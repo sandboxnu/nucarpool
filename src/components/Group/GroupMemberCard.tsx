@@ -22,14 +22,6 @@ export const GroupMembers = (props: GroupMembersProps) => {
   const utils = trpc.useContext();
   const { addToast } = useToasts();
 
-  if (!curUser?.carpoolId) {
-    return (
-      <div className="flex flex-grow items-center justify-center text-xl font-light">
-        You are not currently part of a carpool group
-      </div>
-    );
-  }
-
   const { mutate: deleteGroup } = trpc.user.groups.delete.useMutation({
     onError: (error: any) => {
       toast.error(`Something went wrong: ${error.message}`);
