@@ -26,5 +26,6 @@ export const emailsRouter = router({
       const response = await ctx.sesClient.send(
         new SendTemplatedEmailCommand(connectEmailParams)
       );
+      return response;
     }),
 });
