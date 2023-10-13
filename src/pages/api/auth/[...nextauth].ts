@@ -14,6 +14,18 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+    signIn: async ({ user, account, profile, email, credentials }) => {
+      console.log("User", user);
+      console.log("Account", account);
+      console.log("Profile", profile);
+      if (email) {
+        console.log(email);
+      }
+      if (credentials) {
+        console.log(credentials);
+      }
+      return true;
+    },
   },
   secret: serverEnv.NEXTAUTH_SECRET,
   debug: true,
