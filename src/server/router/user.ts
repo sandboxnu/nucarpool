@@ -9,6 +9,7 @@ import { favoritesRouter } from "./user/favorites";
 import { groupsRouter } from "./user/groups";
 import { requestsRouter } from "./user/requests";
 import { recommendationsRouter } from "./user/recommendations";
+import { emailsRouter } from "./user/email";
 
 // user router to get information about or edit users
 export const userRouter = router({
@@ -102,4 +103,5 @@ export const userRouter = router({
   recommendations: recommendationsRouter,
   requests: requestsRouter,
   groups: groupsRouter,
+  emails: emailsRouter,
 });

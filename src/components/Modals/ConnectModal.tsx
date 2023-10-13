@@ -12,29 +12,6 @@ interface ConnectModalProps {
   onClose: (action: string) => void;
 }
 
-const sendEmail = async (
-  sendingEmail: string,
-  receivingEmail: string,
-  message: string
-) => {
-  const msg: emailSchema = {
-    sendingUser: sendingEmail,
-    receivingUser: receivingEmail,
-    subject: "Carpool Connect Request",
-    body: message,
-  };
-
-  const result = await fetch(`/api/email`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(msg),
-  });
-
-  // console.log(result);
-};
-
 const ConnectModal = (props: ConnectModalProps): JSX.Element => {
   const { addToast } = useToasts();
   const [isOpen, setIsOpen] = useState(true);
@@ -56,9 +33,25 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
     },
   });
 
+  const { mutate: sendConnectEmail } =
+    trpc.user.emails.connectEmail.useMutation({
+      onError: (error: any) => {
+        toast.error(`Something went wrong: ${error.message}`);
+      },
+      onSuccess() {
+        console.log("Email sent successfully");
+      },
+    });
+
   const handleOnClick = () => {
     if (props.user.email && props.otherUser.email) {
-      sendEmail(props.user.email, props.otherUser.email, customMessage);
+      sendConnectEmail({
+        sendingUserName: props.user.preferredName,
+        sendingUserEmail: props.user.email,
+        receivingUserName: props.otherUser.preferredName,
+        receivingUserEmail: props.otherUser.email,
+        body: customMessage,
+      });
       createRequests({
         fromId: props.user.id,
         toId: props.otherUser.id,
