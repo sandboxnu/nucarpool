@@ -34,14 +34,14 @@ model Account {
   type              String
   provider          String
   providerAccountId String  @map(name: "provider_account_id")
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String? @db.MediumText
+  access_token      String? @db.MediumText
   expires_at        Int?
   ext_expires_in    Int?
   token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
+  scope             String? @db.MediumText
+  id_token          String? @db.MediumText
+  session_state     String? 
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
