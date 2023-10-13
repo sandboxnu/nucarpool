@@ -5,7 +5,7 @@ export const generateConnectEmailparams = (schema: emailSchema) => {
   const params = {
     Source: "no-reply@carpoolnu.com",
     Destination: {
-      ToAddresses: [schema.receivingUserEmail, "carpoolnu@gmail.com"],
+      ToAddresses: [schema.receivingUserEmail],
       CcAddresses: [schema.sendingUserEmail],
     },
     Template: "UserReceivedRequest",
