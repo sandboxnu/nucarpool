@@ -29,7 +29,7 @@ export const ComplianceModal = () => {
               interested. Sections 1.10.32 and 1.10.33 from de Finibus Bonorum
               et Malorum by Cicero are also reproduced in their exact original
               form, accompanied by English versions from the 1914 translation by
-              H. Rackham.
+              H. Rackham.testing
             </div>
             <button
               className="w-25 rounded-md border-2 border-red-700 bg-red-700 p-1 text-slate-50 "
