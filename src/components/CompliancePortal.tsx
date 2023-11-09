@@ -13,23 +13,42 @@ export const ComplianceModal = () => {
               Carpool Terms and Conditions
             </Dialog.Title>
             <div className="scroll overflow-y-auto">
-              Contrary to popular belief, Lorem Ipsum is not simply random text.
-              It has roots in a piece of classical Latin literature from 45 BC,
-              making it over 2000 years old. Richard McClintock, a Latin
-              professor at Hampden-Sydney College in Virginia, looked up one of
-              the more obscure Latin words, consectetur, from a Lorem Ipsum
-              passage, and going through the cites of the word in classical
-              literature, discovered the undoubtable source. Lorem Ipsum comes
-              from sections 1.10.32 and 1.10.33 of de Finibus Bonorum et (The
-              Extremes of Good and Evil) by Cicero, written in 45 BC. This book
-              is a treatise on the theory of ethics, very popular during the
-              Renaissance. The first line of Lorem Ipsum, Lorem ipsum dolor sit
-              amet, comes from a line in section 1.10.32. The standard chunk of
-              Lorem Ipsum used since the 1500s is reproduced below for those
-              interested. Sections 1.10.32 and 1.10.33 from de Finibus Bonorum
-              et Malorum by Cicero are also reproduced in their exact original
-              form, accompanied by English versions from the 1914 translation by
-              H. Rackham.
+              This application and any related transportation arrangements and
+              services are provided on an “AS IS” basis and without any warranty
+              or condition, express, implied or statutory. User agrees and
+              acknowledges that they assume full, exclusive and sole
+              responsibility for the use of and reliance on any services through
+              this application, including any ride arranged, offered, solicited,
+              accepted or provided, and further agrees and acknowledges that
+              their use is entirely at their own risk. User agrees to accept all
+              risks associated with participating in any transportation
+              arrangements or services engaged in through this application. This
+              application and any related transportation services are created
+              and are operated exclusively by Northeastern students;
+              Northeastern University is not the provider of any transportation
+              arrangements or services through this application and does not
+              exercise any oversight or control over any transportation
+              arrangements or services engaged in by users of this application.
+              Northeastern University has no control over and is not responsible
+              for this application or the safety of users or the suitability,
+              quality, safety, maintenance, licensure, registration or insurance
+              of any drivers, passengers or vehicles. User also agrees that
+              Northeastern University is not responsible for the security or
+              privacy of any data users provide or is collected by the use of
+              the application. By using this application and participating in
+              any transportation services or arrangements, the user agrees to
+              accept all such risks and agrees that Northeastern University is
+              not responsible for the acts or omissions of any users and is not
+              liable for claims or damages, including property damage or
+              personal injury, arising out of or related to use of the
+              application or the transportation services or arrangements engaged
+              in by users. User agrees to indemnify and hold harmless
+              Northeastern, including all affiliates, subsidiaries, parents,
+              successors and assigns, directors, employees, agents, from and
+              against any claims, actions, suits, losses, costs, liabilities and
+              expenses (including reasonable attorneys’ fees) relating to or
+              arising out of your use of this application and any related
+              transportation arrangements and services.
             </div>
             <button
               className="w-25 rounded-md border-2 border-red-700 bg-red-700 p-1 text-slate-50 "
