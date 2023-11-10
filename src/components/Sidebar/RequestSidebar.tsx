@@ -19,7 +19,7 @@ const RequestSidebar = (props: RequestSidebarProps) => {
           <button
             className={
               curOption === "received"
-                ? "rounded-xl bg-sky-900 p-2 text-xl font-semibold text-white"
+                ? "rounded-xl bg-northeastern-red p-2 text-xl font-semibold text-white"
                 : "rounded-xl p-2 text-xl font-semibold text-black"
             }
             onClick={() => {
@@ -32,7 +32,7 @@ const RequestSidebar = (props: RequestSidebarProps) => {
           <button
             className={
               curOption === "sent"
-                ? "rounded-xl bg-sky-900 p-2 text-xl font-semibold text-white"
+                ? "rounded-xl bg-northeastern-red p-2 text-xl font-semibold text-white"
                 : "rounded-xl p-2 text-xl font-semibold text-black"
             }
             onClick={() => {

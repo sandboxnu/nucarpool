@@ -57,11 +57,11 @@ const SentRequestModal = (props: SentModalProps): JSX.Element => {
         {/* Full-screen container to center the panel */}
         <div className="fixed inset-0 flex items-center justify-center p-4">
           {/* dialog panel container  */}
-          <Dialog.Panel className="justify-center rounded-md shadow-md bg-white h-3/6 w-3/6 content-center flex flex-col p-9 gap-4">
-            <Dialog.Title className="font-bold text-2xl text-center">
+          <Dialog.Panel className="flex h-3/6 w-3/6 flex-col content-center justify-center gap-4 rounded-md bg-white p-9 shadow-md">
+            <Dialog.Title className="text-center text-2xl font-bold">
               Manage Sent Request
             </Dialog.Title>
-            <div className="text-sm text-center">
+            <div className="text-center text-sm">
               {" "}
               {props.otherUser.preferredName} has not yet responded. If
               you&apos;d like to, you can withdraw your request.
@@ -69,13 +69,13 @@ const SentRequestModal = (props: SentModalProps): JSX.Element => {
             <div className="flex justify-center space-x-7">
               <button
                 onClick={onClose}
-                className="w-full p-1 text-blue-900 bg-slate-50 border-2 border-blue-900 rounded-md"
+                className="w-full rounded-md border-2 border-northeastern-red p-1 text-northeastern-red"
               >
                 Cancel
               </button>
               <button
                 onClick={handleWithdrawClick}
-                className="w-full p-1 text-slate-50 bg-blue-900 border-2 border-blue-900 rounded-md"
+                className="w-full rounded-md border-2 border-northeastern-red bg-northeastern-red p-1 text-slate-50"
               >
                 Withdraw Request
               </button>

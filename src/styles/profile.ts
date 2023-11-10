@@ -11,10 +11,11 @@ export const CompleteProfileButton = styled.button`
   font-family: "Montserrat", sans-serif;
   font-style: normal;
   font-weight: 400;
-  font-size: 24px;
+  font-size: 20px;
   text-align: center;
   color: #ffffff;
-  width: 222px;
+  padding: 5px 7px 5px 7px;
+  width: 18%;
   align-self: flex-end;
   @media (min-width: 834px) {
     justify-self: flex-end;

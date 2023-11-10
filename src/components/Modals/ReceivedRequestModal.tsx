@@ -158,13 +158,13 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
             <div className="flex justify-center space-x-7">
               <button
                 onClick={handleRejectClick}
-                className="w-full rounded-md border-2 border-blue-900 bg-slate-50 p-1 text-blue-900"
+                className="w-full rounded-md border-2 border-northeastern-red bg-slate-50 p-1 text-northeastern-red"
               >
                 Decline
               </button>
               <button
                 onClick={handleAcceptClick}
-                className="w-full rounded-md border-2 border-blue-900 bg-blue-900 p-1 text-slate-50"
+                className="w-full rounded-md border-2 border-northeastern-red bg-northeastern-red p-1"
               >
                 Accept
               </button>
