@@ -30,9 +30,6 @@ export const ProfileContainer = styled.form`
   flex: 1 1 auto;
   width: 100%;
   padding: 1.25rem;
-  @media (min-width: 1440px) {
-    height: 100%;
-  }
 
   @media (min-width: 834px) {
     flex-direction: row;
