@@ -142,7 +142,7 @@ const Home: NextPage<any> = () => {
           newestOnTop={true}
         >
           <Head>
-            <title>Home</title>
+            <title>CarpoolNU</title>
           </Head>
           <div className="m-0 h-full max-h-screen w-full">
             <Header

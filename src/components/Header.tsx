@@ -1,7 +1,6 @@
 import React, { Dispatch, SetStateAction, useContext, useState } from "react";
 import styled from "styled-components";
 import DropDownMenu from "./DropDownMenu";
-import { UserContext } from "../utils/userContext";
 import { createPortal } from "react-dom";
 import { GroupPage } from "./GroupPage";
 
@@ -41,7 +40,6 @@ export type HeaderOptions = "explore" | "requests";
 
 const Header = (props: HeaderProps) => {
   const [displayGroup, setDisplayGroup] = useState<boolean>(false);
-  const user = useContext(UserContext);
   const renderClassName = (sidebarValue: string, sidebarText: string) => {
     if (sidebarValue == "explore" && sidebarText == "explore") {
       return "underline underline-offset-8 rounded-xl p-4 font-medium text-xl text-white";
@@ -99,7 +97,7 @@ const Header = (props: HeaderProps) => {
 
   return (
     <HeaderDiv>
-      <Logo>CarPool</Logo>
+      <Logo>CarpoolNU</Logo>
       {props.data && (
         <div className="flex items-center">
           {renderSidebarOptions(props.data)}
