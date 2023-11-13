@@ -11,10 +11,11 @@ export const CompleteProfileButton = styled.button`
   font-family: "Montserrat", sans-serif;
   font-style: normal;
   font-weight: 400;
-  font-size: 24px;
+  font-size: 20px;
   text-align: center;
   color: #ffffff;
-  width: 222px;
+  padding: 5px 7px 5px 7px;
+  width: 18%;
   align-self: flex-end;
   @media (min-width: 834px) {
     justify-self: flex-end;
@@ -30,9 +31,6 @@ export const ProfileContainer = styled.form`
   flex: 1 1 auto;
   width: 100%;
   padding: 1.25rem;
-  @media (min-width: 1440px) {
-    height: 100%;
-  }
 
   @media (min-width: 834px) {
     flex-direction: row;

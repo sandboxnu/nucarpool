@@ -77,7 +77,7 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
         {/* Full-screen container to center the panel */}
         <div className="fixed inset-0 flex items-center justify-center p-4">
           {/* dialog panel container  */}
-          <Dialog.Panel className="flex h-4/6 w-5/6 flex-col content-center justify-center gap-4 rounded-md bg-white p-9 shadow-md sm:h-4/6 sm:w-4/6 md:h-3/6 md:w-3/6">
+          <Dialog.Panel className="flex h-4/6 w-5/6 flex-col content-center justify-center gap-4 overflow-auto rounded-md bg-white p-9 shadow-md sm:h-4/6 sm:w-4/6 md:h-3/6 md:w-3/6">
             <Dialog.Title className="text-center text-2xl font-bold">
               Send an email to connect!
             </Dialog.Title>

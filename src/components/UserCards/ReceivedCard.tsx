@@ -25,7 +25,7 @@ export const ReceivedCard = (props: ReceivedCardProps): JSX.Element => {
   const connectButtonInfo: ButtonInfo = {
     text: "Manage",
     onPress: () => handleManageReceived(),
-    color: "bg-sky-900",
+    color: "bg-northeastern-red",
   };
   return (
     <>

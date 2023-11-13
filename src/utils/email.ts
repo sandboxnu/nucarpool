@@ -10,8 +10,8 @@ export const generateConnectEmailparams = (schema: emailSchema) => {
     },
     Template: "UserReceivedRequest",
     TemplateData: JSON.stringify({
-      preferredName: schema.sendingUserName,
-      OtherUser: schema.receivingUserName,
+      preferredName: schema.receivingUserName,
+      OtherUser: schema.sendingUserName,
       message: schema.body,
     }),
   };

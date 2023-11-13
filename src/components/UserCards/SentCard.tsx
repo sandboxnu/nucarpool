@@ -22,7 +22,7 @@ export const SentCard = (props: SentCardProps): JSX.Element => {
   const connectButtonInfo: ButtonInfo = {
     text: "Manage",
     onPress: () => handleManageSent(),
-    color: "bg-sky-900",
+    color: "bg-northeastern-red",
   };
   return (
     <>

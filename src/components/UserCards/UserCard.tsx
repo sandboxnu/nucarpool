@@ -17,21 +17,11 @@ interface UserCardProps {
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
 }
 
-const borderLColorCSS = (seatAvail: number): string => {
-  if (seatAvail === 1) {
-    return " border-l-busy-red";
-  } else if (seatAvail === 2) {
-    return " border-l-okay-yellow";
-  } else {
-    return " border-l-good-green";
-  }
-};
-
 const getButtonClassName = (button: ButtonInfo): string => {
   const bColor = button.color;
   return classNames(
     `${bColor} w-1/2 hover:${
-      bColor === "bg-northeastern.red" ? "bg-red-700" : "bg-sky-900"
+      bColor === "bg-northeastern.red"
     } rounded-md p-1 my-1 text-center text-white`
   );
 };

@@ -470,7 +470,7 @@ const Profile: NextPage = () => {
                       />
                     </div>
                   </div>
-                  <Note className="md:w-96">
+                  <Note className="py-4 md:w-96">
                     If you don&apos;t have set times, communicate that on your
                     own with potential riders/drivers. For start/end time, enter
                     whatever best matches your work schedule.

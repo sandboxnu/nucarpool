@@ -80,13 +80,21 @@ const Home: NextPage<any> = () => {
     if (mapState) {
       viewRoute(user, otherUser, mapState);
 
-      const points: [number, number][] = [
-        [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
-        [user.startCoordLng, user.startCoordLat],
-        [user.companyCoordLng, user.companyCoordLat],
-        [otherUser.companyCoordLng, otherUser.companyCoordLat],
-      ];
-      setPoints(points);
+      if (user.role === "RIDER") {
+        setPoints([
+          [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
+          [user.startCoordLng, user.startCoordLat],
+          [user.companyCoordLng, user.companyCoordLat],
+          [otherUser.companyCoordLng, otherUser.companyCoordLat],
+        ]);
+      } else {
+        setPoints([
+          [user.startCoordLng, user.startCoordLat],
+          [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
+          [otherUser.companyCoordLng, otherUser.companyCoordLat],
+          [user.companyCoordLng, user.companyCoordLat],
+        ]);
+      }
     }
   };
   const enhancedSentUsers = requests.sent.map((request: { toUser: any }) =>
