@@ -57,7 +57,7 @@ const SentRequestModal = (props: SentModalProps): JSX.Element => {
         {/* Full-screen container to center the panel */}
         <div className="fixed inset-0 flex items-center justify-center p-4">
           {/* dialog panel container  */}
-          <Dialog.Panel className="flex h-3/6 w-3/6 flex-col content-center justify-center gap-4 overflow-auto rounded-md bg-white p-9 shadow-md">
+          <Dialog.Panel className="flex h-2/6 w-2/6 flex-col content-center justify-center gap-4 overflow-auto rounded-md bg-white p-9 shadow-md">
             <Dialog.Title className="text-center text-2xl font-bold">
               Manage Sent Request
             </Dialog.Title>
