@@ -14,7 +14,7 @@ type RadioOwnProps = {
 type RadioProps = RadioOwnProps & React.ComponentPropsWithoutRef<"input">;
 
 const StyledActiveRadioButton = styled.label`
-  background-color: #d0142c;
+  background-color: #c8102e;
   color: white;
 
   font-family: "Montserrat";
@@ -79,26 +79,26 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
     if (isActive) {
       return (
         <StyledActiveRadioButton
-          className={"form-input w-3/12 h-14"}
+          className={"form-input h-14 w-3/12"}
           htmlFor={id}
         >
           {input}
           {label}
           {error && (
-            <p className="text-red-500 text-sm mt-2">{error.message}</p>
+            <p className="mt-2 text-sm text-red-500">{error.message}</p>
           )}
         </StyledActiveRadioButton>
       );
     } else {
       return (
         <StyledInactiveRadioButton
-          className={"form-input w-3/12 h-14"}
+          className={"form-input h-14 w-3/12"}
           htmlFor={id}
         >
           {input}
           {label}
           {error && (
-            <p className="text-red-500 text-sm mt-2">{error.message}</p>
+            <p className="mt-2 text-sm text-red-500">{error.message}</p>
           )}
         </StyledInactiveRadioButton>
       );
