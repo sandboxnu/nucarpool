@@ -73,6 +73,8 @@ export const mapboxRouter = router({
         startPOICoordLng: true,
         startPOICoordLat: true,
         startPOILocation: true,
+        startTime: true,
+        endTime: true,
       },
     });
 
