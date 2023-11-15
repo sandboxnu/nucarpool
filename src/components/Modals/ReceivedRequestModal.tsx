@@ -164,7 +164,7 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
               </button>
               <button
                 onClick={handleAcceptClick}
-                className="w-full rounded-md border-2 border-northeastern-red bg-northeastern-red p-1"
+                className="w-full rounded-md border-2 border-northeastern-red bg-northeastern-red p-1 text-slate-50"
               >
                 Accept
               </button>
