@@ -118,7 +118,6 @@ const Home: NextPage<any> = () => {
         center: [user.companyCoordLng, user.companyCoordLat],
         zoom: 10,
       });
-      newMap.scrollZoom.disable();
       newMap.setMaxZoom(13);
       newMap.on("load", () => {
         addClusters(newMap, geoJsonUsers);

@@ -28,7 +28,7 @@ export const GroupPage = (props: GroupPageProps) => {
       <div className="fixed inset-0 backdrop-blur-sm" aria-hidden="true">
         <div className="fixed inset-0 flex items-center justify-center p-4">
           {/* dialog panel container  */}
-          <Dialog.Panel className="flex h-4/6 w-4/6 flex-col content-center justify-center gap-4 rounded-md bg-white py-9 shadow-md">
+          <Dialog.Panel className="flex h-4/6 w-4/6 flex-col content-center justify-center gap-4 overflow-scroll rounded-md bg-white py-9 shadow-md">
             <Dialog.Title className="text-center text-3xl font-bold">
               Group Page
             </Dialog.Title>
@@ -88,7 +88,7 @@ const GroupInfo = ({
   return (
     <>
       {curUser?.role === "DRIVER" ? (
-        <div className="mx-14 flex flex-col py-1">
+        <div className="mx-20 flex flex-col py-1">
           <div className="my-1 text-xs italic text-slate-400">
             Use this text box to share important communication with your riders!
           </div>
@@ -108,15 +108,15 @@ const GroupInfo = ({
           </div>
         </div>
       ) : (
-        <div className="mx-14 flex flex-col py-1">
-          <p className="flex-1 rounded-md border px-3 py-2 text-sm shadow-sm">
+        <div className="mx-16 flex flex-col py-1">
+          <p className="flex-1 justify-center rounded-md border px-3 py-2 text-center text-sm shadow-sm">
             {groupMessage != ""
               ? groupMessage
-              : "Your driver has not shared a message yet."}
+              : "Keep a look out for messages from your driver on this message board!"}
           </p>
         </div>
       )}
-      <div className="mx-14 mt-2 flex flex-grow flex-col divide-y-2 overflow-auto rounded-md border px-10">
+      <div className="mx-16 mt-2 flex flex-grow flex-col divide-y-2 rounded-md border px-2">
         <GroupMembers users={users} onClose={onClose} />
       </div>
     </>
