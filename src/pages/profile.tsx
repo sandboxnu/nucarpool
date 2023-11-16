@@ -518,7 +518,7 @@ const Profile: NextPage = () => {
                     />
                     <textarea
                       className={`form-input w-full resize-none rounded-md border-black px-3 py-2`}
-                      maxLength={300}
+                      maxLength={188}
                       {...register("bio")}
                     />
                     <Note>
