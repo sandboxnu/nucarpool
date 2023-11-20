@@ -6,6 +6,8 @@ import { serverEnv } from "../../utils/env/server";
 import { Role, Status } from "@prisma/client";
 import { DirectionsResponse } from "../../utils/types";
 import { roundCoord } from "../../utils/publicUser";
+import _ from "lodash";
+import { calculateScore, distanceBasedRecs } from "../../utils/recommendation";
 
 // router for interacting with the Mapbox API
 export const mapboxRouter = router({
@@ -45,6 +47,14 @@ export const mapboxRouter = router({
         id: id,
       },
     });
+
+    if (!currentUser) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `No user with id ${id}.`,
+      });
+    }
+
     const oppRole =
       currentUser?.role === Role.DRIVER ? Role.RIDER : Role.DRIVER;
     const users = await ctx.prisma.user.findMany({
@@ -60,7 +70,6 @@ export const mapboxRouter = router({
         id: true,
         name: true,
         email: true,
-        image: true,
         role: true,
         status: true,
         seatAvail: true,
@@ -75,11 +84,20 @@ export const mapboxRouter = router({
         startPOILocation: true,
         startTime: true,
         endTime: true,
+        startCoordLat: true,
+        startCoordLng: true,
+        carpoolId: true,
       },
     });
 
+    const distances = _.compact(users.map(distanceBasedRecs(currentUser)));
+    distances.sort((a, b) => a.score - b.score);
+    const sortedUsers = _.compact(
+      distances.map((rec) => users.find((user) => user.id === rec.id))
+    ).slice(0, 50);
+
     // creates points for each user with coordinates at company location
-    const features: Feature[] = users.map((u) => {
+    const features: Feature[] = sortedUsers.map((u) => {
       const feat = {
         type: "Feature" as "Feature",
         geometry: {

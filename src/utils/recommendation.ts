@@ -4,6 +4,7 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import _ from "lodash";
 import dayConversion from "./dayConversion";
+import { MapUser } from "./types";
 
 /** Type for storing recommendation scores associated with a particular user */
 export type Recommendation = {
@@ -32,6 +33,41 @@ const weights = {
 /** Provides a very approximate coordinate distance to mile conversion */
 const coordToMile = (dist: number) => dist * 88;
 
+export const distanceBasedRecs = (
+  currentUser: User
+): ((user: MapUser) => Recommendation | undefined) => {
+  return (user: MapUser) => {
+    if (
+      (currentUser.role === "RIDER" &&
+        (user.role === "RIDER" || user.seatAvail === 0)) ||
+      (currentUser.role === "DRIVER" && user.role === "DRIVER") ||
+      (currentUser.role === "DRIVER" && currentUser.seatAvail === 0) ||
+      (currentUser.carpoolId && currentUser.carpoolId === user.carpoolId)
+    ) {
+      return undefined;
+    }
+
+    const startDistance = coordToMile(
+      Math.sqrt(
+        Math.pow(currentUser.startCoordLat - user.startCoordLat, 2) +
+          Math.pow(currentUser.startCoordLng - user.startCoordLng, 2)
+      )
+    );
+
+    const endDistance = coordToMile(
+      Math.sqrt(
+        Math.pow(currentUser.companyCoordLat - user.companyCoordLat, 2) +
+          Math.pow(currentUser.companyCoordLng - user.companyCoordLng, 2)
+      )
+    );
+
+    return {
+      id: user.id,
+      score: startDistance + endDistance,
+    };
+  };
+};
+
 /**
  * Generates a function that can be mapped across users to calculate recommendation scores relative to
  * a single user. If the score in any area exceeds predetermined cutoffs, the function will return undefined.
@@ -40,7 +76,7 @@ const coordToMile = (dist: number) => dist * 88;
  * @param currentUser The user to generate a recommendation callback for
  * @returns A function that takes in a user and returns their score relative to `currentUser`
  */
-const calculateScore = (
+export const calculateScore = (
   currentUser: User
 ): ((user: User) => Recommendation | undefined) => {
   const currentUserDays = dayConversion(currentUser);
@@ -137,8 +173,6 @@ const calculateScore = (
     };
   };
 };
-
-export default calculateScore;
 
 export type GenerateUserInput = {
   role: Role;

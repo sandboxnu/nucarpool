@@ -3,7 +3,7 @@ import { router, protectedRouter } from "../createRouter";
 import _ from "lodash";
 import { convertToPublic } from "../../../utils/publicUser";
 import { Status } from "@prisma/client";
-import calculateScore from "../../../utils/recommendation";
+import { calculateScore } from "../../../utils/recommendation";
 
 // use this router to manage invitations
 export const recommendationsRouter = router({
