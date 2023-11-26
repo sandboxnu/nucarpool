@@ -1,4 +1,4 @@
-import calculateScore, { generateUser } from "../src/utils/recommendation";
+import { calculateScore, generateUser } from "../src/utils/recommendation";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";

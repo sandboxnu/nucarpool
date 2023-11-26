@@ -22,6 +22,29 @@ export type ProfileFormInputs = {
   status: "active" | "inactive";
 };
 
+export type MapUser = {
+  id: string;
+  name: string | null;
+  email: string | null;
+  role: Role;
+  status: Status;
+  seatAvail: number;
+  companyName: string;
+  daysWorking: string;
+  startTime: Date | null;
+  endTime: Date | null;
+  preferredName: string;
+  startPOILocation: string;
+  startPOICoordLng: number;
+  startPOICoordLat: number;
+  companyAddress: string;
+  companyCoordLng: number;
+  companyCoordLat: number;
+  startCoordLat: number;
+  startCoordLng: number;
+  carpoolId: string | null;
+};
+
 // describes a user's public data along with their POIs
 export type PublicUser = {
   id: string;

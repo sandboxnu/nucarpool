@@ -35,7 +35,6 @@ export const authOptions: NextAuthOptions = {
     },
   },
   secret: serverEnv.NEXTAUTH_SECRET,
-  debug: true,
   logger: {
     error(code, metadata) {
       console.error(code, metadata);
