@@ -30,7 +30,7 @@ ACCESS_KEY_ID_AWS=
 SECRET_ACCESS_KEY_AWS=
 REGION_AWS=
 
-#Azure Provider
+#Azure Provider (Can be switched out for other Auth Providers)
 AZURE_CLIENT_ID=
 AZURE_CLIENT_SECRET=
 AZURE_TENANT_ID=
