@@ -9,10 +9,6 @@ This is a web app for Northeastern University's students to assists them in find
 ```env
 # Prisma
 
-MYSQL_DATABASE=
-MYSQL_ROOT_PASSWORD=
-MYSQL_PORT=
-
 
 # DATABASE_URL =
 
