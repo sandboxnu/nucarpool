@@ -12,6 +12,7 @@ interface ControlledAddressComboboxProps {
   addressUpdater: (val: SetStateAction<string>) => void;
   addressSuggestions: CarpoolFeature[];
   error?: FieldError;
+  isDisabled: boolean;
 }
 
 const ControlledAddressCombobox = (props: ControlledAddressComboboxProps) => {
@@ -30,26 +31,37 @@ const ControlledAddressCombobox = (props: ControlledAddressComboboxProps) => {
           }}
           ref={ref}
         >
-          <Combobox.Input
-            className={`w-full shadow-sm rounded-md px-3 py-2 h-12 ${
-              props.error ? "border-northeastern-red" : "border-black"
-            }`}
-            displayValue={(feat: CarpoolAddress) =>
-              feat.place_name ? feat.place_name : ""
-            }
-            type="text"
-            onChange={(e) => {
-              if (e.target.value === "") {
-                props.addressSetter({
-                  place_name: "",
-                  center: [0, 0],
-                });
-                fieldProps.onChange("");
-              } else {
-                props.addressUpdater(e.target.value);
+          {props.isDisabled ? (
+            <input
+              className={`h-12 w-full rounded-md bg-gray-100 px-3 py-2 text-gray-400 shadow-sm ${
+                props.error ? "border-northeastern-red" : "border-gray-200"
+              }`}
+              type="text"
+              disabled={true}
+              value={props.addressSelected.place_name}
+            />
+          ) : (
+            <Combobox.Input
+              className={`h-12 w-full rounded-md px-3 py-2 shadow-sm ${
+                props.error ? "border-northeastern-red" : "border-black"
+              }`}
+              displayValue={(feat: CarpoolAddress) =>
+                feat.place_name ? feat.place_name : ""
               }
-            }}
-          />
+              type="text"
+              onChange={(e) => {
+                if (e.target.value === "") {
+                  props.addressSetter({
+                    place_name: "",
+                    center: [0, 0],
+                  });
+                  fieldProps.onChange("");
+                } else {
+                  props.addressUpdater(e.target.value);
+                }
+              }}
+            />
+          )}
           <Transition
             as={Fragment}
             leave="transition ease-in duration-100"
@@ -58,7 +70,7 @@ const ControlledAddressCombobox = (props: ControlledAddressComboboxProps) => {
           >
             <Combobox.Options className="absolute w-full rounded-md bg-white text-base shadow-lg focus:outline-none ">
               {props.addressSuggestions.length === 0 ? (
-                <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
+                <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
                   Nothing found.
                 </div>
               ) : (
@@ -66,7 +78,7 @@ const ControlledAddressCombobox = (props: ControlledAddressComboboxProps) => {
                   <Combobox.Option
                     key={feat.id}
                     className={({ active }) =>
-                      `cursor-default select-none p-3 border-black ${
+                      `cursor-default select-none border-black p-3 ${
                         active ? "bg-blue-400 text-white" : "text-gray-900"
                       }`
                     }

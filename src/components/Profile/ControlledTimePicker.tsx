@@ -10,6 +10,7 @@ interface ControlledTimePickerRHFProps {
   name: "startTime" | "endTime";
   placeholder?: string;
   value?: Date;
+  isDisabled?: boolean;
 }
 const ControlledTimePickerRHF = (props: ControlledTimePickerRHFProps) => {
   const [displayedTime, setDisplayedTime] = useState<Dayjs | undefined>(
@@ -32,7 +33,7 @@ const ControlledTimePickerRHF = (props: ControlledTimePickerRHFProps) => {
 
   const customSuffixIcon = (): ReactNode => {
     return (
-      <div className="h-1/12 text-northeastern-red flex w-1/12 justify-center text-center text-xs">
+      <div className="h-1/12 flex w-1/12 justify-center text-center text-xs text-northeastern-red">
         ▼
       </div>
     );
@@ -51,6 +52,7 @@ const ControlledTimePickerRHF = (props: ControlledTimePickerRHFProps) => {
             status={fieldState.error ? "error" : undefined}
             placeholder={props.placeholder}
             showNow={false}
+            disabled={props.isDisabled}
             minuteStep={15}
             use12Hours={true}
             value={displayedTime}

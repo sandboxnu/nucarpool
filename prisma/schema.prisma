@@ -19,6 +19,7 @@ generator client {
 enum Role {
   RIDER
   DRIVER
+  VIEWER
 }
 
 // Represents a Status.

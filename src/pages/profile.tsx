@@ -268,7 +268,6 @@ const Profile: NextPage = () => {
       licenseSigned: true,
     });
   };
-
   return (
     <>
       {!user?.licenseSigned && <ComplianceModal />}
@@ -288,6 +287,7 @@ const Profile: NextPage = () => {
                   />
                   <div>
                     <ControlledAddressCombobox
+                      isDisabled={watch("role") == Role.VIEWER}
                       control={control}
                       name={"startAddress"}
                       addressSelected={startAddressSelected}
@@ -317,6 +317,7 @@ const Profile: NextPage = () => {
                     className={`w-full`}
                     inputClassName={`h-12`}
                     label="Workplace Name"
+                    isDisabled={watch("role") == Role.VIEWER}
                     id="companyName"
                     error={errors.companyName}
                     type="text"
@@ -333,6 +334,7 @@ const Profile: NextPage = () => {
                     address out
                   </Note>
                   <ControlledAddressCombobox
+                    isDisabled={watch("role") == Role.VIEWER}
                     control={control}
                     name={"companyAddress"}
                     addressSelected={companyAddressSelected}
@@ -345,13 +347,21 @@ const Profile: NextPage = () => {
                     <ErrorDisplay>{errors.companyAddress.message}</ErrorDisplay>
                   )}
                 </MiddleProfileSection>
-
                 {/* Role field  */}
                 <BottomProfileSection>
                   <ProfileHeaderNoMB>
                     I am a... <span className="text-northeastern-red">*</span>
                   </ProfileHeaderNoMB>
                   <div className="flex h-24 items-end space-x-4">
+                    <Radio
+                      label="Viewer"
+                      id="viewer"
+                      error={errors.role}
+                      role={Role.VIEWER}
+                      value={Role.VIEWER}
+                      currentlySelected={watch("role")}
+                      {...register("role")}
+                    />
                     <Radio
                       label="Rider"
                       id="rider"
@@ -390,14 +400,19 @@ const Profile: NextPage = () => {
                       </div>
                     )}
                   </div>
-                  <Note
-                    style={{
-                      visibility:
-                        watch("role") == Role.DRIVER ? "visible" : "hidden",
-                    }}
-                  >
-                    Registering 0 available seats will remove you from the
-                    app&apos;s recommendation generation.
+                  <Note>
+                    {watch("role") === Role.DRIVER && (
+                      <span>
+                        Registering 0 available seats will remove you from the
+                        app&apos;s recommendation generation.
+                      </span>
+                    )}
+                    {watch("role") === Role.VIEWER && (
+                      <span>
+                        As a viewer, you can see other riders and drivers on the
+                        map but cannot request a ride.
+                      </span>
+                    )}
                   </Note>
                 </BottomProfileSection>
               </ProfileColumn>
@@ -426,6 +441,7 @@ const Profile: NextPage = () => {
                                 height: 1,
                                 padding: 0,
                               }}
+                              disabled={watch("role") == Role.VIEWER}
                               checked={value}
                               onChange={onChange}
                               checkedIcon={
@@ -452,6 +468,7 @@ const Profile: NextPage = () => {
                         label="Start Time"
                       />
                       <ControlledTimePicker
+                        isDisabled={watch("role") == Role.VIEWER}
                         control={control}
                         name={"startTime"}
                         value={user?.startTime ? user.startTime : undefined}
@@ -464,6 +481,7 @@ const Profile: NextPage = () => {
                         label="End Time"
                       />
                       <ControlledTimePicker
+                        isDisabled={watch("role") == Role.VIEWER}
                         control={control}
                         name={"endTime"}
                         value={user?.endTime ? user.endTime : undefined}
@@ -489,6 +507,7 @@ const Profile: NextPage = () => {
                       <TextField
                         id="preferredName"
                         error={errors.preferredName}
+                        isDisabled={watch("role") == Role.VIEWER}
                         type="text"
                         inputClassName={`h-12`}
                         {...register("preferredName")}
@@ -504,6 +523,7 @@ const Profile: NextPage = () => {
                         id="pronouns"
                         inputClassName={`h-12`}
                         error={errors.pronouns}
+                        isDisabled={watch("role") == Role.VIEWER}
                         type="text"
                         {...register("pronouns")}
                       />
@@ -517,8 +537,14 @@ const Profile: NextPage = () => {
                       label="About Me"
                     />
                     <textarea
-                      className={`form-input w-full resize-none rounded-md border-black px-3 py-2`}
+                      className={`form-input w-full resize-none rounded-md
+                       ${
+                         watch("role") == Role.VIEWER
+                           ? "border-gray-100 bg-gray-200 text-gray-400"
+                           : ""
+                       } border-black px-3 py-2`}
                       maxLength={188}
+                      disabled={watch("role") == Role.VIEWER}
                       {...register("bio")}
                     />
                     <Note>
