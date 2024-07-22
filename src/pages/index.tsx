@@ -87,6 +87,11 @@ const Home: NextPage<any> = () => {
           [user.companyCoordLng, user.companyCoordLat],
           [otherUser.companyCoordLng, otherUser.companyCoordLat],
         ]);
+      } else if (user.role === "VIEWER") {
+        setPoints([
+          [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
+          [otherUser.companyCoordLng, otherUser.companyCoordLat],
+        ]);
       } else {
         setPoints([
           [user.startCoordLng, user.startCoordLat],

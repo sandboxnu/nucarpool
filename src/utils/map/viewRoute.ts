@@ -51,7 +51,9 @@ export const viewRoute = (
   clearMarkers();
   clearDirections(map);
 
-  const otherRole = user.role === Role.DRIVER ? "Rider" : "Driver";
+  const otherRole =
+    otherUser.role.charAt(0).toUpperCase() +
+    otherUser.role.slice(1).toLowerCase();
 
   const redCircle = createMarkerEl(RedStart);
   redCircle.style.opacity = "0";
@@ -63,14 +65,6 @@ export const viewRoute = (
     .setLngLat([user.startCoordLng, user.startCoordLat])
     .setPopup(selfStartPopup)
     .addTo(map);
-
-  const blueSquare = createMarkerEl(BlueEnd);
-  const selfEndPopup = createPopup("My Dest.");
-  const selfEndMarker = new mapboxgl.Marker({ element: blueSquare })
-    .setLngLat([user.companyCoordLng, user.companyCoordLat])
-    .setPopup(selfEndPopup)
-    .addTo(map);
-
   const orangeStart = createMarkerEl(orangeCircle);
   const otherUserStartPopup = createPopup(otherRole + " Start");
   const otherUserStartMarker = new mapboxgl.Marker({ element: orangeStart })
@@ -87,14 +81,22 @@ export const viewRoute = (
     .setLngLat([otherUser.companyCoordLng, otherUser.companyCoordLat])
     .setPopup(otherUserEndPopup)
     .addTo(map);
+  if (user.role !== "VIEWER") {
+    const blueSquare = createMarkerEl(BlueEnd);
+    const selfEndPopup = createPopup("My Dest.");
+    const selfEndMarker = new mapboxgl.Marker({ element: blueSquare })
+      .setLngLat([user.companyCoordLng, user.companyCoordLat])
+      .setPopup(selfEndPopup)
+      .addTo(map);
+    selfEndMarker.togglePopup();
+    previousMarkers.push(selfEndMarker);
+  }
 
   selfStartMarker.togglePopup();
-  selfEndMarker.togglePopup();
   otherUserStartMarker.togglePopup();
   otherUserEndMarker.togglePopup();
 
   previousMarkers.push(selfStartMarker);
-  previousMarkers.push(selfEndMarker);
   previousMarkers.push(otherUserStartMarker);
   previousMarkers.push(otherUserEndMarker);
 

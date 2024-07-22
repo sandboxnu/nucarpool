@@ -124,7 +124,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       </div>
       {props.otherUser.role === "DRIVER" && (
         <div className="flex flex-row text-sm">
-          <div className="mr-1">Seats: </div>
+          <div className="mr-1">Open Seats: </div>
           <div className="font-semibold">{props.otherUser.seatAvail}</div>
         </div>
       )}

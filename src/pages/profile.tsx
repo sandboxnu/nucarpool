@@ -268,6 +268,8 @@ const Profile: NextPage = () => {
       licenseSigned: true,
     });
   };
+  const isViewer = watch("role") === Role.VIEWER;
+
   return (
     <>
       {!user?.licenseSigned && <ComplianceModal />}
@@ -287,7 +289,7 @@ const Profile: NextPage = () => {
                   />
                   <div>
                     <ControlledAddressCombobox
-                      isDisabled={watch("role") == Role.VIEWER}
+                      isDisabled={isViewer}
                       control={control}
                       name={"startAddress"}
                       addressSelected={startAddressSelected}
@@ -317,7 +319,7 @@ const Profile: NextPage = () => {
                     className={`w-full`}
                     inputClassName={`h-12`}
                     label="Workplace Name"
-                    isDisabled={watch("role") == Role.VIEWER}
+                    isDisabled={isViewer}
                     id="companyName"
                     error={errors.companyName}
                     type="text"
@@ -334,7 +336,7 @@ const Profile: NextPage = () => {
                     address out
                   </Note>
                   <ControlledAddressCombobox
-                    isDisabled={watch("role") == Role.VIEWER}
+                    isDisabled={isViewer}
                     control={control}
                     name={"companyAddress"}
                     addressSelected={companyAddressSelected}
@@ -407,7 +409,7 @@ const Profile: NextPage = () => {
                         app&apos;s recommendation generation.
                       </span>
                     )}
-                    {watch("role") === Role.VIEWER && (
+                    {isViewer && (
                       <span>
                         As a viewer, you can see other riders and drivers on the
                         map but cannot request a ride.
@@ -436,12 +438,12 @@ const Profile: NextPage = () => {
                               key={day + index.toString()}
                               sx={{
                                 input: { width: 1, height: 1 },
-                                aspectRatio: 1 / 1,
+                                aspectRatio: 1,
                                 width: 1,
                                 height: 1,
                                 padding: 0,
                               }}
-                              disabled={watch("role") == Role.VIEWER}
+                              disabled={isViewer}
                               checked={value}
                               onChange={onChange}
                               checkedIcon={
@@ -468,7 +470,7 @@ const Profile: NextPage = () => {
                         label="Start Time"
                       />
                       <ControlledTimePicker
-                        isDisabled={watch("role") == Role.VIEWER}
+                        isDisabled={isViewer}
                         control={control}
                         name={"startTime"}
                         value={user?.startTime ? user.startTime : undefined}
@@ -481,7 +483,7 @@ const Profile: NextPage = () => {
                         label="End Time"
                       />
                       <ControlledTimePicker
-                        isDisabled={watch("role") == Role.VIEWER}
+                        isDisabled={isViewer}
                         control={control}
                         name={"endTime"}
                         value={user?.endTime ? user.endTime : undefined}
@@ -507,7 +509,7 @@ const Profile: NextPage = () => {
                       <TextField
                         id="preferredName"
                         error={errors.preferredName}
-                        isDisabled={watch("role") == Role.VIEWER}
+                        isDisabled={isViewer}
                         type="text"
                         inputClassName={`h-12`}
                         {...register("preferredName")}
@@ -544,7 +546,7 @@ const Profile: NextPage = () => {
                            : ""
                        } border-black px-3 py-2`}
                       maxLength={188}
-                      disabled={watch("role") == Role.VIEWER}
+                      disabled={isViewer}
                       {...register("bio")}
                     />
                     <Note>
