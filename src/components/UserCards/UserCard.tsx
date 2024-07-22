@@ -90,7 +90,15 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         {/* top row */}
         <div className="flex">
           <div className="text-lg">
-            <p className="font-semibold">{props.otherUser.preferredName}</p>
+            {user.role === "VIEWER" ? (
+              <p className="font-semibold">{`${props.otherUser.role.charAt(
+                0
+              )}${props.otherUser.role.slice(1).toLowerCase()} ${
+                props.otherUser.id
+              }`}</p>
+            ) : (
+              <p className="font-semibold">{props.otherUser.preferredName}</p>
+            )}
             <p className="font-light">{props.otherUser.companyName}</p>
           </div>
         </div>
