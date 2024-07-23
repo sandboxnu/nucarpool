@@ -7,6 +7,7 @@ import Image from "next/image";
 interface LegendProps {
   role: string;
 }
+// Currently this isn't used anywhere
 export const MapLegend = (props: LegendProps) => {
   return (
     <>
