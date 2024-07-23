@@ -1,8 +1,8 @@
 import mapboxgl from "mapbox-gl";
-import { PublicUser, User } from "../types";
+import { CarpoolAddress, CarpoolFeature, PublicUser, User } from "../types";
 import { Role } from "@prisma/client";
 import { trpc } from "../trpc";
-import { useEffect } from "react";
+import { SetStateAction, useEffect } from "react";
 import { toast } from "react-toastify";
 import polyline from "@mapbox/polyline";
 import { LineString } from "geojson";
@@ -42,35 +42,50 @@ const createMarkerEl = (img: StaticImageData) => {
   el.style.marginTop = "1em";
   return el;
 };
+interface ViewRouteProps {
+  user: User;
+  otherUser: PublicUser;
+  map: mapboxgl.Map;
+  userCoord: {
+    startLat: number;
+    startLng: number;
+    endLat: number;
+    endLng: number;
+  };
+}
+
 // Creates MapBox markers showing user's start address and the start area of the other user.
-export const viewRoute = (
-  user: User,
-  otherUser: PublicUser,
-  map: mapboxgl.Map
-) => {
+export const viewRoute = (props: ViewRouteProps) => {
   clearMarkers();
-  clearDirections(map);
+  clearDirections(props.map);
 
   const otherRole =
-    otherUser.role.charAt(0).toUpperCase() +
-    otherUser.role.slice(1).toLowerCase();
+    props.otherUser.role.charAt(0).toUpperCase() +
+    props.otherUser.role.slice(1).toLowerCase();
 
   const redCircle = createMarkerEl(RedStart);
   redCircle.style.opacity = "0";
   const selfStartPopup = createPopup("My Start");
+
   const selfStartMarker = new mapboxgl.Marker({
     element: redCircle,
     anchor: "bottom",
   })
-    .setLngLat([user.startCoordLng, user.startCoordLat])
+    .setLngLat([props.userCoord.startLng, props.userCoord.startLat])
     .setPopup(selfStartPopup)
-    .addTo(map);
+    .addTo(props.map);
   const orangeStart = createMarkerEl(orangeCircle);
+  const redStart = createMarkerEl(redCircle);
   const otherUserStartPopup = createPopup(otherRole + " Start");
-  const otherUserStartMarker = new mapboxgl.Marker({ element: orangeStart })
-    .setLngLat([otherUser.startPOICoordLng, otherUser.startPOICoordLat])
+  const otherUserStartMarker = new mapboxgl.Marker({
+    element: otherRole === "Rider" ? orangeStart : redStart,
+  })
+    .setLngLat([
+      props.otherUser.startPOICoordLng,
+      props.otherUser.startPOICoordLat,
+    ])
     .setPopup(otherUserStartPopup)
-    .addTo(map);
+    .addTo(props.map);
 
   const redSquare = createMarkerEl(RedEnd);
   redSquare.style.opacity = "0";
@@ -78,19 +93,20 @@ export const viewRoute = (
   const otherUserEndMarker = new mapboxgl.Marker({
     element: redSquare,
   })
-    .setLngLat([otherUser.companyCoordLng, otherUser.companyCoordLat])
+    .setLngLat([
+      props.otherUser.companyCoordLng,
+      props.otherUser.companyCoordLat,
+    ])
     .setPopup(otherUserEndPopup)
-    .addTo(map);
-  if (user.role !== "VIEWER") {
-    const blueSquare = createMarkerEl(BlueEnd);
-    const selfEndPopup = createPopup("My Dest.");
-    const selfEndMarker = new mapboxgl.Marker({ element: blueSquare })
-      .setLngLat([user.companyCoordLng, user.companyCoordLat])
-      .setPopup(selfEndPopup)
-      .addTo(map);
-    selfEndMarker.togglePopup();
-    previousMarkers.push(selfEndMarker);
-  }
+    .addTo(props.map);
+  const blueSquare = createMarkerEl(BlueEnd);
+  const selfEndPopup = createPopup("My Dest.");
+  const selfEndMarker = new mapboxgl.Marker({ element: blueSquare })
+    .setLngLat([props.userCoord.endLng, props.userCoord.endLat])
+    .setPopup(selfEndPopup)
+    .addTo(props.map);
+  selfEndMarker.togglePopup();
+  previousMarkers.push(selfEndMarker);
 
   selfStartMarker.togglePopup();
   otherUserStartMarker.togglePopup();
@@ -100,14 +116,26 @@ export const viewRoute = (
   previousMarkers.push(otherUserStartMarker);
   previousMarkers.push(otherUserEndMarker);
 
-  map.fitBounds([
+  props.map.fitBounds([
     [
-      Math.min(otherUser.startPOICoordLng, otherUser.companyCoordLng) - 0.0075,
-      Math.max(otherUser.startPOICoordLat, otherUser.companyCoordLat) + 0.0075,
+      Math.min(
+        props.otherUser.startPOICoordLng,
+        props.otherUser.companyCoordLng
+      ) - 0.0075,
+      Math.max(
+        props.otherUser.startPOICoordLat,
+        props.otherUser.companyCoordLat
+      ) + 0.0075,
     ],
     [
-      Math.max(otherUser.startPOICoordLng, otherUser.companyCoordLng) + 0.0075,
-      Math.min(otherUser.startPOICoordLat, otherUser.companyCoordLat) - 0.0075,
+      Math.max(
+        props.otherUser.startPOICoordLng,
+        props.otherUser.companyCoordLng
+      ) + 0.0075,
+      Math.min(
+        props.otherUser.startPOICoordLat,
+        props.otherUser.companyCoordLat
+      ) - 0.0075,
     ],
   ]);
 };

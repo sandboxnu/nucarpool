@@ -2,14 +2,18 @@ import { Map } from "mapbox-gl";
 import { User } from "../types";
 import PulsingDot from "./PulsingDot";
 
-const addUserLocation = (map: Map, user: User) => {
+const addUserLocation = (
+  map: Map,
+  userLongitude: number,
+  userLatitude: number
+) => {
   map.addSource("dot-point", {
     type: "geojson",
     data: {
       type: "Feature",
       geometry: {
         type: "Point",
-        coordinates: [user.startCoordLng, user.startCoordLat], // icon position [lng, lat]
+        coordinates: [userLongitude, userLatitude], // icon position [lng, lat]
       },
       properties: {},
     },

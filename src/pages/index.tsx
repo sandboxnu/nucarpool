@@ -1,7 +1,7 @@
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import type { GetServerSidePropsContext, NextPage } from "next";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { RiFocus3Line } from "react-icons/ri";
 import { ToastProvider } from "react-toast-notifications";
 import addClusters from "../utils/map/addClusters";
@@ -14,12 +14,21 @@ import Header, { HeaderOptions } from "../components/Header";
 import { getSession } from "next-auth/react";
 import Spinner from "../components/Spinner";
 import { UserContext } from "../utils/userContext";
-import _ from "lodash";
+import _, { debounce } from "lodash";
 import { SidebarPage } from "../components/Sidebar/Sidebar";
-import { EnhancedPublicUser, PublicUser } from "../utils/types";
+import {
+  CarpoolAddress,
+  CarpoolFeature,
+  EnhancedPublicUser,
+  PublicUser,
+} from "../utils/types";
 import { User } from "@prisma/client";
 import { useGetDirections, viewRoute } from "../utils/map/viewRoute";
 import { MapConnectPortal } from "../components/MapConnectPortal";
+import ControlledAddressCombobox from "../components/Profile/ControlledAddressCombobox";
+import useSearch from "../utils/search";
+import AddressCombobox from "../components/Map/AddressCombobox";
+import updateUserLocation from "../utils/map/updateUserLocation";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -62,6 +71,35 @@ const Home: NextPage<any> = () => {
   const [popupUser, setPopupUser] = useState<PublicUser | null>(null);
   const mapContainerRef = useRef(null);
   const [points, setPoints] = useState<[number, number][]>([]);
+  const [companyAddressSuggestions, setCompanyAddressSuggestions] = useState<
+    CarpoolFeature[]
+  >([]);
+  const [startAddressSuggestions, setStartAddressSuggestions] = useState<
+    CarpoolFeature[]
+  >([]);
+
+  const [companyAddressSelected, setCompanyAddressSelected] =
+    useState<CarpoolAddress>({
+      place_name: "",
+      center: [0, 0],
+    });
+  const [startAddressSelected, setStartAddressSelected] =
+    useState<CarpoolAddress>({
+      place_name: "",
+      center: [0, 0],
+    });
+
+  const [companyAddress, setCompanyAddress] = useState("");
+  const updateCompanyAddress = useMemo(
+    () => debounce(setCompanyAddress, 250),
+    []
+  );
+
+  const [startingAddress, setStartingAddress] = useState("");
+  const updateStartingAddress = useMemo(
+    () => debounce(setStartingAddress, 250),
+    []
+  );
 
   useGetDirections({ points: points, map: mapState! });
 
@@ -77,27 +115,52 @@ const Home: NextPage<any> = () => {
   };
 
   const onViewRouteClick = (user: User, otherUser: PublicUser) => {
+    const isViewerAddressSelected =
+      companyAddressSelected.place_name !== "" &&
+      startAddressSelected.place_name !== "";
+    const companyCord: number[] = companyAddressSelected.center;
+    const startCord: number[] = startAddressSelected.center;
+    const userStartLng = isViewerAddressSelected
+      ? startCord[0]
+      : user.startCoordLng;
+    const userStartLat = isViewerAddressSelected
+      ? startCord[1]
+      : user.startCoordLat;
+    const userCompanyLng = isViewerAddressSelected
+      ? companyCord[0]
+      : user.companyCoordLng;
+    const userCompanyLat = isViewerAddressSelected
+      ? companyCord[1]
+      : user.companyCoordLat;
+    const userCoord = {
+      startLat: userStartLat,
+      startLng: userStartLng,
+      endLat: userCompanyLat,
+      endLng: userCompanyLng,
+    };
     if (mapState) {
-      viewRoute(user, otherUser, mapState);
+      updateUserLocation(mapState, userStartLng, userStartLat);
+      const viewProps = {
+        user,
+        otherUser,
+        map: mapState,
+        userCoord,
+      };
+      viewRoute(viewProps);
 
-      if (user.role === "RIDER") {
+      if (otherUser.role === "DRIVER") {
         setPoints([
           [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
-          [user.startCoordLng, user.startCoordLat],
-          [user.companyCoordLng, user.companyCoordLat],
-          [otherUser.companyCoordLng, otherUser.companyCoordLat],
-        ]);
-      } else if (user.role === "VIEWER") {
-        setPoints([
-          [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
+          [userStartLng, userStartLat],
+          [userCompanyLng, userCompanyLat],
           [otherUser.companyCoordLng, otherUser.companyCoordLat],
         ]);
       } else {
         setPoints([
-          [user.startCoordLng, user.startCoordLat],
+          [userStartLng, userStartLat],
           [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
           [otherUser.companyCoordLng, otherUser.companyCoordLat],
-          [user.companyCoordLng, user.companyCoordLat],
+          [userCompanyLng, userCompanyLat],
         ]);
       }
     }
@@ -116,6 +179,7 @@ const Home: NextPage<any> = () => {
   const enhancedFavs = favorites.map(extendPublicUser);
 
   useEffect(() => {
+    // TODO add default center zoom for viewer mode
     if (user && geoJsonUsers && mapContainerRef.current) {
       const newMap = new mapboxgl.Map({
         container: "map",
@@ -126,13 +190,26 @@ const Home: NextPage<any> = () => {
       newMap.setMaxZoom(13);
       newMap.on("load", () => {
         addClusters(newMap, geoJsonUsers);
-        addUserLocation(newMap, user);
+        if (user.role !== "VIEWER") {
+          addUserLocation(newMap, user.startCoordLng, user.startCoordLat);
+        }
         addMapEvents(newMap, user, setPopupUser);
       });
+
       setMapState(newMap);
     }
   }, [user, geoJsonUsers]);
+  useSearch({
+    value: companyAddress,
+    type: "address%2Cpostcode",
+    setFunc: setCompanyAddressSuggestions,
+  });
 
+  useSearch({
+    value: startingAddress,
+    type: "address%2Cpostcode",
+    setFunc: setStartAddressSuggestions,
+  });
   if (!user) {
     return <Spinner />;
   }
@@ -179,6 +256,22 @@ const Home: NextPage<any> = () => {
                   id="map"
                   className={"h-full w-full flex-auto"}
                 >
+                  <div className="absolute left-0 top-0 z-10 m-2 bg-white p-4 shadow-lg">
+                    <AddressCombobox
+                      name={"startAddress"}
+                      addressSelected={startAddressSelected}
+                      addressSetter={setStartAddressSelected}
+                      addressSuggestions={startAddressSuggestions}
+                      addressUpdater={updateStartingAddress}
+                    />
+                    <AddressCombobox
+                      name={"companyAddress"}
+                      addressSelected={companyAddressSelected}
+                      addressSetter={setCompanyAddressSelected}
+                      addressSuggestions={companyAddressSuggestions}
+                      addressUpdater={updateCompanyAddress}
+                    />
+                  </div>
                   <MapConnectPortal
                     otherUser={popupUser}
                     extendUser={extendPublicUser}
