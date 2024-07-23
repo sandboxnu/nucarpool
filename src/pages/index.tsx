@@ -256,21 +256,39 @@ const Home: NextPage<any> = () => {
                   id="map"
                   className={"h-full w-full flex-auto"}
                 >
-                  <div className="absolute left-0 top-0 z-10 m-2 bg-white p-4 shadow-lg">
-                    <AddressCombobox
-                      name={"startAddress"}
-                      addressSelected={startAddressSelected}
-                      addressSetter={setStartAddressSelected}
-                      addressSuggestions={startAddressSuggestions}
-                      addressUpdater={updateStartingAddress}
-                    />
-                    <AddressCombobox
-                      name={"companyAddress"}
-                      addressSelected={companyAddressSelected}
-                      addressSetter={setCompanyAddressSelected}
-                      addressSuggestions={companyAddressSuggestions}
-                      addressUpdater={updateCompanyAddress}
-                    />
+                  <div className="absolute left-0 top-0 z-10 m-2 flex min-w-[25rem] flex-col bg-white p-4 shadow-lg ">
+                    <div className="flex items-center space-x-4">
+                      <div className="h-6 w-6 flex-shrink-0 rounded-full bg-blue-500"></div>
+                      <AddressCombobox
+                        name="startAddress"
+                        placeholder="Input start address"
+                        addressSelected={startAddressSelected}
+                        addressSetter={setStartAddressSelected}
+                        addressSuggestions={startAddressSuggestions}
+                        addressUpdater={updateStartingAddress}
+                        className="flex-1"
+                      />
+                    </div>
+
+                    <div
+                      className="mx-3 flex-none"
+                      style={{ width: "3px", height: "2rem" }}
+                    >
+                      <div className="h-full border-l-2 border-dashed border-gray-400"></div>
+                    </div>
+
+                    <div className="flex items-center space-x-4">
+                      <div className="h-6 w-6 flex-shrink-0 bg-blue-500"></div>
+                      <AddressCombobox
+                        name="companyAddress"
+                        placeholder="Input company address"
+                        addressSelected={companyAddressSelected}
+                        addressSetter={setCompanyAddressSelected}
+                        addressSuggestions={companyAddressSuggestions}
+                        addressUpdater={updateCompanyAddress}
+                        className="flex-1"
+                      />
+                    </div>
                   </div>
                   <MapConnectPortal
                     otherUser={popupUser}
