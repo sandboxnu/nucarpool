@@ -29,6 +29,7 @@ import ControlledAddressCombobox from "../components/Profile/ControlledAddressCo
 import useSearch from "../utils/search";
 import AddressCombobox from "../components/Map/AddressCombobox";
 import updateUserLocation from "../utils/map/updateUserLocation";
+import { MapLegend } from "../components/MapLegend";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -146,7 +147,6 @@ const Home: NextPage<any> = () => {
         map: mapState,
         userCoord,
       };
-      viewRoute(viewProps);
 
       if (otherUser.role === "DRIVER") {
         setPoints([
@@ -163,6 +163,7 @@ const Home: NextPage<any> = () => {
           [userCompanyLng, userCompanyLat],
         ]);
       }
+      viewRoute(viewProps);
     }
   };
   const enhancedSentUsers = requests.sent.map((request: { toUser: any }) =>
@@ -256,7 +257,7 @@ const Home: NextPage<any> = () => {
                   id="map"
                   className={"h-full w-full flex-auto"}
                 >
-                  <div className="absolute left-0 top-0 z-10 m-2 flex min-w-[25rem] flex-col bg-white p-4 shadow-lg ">
+                  <div className="absolute left-0 top-0 z-10 m-2 flex min-w-[25rem] flex-col rounded-xl bg-white p-4 shadow-lg ">
                     <div className="flex items-center space-x-4">
                       <div className="h-6 w-6 flex-shrink-0 rounded-full bg-blue-500"></div>
                       <AddressCombobox
@@ -290,6 +291,7 @@ const Home: NextPage<any> = () => {
                       />
                     </div>
                   </div>
+                  <MapLegend />
                   <MapConnectPortal
                     otherUser={popupUser}
                     extendUser={extendPublicUser}

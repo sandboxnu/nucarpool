@@ -108,7 +108,7 @@ export const viewRoute = (props: ViewRouteProps) => {
   selfEndMarker.togglePopup();
   previousMarkers.push(selfEndMarker);
 
-  selfStartMarker.togglePopup();
+  //selfStartMarker.togglePopup();
   otherUserStartMarker.togglePopup();
   otherUserEndMarker.togglePopup();
 
@@ -174,22 +174,25 @@ export function useGetDirections({
           clearDirections(map);
         });
 
-        map.addLayer({
-          id: "route",
-          type: "line",
-          source: {
-            type: "geojson",
-            data: lineStringFeature,
+        map.addLayer(
+          {
+            id: "route",
+            type: "line",
+            source: {
+              type: "geojson",
+              data: lineStringFeature,
+            },
+            layout: {
+              "line-join": "round",
+              "line-cap": "round",
+            },
+            paint: {
+              "line-color": "#61666b",
+              "line-width": 6,
+            },
           },
-          layout: {
-            "line-join": "round",
-            "line-cap": "round",
-          },
-          paint: {
-            "line-color": "#61666b",
-            "line-width": 6,
-          },
-        });
+          "unclustered-point"
+        );
       },
       onError: (error) => {
         toast.error(`Something went wrong: ${error}`);
