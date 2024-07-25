@@ -12,9 +12,11 @@ import RedEnd from "../../../public/red-square.png";
 import BlueEnd from "../../../public/blue-square.png";
 import orangeCircle from "../../../public/orange-circle.png";
 
-const previousMarkers: mapboxgl.Marker[] = [];
+const previousMarkers: (mapboxgl.Marker | mapboxgl.Popup)[] = [];
 export const clearMarkers = () => {
-  previousMarkers.forEach((marker) => marker.remove());
+  previousMarkers.forEach((element) => {
+    element.remove();
+  });
   previousMarkers.length = 0;
 };
 
@@ -67,13 +69,6 @@ export const viewRoute = (props: ViewRouteProps) => {
   redCircle.style.opacity = "0";
   const selfStartPopup = createPopup("My Start");
 
-  const selfStartMarker = new mapboxgl.Marker({
-    element: redCircle,
-    anchor: "bottom",
-  })
-    .setLngLat([props.userCoord.startLng, props.userCoord.startLat])
-    .setPopup(selfStartPopup)
-    .addTo(props.map);
   const orangeStart = createMarkerEl(orangeCircle);
   const redStart = createMarkerEl(redCircle);
   const otherUserStartPopup = createPopup(otherRole + " Start");
@@ -108,11 +103,12 @@ export const viewRoute = (props: ViewRouteProps) => {
   selfEndMarker.togglePopup();
   previousMarkers.push(selfEndMarker);
 
-  //selfStartMarker.togglePopup();
+  selfStartPopup
+    .setLngLat([props.userCoord.startLng, props.userCoord.startLat])
+    .addTo(props.map);
   otherUserStartMarker.togglePopup();
   otherUserEndMarker.togglePopup();
-
-  previousMarkers.push(selfStartMarker);
+  previousMarkers.push(selfStartPopup);
   previousMarkers.push(otherUserStartMarker);
   previousMarkers.push(otherUserEndMarker);
 

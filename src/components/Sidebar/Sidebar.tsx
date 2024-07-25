@@ -11,6 +11,7 @@ import { Request } from "@prisma/client";
 interface SidebarProps {
   sidebarType: HeaderOptions;
   map: mapboxgl.Map;
+  role: string;
   recs: EnhancedPublicUser[];
   favs: EnhancedPublicUser[];
   received: EnhancedPublicUser[];
@@ -19,11 +20,16 @@ interface SidebarProps {
 }
 
 export const SidebarPage = (props: SidebarProps) => {
+  let disabled = false;
+  if (props.role === "VIEWER") {
+    disabled = true;
+  }
   if (props.sidebarType === "explore") {
     return (
       <ExploreSidebar
         recs={props.recs}
         favs={props.favs}
+        disabled={disabled}
         viewRoute={props.onViewRouteClick}
       />
     );
@@ -32,6 +38,7 @@ export const SidebarPage = (props: SidebarProps) => {
       <RequestSidebar
         received={props.received.reverse()}
         sent={props.sent.reverse()}
+        disabled={disabled}
         viewRoute={props.onViewRouteClick}
       />
     );

@@ -7,6 +7,7 @@ interface RequestSidebarProps {
   received: EnhancedPublicUser[];
   sent: EnhancedPublicUser[];
   viewRoute: (user: User, otherUser: PublicUser) => void;
+  disabled: boolean;
 }
 
 const RequestSidebar = (props: RequestSidebarProps) => {
@@ -24,7 +25,8 @@ const RequestSidebar = (props: RequestSidebarProps) => {
             }
             onClick={() => {
               setCurOption("received");
-              clearMarkers();
+              // don't see a reason for clearing markers
+              //clearMarkers();
             }}
           >
             Received
@@ -37,7 +39,7 @@ const RequestSidebar = (props: RequestSidebarProps) => {
             }
             onClick={() => {
               setCurOption("sent");
-              clearMarkers();
+              //clearMarkers();
             }}
           >
             Sent
@@ -47,6 +49,7 @@ const RequestSidebar = (props: RequestSidebarProps) => {
       <SidebarContent
         userCardList={curOption === "received" ? props.received : props.sent}
         subType={curOption}
+        disabled={props.disabled}
         onViewRouteClick={props.viewRoute}
       />
     </div>

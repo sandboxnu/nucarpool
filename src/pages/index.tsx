@@ -200,6 +200,16 @@ const Home: NextPage<any> = () => {
       setMapState(newMap);
     }
   }, [user, geoJsonUsers]);
+  // seperate use effect for user location rendering
+  useEffect(() => {
+    if (mapState) {
+      updateUserLocation(
+        mapState,
+        startAddressSelected.center[0],
+        startAddressSelected.center[1]
+      );
+    }
+  }, [companyAddressSelected, startAddressSelected]);
   useSearch({
     value: companyAddress,
     type: "address%2Cpostcode",
@@ -235,6 +245,7 @@ const Home: NextPage<any> = () => {
                 {mapState && (
                   <SidebarPage
                     sidebarType={sidebarType}
+                    role={user.role}
                     map={mapState}
                     recs={enhancedRecs}
                     favs={enhancedFavs}

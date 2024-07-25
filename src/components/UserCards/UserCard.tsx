@@ -144,7 +144,11 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
           View Route
         </button>
         <button
-          onClick={() => props.rightButton.onPress(props.otherUser)}
+          onClick={
+            user.role === "VIEWER"
+              ? () => {} // Does nothing when the user is a VIEWER
+              : () => props.rightButton.onPress(props.otherUser)
+          }
           className={getButtonClassName(props.rightButton)}
         >
           {props.rightButton.text}
