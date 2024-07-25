@@ -57,35 +57,72 @@ const dateErrorMap: z.ZodErrorMap = (issue, ctx) => {
   return { message: "Invalid time" };
 };
 
-const onboardSchema = z.intersection(
-  z.object({
+const custom = z.ZodIssueCode.custom;
+const onboardSchema = z
+  .object({
     role: z.nativeEnum(Role),
-    seatAvail: z
-      .number({ invalid_type_error: "Cannot be empty" })
-      .int("Must be an integer")
-      .nonnegative("Must be greater or equal to 0")
-      .max(6),
-    companyName: z.string().min(1, "Cannot be empty"),
-    companyAddress: z.string().min(1, "Cannot be empty"),
-    startAddress: z.string().min(1, "Cannot be empty"),
-    preferredName: z.string(),
-    pronouns: z.string(),
-    daysWorking: z
-      .array(z.boolean())
-      .refine((a) => a.some((b) => b), { message: "Select at least one day" }), // Make this regex.
-    bio: z.string(),
-  }),
-  z.union([
-    z.object({
-      startTime: z.date({ errorMap: dateErrorMap }),
-      endTime: z.date({ errorMap: dateErrorMap }),
-      timeDiffers: z.literal(false),
-    }),
-    z.object({
-      timeDiffers: z.literal(true),
-    }),
-  ])
-);
+    seatAvail: z.number().int().nonnegative().max(6).optional(),
+    companyName: z.string().optional(),
+    companyAddress: z.string().optional(),
+    startAddress: z.string().optional(),
+    preferredName: z.string().optional(),
+    pronouns: z.string().optional(),
+    daysWorking: z.array(z.boolean()).optional(),
+    bio: z.string().optional(),
+    startTime: z.date().optional(),
+    endTime: z.date().optional(),
+    timeDiffers: z.boolean().optional(),
+  })
+  .superRefine((data, ctx) => {
+    console.log("CURRENT ROLE = " + data.role);
+    if (data.role !== Role.VIEWER) {
+      if (!data.seatAvail && data.seatAvail !== 0)
+        ctx.addIssue({
+          code: custom,
+          path: ["seatAvail"],
+          message: "Cannot be empty",
+        });
+      if (data.companyName?.length === 0)
+        ctx.addIssue({
+          code: custom,
+          path: ["companyName"],
+          message: "Cannot be empty",
+        });
+      if (data.companyAddress?.length === 0)
+        ctx.addIssue({
+          code: custom,
+          path: ["companyAddress"],
+          message: "Cannot be empty",
+        });
+      if (data.startAddress?.length === 0)
+        ctx.addIssue({
+          code: custom,
+          path: ["startAddress"],
+          message: "Cannot be empty",
+        });
+      if (!data.daysWorking?.some(Boolean))
+        ctx.addIssue({
+          code: custom,
+          path: ["daysWorking"],
+          message: "Select at least one day",
+        });
+
+      if (!data.timeDiffers) {
+        if (!data.startTime)
+          ctx.addIssue({
+            code: custom,
+            path: ["startTime"],
+            message: "Start time must be provided",
+          });
+        if (!data.endTime)
+          ctx.addIssue({
+            code: custom,
+            path: ["endTime"],
+            message: "End time must be provided",
+          });
+      }
+    }
+  });
 
 const daysOfWeek = ["Su", "M", "Tu", "W", "Th", "F", "S"];
 
@@ -109,6 +146,9 @@ const Profile: NextPage = () => {
   const router = useRouter();
   const utils = trpc.useContext();
   const { data: session } = useSession();
+  const { data: user } = trpc.user.me.useQuery(undefined, {
+    refetchOnMount: true,
+  });
   const {
     register,
     formState: { errors },
@@ -134,9 +174,8 @@ const Profile: NextPage = () => {
     },
     resolver: zodResolver(onboardSchema),
   });
-  const { data: user } = trpc.user.me.useQuery(undefined, {
-    refetchOnMount: true,
-  });
+  const role = watch("role");
+  const isViewer = role === "VIEWER";
 
   const [companyAddressSuggestions, setCompanyAddressSuggestions] = useState<
     CarpoolFeature[]
@@ -268,7 +307,6 @@ const Profile: NextPage = () => {
       licenseSigned: true,
     });
   };
-  const isViewer = watch("role") === Role.VIEWER;
 
   return (
     <>

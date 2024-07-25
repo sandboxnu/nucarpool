@@ -182,16 +182,21 @@ const Home: NextPage<any> = () => {
   useEffect(() => {
     // TODO add default center zoom for viewer mode
     if (user && geoJsonUsers && mapContainerRef.current) {
+      const isViewer = user.role === "VIEWER";
+      const neuLat = 42.33907;
+      const neuLng = -71.088748;
       const newMap = new mapboxgl.Map({
         container: "map",
         style: "mapbox://styles/mapbox/light-v10",
-        center: [user.companyCoordLng, user.companyCoordLat],
+        center: isViewer
+          ? [neuLng, neuLat]
+          : [user.companyCoordLng, user.companyCoordLat],
         zoom: 10,
       });
       newMap.setMaxZoom(13);
       newMap.on("load", () => {
         addClusters(newMap, geoJsonUsers);
-        if (user.role !== "VIEWER") {
+        if (isViewer) {
           addUserLocation(newMap, user.startCoordLng, user.startCoordLat);
         }
         addMapEvents(newMap, user, setPopupUser);
@@ -200,6 +205,7 @@ const Home: NextPage<any> = () => {
       setMapState(newMap);
     }
   }, [user, geoJsonUsers]);
+
   // seperate use effect for user location rendering
   useEffect(() => {
     if (mapState) {
