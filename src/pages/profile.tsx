@@ -74,7 +74,6 @@ const onboardSchema = z
     timeDiffers: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
-    console.log("CURRENT ROLE = " + data.role);
     if (data.role !== Role.VIEWER) {
       if (!data.seatAvail && data.seatAvail !== 0)
         ctx.addIssue({
