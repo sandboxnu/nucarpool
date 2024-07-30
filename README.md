@@ -30,6 +30,10 @@ REGION_AWS=
 AZURE_CLIENT_ID=
 AZURE_CLIENT_SECRET=
 AZURE_TENANT_ID=
+
+# Google Auth Provider (used in the non-prod environment)
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
 ```
 
 Then do `yarn` and `yarn dev` to get the project running.
