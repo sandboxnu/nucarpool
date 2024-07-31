@@ -30,8 +30,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 
 const SignIn: NextPage = () => {
-  console.log(process.env);
   console.log(process.env.NODE_ENV);
+  console.log(process.env.DATABASE_URL);
   const handleOnNortheasternSignInClick = (
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
