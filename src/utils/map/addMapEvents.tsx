@@ -1,10 +1,8 @@
 import {
   GeoJSONSource,
   Map,
-  MapLayerEventType,
   MapLayerMouseEvent,
   NavigationControl,
-  Popup,
 } from "mapbox-gl";
 import { PublicUser } from "../types";
 import { User } from "../types";

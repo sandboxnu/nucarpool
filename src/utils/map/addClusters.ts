@@ -57,7 +57,6 @@ const addClusters = (map: Map, geoJsonUsers: GeoJsonUsers) => {
       "text-size": 12,
     },
   });
-  console.log("Adding source to map with GeoJSON data:", geoJsonUsers); // Log GeoJSON data
 
   // Add Driver Locations
   map.loadImage(OrangeSquare.src, (error, orangeImage) => {

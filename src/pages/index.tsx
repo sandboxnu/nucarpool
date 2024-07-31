@@ -66,7 +66,9 @@ const Home: NextPage<any> = () => {
   const { data: user = null } = trpc.user.me.useQuery();
   const { data: recommendations = [] } =
     trpc.user.recommendations.me.useQuery();
-  const { data: favorites = [] } = trpc.user.favorites.me.useQuery();
+  const { data: favorites = [] } = trpc.user.favorites.me.useQuery(undefined, {
+    refetchOnMount: true,
+  });
   const { data: requests = { sent: [], received: [] } } =
     trpc.user.requests.me.useQuery();
 
