@@ -10,6 +10,7 @@ export const favoritesRouter = router({
     const user = await ctx.prisma.user.findUnique({
       where: { id },
       select: {
+        role: true,
         favorites: true,
       },
     });
@@ -21,8 +22,11 @@ export const favoritesRouter = router({
         message: `No profile with id '${id}'`,
       });
     }
-
-    return user.favorites.map(convertToPublic);
+    const userRole = user.role;
+    const filteredFavorites = user.favorites.filter(
+      (favorite) => favorite.role !== userRole
+    );
+    return filteredFavorites.map(convertToPublic);
   }),
   edit: protectedRouter
     .input(

@@ -208,7 +208,7 @@ const Home: NextPage<any> = () => {
     }
   }, [user, geoJsonUsers]);
 
-  // seperate use effect for user location rendering
+  // separate use effect for user location rendering
   useEffect(() => {
     if (mapState) {
       updateUserLocation(
@@ -261,6 +261,18 @@ const Home: NextPage<any> = () => {
           className="flex-1 pt-4"
         />
       </div>
+      <div className="flex items-center space-x-4">
+        <VisibilityToggle
+          map={mapState}
+          style={{
+            width: "100%",
+            marginTop: "20px",
+            backgroundColor: "white",
+            borderRadius: "8px",
+            borderColor: "black",
+          }}
+        />
+      </div>
     </div>
   );
   return (
@@ -307,22 +319,6 @@ const Home: NextPage<any> = () => {
                   className={"h-full w-full flex-auto"}
                 >
                   {user.role === "VIEWER" && viewerBox}
-                  {user.role === "VIEWER" && (
-                    <VisibilityToggle
-                      map={mapState}
-                      style={{
-                        position: "absolute",
-                        top: "10px",
-                        right: "10px",
-                        zIndex: 9999,
-                        padding: "10px",
-                        paddingRight: "25px",
-                        backgroundColor: "white",
-                        boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-                        borderRadius: "8px",
-                      }}
-                    />
-                  )}
                   <MapLegend role={user.role} />
                   <MapConnectPortal
                     otherUser={popupUser}
