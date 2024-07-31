@@ -570,11 +570,7 @@ const Profile: NextPage = () => {
                   </div>
                   {/* Bio field */}
                   <div className="w-full py-4">
-                    <EntryLabel
-                      required
-                      error={errors.companyAddress}
-                      label="About Me"
-                    />
+                    <EntryLabel error={errors.bio} label="About Me" />
                     <textarea
                       className={`form-input w-full resize-none rounded-md
                        ${

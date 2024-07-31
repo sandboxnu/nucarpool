@@ -169,7 +169,13 @@ export function useGetDirections({
         map.on("load", () => {
           clearDirections(map);
         });
+        let beforeLayerId = "";
 
+        if (map.getLayer("riders")) {
+          beforeLayerId = "riders";
+        } else if (map.getLayer("drivers")) {
+          beforeLayerId = "drivers";
+        }
         map.addLayer(
           {
             id: "route",
@@ -187,7 +193,7 @@ export function useGetDirections({
               "line-width": 6,
             },
           },
-          "unclustered-point"
+          beforeLayerId
         );
       },
       onError: (error) => {

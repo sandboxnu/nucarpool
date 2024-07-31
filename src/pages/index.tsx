@@ -32,6 +32,7 @@ import { MapLegend } from "../components/MapLegend";
 import Image from "next/image";
 import BlueSquare from "../../public/blue-square.png";
 import BlueCircle from "../../public/blue-circle.png";
+import VisibilityToggle from "../components/Map/VisibilityToggle";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -182,7 +183,6 @@ const Home: NextPage<any> = () => {
   const enhancedFavs = favorites.map(extendPublicUser);
 
   useEffect(() => {
-    // TODO add default center zoom for viewer mode
     if (user && geoJsonUsers && mapContainerRef.current) {
       const isViewer = user.role === "VIEWER";
       const neuLat = 42.33907;
@@ -232,6 +232,7 @@ const Home: NextPage<any> = () => {
   if (!user) {
     return <Spinner />;
   }
+
   const viewerBox = (
     <div className="absolute left-0 top-0 z-10 m-2 flex min-w-[25rem] flex-col rounded-xl bg-white p-4 shadow-lg ">
       <div className="flex items-center space-x-4">
@@ -248,10 +249,6 @@ const Home: NextPage<any> = () => {
         />
       </div>
 
-      <div className="mx-3 flex-none" style={{ width: "3px", height: "2rem" }}>
-        <div className="h-full w-4 border-l-2 border-dashed border-black"></div>
-      </div>
-
       <div className="flex items-center space-x-4">
         <Image className="h-8 w-8 " src={BlueCircle} width={32} height={32} />
         <AddressCombobox
@@ -261,7 +258,7 @@ const Home: NextPage<any> = () => {
           addressSetter={setCompanyAddressSelected}
           addressSuggestions={companyAddressSuggestions}
           addressUpdater={updateCompanyAddress}
-          className="flex-1"
+          className="flex-1 pt-4"
         />
       </div>
     </div>
@@ -310,6 +307,22 @@ const Home: NextPage<any> = () => {
                   className={"h-full w-full flex-auto"}
                 >
                   {user.role === "VIEWER" && viewerBox}
+                  {user.role === "VIEWER" && (
+                    <VisibilityToggle
+                      map={mapState}
+                      style={{
+                        position: "absolute",
+                        top: "10px",
+                        right: "10px",
+                        zIndex: 9999,
+                        padding: "10px",
+                        paddingRight: "25px",
+                        backgroundColor: "white",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+                        borderRadius: "8px",
+                      }}
+                    />
+                  )}
                   <MapLegend role={user.role} />
                   <MapConnectPortal
                     otherUser={popupUser}

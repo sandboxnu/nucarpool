@@ -66,33 +66,34 @@ const addClusters = (map: Map, geoJsonUsers: GeoJsonUsers) => {
     map.loadImage(RedSquare.src, (error, blueImage) => {
       if (error || !blueImage) throw error;
       map.addImage("driver-marker", blueImage);
-      // Add the image to the map style.
-      // map.addImage("end_locs", image);
-
+      // Layer for Rider markers
       map.addLayer({
-        id: "unclustered-point",
+        id: "riders",
         type: "symbol",
         source: "company-locations",
-        filter: ["!", ["has", "point_count"]],
+        filter: [
+          "all",
+          ["!", ["has", "point_count"]],
+          ["==", ["get", "role"], "RIDER"],
+        ],
         layout: {
-          "icon-image": [
-            "match",
-            ["get", "role"],
-            "RIDER",
-            "rider-marker",
-            "DRIVER",
-            "driver-marker",
-            "rider-marker",
-          ],
-          "icon-size": [
-            "match",
-            ["get", "role"], // Get the role from each feature's properties
-            "DRIVER",
-            1,
-            "RIDER",
-            0.35,
-            0.35,
-          ],
+          "icon-image": "rider-marker",
+          "icon-size": 0.35,
+        },
+      });
+      // Layer for Driver markers
+      map.addLayer({
+        id: "drivers",
+        type: "symbol",
+        source: "company-locations",
+        filter: [
+          "all",
+          ["!", ["has", "point_count"]],
+          ["==", ["get", "role"], "DRIVER"],
+        ],
+        layout: {
+          "icon-image": "driver-marker",
+          "icon-size": 1,
         },
       });
     });
