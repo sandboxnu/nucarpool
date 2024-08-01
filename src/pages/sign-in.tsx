@@ -30,11 +30,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 
 const SignIn: NextPage = () => {
-  console.log(process.env.NODE_ENV);
-  console.log(process.env.DATABASE_URL);
-  console.log(process.env.NEXTAUTH_URL);
-  console.log(process.env.BUILD_ENV);
-  console.log(process.env.NEXT_PUBLIC_ENV);
   const handleOnNortheasternSignInClick = (
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
@@ -67,7 +62,7 @@ const SignIn: NextPage = () => {
               Sign in with Northeastern!
             </div>
           </button>
-          {process.env.NODE_ENV !== "production" && (
+          {process.env.NEXT_PUBLIC_ENV !== "production" && (
             <button onClick={handleOnGoogleSignInClick}>
               <div className="flex w-64 cursor-pointer items-center justify-center rounded bg-blue-500 px-4 py-3 text-center text-sm font-bold text-white shadow hover:bg-blue-700">
                 Sign in via Google!
