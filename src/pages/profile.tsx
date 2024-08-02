@@ -69,8 +69,8 @@ const onboardSchema = z
     pronouns: z.string().optional(),
     daysWorking: z.array(z.boolean()).optional(),
     bio: z.string().optional(),
-    startTime: z.date().optional(),
-    endTime: z.date().optional(),
+    startTime: z.date().nullable().optional(),
+    endTime: z.date().nullable().optional(),
     timeDiffers: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
@@ -528,9 +528,10 @@ const Profile: NextPage = () => {
                     </div>
                   </div>
                   <Note className="py-4 md:w-96">
-                    If you don&apos;t have set times, communicate that on your
-                    own with potential riders/drivers. For start/end time, enter
-                    whatever best matches your work schedule.
+                    Please input the start and end times of your work, rather
+                    than your departure times. If your work hours are flexible,
+                    coordinate directly with potential riders or drivers to
+                    inform them.
                   </Note>
                   <div className="flex flex-col space-y-2"></div>
                 </CommutingScheduleSection>

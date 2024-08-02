@@ -67,7 +67,7 @@ model Session {
 // Represents an Invitation to a user
 model Request {
   id         String @id @default(cuid()) // primary key
-  message    String
+  message    String @db.VarChar(255)
   fromUserId String // foreign key
   toUserId   String // foreign key
   fromUser   User   @relation("sentRequests", fields: [fromUserId], references: [id])

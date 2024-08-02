@@ -89,7 +89,7 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
             </div>
             <textarea
               className={`form-input h-24 min-h-[120px] w-full resize-none rounded-md px-3 py-2 shadow-sm`}
-              maxLength={280}
+              maxLength={255}
               defaultValue={customMessage}
               onChange={(e) => setCustomMessage(e.target.value)}
             ></textarea>

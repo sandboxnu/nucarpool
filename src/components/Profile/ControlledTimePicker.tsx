@@ -26,7 +26,7 @@ const ControlledTimePickerRHF = (props: ControlledTimePickerRHFProps) => {
   const convertInputDateToUTC = (inputDate: Date): Date => {
     const inputHours = inputDate.getHours();
     const result = dayjs.utc(
-      `2022-2-2 ${inputHours}:${inputDate.getMinutes()}`
+      `2022-02-02 ${inputHours}:${inputDate.getMinutes()}`
     );
     return result.toDate();
   };
@@ -42,33 +42,40 @@ const ControlledTimePickerRHF = (props: ControlledTimePickerRHFProps) => {
     <Controller
       name={props.name}
       control={props.control}
-      render={({ field: { ref, ...fieldProps }, fieldState }) => (
-        <div className={"flex flex-col"}>
-          <TimePicker
-            className="form-input w-full rounded-lg"
-            format="h:mm A"
-            suffixIcon={customSuffixIcon()}
-            ref={ref}
-            status={fieldState.error ? "error" : undefined}
-            placeholder={props.placeholder}
-            showNow={false}
-            disabled={props.isDisabled}
-            minuteStep={15}
-            use12Hours={true}
-            value={displayedTime}
-            onSelect={(date) => {
-              if (!date.isUTC()) {
-                const utcDate = convertInputDateToUTC(date.toDate());
-                setDisplayedTime(date);
-                fieldProps.onChange(utcDate);
-              } else {
-                setDisplayedTime(dayjs.utc(date));
-                fieldProps.onChange(date.toDate());
-              }
-            }}
-          />
-        </div>
-      )}
+      render={({ field: { ref, ...fieldProps }, fieldState }) => {
+        // Log the error state to the console
+        if (fieldState.error) {
+          console.log("Error in TimePicker:", fieldState.error);
+        }
+
+        return (
+          <div className={"flex flex-col"}>
+            <TimePicker
+              className="form-input w-full rounded-lg"
+              format="h:mm A"
+              suffixIcon={customSuffixIcon()}
+              ref={ref}
+              status={fieldState.error ? "error" : undefined}
+              placeholder={props.placeholder}
+              showNow={false}
+              disabled={props.isDisabled}
+              minuteStep={15}
+              use12Hours={true}
+              value={displayedTime}
+              onSelect={(date) => {
+                if (!date.isUTC()) {
+                  const utcDate = convertInputDateToUTC(date.toDate());
+                  setDisplayedTime(date);
+                  fieldProps.onChange(utcDate);
+                } else {
+                  setDisplayedTime(dayjs.utc(date));
+                  fieldProps.onChange(date.toDate());
+                }
+              }}
+            />
+          </div>
+        );
+      }}
     />
   );
 };
