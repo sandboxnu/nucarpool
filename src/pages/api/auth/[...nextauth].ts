@@ -4,6 +4,7 @@ import { NextAuthOptions } from "next-auth";
 import { prisma } from "../../../server/db/client";
 import { serverEnv } from "../../../utils/env/server";
 import AzureADProvider from "next-auth/providers/azure-ad";
+import GoogleProvider from "next-auth/providers/google";
 import { Adapter } from "next-auth/adapters";
 
 const CustomPrismaAdapter = (p: typeof prisma): Adapter => {
@@ -48,6 +49,10 @@ export const authOptions: NextAuthOptions = {
   },
   adapter: CustomPrismaAdapter(prisma),
   providers: [
+    GoogleProvider({
+      clientId: serverEnv.GOOGLE_CLIENT_ID,
+      clientSecret: serverEnv.GOOGLE_CLIENT_SECRET,
+    }),
     AzureADProvider({
       clientId: serverEnv.AZURE_CLIENT_ID,
       clientSecret: serverEnv.AZURE_CLIENT_SECRET,
