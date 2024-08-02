@@ -34,6 +34,10 @@ AZURE_TENANT_ID=
 # Google Auth Provider (used in the non-prod environment)
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
+
+# Environment Configuration
+BUILD_ENV=
+NEXT_PUBLIC_ENV=
 ```
 
 Then do `yarn` and `yarn dev` to get the project running.
