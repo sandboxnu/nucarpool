@@ -6,7 +6,6 @@ import { RiFocus3Line } from "react-icons/ri";
 import { ToastProvider } from "react-toast-notifications";
 import addClusters from "../utils/map/addClusters";
 import addMapEvents from "../utils/map/addMapEvents";
-import addUserLocation from "../utils/map/addUserLocation";
 import Head from "next/head";
 import { trpc } from "../utils/trpc";
 import { browserEnv } from "../utils/env/browser";
@@ -33,6 +32,7 @@ import Image from "next/image";
 import BlueSquare from "../../public/blue-square.png";
 import BlueCircle from "../../public/blue-circle.png";
 import VisibilityToggle from "../components/Map/VisibilityToggle";
+import updateCompanyLocation from "../utils/map/updateCompanyLocation";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -146,6 +146,7 @@ const Home: NextPage<any> = () => {
     };
     if (mapState) {
       updateUserLocation(mapState, userStartLng, userStartLat);
+      updateCompanyLocation(mapState, userCompanyLng, userCompanyLat);
       const viewProps = {
         user,
         otherUser,
@@ -200,9 +201,12 @@ const Home: NextPage<any> = () => {
       newMap.setMaxZoom(13);
       newMap.on("load", () => {
         addClusters(newMap, geoJsonUsers);
-        if (isViewer) {
-          addUserLocation(newMap, user.startCoordLng, user.startCoordLat);
-        }
+        updateUserLocation(newMap, user.startCoordLng, user.startCoordLat);
+        updateCompanyLocation(
+          newMap,
+          user.companyCoordLng,
+          user.companyCoordLat
+        );
         addMapEvents(newMap, user, setPopupUser);
       });
 
@@ -217,6 +221,11 @@ const Home: NextPage<any> = () => {
         mapState,
         startAddressSelected.center[0],
         startAddressSelected.center[1]
+      );
+      updateCompanyLocation(
+        mapState,
+        companyAddressSelected.center[0],
+        companyAddressSelected.center[1]
       );
     }
   }, [companyAddressSelected, startAddressSelected]);

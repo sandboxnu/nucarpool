@@ -94,20 +94,17 @@ export const viewRoute = (props: ViewRouteProps) => {
     ])
     .setPopup(otherUserEndPopup)
     .addTo(props.map);
-  const blueSquare = createMarkerEl(BlueEnd);
   const selfEndPopup = createPopup("My Dest.");
-  const selfEndMarker = new mapboxgl.Marker({ element: blueSquare })
-    .setLngLat([props.userCoord.endLng, props.userCoord.endLat])
-    .setPopup(selfEndPopup)
-    .addTo(props.map);
-  selfEndMarker.togglePopup();
-  previousMarkers.push(selfEndMarker);
 
+  selfEndPopup
+    .setLngLat([props.userCoord.endLng, props.userCoord.endLat])
+    .addTo(props.map);
   selfStartPopup
     .setLngLat([props.userCoord.startLng, props.userCoord.startLat])
     .addTo(props.map);
   otherUserStartMarker.togglePopup();
   otherUserEndMarker.togglePopup();
+  previousMarkers.push(selfEndPopup);
   previousMarkers.push(selfStartPopup);
   previousMarkers.push(otherUserStartMarker);
   previousMarkers.push(otherUserEndMarker);

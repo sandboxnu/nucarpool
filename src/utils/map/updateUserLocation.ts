@@ -1,5 +1,5 @@
 import { Map } from "mapbox-gl";
-import addUserLocation from "./addUserLocation";
+import PulsingDot from "./PulsingDot";
 
 const updateUserLocation = (
   map: Map,
@@ -18,7 +18,29 @@ const updateUserLocation = (
       properties: {},
     });
   } else {
-    addUserLocation(map, userLongitude, userLatitude);
+    map.addSource("dot-point", {
+      type: "geojson",
+      data: {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [userLongitude, userLatitude], // icon position [lng, lat]
+        },
+        properties: {},
+      },
+    });
+    map.addImage("pulsing-dot", new PulsingDot(100, map), {
+      pixelRatio: 2,
+    });
+    map.addLayer({
+      id: "layer-with-pulsing-dot",
+      type: "symbol",
+      source: "dot-point",
+      layout: {
+        "icon-image": "pulsing-dot",
+        "icon-allow-overlap": true,
+      },
+    });
   }
 };
 
