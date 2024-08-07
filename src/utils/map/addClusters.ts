@@ -1,6 +1,7 @@
 import { Map } from "mapbox-gl";
 import { GeoJsonUsers } from "../types";
-import OrangeCircle from "../../../public/orange-square.png";
+import OrangeSquare from "../../../public/orange-square.png";
+import RedSquare from "../../../public/red-square.png";
 /**
  * Filter Expression: https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/
  * Clusters example with filter expression: https://docs.mapbox.com/mapbox-gl-js/example/cluster-html/
@@ -57,21 +58,43 @@ const addClusters = (map: Map, geoJsonUsers: GeoJsonUsers) => {
     },
   });
 
-  map.loadImage(OrangeCircle.src, (error, image) => {
-    if (error || !image) throw error;
-
-    // Add the image to the map style.
-    map.addImage("end_locs", image);
-
-    map.addLayer({
-      id: "unclustered-point",
-      type: "symbol",
-      source: "company-locations",
-      filter: ["!", ["has", "point_count"]],
-      layout: {
-        "icon-image": "end_locs",
-        "icon-size": 0.35,
-      },
+  // Add Driver Locations
+  map.loadImage(OrangeSquare.src, (error, orangeImage) => {
+    if (error || !orangeImage) throw error;
+    map.addImage("rider-marker", orangeImage);
+    map.loadImage(RedSquare.src, (error, blueImage) => {
+      if (error || !blueImage) throw error;
+      map.addImage("driver-marker", blueImage);
+      // Layer for Rider markers
+      map.addLayer({
+        id: "riders",
+        type: "symbol",
+        source: "company-locations",
+        filter: [
+          "all",
+          ["!", ["has", "point_count"]],
+          ["==", ["get", "role"], "RIDER"],
+        ],
+        layout: {
+          "icon-image": "rider-marker",
+          "icon-size": 0.35,
+        },
+      });
+      // Layer for Driver markers
+      map.addLayer({
+        id: "drivers",
+        type: "symbol",
+        source: "company-locations",
+        filter: [
+          "all",
+          ["!", ["has", "point_count"]],
+          ["==", ["get", "role"], "DRIVER"],
+        ],
+        layout: {
+          "icon-image": "driver-marker",
+          "icon-size": 1,
+        },
+      });
     });
   });
 };

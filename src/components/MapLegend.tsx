@@ -1,32 +1,33 @@
-import RedMarker from "../../public/red-marker.png";
-import GreenMarker from "../../public/green-marker.png";
-import BlueMarker from "../../public/blue-marker.png";
-import OrangeMarker from "../../public/orange-marker.png";
+import RedSquare from "../../public/red-square.png";
+import BlueSquare from "../../public/blue-square.png";
+import OrangeSquare from "../../public/orange-square.png";
 import Image from "next/image";
-
-interface LegendProps {
+import { EnhancedPublicUser, PublicUser } from "../utils/types";
+import { User } from "@prisma/client";
+interface MapLegendProps {
   role: string;
 }
-export const MapLegend = (props: LegendProps) => {
+export const MapLegend = (props: MapLegendProps) => {
+  const role = props.role;
   return (
     <>
-      <div className="absolute right-4 top-4 z-10 flex flex-col rounded-md border bg-white bg-opacity-75 p-4">
-        <div className="my-1 flex flex-row">
-          <Image className="" src={GreenMarker} width={25} height={20} />
-          <p className="mx-3">My Start</p>
+      <div className="text-md absolute bottom-8 left-2 z-10  flex flex-col rounded-xl border bg-white p-2  md:text-lg">
+        <div className="my-1 flex flex-row items-center">
+          <Image className="" src={BlueSquare} width={32} height={32} />
+          <p className="mx-2">My Destination</p>
         </div>
-        <div className="my-1 flex flex-row">
-          <Image className="" src={RedMarker} width={25} height={20} />
-          <p className="mx-3">My Destination</p>
-        </div>
-        <div className="my-1 flex flex-row">
-          <Image className="" src={BlueMarker} width={25} height={20} />
-          <p className="mx-3">{props.role + " Start"}</p>
-        </div>
-        <div className="my-1 flex flex-row">
-          <Image className="" src={OrangeMarker} width={25} height={20} />
-          <p className="mx-3">{props.role + " Destination"}</p>
-        </div>
+        {(role === "VIEWER" || role === "RIDER") && (
+          <div className="my-1 flex flex-row items-center">
+            <Image className="" src={RedSquare} width={32} height={32} />
+            <p className="mx-2">{"Driver Destination"}</p>
+          </div>
+        )}
+        {(role === "VIEWER" || role === "DRIVER") && (
+          <div className="my-1 flex flex-row items-center">
+            <Image className="" src={OrangeSquare} width={32} height={32} />
+            <p className="mx-2">{"Rider Destination"}</p>
+          </div>
+        )}
       </div>
     </>
   );

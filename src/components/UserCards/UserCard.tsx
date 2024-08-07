@@ -90,7 +90,15 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         {/* top row */}
         <div className="flex">
           <div className="text-lg">
-            <p className="font-semibold">{props.otherUser.preferredName}</p>
+            {user.role === "VIEWER" ? (
+              <p className="font-semibold">{`${props.otherUser.role.charAt(
+                0
+              )}${props.otherUser.role.slice(1).toLowerCase()} ${
+                props.otherUser.id
+              }`}</p>
+            ) : (
+              <p className="font-semibold">{props.otherUser.preferredName}</p>
+            )}
             <p className="font-light">{props.otherUser.companyName}</p>
           </div>
         </div>
@@ -124,7 +132,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       </div>
       {props.otherUser.role === "DRIVER" && (
         <div className="flex flex-row text-sm">
-          <div className="mr-1">Seats: </div>
+          <div className="mr-1">Open Seats: </div>
           <div className="font-semibold">{props.otherUser.seatAvail}</div>
         </div>
       )}
@@ -137,6 +145,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         </button>
         <button
           onClick={() => props.rightButton.onPress(props.otherUser)}
+          disabled={user.role === "VIEWER"}
           className={getButtonClassName(props.rightButton)}
         >
           {props.rightButton.text}

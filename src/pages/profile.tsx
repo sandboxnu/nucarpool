@@ -57,35 +57,71 @@ const dateErrorMap: z.ZodErrorMap = (issue, ctx) => {
   return { message: "Invalid time" };
 };
 
-const onboardSchema = z.intersection(
-  z.object({
+const custom = z.ZodIssueCode.custom;
+const onboardSchema = z
+  .object({
     role: z.nativeEnum(Role),
-    seatAvail: z
-      .number({ invalid_type_error: "Cannot be empty" })
-      .int("Must be an integer")
-      .nonnegative("Must be greater or equal to 0")
-      .max(6),
-    companyName: z.string().min(1, "Cannot be empty"),
-    companyAddress: z.string().min(1, "Cannot be empty"),
-    startAddress: z.string().min(1, "Cannot be empty"),
-    preferredName: z.string(),
-    pronouns: z.string(),
-    daysWorking: z
-      .array(z.boolean())
-      .refine((a) => a.some((b) => b), { message: "Select at least one day" }), // Make this regex.
-    bio: z.string(),
-  }),
-  z.union([
-    z.object({
-      startTime: z.date({ errorMap: dateErrorMap }),
-      endTime: z.date({ errorMap: dateErrorMap }),
-      timeDiffers: z.literal(false),
-    }),
-    z.object({
-      timeDiffers: z.literal(true),
-    }),
-  ])
-);
+    seatAvail: z.number().int().nonnegative().max(6).optional(),
+    companyName: z.string().optional(),
+    companyAddress: z.string().optional(),
+    startAddress: z.string().optional(),
+    preferredName: z.string().optional(),
+    pronouns: z.string().optional(),
+    daysWorking: z.array(z.boolean()).optional(),
+    bio: z.string().optional(),
+    startTime: z.date().nullable().optional(),
+    endTime: z.date().nullable().optional(),
+    timeDiffers: z.boolean().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.role !== Role.VIEWER) {
+      if (!data.seatAvail && data.seatAvail !== 0)
+        ctx.addIssue({
+          code: custom,
+          path: ["seatAvail"],
+          message: "Cannot be empty",
+        });
+      if (data.companyName?.length === 0)
+        ctx.addIssue({
+          code: custom,
+          path: ["companyName"],
+          message: "Cannot be empty",
+        });
+      if (data.companyAddress?.length === 0)
+        ctx.addIssue({
+          code: custom,
+          path: ["companyAddress"],
+          message: "Cannot be empty",
+        });
+      if (data.startAddress?.length === 0)
+        ctx.addIssue({
+          code: custom,
+          path: ["startAddress"],
+          message: "Cannot be empty",
+        });
+      if (!data.daysWorking?.some(Boolean))
+        ctx.addIssue({
+          code: custom,
+          path: ["daysWorking"],
+          message: "Select at least one day",
+        });
+
+      if (!data.timeDiffers) {
+        if (!data.startTime)
+          ctx.addIssue({
+            code: custom,
+            path: ["startTime"],
+            message: "Start time must be provided",
+          });
+        if (!data.endTime)
+          ctx.addIssue({
+            code: custom,
+            path: ["endTime"],
+            message: "End time must be provided",
+          });
+      }
+    }
+  });
 
 const daysOfWeek = ["Su", "M", "Tu", "W", "Th", "F", "S"];
 
@@ -109,6 +145,9 @@ const Profile: NextPage = () => {
   const router = useRouter();
   const utils = trpc.useContext();
   const { data: session } = useSession();
+  const { data: user } = trpc.user.me.useQuery(undefined, {
+    refetchOnMount: true,
+  });
   const {
     register,
     formState: { errors },
@@ -134,9 +173,8 @@ const Profile: NextPage = () => {
     },
     resolver: zodResolver(onboardSchema),
   });
-  const { data: user } = trpc.user.me.useQuery(undefined, {
-    refetchOnMount: true,
-  });
+  const role = watch("role");
+  const isViewer = role === "VIEWER";
 
   const [companyAddressSuggestions, setCompanyAddressSuggestions] = useState<
     CarpoolFeature[]
@@ -288,6 +326,7 @@ const Profile: NextPage = () => {
                   />
                   <div>
                     <ControlledAddressCombobox
+                      isDisabled={isViewer}
                       control={control}
                       name={"startAddress"}
                       addressSelected={startAddressSelected}
@@ -317,6 +356,7 @@ const Profile: NextPage = () => {
                     className={`w-full`}
                     inputClassName={`h-12`}
                     label="Workplace Name"
+                    isDisabled={isViewer}
                     id="companyName"
                     error={errors.companyName}
                     type="text"
@@ -333,6 +373,7 @@ const Profile: NextPage = () => {
                     address out
                   </Note>
                   <ControlledAddressCombobox
+                    isDisabled={isViewer}
                     control={control}
                     name={"companyAddress"}
                     addressSelected={companyAddressSelected}
@@ -345,13 +386,21 @@ const Profile: NextPage = () => {
                     <ErrorDisplay>{errors.companyAddress.message}</ErrorDisplay>
                   )}
                 </MiddleProfileSection>
-
                 {/* Role field  */}
                 <BottomProfileSection>
                   <ProfileHeaderNoMB>
                     I am a... <span className="text-northeastern-red">*</span>
                   </ProfileHeaderNoMB>
                   <div className="flex h-24 items-end space-x-4">
+                    <Radio
+                      label="Viewer"
+                      id="viewer"
+                      error={errors.role}
+                      role={Role.VIEWER}
+                      value={Role.VIEWER}
+                      currentlySelected={watch("role")}
+                      {...register("role")}
+                    />
                     <Radio
                       label="Rider"
                       id="rider"
@@ -390,14 +439,19 @@ const Profile: NextPage = () => {
                       </div>
                     )}
                   </div>
-                  <Note
-                    style={{
-                      visibility:
-                        watch("role") == Role.DRIVER ? "visible" : "hidden",
-                    }}
-                  >
-                    Registering 0 available seats will remove you from the
-                    app&apos;s recommendation generation.
+                  <Note>
+                    {watch("role") === Role.DRIVER && (
+                      <span>
+                        Registering 0 available seats will remove you from the
+                        app&apos;s recommendation generation.
+                      </span>
+                    )}
+                    {isViewer && (
+                      <span>
+                        As a viewer, you can see other riders and drivers on the
+                        map but cannot request a ride.
+                      </span>
+                    )}
                   </Note>
                 </BottomProfileSection>
               </ProfileColumn>
@@ -421,11 +475,12 @@ const Profile: NextPage = () => {
                               key={day + index.toString()}
                               sx={{
                                 input: { width: 1, height: 1 },
-                                aspectRatio: 1 / 1,
+                                aspectRatio: 1,
                                 width: 1,
                                 height: 1,
                                 padding: 0,
                               }}
+                              disabled={isViewer}
                               checked={value}
                               onChange={onChange}
                               checkedIcon={
@@ -452,6 +507,7 @@ const Profile: NextPage = () => {
                         label="Start Time"
                       />
                       <ControlledTimePicker
+                        isDisabled={isViewer}
                         control={control}
                         name={"startTime"}
                         value={user?.startTime ? user.startTime : undefined}
@@ -464,6 +520,7 @@ const Profile: NextPage = () => {
                         label="End Time"
                       />
                       <ControlledTimePicker
+                        isDisabled={isViewer}
                         control={control}
                         name={"endTime"}
                         value={user?.endTime ? user.endTime : undefined}
@@ -471,9 +528,10 @@ const Profile: NextPage = () => {
                     </div>
                   </div>
                   <Note className="py-4 md:w-96">
-                    If you don&apos;t have set times, communicate that on your
-                    own with potential riders/drivers. For start/end time, enter
-                    whatever best matches your work schedule.
+                    Please input the start and end times of your work, rather
+                    than your departure times. If your work hours are flexible,
+                    coordinate directly with potential riders or drivers to
+                    inform them.
                   </Note>
                   <div className="flex flex-col space-y-2"></div>
                 </CommutingScheduleSection>
@@ -489,6 +547,7 @@ const Profile: NextPage = () => {
                       <TextField
                         id="preferredName"
                         error={errors.preferredName}
+                        isDisabled={isViewer}
                         type="text"
                         inputClassName={`h-12`}
                         {...register("preferredName")}
@@ -504,6 +563,7 @@ const Profile: NextPage = () => {
                         id="pronouns"
                         inputClassName={`h-12`}
                         error={errors.pronouns}
+                        isDisabled={isViewer}
                         type="text"
                         {...register("pronouns")}
                       />
@@ -511,14 +571,16 @@ const Profile: NextPage = () => {
                   </div>
                   {/* Bio field */}
                   <div className="w-full py-4">
-                    <EntryLabel
-                      required
-                      error={errors.companyAddress}
-                      label="About Me"
-                    />
+                    <EntryLabel error={errors.bio} label="About Me" />
                     <textarea
-                      className={`form-input w-full resize-none rounded-md border-black px-3 py-2`}
+                      className={`form-input w-full resize-none rounded-md
+                       ${
+                         isViewer
+                           ? "border-gray-100 bg-gray-200 text-gray-400"
+                           : ""
+                       } border-black px-3 py-2`}
                       maxLength={188}
+                      disabled={isViewer}
                       {...register("bio")}
                     />
                     <Note>

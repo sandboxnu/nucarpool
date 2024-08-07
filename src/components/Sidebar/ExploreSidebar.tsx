@@ -7,6 +7,7 @@ import { clearMarkers } from "../../utils/map/viewRoute";
 interface ExploreSidebarProps {
   recs: EnhancedPublicUser[];
   favs: EnhancedPublicUser[];
+  disabled: boolean;
   viewRoute: (user: User, otherUser: PublicUser) => void;
 }
 
@@ -26,7 +27,8 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
             }
             onClick={() => {
               setCurOption("recommendations");
-              clearMarkers();
+              // don't see a reason for clearing markers
+              //clearMarkers();
             }}
           >
             Recommendations
@@ -39,7 +41,7 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
             }
             onClick={() => {
               setCurOption("favorites");
-              clearMarkers();
+              //clearMarkers();
             }}
           >
             Favorites
@@ -49,6 +51,7 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
       <SidebarContent
         userCardList={curOption == "recommendations" ? props.recs : props.favs}
         subType={curOption}
+        disabled={props.disabled}
         onViewRouteClick={props.viewRoute}
       />
     </div>

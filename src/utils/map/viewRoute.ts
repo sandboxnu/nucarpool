@@ -1,8 +1,8 @@
 import mapboxgl from "mapbox-gl";
-import { PublicUser, User } from "../types";
+import { CarpoolAddress, CarpoolFeature, PublicUser, User } from "../types";
 import { Role } from "@prisma/client";
 import { trpc } from "../trpc";
-import { useEffect } from "react";
+import { SetStateAction, useEffect } from "react";
 import { toast } from "react-toastify";
 import polyline from "@mapbox/polyline";
 import { LineString } from "geojson";
@@ -12,9 +12,11 @@ import RedEnd from "../../../public/red-square.png";
 import BlueEnd from "../../../public/blue-square.png";
 import orangeCircle from "../../../public/orange-circle.png";
 
-const previousMarkers: mapboxgl.Marker[] = [];
+const previousMarkers: (mapboxgl.Marker | mapboxgl.Popup)[] = [];
 export const clearMarkers = () => {
-  previousMarkers.forEach((marker) => marker.remove());
+  previousMarkers.forEach((element) => {
+    element.remove();
+  });
   previousMarkers.length = 0;
 };
 
@@ -42,41 +44,43 @@ const createMarkerEl = (img: StaticImageData) => {
   el.style.marginTop = "1em";
   return el;
 };
-// Creates MapBox markers showing user's start address and the start area of the other user.
-export const viewRoute = (
-  user: User,
-  otherUser: PublicUser,
-  map: mapboxgl.Map
-) => {
-  clearMarkers();
-  clearDirections(map);
+interface ViewRouteProps {
+  user: User;
+  otherUser: PublicUser;
+  map: mapboxgl.Map;
+  userCoord: {
+    startLat: number;
+    startLng: number;
+    endLat: number;
+    endLng: number;
+  };
+}
 
-  const otherRole = user.role === Role.DRIVER ? "Rider" : "Driver";
+// Creates MapBox markers showing user's start address and the start area of the other user.
+export const viewRoute = (props: ViewRouteProps) => {
+  clearMarkers();
+  clearDirections(props.map);
+
+  const otherRole =
+    props.otherUser.role.charAt(0).toUpperCase() +
+    props.otherUser.role.slice(1).toLowerCase();
 
   const redCircle = createMarkerEl(RedStart);
   redCircle.style.opacity = "0";
   const selfStartPopup = createPopup("My Start");
-  const selfStartMarker = new mapboxgl.Marker({
-    element: redCircle,
-    anchor: "bottom",
-  })
-    .setLngLat([user.startCoordLng, user.startCoordLat])
-    .setPopup(selfStartPopup)
-    .addTo(map);
-
-  const blueSquare = createMarkerEl(BlueEnd);
-  const selfEndPopup = createPopup("My Dest.");
-  const selfEndMarker = new mapboxgl.Marker({ element: blueSquare })
-    .setLngLat([user.companyCoordLng, user.companyCoordLat])
-    .setPopup(selfEndPopup)
-    .addTo(map);
 
   const orangeStart = createMarkerEl(orangeCircle);
+  const redStart = createMarkerEl(redCircle);
   const otherUserStartPopup = createPopup(otherRole + " Start");
-  const otherUserStartMarker = new mapboxgl.Marker({ element: orangeStart })
-    .setLngLat([otherUser.startPOICoordLng, otherUser.startPOICoordLat])
+  const otherUserStartMarker = new mapboxgl.Marker({
+    element: otherRole === "Rider" ? orangeStart : redStart,
+  })
+    .setLngLat([
+      props.otherUser.startPOICoordLng,
+      props.otherUser.startPOICoordLat,
+    ])
     .setPopup(otherUserStartPopup)
-    .addTo(map);
+    .addTo(props.map);
 
   const redSquare = createMarkerEl(RedEnd);
   redSquare.style.opacity = "0";
@@ -84,28 +88,47 @@ export const viewRoute = (
   const otherUserEndMarker = new mapboxgl.Marker({
     element: redSquare,
   })
-    .setLngLat([otherUser.companyCoordLng, otherUser.companyCoordLat])
+    .setLngLat([
+      props.otherUser.companyCoordLng,
+      props.otherUser.companyCoordLat,
+    ])
     .setPopup(otherUserEndPopup)
-    .addTo(map);
+    .addTo(props.map);
+  const selfEndPopup = createPopup("My Dest.");
 
-  selfStartMarker.togglePopup();
-  selfEndMarker.togglePopup();
+  selfEndPopup
+    .setLngLat([props.userCoord.endLng, props.userCoord.endLat])
+    .addTo(props.map);
+  selfStartPopup
+    .setLngLat([props.userCoord.startLng, props.userCoord.startLat])
+    .addTo(props.map);
   otherUserStartMarker.togglePopup();
   otherUserEndMarker.togglePopup();
-
-  previousMarkers.push(selfStartMarker);
-  previousMarkers.push(selfEndMarker);
+  previousMarkers.push(selfEndPopup);
+  previousMarkers.push(selfStartPopup);
   previousMarkers.push(otherUserStartMarker);
   previousMarkers.push(otherUserEndMarker);
 
-  map.fitBounds([
+  props.map.fitBounds([
     [
-      Math.min(otherUser.startPOICoordLng, otherUser.companyCoordLng) - 0.0075,
-      Math.max(otherUser.startPOICoordLat, otherUser.companyCoordLat) + 0.0075,
+      Math.min(
+        props.otherUser.startPOICoordLng,
+        props.otherUser.companyCoordLng
+      ) - 0.0075,
+      Math.max(
+        props.otherUser.startPOICoordLat,
+        props.otherUser.companyCoordLat
+      ) + 0.0075,
     ],
     [
-      Math.max(otherUser.startPOICoordLng, otherUser.companyCoordLng) + 0.0075,
-      Math.min(otherUser.startPOICoordLat, otherUser.companyCoordLat) - 0.0075,
+      Math.max(
+        props.otherUser.startPOICoordLng,
+        props.otherUser.companyCoordLng
+      ) + 0.0075,
+      Math.min(
+        props.otherUser.startPOICoordLat,
+        props.otherUser.companyCoordLat
+      ) - 0.0075,
     ],
   ]);
 };
@@ -143,23 +166,32 @@ export function useGetDirections({
         map.on("load", () => {
           clearDirections(map);
         });
+        let beforeLayerId = "";
 
-        map.addLayer({
-          id: "route",
-          type: "line",
-          source: {
-            type: "geojson",
-            data: lineStringFeature,
+        if (map.getLayer("riders")) {
+          beforeLayerId = "riders";
+        } else if (map.getLayer("drivers")) {
+          beforeLayerId = "drivers";
+        }
+        map.addLayer(
+          {
+            id: "route",
+            type: "line",
+            source: {
+              type: "geojson",
+              data: lineStringFeature,
+            },
+            layout: {
+              "line-join": "round",
+              "line-cap": "round",
+            },
+            paint: {
+              "line-color": "#61666b",
+              "line-width": 6,
+            },
           },
-          layout: {
-            "line-join": "round",
-            "line-cap": "round",
-          },
-          paint: {
-            "line-color": "#61666b",
-            "line-width": 6,
-          },
-        });
+          beforeLayerId
+        );
       },
       onError: (error) => {
         toast.error(`Something went wrong: ${error}`);

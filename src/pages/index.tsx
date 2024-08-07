@@ -1,12 +1,11 @@
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import type { GetServerSidePropsContext, NextPage } from "next";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { RiFocus3Line } from "react-icons/ri";
 import { ToastProvider } from "react-toast-notifications";
 import addClusters from "../utils/map/addClusters";
 import addMapEvents from "../utils/map/addMapEvents";
-import addUserLocation from "../utils/map/addUserLocation";
 import Head from "next/head";
 import { trpc } from "../utils/trpc";
 import { browserEnv } from "../utils/env/browser";
@@ -14,12 +13,26 @@ import Header, { HeaderOptions } from "../components/Header";
 import { getSession } from "next-auth/react";
 import Spinner from "../components/Spinner";
 import { UserContext } from "../utils/userContext";
-import _ from "lodash";
+import _, { debounce } from "lodash";
 import { SidebarPage } from "../components/Sidebar/Sidebar";
-import { EnhancedPublicUser, PublicUser } from "../utils/types";
+import {
+  CarpoolAddress,
+  CarpoolFeature,
+  EnhancedPublicUser,
+  PublicUser,
+} from "../utils/types";
 import { User } from "@prisma/client";
 import { useGetDirections, viewRoute } from "../utils/map/viewRoute";
 import { MapConnectPortal } from "../components/MapConnectPortal";
+import useSearch from "../utils/search";
+import AddressCombobox from "../components/Map/AddressCombobox";
+import updateUserLocation from "../utils/map/updateUserLocation";
+import { MapLegend } from "../components/MapLegend";
+import Image from "next/image";
+import BlueSquare from "../../public/blue-square.png";
+import BlueCircle from "../../public/blue-circle.png";
+import VisibilityToggle from "../components/Map/VisibilityToggle";
+import updateCompanyLocation from "../utils/map/updateCompanyLocation";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -53,7 +66,9 @@ const Home: NextPage<any> = () => {
   const { data: user = null } = trpc.user.me.useQuery();
   const { data: recommendations = [] } =
     trpc.user.recommendations.me.useQuery();
-  const { data: favorites = [] } = trpc.user.favorites.me.useQuery();
+  const { data: favorites = [] } = trpc.user.favorites.me.useQuery(undefined, {
+    refetchOnMount: true,
+  });
   const { data: requests = { sent: [], received: [] } } =
     trpc.user.requests.me.useQuery();
 
@@ -62,6 +77,35 @@ const Home: NextPage<any> = () => {
   const [popupUser, setPopupUser] = useState<PublicUser | null>(null);
   const mapContainerRef = useRef(null);
   const [points, setPoints] = useState<[number, number][]>([]);
+  const [companyAddressSuggestions, setCompanyAddressSuggestions] = useState<
+    CarpoolFeature[]
+  >([]);
+  const [startAddressSuggestions, setStartAddressSuggestions] = useState<
+    CarpoolFeature[]
+  >([]);
+
+  const [companyAddressSelected, setCompanyAddressSelected] =
+    useState<CarpoolAddress>({
+      place_name: "",
+      center: [0, 0],
+    });
+  const [startAddressSelected, setStartAddressSelected] =
+    useState<CarpoolAddress>({
+      place_name: "",
+      center: [0, 0],
+    });
+
+  const [companyAddress, setCompanyAddress] = useState("");
+  const updateCompanyAddress = useMemo(
+    () => debounce(setCompanyAddress, 250),
+    []
+  );
+
+  const [startingAddress, setStartingAddress] = useState("");
+  const updateStartingAddress = useMemo(
+    () => debounce(setStartingAddress, 250),
+    []
+  );
 
   useGetDirections({ points: points, map: mapState! });
 
@@ -77,24 +121,55 @@ const Home: NextPage<any> = () => {
   };
 
   const onViewRouteClick = (user: User, otherUser: PublicUser) => {
+    const isViewerAddressSelected =
+      companyAddressSelected.place_name !== "" &&
+      startAddressSelected.place_name !== "";
+    const companyCord: number[] = companyAddressSelected.center;
+    const startCord: number[] = startAddressSelected.center;
+    const userStartLng = isViewerAddressSelected
+      ? startCord[0]
+      : user.startCoordLng;
+    const userStartLat = isViewerAddressSelected
+      ? startCord[1]
+      : user.startCoordLat;
+    const userCompanyLng = isViewerAddressSelected
+      ? companyCord[0]
+      : user.companyCoordLng;
+    const userCompanyLat = isViewerAddressSelected
+      ? companyCord[1]
+      : user.companyCoordLat;
+    const userCoord = {
+      startLat: userStartLat,
+      startLng: userStartLng,
+      endLat: userCompanyLat,
+      endLng: userCompanyLng,
+    };
     if (mapState) {
-      viewRoute(user, otherUser, mapState);
+      updateUserLocation(mapState, userStartLng, userStartLat);
+      updateCompanyLocation(mapState, userCompanyLng, userCompanyLat);
+      const viewProps = {
+        user,
+        otherUser,
+        map: mapState,
+        userCoord,
+      };
 
-      if (user.role === "RIDER") {
+      if (otherUser.role === "DRIVER") {
         setPoints([
           [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
-          [user.startCoordLng, user.startCoordLat],
-          [user.companyCoordLng, user.companyCoordLat],
+          [userStartLng, userStartLat],
+          [userCompanyLng, userCompanyLat],
           [otherUser.companyCoordLng, otherUser.companyCoordLat],
         ]);
       } else {
         setPoints([
-          [user.startCoordLng, user.startCoordLat],
+          [userStartLng, userStartLat],
           [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
           [otherUser.companyCoordLng, otherUser.companyCoordLat],
-          [user.companyCoordLng, user.companyCoordLat],
+          [userCompanyLng, userCompanyLat],
         ]);
       }
+      viewRoute(viewProps);
     }
   };
   const enhancedSentUsers = requests.sent.map((request: { toUser: any }) =>
@@ -112,26 +187,105 @@ const Home: NextPage<any> = () => {
 
   useEffect(() => {
     if (user && geoJsonUsers && mapContainerRef.current) {
+      const isViewer = user.role === "VIEWER";
+      const neuLat = 42.33907;
+      const neuLng = -71.088748;
       const newMap = new mapboxgl.Map({
         container: "map",
         style: "mapbox://styles/mapbox/light-v10",
-        center: [user.companyCoordLng, user.companyCoordLat],
+        center: isViewer
+          ? [neuLng, neuLat]
+          : [user.companyCoordLng, user.companyCoordLat],
         zoom: 10,
       });
       newMap.setMaxZoom(13);
       newMap.on("load", () => {
         addClusters(newMap, geoJsonUsers);
-        addUserLocation(newMap, user);
+        updateUserLocation(newMap, user.startCoordLng, user.startCoordLat);
+        updateCompanyLocation(
+          newMap,
+          user.companyCoordLng,
+          user.companyCoordLat
+        );
         addMapEvents(newMap, user, setPopupUser);
       });
+
       setMapState(newMap);
     }
   }, [user, geoJsonUsers]);
 
+  // separate use effect for user location rendering
+  useEffect(() => {
+    if (mapState) {
+      updateUserLocation(
+        mapState,
+        startAddressSelected.center[0],
+        startAddressSelected.center[1]
+      );
+      updateCompanyLocation(
+        mapState,
+        companyAddressSelected.center[0],
+        companyAddressSelected.center[1]
+      );
+    }
+  }, [companyAddressSelected, startAddressSelected]);
+  useSearch({
+    value: companyAddress,
+    type: "address%2Cpostcode",
+    setFunc: setCompanyAddressSuggestions,
+  });
+
+  useSearch({
+    value: startingAddress,
+    type: "address%2Cpostcode",
+    setFunc: setStartAddressSuggestions,
+  });
   if (!user) {
     return <Spinner />;
   }
 
+  const viewerBox = (
+    <div className="absolute left-0 top-0 z-10 m-2 flex min-w-[25rem] flex-col rounded-xl bg-white p-4 shadow-lg ">
+      <div className="flex items-center space-x-4">
+        <Image className="h-8 w-8" src={BlueSquare} width={32} height={32} />
+
+        <AddressCombobox
+          name="startAddress"
+          placeholder="Input start address"
+          addressSelected={startAddressSelected}
+          addressSetter={setStartAddressSelected}
+          addressSuggestions={startAddressSuggestions}
+          addressUpdater={updateStartingAddress}
+          className="flex-1"
+        />
+      </div>
+
+      <div className="flex items-center space-x-4">
+        <Image className="h-8 w-8 " src={BlueCircle} width={32} height={32} />
+        <AddressCombobox
+          name="companyAddress"
+          placeholder="Input company address"
+          addressSelected={companyAddressSelected}
+          addressSetter={setCompanyAddressSelected}
+          addressSuggestions={companyAddressSuggestions}
+          addressUpdater={updateCompanyAddress}
+          className="flex-1 pt-4"
+        />
+      </div>
+      <div className="flex items-center space-x-4">
+        <VisibilityToggle
+          map={mapState}
+          style={{
+            width: "100%",
+            marginTop: "20px",
+            backgroundColor: "white",
+            borderRadius: "8px",
+            borderColor: "black",
+          }}
+        />
+      </div>
+    </div>
+  );
   return (
     <>
       <UserContext.Provider value={user}>
@@ -152,6 +306,7 @@ const Home: NextPage<any> = () => {
                 {mapState && (
                   <SidebarPage
                     sidebarType={sidebarType}
+                    role={user.role}
                     map={mapState}
                     recs={enhancedRecs}
                     favs={enhancedFavs}
@@ -174,6 +329,8 @@ const Home: NextPage<any> = () => {
                   id="map"
                   className={"h-full w-full flex-auto"}
                 >
+                  {user.role === "VIEWER" && viewerBox}
+                  <MapLegend role={user.role} />
                   <MapConnectPortal
                     otherUser={popupUser}
                     extendUser={extendPublicUser}
