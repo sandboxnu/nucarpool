@@ -71,7 +71,7 @@ const Home: NextPage<any> = () => {
   });
   const { data: requests = { sent: [], received: [] } } =
     trpc.user.requests.me.useQuery();
-
+  const [otherUser, setOtherUser] = useState<PublicUser | null>(null);
   const [mapState, setMapState] = useState<mapboxgl.Map>();
   const [sidebarType, setSidebarType] = useState<HeaderOptions>("explore");
   const [popupUser, setPopupUser] = useState<PublicUser | null>(null);
@@ -121,6 +121,7 @@ const Home: NextPage<any> = () => {
   };
 
   const onViewRouteClick = (user: User, otherUser: PublicUser) => {
+    setOtherUser(otherUser);
     const isViewerAddressSelected =
       companyAddressSelected.place_name !== "" &&
       startAddressSelected.place_name !== "";
@@ -227,6 +228,9 @@ const Home: NextPage<any> = () => {
         companyAddressSelected.center[0],
         companyAddressSelected.center[1]
       );
+      if (mapState.getLayer("route") && user && otherUser) {
+        onViewRouteClick(user, otherUser);
+      }
     }
   }, [companyAddressSelected, startAddressSelected]);
   useSearch({
