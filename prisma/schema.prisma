@@ -5,14 +5,13 @@
 datasource db {
   provider             = "mysql"
   url                  = env("DATABASE_URL")
-  referentialIntegrity = "prisma"
+  relationMode =  "prisma"
 }
 
 // Boilerplate--we would only change this if we wanted to change how 
 // the Prisma Client is generated.
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["referentialIntegrity"]
 }
 
 // Represents a Role.

@@ -563,7 +563,7 @@ const Profile: NextPage = () => {
                         id="pronouns"
                         inputClassName={`h-12`}
                         error={errors.pronouns}
-                        isDisabled={watch("role") == Role.VIEWER}
+                        isDisabled={isViewer}
                         type="text"
                         {...register("pronouns")}
                       />
@@ -575,7 +575,7 @@ const Profile: NextPage = () => {
                     <textarea
                       className={`form-input w-full resize-none rounded-md
                        ${
-                         watch("role") == Role.VIEWER
+                         isViewer
                            ? "border-gray-100 bg-gray-200 text-gray-400"
                            : ""
                        } border-black px-3 py-2`}
