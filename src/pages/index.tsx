@@ -155,19 +155,24 @@ const Home: NextPage<any> = () => {
         userCoord,
       };
 
-      if (otherUser.role === "DRIVER") {
+      if (user.role === "RIDER") {
         setPoints([
           [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
           [userStartLng, userStartLat],
           [userCompanyLng, userCompanyLat],
           [otherUser.companyCoordLng, otherUser.companyCoordLat],
         ]);
-      } else {
+      } else if (isViewerAddressSelected || user.role == "DRIVER") {
         setPoints([
           [userStartLng, userStartLat],
           [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
           [otherUser.companyCoordLng, otherUser.companyCoordLat],
           [userCompanyLng, userCompanyLat],
+        ]);
+      } else {
+        setPoints([
+          [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
+          [otherUser.companyCoordLng, otherUser.companyCoordLat],
         ]);
       }
       viewRoute(viewProps);
@@ -203,11 +208,13 @@ const Home: NextPage<any> = () => {
       newMap.on("load", () => {
         addClusters(newMap, geoJsonUsers);
         updateUserLocation(newMap, user.startCoordLng, user.startCoordLat);
-        updateCompanyLocation(
-          newMap,
-          user.companyCoordLng,
-          user.companyCoordLat
-        );
+        if (!isViewer) {
+          updateCompanyLocation(
+            newMap,
+            user.companyCoordLng,
+            user.companyCoordLat
+          );
+        }
         addMapEvents(newMap, user, setPopupUser);
       });
 
@@ -251,8 +258,7 @@ const Home: NextPage<any> = () => {
   const viewerBox = (
     <div className="absolute left-0 top-0 z-10 m-2 flex min-w-[25rem] flex-col rounded-xl bg-white p-4 shadow-lg ">
       <div className="flex items-center space-x-4">
-        <Image className="h-8 w-8" src={BlueSquare} width={32} height={32} />
-
+        <Image className="h-8 w-8" src={BlueCircle} width={32} height={32} />
         <AddressCombobox
           name="startAddress"
           placeholder="Input start address"
@@ -265,7 +271,7 @@ const Home: NextPage<any> = () => {
       </div>
 
       <div className="flex items-center space-x-4">
-        <Image className="h-8 w-8 " src={BlueCircle} width={32} height={32} />
+        <Image className="h-8 w-8 " src={BlueSquare} width={32} height={32} />
         <AddressCombobox
           name="companyAddress"
           placeholder="Input company address"
