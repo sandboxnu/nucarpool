@@ -258,7 +258,7 @@ const Home: NextPage<any> = () => {
   const viewerBox = (
     <div className="absolute left-0 top-0 z-10 m-2 flex min-w-[25rem] flex-col rounded-xl bg-white p-4 shadow-lg ">
       <div className="flex items-center space-x-4">
-        <Image className="h-8 w-8" src={BlueCircle} width={32} height={32} />
+        <Image className="h-8 w-8" src={BlueCircle} width={30} height={30} />
         <AddressCombobox
           name="startAddress"
           placeholder="Input start address"
@@ -270,7 +270,7 @@ const Home: NextPage<any> = () => {
         />
       </div>
 
-      <div className="flex items-center space-x-4">
+      <div className="mt-4 flex items-center space-x-4">
         <Image className="h-8 w-8 " src={BlueSquare} width={32} height={32} />
         <AddressCombobox
           name="companyAddress"
@@ -279,7 +279,7 @@ const Home: NextPage<any> = () => {
           addressSetter={setCompanyAddressSelected}
           addressSuggestions={companyAddressSuggestions}
           addressUpdater={updateCompanyAddress}
-          className="flex-1 pt-4"
+          className="flex-1 "
         />
       </div>
       <div className="flex items-center space-x-4">
