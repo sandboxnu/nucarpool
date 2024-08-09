@@ -58,7 +58,8 @@ export const mapboxRouter = router({
     // Now returns all drivers and riders if user is in viewer mode
     const oppRole =
       currentUser?.role === Role.DRIVER ? Role.RIDER : Role.DRIVER;
-    const viewCheck = currentUser?.role === Role.VIEWER ? Role.RIDER : oppRole;
+    const isViewer = currentUser?.role === Role.VIEWER;
+    const viewCheck = isViewer ? Role.RIDER : oppRole;
     const users = await ctx.prisma.user.findMany({
       where: {
         id: {
@@ -96,10 +97,11 @@ export const mapboxRouter = router({
     distances.sort((a, b) => a.score - b.score);
     const sortedUsers = _.compact(
       distances.map((rec) => users.find((user) => user.id === rec.id))
-    ).slice(0, 50);
+    );
+    const finalUsers = isViewer ? sortedUsers : sortedUsers.slice(0, 50);
 
     // creates points for each user with coordinates at company location
-    const features: Feature[] = sortedUsers.map((u) => {
+    const features: Feature[] = finalUsers.map((u) => {
       const feat = {
         type: "Feature" as "Feature",
         geometry: {
