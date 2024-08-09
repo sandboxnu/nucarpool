@@ -207,8 +207,8 @@ const Home: NextPage<any> = () => {
       newMap.setMaxZoom(13);
       newMap.on("load", () => {
         addClusters(newMap, geoJsonUsers);
-        updateUserLocation(newMap, user.startCoordLng, user.startCoordLat);
         if (!isViewer) {
+          updateUserLocation(newMap, user.startCoordLng, user.startCoordLat);
           updateCompanyLocation(
             newMap,
             user.companyCoordLng,
