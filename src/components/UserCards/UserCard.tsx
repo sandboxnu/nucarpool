@@ -93,9 +93,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
             {user.role === "VIEWER" ? (
               <p className="font-semibold">{`${props.otherUser.role.charAt(
                 0
-              )}${props.otherUser.role.slice(1).toLowerCase()} ${
-                props.otherUser.id
-              }`}</p>
+              )}${props.otherUser.role.slice(1).toLowerCase()}`}</p>
             ) : (
               <p className="font-semibold">{props.otherUser.preferredName}</p>
             )}
