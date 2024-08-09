@@ -55,8 +55,10 @@ export const mapboxRouter = router({
       });
     }
 
+    // Now returns all drivers and riders if user is in viewer mode
     const oppRole =
       currentUser?.role === Role.DRIVER ? Role.RIDER : Role.DRIVER;
+    const viewCheck = currentUser?.role === Role.VIEWER ? Role.RIDER : oppRole;
     const users = await ctx.prisma.user.findMany({
       where: {
         id: {
@@ -64,7 +66,7 @@ export const mapboxRouter = router({
         },
         isOnboarded: true, // only include user that have finished onboarding
         status: Status.ACTIVE, // only include active users
-        role: oppRole,
+        OR: [{ role: oppRole }, { role: viewCheck }],
       },
       select: {
         id: true,

@@ -9,27 +9,34 @@ interface SidebarContentProps {
   subType: string;
   userCardList: EnhancedPublicUser[];
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
+  disabled: boolean;
 }
 
 const emptyMessages = {
   recommendations: `We're unable to find any recommendations for you right now.
   We recommend reviewing your profile to make sure all information you've entered is accurate!`,
+  disabledReq:
+    "You are currently in Viewer mode, switch to Rider or Driver in profile to view Requests.",
+  disabledRec:
+    "You are currently in Viewer mode, to get recommendations select Driver or Rider in profile.",
   favorites: `You have no users currently favorited.
   Click the star icon on the upper-right side of a user's card to add them to your favorites!`,
   sent: "You have no current outgoing requests. Sent requests to other users through the recommendations dashbaord!",
   received: "You have no current incoming requests. Hold tight!",
 };
 
-const emptyMessage = (card: string): string => {
+const emptyMessage = (card: string, disabled: boolean): string => {
   switch (card) {
     case "recommendations":
-      return emptyMessages.recommendations;
+      return disabled
+        ? emptyMessages.disabledRec
+        : emptyMessages.recommendations;
     case "favorites":
       return emptyMessages.favorites;
     case "sent":
-      return emptyMessages.sent;
+      return disabled ? emptyMessages.disabledReq : emptyMessages.sent;
     case "received":
-      return emptyMessages.received;
+      return disabled ? emptyMessages.disabledReq : emptyMessages.received;
     default:
       return "";
   }
@@ -85,9 +92,9 @@ const renderUserCard = (
 export const SidebarContent = (props: SidebarContentProps) => {
   return (
     <div id="scrollableDiv" className="overflow-auto">
-      {props.userCardList.length === 0 ? (
+      {props.userCardList.length === 0 || props.disabled ? (
         <div className="m-4 text-center text-lg font-light">
-          {emptyMessage(props.subType)}
+          {emptyMessage(props.subType, props.disabled)}
         </div>
       ) : (
         props.userCardList.map((otherUser: EnhancedPublicUser) =>

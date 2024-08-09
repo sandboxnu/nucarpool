@@ -3,7 +3,7 @@ import { useContext, useState, useEffect } from "react";
 import { GroupMembers } from "./Group/GroupMemberCard";
 import { trpc } from "../utils/trpc";
 import { UserContext } from "../utils/userContext";
-import { User } from "@prisma/client";
+import { Role, User } from "@prisma/client";
 import Spinner from "./Spinner";
 
 interface GroupPageProps {
@@ -48,16 +48,24 @@ const GroupBody = ({
   onClose: () => void;
 }) => {
   return !curUser?.carpoolId ? (
-    <NoGroupInfo />
+    <NoGroupInfo role={curUser.role} />
   ) : (
     <GroupInfo curUser={curUser} onClose={onClose} />
   );
 };
 
-const NoGroupInfo = () => {
+interface NoGroupInfoProps {
+  role: Role;
+}
+
+const NoGroupInfo = ({ role }: NoGroupInfoProps) => {
+  const text =
+    role === Role.VIEWER
+      ? "You are in Viewer mode, switch to Rider or Driver to join a group"
+      : "You are not currently part of a carpool group";
   return (
     <div className="flex flex-grow items-center justify-center text-xl font-light">
-      You are not currently part of a carpool group
+      {text}
     </div>
   );
 };
