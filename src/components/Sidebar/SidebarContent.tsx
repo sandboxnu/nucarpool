@@ -92,7 +92,8 @@ const renderUserCard = (
 export const SidebarContent = (props: SidebarContentProps) => {
   return (
     <div id="scrollableDiv" className="overflow-auto">
-      {props.userCardList.length === 0 || props.disabled ? (
+      {props.userCardList.length === 0 ||
+      (props.disabled && props.subType !== "favorites") ? (
         <div className="m-4 text-center text-lg font-light">
           {emptyMessage(props.subType, props.disabled)}
         </div>
