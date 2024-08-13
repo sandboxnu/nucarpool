@@ -167,6 +167,23 @@ export const calculateScore = (
       finalScore += weights.startTime + weights.endTime;
     }
 
+    // New: Calculate route deviation for drivers
+    if (currentUser.role === "DRIVER") {
+      const driverDirectDistance = coordToMile(
+        Math.sqrt(
+          Math.pow(currentUser.startCoordLat - currentUser.companyCoordLat, 2) +
+          Math.pow(currentUser.startCoordLng - currentUser.companyCoordLng, 2)
+        )
+      );
+
+      const deviationDistance = startDistance + endDistance - driverDirectDistance;
+      const deviationRatio = (startDistance + endDistance) / driverDirectDistance;
+
+      // Adjust these weights as needed
+      finalScore += deviationDistance * 0.1; // Penalize based on absolute deviation
+      finalScore += (deviationRatio - 1) * 10; // Penalize based on relative deviation
+    }
+
     return {
       id: user.id,
       score: finalScore,
