@@ -61,9 +61,26 @@ export const distanceBasedRecs = (
       )
     );
 
+    let deviationDistanceWeighted = 0;
+    let deviationRatioWeighted = 0;
+        // New: Calculate route deviation for drivers
+        if (currentUser.role === "DRIVER") {
+          const driverDirectDistance = coordToMile(
+            Math.sqrt(
+              Math.pow(currentUser.startCoordLat - currentUser.companyCoordLat, 2) +
+              Math.pow(currentUser.startCoordLng - currentUser.companyCoordLng, 2)
+            )
+          );
+    
+        deviationDistanceWeighted = (startDistance + endDistance - driverDirectDistance) * 10;
+        deviationRatioWeighted = (((startDistance + endDistance) / driverDirectDistance) - 1) * 10;
+        }
+
+        console.log("deviationDistanceWeighted", deviationDistanceWeighted);
+        console.log("deviationRatioWeighted", deviationRatioWeighted);
     return {
       id: user.id,
-      score: startDistance + endDistance,
+      score: startDistance + endDistance + (deviationDistanceWeighted ?? 0) + (deviationRatioWeighted ?? 0),
     };
   };
 };
@@ -180,8 +197,10 @@ export const calculateScore = (
       const deviationRatio = (startDistance + endDistance) / driverDirectDistance;
 
       // Adjust these weights as needed
-      finalScore += deviationDistance * 0.1; // Penalize based on absolute deviation
-      finalScore += (deviationRatio - 1) * 10; // Penalize based on relative deviation
+      finalScore += 2 * deviationDistance * 0.1; // Penalize based on absolute deviation
+      finalScore += 2 * (deviationRatio - 1) * 10; // Penalize based on relative deviation
+      // console.log("deviationDistance", deviationDistance);
+      // console.log("deviationRatio", deviationRatio);
     }
 
     return {
