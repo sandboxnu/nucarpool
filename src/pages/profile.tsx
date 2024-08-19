@@ -337,7 +337,7 @@ const Profile: NextPage = () => {
                   <ProfileHeaderNoMB>
                     I am a... <span className="text-northeastern-red">*</span>
                   </ProfileHeaderNoMB>
-                  <div className="flex h-24 items-end space-x-4">
+                  <div className="flex h-20 items-end space-x-4">
                     <Radio
                       label="Viewer"
                       id="viewer"
