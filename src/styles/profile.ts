@@ -46,18 +46,18 @@ export const ProfileColumn = styled.div`
   gap: 6px;
 `;
 
-export const TopProfileSection = styled(ProfileColumn)`
+export const MiddleProfileSection = styled(ProfileColumn)`
   width: 100%;
   flex: 1 1 auto;
 `;
 
-export const MiddleProfileSection = styled(ProfileColumn)`
+export const BottomProfileSection = styled(ProfileColumn)`
   width: 100%;
   flex: 1 1 auto;
   margin-bottom: 24px;
 `;
 
-export const BottomProfileSection = styled(ProfileColumn)`
+export const TopProfileSection = styled(ProfileColumn)`
   width: 100%;
   padding: 1rem 0 1rem 0;
   display: flex;

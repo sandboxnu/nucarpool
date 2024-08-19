@@ -5,6 +5,8 @@ import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import FormControlLabel from "@mui/material/FormControlLabel";
+
 import Header from "../components/Header";
 import { z } from "zod";
 import { trpc } from "../utils/trpc";
@@ -36,10 +38,12 @@ import ControlledAddressCombobox from "../components/Profile/ControlledAddressCo
 import { getSession, useSession } from "next-auth/react";
 import { createPortal } from "react-dom";
 import { ComplianceModal } from "../components/CompliancePortal";
+import Spinner from "../components/Spinner";
 
 // Inputs to the onboarding form.
 export type OnboardingFormInputs = {
   role: Role;
+  status: Status;
   seatAvail: number;
   companyName: string;
   companyAddress: string;
@@ -61,6 +65,7 @@ const custom = z.ZodIssueCode.custom;
 const onboardSchema = z
   .object({
     role: z.nativeEnum(Role),
+    status: z.nativeEnum(Status),
     seatAvail: z.number().int().nonnegative().max(6).optional(),
     companyName: z.string().optional(),
     companyAddress: z.string().optional(),
@@ -143,6 +148,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 const Profile: NextPage = () => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const utils = trpc.useContext();
   const { data: session } = useSession();
   const { data: user } = trpc.user.me.useQuery(undefined, {
@@ -159,6 +165,7 @@ const Profile: NextPage = () => {
     mode: "onSubmit",
     defaultValues: {
       role: Role.RIDER,
+      status: Status.ACTIVE,
       seatAvail: 0,
       companyName: "",
       companyAddress: "",
@@ -260,6 +267,7 @@ const Profile: NextPage = () => {
   });
 
   const onSubmit = async (values: OnboardingFormInputs) => {
+    setIsLoading(true);
     const coord: number[] = companyAddressSelected.center;
     const startCoord: number[] = startAddressSelected.center;
     const userInfo = {
@@ -285,7 +293,7 @@ const Profile: NextPage = () => {
 
     editUserMutation.mutate({
       role: userInfo.role,
-      status: Status.ACTIVE,
+      status: userInfo.status,
       seatAvail: userInfo.seatAvail,
       companyName: userInfo.companyName,
       companyAddress: userInfo.companyAddress,
@@ -305,8 +313,17 @@ const Profile: NextPage = () => {
       bio: userInfo.bio,
       licenseSigned: true,
     });
+
+    setIsLoading(false);
   };
 
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white ">
+        <Spinner />
+      </div>
+    );
+  }
   return (
     <>
       {!user?.licenseSigned && <ComplianceModal />}
@@ -317,77 +334,6 @@ const Profile: NextPage = () => {
             <div className="flex flex-col items-center justify-center gap-8 md:gap-12 lg:flex-row lg:items-start">
               <ProfileColumn>
                 <TopProfileSection>
-                  <ProfileHeader>Locations</ProfileHeader>
-                  {/* Starting Location field  */}
-                  <EntryLabel
-                    required={true}
-                    error={errors.startAddress}
-                    label="Home Address"
-                  />
-                  <div>
-                    <ControlledAddressCombobox
-                      isDisabled={isViewer}
-                      control={control}
-                      name={"startAddress"}
-                      addressSelected={startAddressSelected}
-                      addressSetter={setStartAddressSelected}
-                      addressSuggestions={startAddressSuggestions}
-                      error={errors.startAddress}
-                      addressUpdater={updateStartingAddress}
-                    />
-
-                    <Note className="pt-2">
-                      Note: Your address will only be used to find users close
-                      to you. It will not be displayed to any other users.
-                    </Note>
-                  </div>
-                  {errors.startAddress && (
-                    <ErrorDisplay>{errors.startAddress.message}</ErrorDisplay>
-                  )}
-                </TopProfileSection>
-
-                <MiddleProfileSection>
-                  <EntryLabel
-                    required={true}
-                    error={errors.companyName}
-                    label="Workplace Name"
-                  />
-                  <TextField
-                    className={`w-full`}
-                    inputClassName={`h-12`}
-                    label="Workplace Name"
-                    isDisabled={isViewer}
-                    id="companyName"
-                    error={errors.companyName}
-                    type="text"
-                    {...register("companyName")}
-                  />
-                  {/* Company Address field  */}
-                  <EntryLabel
-                    required={true}
-                    error={errors.companyAddress}
-                    label="Workplace Address"
-                  />
-                  <Note>
-                    Note: Select the autocomplete results, even if you typed the
-                    address out
-                  </Note>
-                  <ControlledAddressCombobox
-                    isDisabled={isViewer}
-                    control={control}
-                    name={"companyAddress"}
-                    addressSelected={companyAddressSelected}
-                    addressSetter={setCompanyAddressSelected}
-                    addressSuggestions={companyAddressSuggestions}
-                    error={errors.companyAddress}
-                    addressUpdater={updateCompanyAddress}
-                  />
-                  {errors.companyAddress && (
-                    <ErrorDisplay>{errors.companyAddress.message}</ErrorDisplay>
-                  )}
-                </MiddleProfileSection>
-                {/* Role field  */}
-                <BottomProfileSection>
                   <ProfileHeaderNoMB>
                     I am a... <span className="text-northeastern-red">*</span>
                   </ProfileHeaderNoMB>
@@ -453,6 +399,105 @@ const Profile: NextPage = () => {
                       </span>
                     )}
                   </Note>
+                  <Controller
+                    name="status"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={field.value === Status.INACTIVE}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.checked
+                                  ? Status.INACTIVE
+                                  : Status.ACTIVE
+                              )
+                            }
+                            inputProps={{ "aria-label": "Inactive status" }}
+                          />
+                        }
+                        label="Mark as Inactive"
+                      />
+                    )}
+                  />
+                  <Note>
+                    <span>
+                      Marking as inactive will hide your profile from all
+                      searches and matches.
+                    </span>
+                  </Note>
+                </TopProfileSection>
+
+                <MiddleProfileSection>
+                  <ProfileHeader>Locations</ProfileHeader>
+                  {/* Starting Location field  */}
+                  <EntryLabel
+                    required={true}
+                    error={errors.startAddress}
+                    label="Home Address"
+                  />
+                  <div>
+                    <ControlledAddressCombobox
+                      isDisabled={isViewer}
+                      control={control}
+                      name={"startAddress"}
+                      addressSelected={startAddressSelected}
+                      addressSetter={setStartAddressSelected}
+                      addressSuggestions={startAddressSuggestions}
+                      error={errors.startAddress}
+                      addressUpdater={updateStartingAddress}
+                    />
+
+                    <Note className="pt-2">
+                      Note: Your address will only be used to find users close
+                      to you. It will not be displayed to any other users.
+                    </Note>
+                  </div>
+                  {errors.startAddress && (
+                    <ErrorDisplay>{errors.startAddress.message}</ErrorDisplay>
+                  )}
+                </MiddleProfileSection>
+                {/* Role field  */}
+                <BottomProfileSection>
+                  <EntryLabel
+                    required={true}
+                    error={errors.companyName}
+                    label="Workplace Name"
+                  />
+                  <TextField
+                    className={`w-full`}
+                    inputClassName={`h-12`}
+                    label="Workplace Name"
+                    isDisabled={isViewer}
+                    id="companyName"
+                    error={errors.companyName}
+                    type="text"
+                    {...register("companyName")}
+                  />
+                  {/* Company Address field  */}
+                  <EntryLabel
+                    required={true}
+                    error={errors.companyAddress}
+                    label="Workplace Address"
+                  />
+                  <Note>
+                    Note: Select the autocomplete results, even if you typed the
+                    address out
+                  </Note>
+                  <ControlledAddressCombobox
+                    isDisabled={isViewer}
+                    control={control}
+                    name={"companyAddress"}
+                    addressSelected={companyAddressSelected}
+                    addressSetter={setCompanyAddressSelected}
+                    addressSuggestions={companyAddressSuggestions}
+                    error={errors.companyAddress}
+                    addressUpdater={updateCompanyAddress}
+                  />
+                  {errors.companyAddress && (
+                    <ErrorDisplay>{errors.companyAddress.message}</ErrorDisplay>
+                  )}
                 </BottomProfileSection>
               </ProfileColumn>
 
