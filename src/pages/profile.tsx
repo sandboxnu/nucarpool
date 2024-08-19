@@ -634,11 +634,11 @@ const Profile: NextPage = () => {
                     </Note>
                   </div>
                 </PersonalInfoSection>
+                <CompleteProfileButton type="submit">
+                  Complete Profile
+                </CompleteProfileButton>
               </ProfileColumn>
             </div>
-            <CompleteProfileButton type="submit">
-              Complete Profile
-            </CompleteProfileButton>
           </div>
         </ProfileContainer>
       </div>
