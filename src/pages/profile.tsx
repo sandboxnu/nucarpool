@@ -38,6 +38,7 @@ import ControlledAddressCombobox from "../components/Profile/ControlledAddressCo
 import { getSession, useSession } from "next-auth/react";
 import { createPortal } from "react-dom";
 import { ComplianceModal } from "../components/CompliancePortal";
+import ProfilePicture from "../components/Profile/ProfilePicture";
 import Spinner from "../components/Spinner";
 
 // Inputs to the onboarding form.
@@ -46,6 +47,7 @@ export type OnboardingFormInputs = {
   status: Status;
   seatAvail: number;
   companyName: string;
+  profilePicture: string;
   companyAddress: string;
   startAddress: string;
   preferredName: string;
@@ -150,6 +152,39 @@ const Profile: NextPage = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const utils = trpc.useContext();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const useUploadFile = (selectedFile: File | null) => {
+    const { data: presignedData, error } = trpc.user.getPresignedUrl.useQuery(
+      {
+        contentType: selectedFile?.type || "",
+      },
+      { enabled: !!selectedFile } // Only run query if `selectedFile` is truthy
+    );
+
+    const uploadFile = async () => {
+      if (presignedData?.url && selectedFile) {
+        const url = presignedData.url;
+
+        const response = await fetch(url, {
+          method: "PUT",
+          headers: {
+            "Content-Type": selectedFile.type,
+          },
+          body: selectedFile,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to upload file: ${response.statusText}`);
+        }
+
+        console.log("File uploaded successfully!");
+      }
+    };
+
+    return { uploadFile, error };
+  };
+  const { uploadFile, error } = useUploadFile(selectedFile);
+
   const { data: session } = useSession();
   const { data: user } = trpc.user.me.useQuery(undefined, {
     refetchOnMount: true,
@@ -168,6 +203,7 @@ const Profile: NextPage = () => {
       status: Status.ACTIVE,
       seatAvail: 0,
       companyName: "",
+      profilePicture: "",
       companyAddress: "",
       startAddress: "",
       preferredName: "",
@@ -294,6 +330,13 @@ const Profile: NextPage = () => {
       .join(",");
 
     const sessionName = session?.user?.name ?? "";
+    if (selectedFile) {
+      try {
+        await uploadFile();
+      } catch (error) {
+        console.error("File upload failed:", error);
+      }
+    }
 
     editUserMutation.mutate({
       role: userInfo.role,
@@ -561,6 +604,15 @@ const Profile: NextPage = () => {
                   <div className="flex w-full flex-row space-x-6">
                     {/* Preferred Name field  */}
                     <div className="flex w-3/5 flex-col">
+                      <EntryLabel
+                        required={false}
+                        error={errors.profilePicture}
+                        label="Profile Picture"
+                      />
+                      <ProfilePicture
+                        initialImageUrl={""}
+                        onFileSelected={setSelectedFile}
+                      />
                       <LightEntryLabel error={!!errors.preferredName}>
                         Preferred Name
                       </LightEntryLabel>

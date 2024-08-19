@@ -10,6 +10,7 @@ import { groupsRouter } from "./user/groups";
 import { requestsRouter } from "./user/requests";
 import { recommendationsRouter } from "./user/recommendations";
 import { emailsRouter } from "./user/email";
+import { generatePresignedUrl } from "../../utils/uploadToS3";
 
 // user router to get information about or edit users
 export const userRouter = router({
@@ -96,6 +97,28 @@ export const userRouter = router({
       });
 
       return user;
+    }),
+
+  getPresignedUrl: protectedRouter
+    .input(
+      z.object({
+        contentType: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { contentType } = input;
+      const fileName = ctx.session.user?.id;
+      if (fileName) {
+        try {
+          const url = await generatePresignedUrl(fileName, contentType);
+          return { url };
+        } catch (error) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to generate a pre-signed URL",
+          });
+        }
+      }
     }),
 
   //merging secondary user routes
