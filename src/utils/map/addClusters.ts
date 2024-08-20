@@ -78,6 +78,7 @@ const addClusters = (map: Map, geoJsonUsers: GeoJsonUsers) => {
         layout: {
           "icon-image": "rider-marker",
           "icon-size": 0.35,
+          "icon-allow-overlap": true,
         },
       });
       // Layer for Driver markers
@@ -93,6 +94,7 @@ const addClusters = (map: Map, geoJsonUsers: GeoJsonUsers) => {
         layout: {
           "icon-image": "driver-marker",
           "icon-size": 1,
+          "icon-allow-overlap": true,
         },
       });
     });
