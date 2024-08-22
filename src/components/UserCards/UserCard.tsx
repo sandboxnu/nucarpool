@@ -107,6 +107,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
           value={props.otherUser.isFavorited ? 1 : 0}
           max={1}
         />
+        
       </div>
       {/* second row */}
       <p className="font-semibold">{props.otherUser.startPOILocation}</p>
