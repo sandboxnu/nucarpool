@@ -143,7 +143,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         </button>
         <button
           onClick={() => props.rightButton.onPress(props.otherUser)}
-          disabled={user.role === "VIEWER"}
+          disabled={user.role === "VIEWER" || user.status === "INACTIVE"}
           className={getButtonClassName(props.rightButton)}
         >
           {props.rightButton.text}
