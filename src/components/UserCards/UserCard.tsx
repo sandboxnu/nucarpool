@@ -67,7 +67,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         <div
           key={i}
           className={
-            "font-heavy flex h-6 w-6 items-center justify-center rounded-full border border-black text-sm" +
+            "font-semibold flex h-7 w-7 items-center justify-center rounded-full border border-black text-sm" +
             backgroundColor
           }
         >
@@ -136,11 +136,11 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
 
 
       <div className="flex items-center w-full">
-        <p className="w-[45%] text-left">{props.otherUser.startPOILocation}</p>
+        <p className="font-semibold w-[45%] text-left">{props.otherUser.startPOILocation}</p>
         <div className="w-[10%] flex justify-center">
           <ArrowForwardIcon fontSize="small" />
         </div>
-        <p className="w-[45%] text-right">{props.otherUser.companyName}</p>
+        <p className="font-semibold w-[45%] text-right">{props.otherUser.companyName}</p>
       </div>
 
 
