@@ -387,10 +387,10 @@ const Profile: NextPage = () => {
                   </div>
                   <Note>
                     {watch("role") === Role.DRIVER && (
-                      <span>
-                        Registering 0 available seats will remove you from the
-                        app&apos;s recommendation generation.
-                      </span>
+                      <span>Looking for Carpoolers to join you.</span>
+                    )}
+                    {watch("role") === Role.RIDER && (
+                      <span>Looking for a Carpool to join.</span>
                     )}
                     {isViewer && (
                       <span>
@@ -398,34 +398,6 @@ const Profile: NextPage = () => {
                         map but cannot request a ride.
                       </span>
                     )}
-                  </Note>
-                  <Controller
-                    name="status"
-                    control={control}
-                    render={({ field }) => (
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={field.value === Status.INACTIVE}
-                            onChange={(e) =>
-                              field.onChange(
-                                e.target.checked
-                                  ? Status.INACTIVE
-                                  : Status.ACTIVE
-                              )
-                            }
-                            inputProps={{ "aria-label": "Inactive status" }}
-                          />
-                        }
-                        label="Mark as Inactive"
-                      />
-                    )}
-                  />
-                  <Note>
-                    <span>
-                      Marking as inactive will hide your profile from all
-                      searches and matches.
-                    </span>
                   </Note>
                 </TopProfileSection>
 
@@ -632,6 +604,38 @@ const Profile: NextPage = () => {
                       This intro will be shared with people you choose to
                       connect with.
                     </Note>
+                    {!isViewer && (
+                      <Controller
+                        name="status"
+                        control={control}
+                        render={({ field }) => (
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={field.value === Status.INACTIVE}
+                                onChange={(e) =>
+                                  field.onChange(
+                                    e.target.checked
+                                      ? Status.INACTIVE
+                                      : Status.ACTIVE
+                                  )
+                                }
+                                inputProps={{ "aria-label": "Inactive status" }}
+                              />
+                            }
+                            label="Mark as Inactive"
+                          />
+                        )}
+                      />
+                    )}
+                    {!isViewer && (
+                      <Note>
+                        <span>
+                          Marking as inactive will hide your profile from all
+                          searches and matches.
+                        </span>
+                      </Note>
+                    )}
                   </div>
                 </PersonalInfoSection>
                 <CompleteProfileButton type="submit">
