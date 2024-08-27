@@ -22,6 +22,8 @@ export const ReceivedCard = (props: ReceivedCardProps): JSX.Element => {
     setShowModal(true);
   };
 
+  // TODO: Need to create a leftButton props for UserCard component so that each card can have custom things
+
   const connectButtonInfo: ButtonInfo = {
     text: "Manage",
     onPress: () => handleManageReceived(),
