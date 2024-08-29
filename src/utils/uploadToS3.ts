@@ -1,5 +1,5 @@
 import {
-  ObjectCannedACL,
+  GetObjectCommand,
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
@@ -30,7 +30,23 @@ export async function generatePresignedUrl(
   try {
     return await getSignedUrl(s3Client, command, { expiresIn: expiry });
   } catch (error) {
-    console.error("Error generating pre-signed URL", error);
+    console.error("Error generating pre-signed URL for putting", error);
     throw new Error("Could not generate pre-signed URL");
+  }
+}
+export async function getPresignedImageUrl(fileName: string) {
+  const command = new GetObjectCommand({
+    Bucket: "carpoolnubucket",
+    Key: `profile-pictures/${fileName}`,
+  });
+
+  const expiry = 60;
+
+  try {
+    const url = await getSignedUrl(s3Client, command, { expiresIn: expiry });
+    return url;
+  } catch (error) {
+    console.error("Error generating presigned URL for getting", error);
+    throw new Error("Could not generate presigned URL for image retrieval");
   }
 }

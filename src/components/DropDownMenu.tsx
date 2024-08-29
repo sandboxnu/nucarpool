@@ -3,17 +3,28 @@ import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import Spinner from "./Spinner";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { AiOutlineUser } from "react-icons/ai";
 import { useRouter } from "next/router";
+import { generatePresignedUrl } from "../utils/uploadToS3";
+import { trpc } from "../utils/trpc";
 
 const DropDownMenu = () => {
   const { data: session } = useSession();
   const router = useRouter();
+  const [profileImageUrl, setProfileImageUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const logout = () => {
     signOut();
   };
+  const { data: presignedData } = trpc.user.getPresignedDownloadUrl.useQuery();
+
+  useEffect(() => {
+    if (presignedData?.url && !isLoading) {
+      console.log(presignedData.url);
+      setProfileImageUrl(presignedData.url);
+    }
+  }, [presignedData, isLoading]);
   const handleProfileClick = async () => {
     setIsLoading(true);
     await router.push("/profile");
@@ -29,7 +40,17 @@ const DropDownMenu = () => {
       )}
       <Menu>
         <Menu.Button className="rounded-full bg-gray-400 p-2">
-          <AiOutlineUser className="h-7 w-7" />
+          {profileImageUrl ? (
+            <Image
+              src={profileImageUrl}
+              alt="Profile Image"
+              width={32}
+              height={32}
+              className="rounded-full"
+            />
+          ) : (
+            <AiOutlineUser className="h-7 w-7" />
+          )}
         </Menu.Button>
 
         <Transition
