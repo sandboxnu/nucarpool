@@ -11,6 +11,13 @@ import Spinner from "../Spinner";
 import { classNames } from "../../utils/classNames";
 import { User } from "@prisma/client";
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import LineIcon from '../../../public/line.png';
+import StartIcon from '../../../public/start.png';
+import EndIcon from '../../../public/end.png';
+import Image from "next/image";
+
+
+
 
 interface UserCardProps {
   otherUser: EnhancedPublicUser;
@@ -59,16 +66,19 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
     const days: string[] = ["S", "M", "T", "W", "Th", "F", "Sa"];
     for (let i = 0; i < daysWorking.length; i = i + 2) {
       let backgroundColor = "";
+      let textColor = "";
       let dayIndex = Math.floor(i / 2);
       if (daysWorking[i] == "1") {
         backgroundColor = " bg-red-500";
+        textColor = " text-white";
       }
       boxes.push(
         <div
           key={i}
           className={
-            "font-semibold flex h-7 w-7 items-center justify-center rounded-full border border-black text-sm" +
-            backgroundColor
+            "flex h-7 w-7 items-center justify-center rounded-full border border-black text-sm" +
+            backgroundColor +
+            textColor
           }
         >
           {days[dayIndex]}
@@ -116,9 +126,16 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
 
 
       <div className="flex items-center w-full">
-        <p className="font-semibold w-[45%] text-left">{props.otherUser.startPOILocation}</p>
+        {/* <Image src={StartIcon} alt="Start icon" /> */}
+        {/* Try to get it just to one line for the texts */}
+        <p className="font-semibold w-[40%] text-left text-sm ">{props.otherUser.startPOILocation}</p> 
         
-        <p className="font-semibold w-[45%] text-right">{props.otherUser.companyName}</p>
+   
+          <Image src={LineIcon} alt="Line icon" className="mx-2"/>
+   
+        
+        {/* <Image src={EndIcon} alt="End icon" /> */}
+        <p className="font-semibold w-[40%] text-right text-sm">{props.otherUser.companyName}</p>
       </div>
 
       <div className="flex w-full items-center gap-4">
