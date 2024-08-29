@@ -114,15 +114,27 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       </div>
       {/* second row */}
 
+
+      <div className="flex items-center w-full">
+        <p className="font-semibold w-[45%] text-left">{props.otherUser.startPOILocation}</p>
+        
+        <p className="font-semibold w-[45%] text-right">{props.otherUser.companyName}</p>
+      </div>
+
+      <div className="flex w-full items-center gap-4">
+        {DaysWorkingDisplay(props.otherUser.daysWorking)}
+      </div>
+
       {/* third row */}
 
       <div className="m-0 flex w-full justify-between align-middle">
         <div className="flex text-sm font-normal">
-          <p className="pr-1">Hours:</p>
+          <p className="pr-1">Start:</p>
           <p className="font-semibold">
             {dayjs.tz(props.otherUser.startTime, "UTC").format("h:mm")} am
           </p>
           <p className="px-2 font-semibold">|</p>
+          <p className="pr-1">End:</p>
           <p className="font-semibold">
             {dayjs.tz(props.otherUser.endTime, "UTC").format("h:mm")} pm
           </p>
@@ -130,18 +142,9 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       </div>
 
 {/* fourth row */}
-      <div className="flex w-full items-center gap-4">
-        {DaysWorkingDisplay(props.otherUser.daysWorking)}
-      </div>
 
 
-      <div className="flex items-center w-full">
-        <p className="font-semibold w-[45%] text-left">{props.otherUser.startPOILocation}</p>
-        <div className="w-[10%] flex justify-center">
-          <ArrowForwardIcon fontSize="small" />
-        </div>
-        <p className="font-semibold w-[45%] text-right">{props.otherUser.companyName}</p>
-      </div>
+
 
 
       {/* request.message goes over here for displaying the request message */}
@@ -151,7 +154,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
  
       {props.otherUser.role === "DRIVER" && (
         <div className="flex flex-row text-sm">
-          <div className="mr-1">Open Seats: </div>
+          <div className="mr-1">Seats Available: </div>
           <div className="font-semibold">{props.otherUser.seatAvail}</div>
         </div>
       )}
