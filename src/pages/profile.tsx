@@ -228,6 +228,7 @@ const Profile: NextPage = () => {
     reset({
       role: user.role,
       seatAvail: user.seatAvail,
+      status: user.status,
       companyName: user.companyName,
       companyAddress: user.companyAddress,
       startAddress: user.startAddress,
