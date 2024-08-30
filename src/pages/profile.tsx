@@ -152,15 +152,16 @@ const Profile: NextPage = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const utils = trpc.useContext();
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const useUploadFile = (selectedFile: File | null) => {
     const { data: presignedData, error } = trpc.user.getPresignedUrl.useQuery(
       {
         contentType: selectedFile?.type || "",
       },
-      { enabled: !!selectedFile } // Only run query if `selectedFile` is truthy
+      { enabled: !!selectedFile }
     );
-
+    console.log(selectedFile);
     const uploadFile = async () => {
       if (presignedData?.url && selectedFile) {
         const url = presignedData.url;
