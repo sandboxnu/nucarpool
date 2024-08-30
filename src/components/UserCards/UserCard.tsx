@@ -124,25 +124,24 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       </div>
       {/* second row */}
 
+    <div className="flex items-center">
+      <Image src={StartIcon} alt="Start icon" />
+      <p className="font-semibold text-sm ml-2">{props.otherUser.startPOILocation}</p>
+    </div>
 
-      <div className="flex items-center w-full">
-        {/* <Image src={StartIcon} alt="Start icon" /> */}
-        {/* Try to get it just to one line for the texts */}
-        <p className="font-semibold w-[40%] text-left text-sm ">{props.otherUser.startPOILocation}</p> 
-        
-   
-          <Image src={LineIcon} alt="Line icon" className="mx-2"/>
-   
-        
-        {/* <Image src={EndIcon} alt="End icon" /> */}
-        <p className="font-semibold w-[40%] text-right text-sm">{props.otherUser.companyName}</p>
-      </div>
+
+{/* third row */}
+  <div className="flex items-center">
+      <Image src={EndIcon} alt="End icon" />
+      <p className="font-semibold text-sm ml-2">{props.otherUser.companyName}</p>
+    </div>
+
 
       <div className="flex w-full items-center gap-4">
         {DaysWorkingDisplay(props.otherUser.daysWorking)}
       </div>
 
-      {/* third row */}
+      {/* fourth row */}
 
       <div className="m-0 flex w-full justify-between align-middle">
         <div className="flex text-sm font-normal">
@@ -158,16 +157,9 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         </div>
       </div>
 
-{/* fourth row */}
-
-
-
-
-
       {/* request.message goes over here for displaying the request message */}
       {/* fifth row */}
 
-      {/* Need to move time from here to above days */}
  
       {props.otherUser.role === "DRIVER" && (
         <div className="flex flex-row text-sm">
