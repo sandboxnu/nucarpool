@@ -10,6 +10,14 @@ import { UserContext } from "../../utils/userContext";
 import Spinner from "../Spinner";
 import { classNames } from "../../utils/classNames";
 import { User } from "@prisma/client";
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import LineIcon from '../../../public/line.png';
+import StartIcon from '../../../public/start.png';
+import EndIcon from '../../../public/end.png';
+import Image from "next/image";
+
+
+
 
 interface UserCardProps {
   otherUser: EnhancedPublicUser;
@@ -58,23 +66,26 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
     const days: string[] = ["S", "M", "T", "W", "Th", "F", "Sa"];
     for (let i = 0; i < daysWorking.length; i = i + 2) {
       let backgroundColor = "";
+      let textColor = "";
       let dayIndex = Math.floor(i / 2);
       if (daysWorking[i] == "1") {
-        backgroundColor = " bg-good-green";
+        backgroundColor = " bg-red-500";
+        textColor = " text-white";
       }
       boxes.push(
         <div
           key={i}
           className={
-            "font-heavy pl-auto h-6 w-6 border border-l-0 border-black pt-0.5 text-center text-sm" +
-            backgroundColor
+            "flex h-7 w-7 items-center justify-center rounded-full border border-black text-sm" +
+            backgroundColor +
+            textColor
           }
         >
           {days[dayIndex]}
         </div>
       );
     }
-    return <div className="flex h-min border-l border-black">{boxes}</div>;
+    return <div className="flex gap-2">{boxes}</div>;
   };
 
   if (!user) {
@@ -88,6 +99,8 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
     >
       <div className="flex justify-between">
         {/* top row */}
+
+        {/* Profile picture goes here */}
         <div className="flex">
           <div className="text-lg">
             {user.role === "VIEWER" ? (
@@ -97,7 +110,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
             ) : (
               <p className="font-semibold">{props.otherUser.preferredName}</p>
             )}
-            <p className="font-light">{props.otherUser.companyName}</p>
+
           </div>
         </div>
         <Rating
@@ -107,30 +120,50 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
           value={props.otherUser.isFavorited ? 1 : 0}
           max={1}
         />
+        
       </div>
       {/* second row */}
-      <p className="font-semibold">{props.otherUser.startPOILocation}</p>
-      {/* third row */}
+
+    <div className="flex items-center">
+      <Image src={StartIcon} alt="Start icon" />
+      <p className="font-semibold text-sm ml-2">{props.otherUser.startPOILocation}</p>
+    </div>
+
+
+{/* third row */}
+  <div className="flex items-center">
+      <Image src={EndIcon} alt="End icon" />
+      <p className="font-semibold text-sm ml-2">{props.otherUser.companyName}</p>
+    </div>
+
+
       <div className="flex w-full items-center gap-4">
         {DaysWorkingDisplay(props.otherUser.daysWorking)}
       </div>
+
       {/* fourth row */}
+
       <div className="m-0 flex w-full justify-between align-middle">
         <div className="flex text-sm font-normal">
           <p className="pr-1">Start:</p>
           <p className="font-semibold">
             {dayjs.tz(props.otherUser.startTime, "UTC").format("h:mm")} am
           </p>
-          <p className="px-2 font-semibold"> | </p>
+          <p className="px-2 font-semibold">|</p>
           <p className="pr-1">End:</p>
           <p className="font-semibold">
             {dayjs.tz(props.otherUser.endTime, "UTC").format("h:mm")} pm
           </p>
         </div>
       </div>
+
+      {/* request.message goes over here for displaying the request message */}
+      {/* fifth row */}
+
+ 
       {props.otherUser.role === "DRIVER" && (
         <div className="flex flex-row text-sm">
-          <div className="mr-1">Open Seats: </div>
+          <div className="mr-1">Seats Available: </div>
           <div className="font-semibold">{props.otherUser.seatAvail}</div>
         </div>
       )}
