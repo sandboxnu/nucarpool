@@ -60,7 +60,6 @@ interface ViewRouteProps {
 export const viewRoute = (props: ViewRouteProps) => {
   clearMarkers();
   clearDirections(props.map);
-  console.log("view route has been called");
   const redCircle = createMarkerEl(DriverStart);
   const selfStartPopup = createPopup("My Start");
   const redSquare = createMarkerEl(DriverDest);

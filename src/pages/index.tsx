@@ -191,7 +191,6 @@ const Home: NextPage<any> = () => {
 
   useEffect(() => {
     if (user && geoJsonUsers && mapContainerRef.current) {
-      console.log("use effect one");
       const isViewer = user.role === "VIEWER";
       const neuLat = 42.33907;
       const neuLng = -71.088748;
@@ -223,8 +222,6 @@ const Home: NextPage<any> = () => {
   // separate use effect for user location rendering
   useEffect(() => {
     if (mapState) {
-      console.log("use effect two");
-
       updateUserLocation(
         mapState,
         startAddressSelected.center[0],
@@ -251,8 +248,6 @@ const Home: NextPage<any> = () => {
         (startAddressSelected.center[0] !== 0 &&
           companyAddressSelected.center[0] !== 0))
     ) {
-      console.log("use effect three");
-
       let userCoord = {
         startLat: user.startCoordLat,
         startLng: user.startCoordLng,
@@ -260,7 +255,6 @@ const Home: NextPage<any> = () => {
         endLng: user.companyCoordLng,
       };
       if (user.role == "VIEWER") {
-        console.log(startAddressSelected);
         userCoord = {
           startLng: startAddressSelected.center[0],
           startLat: startAddressSelected.center[1],
