@@ -161,7 +161,6 @@ const Profile: NextPage = () => {
       },
       { enabled: !!selectedFile }
     );
-    console.log(selectedFile);
     const uploadFile = async () => {
       if (presignedData?.url && selectedFile) {
         const url = presignedData.url;

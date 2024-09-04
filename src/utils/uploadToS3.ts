@@ -25,7 +25,7 @@ export async function generatePresignedUrl(
     ContentType: contentType,
   });
 
-  const expiry = 60;
+  const expiry = 3600;
 
   try {
     return await getSignedUrl(s3Client, command, { expiresIn: expiry });
@@ -40,7 +40,7 @@ export async function getPresignedImageUrl(fileName: string) {
     Key: `profile-pictures/${fileName}`,
   });
 
-  const expiry = 60;
+  const expiry = 3600;
 
   try {
     const url = await getSignedUrl(s3Client, command, { expiresIn: expiry });

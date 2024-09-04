@@ -44,12 +44,11 @@ const DropDownMenu = () => {
             <Image
               src={profileImageUrl}
               alt="Profile Image"
-              width={32}
-              height={32}
-              className="rounded-full"
+              width={40}
+              height={40}
             />
           ) : (
-            <AiOutlineUser className="h-7 w-7" />
+            <AiOutlineUser className="h-7 w-7 bg-gray-400" />
           )}
         </Menu.Button>
 
