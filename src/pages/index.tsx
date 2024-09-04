@@ -29,7 +29,7 @@ import AddressCombobox from "../components/Map/AddressCombobox";
 import updateUserLocation from "../utils/map/updateUserLocation";
 import { MapLegend } from "../components/MapLegend";
 import Image from "next/image";
-import BlueSquare from "../../public/blue-square.png";
+import BlueSquare from "../../public/user-dest.png";
 import BlueCircle from "../../public/blue-circle.png";
 import VisibilityToggle from "../components/Map/VisibilityToggle";
 import updateCompanyLocation from "../utils/map/updateCompanyLocation";
@@ -106,8 +106,6 @@ const Home: NextPage<any> = () => {
     () => debounce(setStartingAddress, 250),
     []
   );
-
-  useGetDirections({ points: points, map: mapState! });
 
   const extendPublicUser = (user: PublicUser): EnhancedPublicUser => {
     return {
@@ -193,6 +191,7 @@ const Home: NextPage<any> = () => {
 
   useEffect(() => {
     if (user && geoJsonUsers && mapContainerRef.current) {
+      console.log("use effect one");
       const isViewer = user.role === "VIEWER";
       const neuLat = 42.33907;
       const neuLng = -71.088748;
@@ -217,7 +216,6 @@ const Home: NextPage<any> = () => {
         }
         addMapEvents(newMap, user, setPopupUser);
       });
-
       setMapState(newMap);
     }
   }, [user, geoJsonUsers]);
@@ -225,6 +223,8 @@ const Home: NextPage<any> = () => {
   // separate use effect for user location rendering
   useEffect(() => {
     if (mapState) {
+      console.log("use effect two");
+
       updateUserLocation(
         mapState,
         startAddressSelected.center[0],
@@ -240,6 +240,50 @@ const Home: NextPage<any> = () => {
       }
     }
   }, [companyAddressSelected, startAddressSelected]);
+
+  useEffect(() => {
+    // useEffect for initial route rendering
+    if (
+      user &&
+      !otherUser &&
+      mapState &&
+      (user.role !== "VIEWER" ||
+        (startAddressSelected.center[0] !== 0 &&
+          companyAddressSelected.center[0] !== 0))
+    ) {
+      console.log("use effect three");
+
+      let userCoord = {
+        startLat: user.startCoordLat,
+        startLng: user.startCoordLng,
+        endLat: user.companyCoordLat,
+        endLng: user.companyCoordLng,
+      };
+      if (user.role == "VIEWER") {
+        console.log(startAddressSelected);
+        userCoord = {
+          startLng: startAddressSelected.center[0],
+          startLat: startAddressSelected.center[1],
+          endLng: companyAddressSelected.center[0],
+          endLat: companyAddressSelected.center[1],
+        };
+      }
+
+      const viewProps = {
+        user,
+        otherUser: undefined,
+        map: mapState,
+        userCoord,
+      };
+
+      // Set initial points for directions or route viewing
+      setPoints([
+        [userCoord.startLng, userCoord.startLat],
+        [userCoord.endLng, userCoord.endLat],
+      ]);
+      viewRoute(viewProps);
+    }
+  }, [companyAddressSelected, mapState, otherUser, startAddressSelected, user]);
   useSearch({
     value: companyAddress,
     type: "address%2Cpostcode",
@@ -251,6 +295,8 @@ const Home: NextPage<any> = () => {
     type: "address%2Cpostcode",
     setFunc: setStartAddressSuggestions,
   });
+  useGetDirections({ points: points, map: mapState! });
+
   if (!user) {
     return <Spinner />;
   }
@@ -271,7 +317,7 @@ const Home: NextPage<any> = () => {
       </div>
 
       <div className="mt-4 flex items-center space-x-4">
-        <Image className="h-8 w-8 " src={BlueSquare} width={32} height={32} />
+        <Image className="h-8 w-8 " src={BlueSquare} width={30} height={37} />
         <AddressCombobox
           name="companyAddress"
           placeholder="Input company address"

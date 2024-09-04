@@ -7,10 +7,10 @@ import { toast } from "react-toastify";
 import polyline from "@mapbox/polyline";
 import { LineString } from "geojson";
 import { StaticImageData } from "next/image";
-import RedStart from "../../../public/red-circle.png";
-import RedEnd from "../../../public/red-square.png";
-import BlueEnd from "../../../public/blue-square.png";
-import orangeCircle from "../../../public/orange-circle.png";
+import DriverStart from "../../../public/driver-start.png";
+import DriverDest from "../../../public/driver-dest.png";
+import BlueEnd from "../../../public/user-dest.png";
+import RiderStart from "../../../public/rider-start.png";
 
 const previousMarkers: (mapboxgl.Marker | mapboxgl.Popup)[] = [];
 export const clearMarkers = () => {
@@ -46,7 +46,7 @@ const createMarkerEl = (img: StaticImageData) => {
 };
 interface ViewRouteProps {
   user: User;
-  otherUser: PublicUser;
+  otherUser: PublicUser | undefined;
   map: mapboxgl.Map;
   userCoord: {
     startLat: number;
@@ -60,41 +60,43 @@ interface ViewRouteProps {
 export const viewRoute = (props: ViewRouteProps) => {
   clearMarkers();
   clearDirections(props.map);
-
-  const otherRole =
-    props.otherUser.role.charAt(0).toUpperCase() +
-    props.otherUser.role.slice(1).toLowerCase();
-
-  const redCircle = createMarkerEl(RedStart);
-  redCircle.style.opacity = "0";
+  console.log("view route has been called");
+  const redCircle = createMarkerEl(DriverStart);
   const selfStartPopup = createPopup("My Start");
-
-  const orangeStart = createMarkerEl(orangeCircle);
-  const redStart = createMarkerEl(redCircle);
-  const otherUserStartPopup = createPopup(otherRole + " Start");
-  const otherUserStartMarker = new mapboxgl.Marker({
-    element: otherRole === "Rider" ? orangeStart : redStart,
-  })
-    .setLngLat([
-      props.otherUser.startPOICoordLng,
-      props.otherUser.startPOICoordLat,
-    ])
-    .setPopup(otherUserStartPopup)
-    .addTo(props.map);
-
-  const redSquare = createMarkerEl(RedEnd);
+  const redSquare = createMarkerEl(DriverDest);
   redSquare.style.opacity = "0";
-  const otherUserEndPopup = createPopup(otherRole + " Dest.");
-  const otherUserEndMarker = new mapboxgl.Marker({
-    element: redSquare,
-  })
-    .setLngLat([
-      props.otherUser.companyCoordLng,
-      props.otherUser.companyCoordLat,
-    ])
-    .setPopup(otherUserEndPopup)
-    .addTo(props.map);
   const selfEndPopup = createPopup("My Dest.");
+  const orangeStart = createMarkerEl(RiderStart);
+  const redStart = createMarkerEl(redCircle);
+  if (props.otherUser !== undefined) {
+    const otherRole =
+      props.otherUser.role.charAt(0).toUpperCase() +
+      props.otherUser.role.slice(1).toLowerCase();
+    const otherUserStartPopup = createPopup(otherRole + " Start");
+    const otherUserStartMarker = new mapboxgl.Marker({
+      element: otherRole === "Rider" ? orangeStart : redStart,
+    })
+      .setLngLat([
+        props.otherUser.startPOICoordLng,
+        props.otherUser.startPOICoordLat,
+      ])
+      .setPopup(otherUserStartPopup)
+      .addTo(props.map);
+    const otherUserEndPopup = createPopup(otherRole + " Dest.");
+    const otherUserEndMarker = new mapboxgl.Marker({
+      element: redSquare,
+    })
+      .setLngLat([
+        props.otherUser.companyCoordLng,
+        props.otherUser.companyCoordLat,
+      ])
+      .setPopup(otherUserEndPopup)
+      .addTo(props.map);
+    otherUserStartMarker.togglePopup();
+    otherUserEndMarker.togglePopup();
+    previousMarkers.push(otherUserStartMarker);
+    previousMarkers.push(otherUserEndMarker);
+  }
 
   selfEndPopup
     .setLngLat([props.userCoord.endLng, props.userCoord.endLat])
@@ -102,33 +104,27 @@ export const viewRoute = (props: ViewRouteProps) => {
   selfStartPopup
     .setLngLat([props.userCoord.startLng, props.userCoord.startLat])
     .addTo(props.map);
-  otherUserStartMarker.togglePopup();
-  otherUserEndMarker.togglePopup();
+
   previousMarkers.push(selfEndPopup);
   previousMarkers.push(selfStartPopup);
-  previousMarkers.push(otherUserStartMarker);
-  previousMarkers.push(otherUserEndMarker);
-
+  let startPoiLng = props.user.startPOICoordLng;
+  let startPoiLat = props.user.startPOICoordLat;
+  let endPoiLng = props.user.companyPOICoordLng;
+  let endPoiLat = props.user.companyPOICoordLat;
+  if (props.otherUser) {
+    startPoiLng = props.otherUser.startPOICoordLng;
+    startPoiLat = props.otherUser.startPOICoordLat;
+    endPoiLng = props.otherUser.companyCoordLng;
+    endPoiLat = props.otherUser.companyCoordLat;
+  }
   props.map.fitBounds([
     [
-      Math.min(
-        props.otherUser.startPOICoordLng,
-        props.otherUser.companyCoordLng
-      ) - 0.0075,
-      Math.max(
-        props.otherUser.startPOICoordLat,
-        props.otherUser.companyCoordLat
-      ) + 0.0075,
+      Math.min(startPoiLng, endPoiLng) - 0.0075,
+      Math.max(startPoiLat, endPoiLat) + 0.0075,
     ],
     [
-      Math.max(
-        props.otherUser.startPOICoordLng,
-        props.otherUser.companyCoordLng
-      ) + 0.0075,
-      Math.min(
-        props.otherUser.startPOICoordLat,
-        props.otherUser.companyCoordLat
-      ) - 0.0075,
+      Math.max(startPoiLng, endPoiLng) + 0.0075,
+      Math.min(startPoiLat, endPoiLat) - 0.0075,
     ],
   ]);
 };
@@ -163,9 +159,6 @@ export function useGetDirections({
           type: "LineString",
         };
 
-        map.on("load", () => {
-          clearDirections(map);
-        });
         let beforeLayerId = "";
 
         if (map.getLayer("riders")) {

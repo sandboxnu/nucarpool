@@ -1,6 +1,6 @@
-import RedSquare from "../../public/red-square.png";
-import BlueSquare from "../../public/blue-square.png";
-import OrangeSquare from "../../public/orange-square.png";
+import RedSquare from "../../public/driver-dest.png";
+import BlueSquare from "../../public/user-dest.png";
+import OrangeSquare from "../../public/rider-dest.png";
 import Image from "next/image";
 import { EnhancedPublicUser, PublicUser } from "../utils/types";
 import { User } from "@prisma/client";
@@ -13,18 +13,18 @@ export const MapLegend = (props: MapLegendProps) => {
     <>
       <div className="text-md absolute bottom-8 left-2 z-10  flex flex-col rounded-xl border bg-white p-2  md:text-lg">
         <div className="my-1 flex flex-row items-center">
-          <Image className="" src={BlueSquare} width={32} height={32} />
+          <Image className="" src={BlueSquare} width={20} height={25} />
           <p className="mx-2">My Destination</p>
         </div>
         {(role === "VIEWER" || role === "RIDER") && (
           <div className="my-1 flex flex-row items-center">
-            <Image className="" src={RedSquare} width={32} height={32} />
+            <Image className="" src={RedSquare} width={20} height={25} />
             <p className="mx-2">{"Driver Destination"}</p>
           </div>
         )}
         {(role === "VIEWER" || role === "DRIVER") && (
           <div className="my-1 flex flex-row items-center">
-            <Image className="" src={OrangeSquare} width={32} height={32} />
+            <Image className="" src={OrangeSquare} width={20} height={25} />
             <p className="mx-2">{"Rider Destination"}</p>
           </div>
         )}

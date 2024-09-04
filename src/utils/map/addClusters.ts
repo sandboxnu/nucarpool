@@ -1,7 +1,7 @@
 import { Map } from "mapbox-gl";
 import { GeoJsonUsers } from "../types";
-import OrangeSquare from "../../../public/orange-square.png";
-import RedSquare from "../../../public/red-square.png";
+import OrangeSquare from "../../../public/rider-dest.png";
+import RedSquare from "../../../public/driver-dest.png";
 /**
  * Filter Expression: https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/
  * Clusters example with filter expression: https://docs.mapbox.com/mapbox-gl-js/example/cluster-html/
@@ -77,7 +77,6 @@ const addClusters = (map: Map, geoJsonUsers: GeoJsonUsers) => {
         ],
         layout: {
           "icon-image": "rider-marker",
-          "icon-size": 0.35,
           "icon-allow-overlap": true,
         },
       });
@@ -93,7 +92,6 @@ const addClusters = (map: Map, geoJsonUsers: GeoJsonUsers) => {
         ],
         layout: {
           "icon-image": "driver-marker",
-          "icon-size": 1,
           "icon-allow-overlap": true,
         },
       });

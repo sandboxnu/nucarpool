@@ -1,27 +1,61 @@
-import mapboxgl, { Map } from "mapbox-gl";
-import BlueEnd from "../../../public/blue-square.png";
+import mapboxgl from "mapbox-gl";
+import BlueEnd from "../../../public/user-dest.png";
 
-// Variable to hold the marker reference
-let companyMarker: mapboxgl.Marker | null = null;
-
+let companyMarkerSourceId = "company-marker-source"; // Source ID for reference
 const updateCompanyLocation = (
   map: mapboxgl.Map,
   companyLongitude: number,
   companyLatitude: number
-) => {
-  if (companyMarker) {
-    // If the marker exists, remove it first
-    companyMarker.remove();
-  }
-  // If the marker doesn't exist, create it
-  const el = document.createElement("img");
-  el.src = BlueEnd.src;
-  el.style.marginTop = "1em";
-  el.style.opacity = "1";
+): void => {
+  map.loadImage(
+    BlueEnd.src,
+    (
+      error: Error | undefined,
+      image: HTMLImageElement | ImageBitmap | undefined
+    ) => {
+      if (error) throw error;
 
-  companyMarker = new mapboxgl.Marker({ element: el })
-    .setLngLat([companyLongitude, companyLatitude])
-    .addTo(map);
+      if (!map.hasImage("user-company")) {
+        if (image instanceof HTMLImageElement || image instanceof ImageBitmap) {
+          map.addImage("user-company", image);
+        }
+      }
+
+      const feature: GeoJSON.Feature<GeoJSON.Point> = {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [companyLongitude, companyLatitude],
+        },
+        properties: {},
+      };
+
+      // Create source if it doesn't exist
+      let source = map.getSource(companyMarkerSourceId) as
+        | mapboxgl.GeoJSONSource
+        | undefined;
+      if (source) {
+        // If source exists, update its data
+        source.setData(feature);
+      } else {
+        // Create the source and layer if they don't exist
+        map.addSource(companyMarkerSourceId, {
+          type: "geojson",
+          data: feature,
+        });
+
+        map.addLayer({
+          id: "company-marker-layer",
+          type: "symbol",
+          source: companyMarkerSourceId,
+          layout: {
+            "icon-image": "user-company",
+            "icon-allow-overlap": true,
+          },
+        });
+      }
+    }
+  );
 };
 
 export default updateCompanyLocation;
