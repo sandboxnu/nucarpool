@@ -51,6 +51,7 @@ const updateCompanyLocation = (
           layout: {
             "icon-image": "user-company",
             "icon-allow-overlap": true,
+            "icon-size": 0.33,
           },
         });
       }

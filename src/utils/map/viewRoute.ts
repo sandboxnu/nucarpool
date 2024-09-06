@@ -8,8 +8,6 @@ import polyline from "@mapbox/polyline";
 import { LineString } from "geojson";
 import { StaticImageData } from "next/image";
 import DriverStart from "../../../public/driver-start.png";
-import DriverDest from "../../../public/driver-dest.png";
-import BlueEnd from "../../../public/user-dest.png";
 import RiderStart from "../../../public/rider-start.png";
 
 const previousMarkers: (mapboxgl.Marker | mapboxgl.Popup)[] = [];
@@ -38,11 +36,12 @@ const createPopup = (text: string) => {
   return popup;
 };
 
-const createMarkerEl = (img: StaticImageData) => {
-  const el = document.createElement("img");
-  el.src = img.src;
-  el.style.marginTop = "1em";
-  return el;
+const createMarkerEl = (imgData: StaticImageData) => {
+  const img = new Image();
+  img.src = imgData.src;
+  img.width = 32;
+  img.height = 42;
+  return img;
 };
 interface ViewRouteProps {
   user: User;
@@ -62,8 +61,6 @@ export const viewRoute = (props: ViewRouteProps) => {
   clearDirections(props.map);
   const redCircle = createMarkerEl(DriverStart);
   const selfStartPopup = createPopup("My Start");
-  const redSquare = createMarkerEl(DriverDest);
-  redSquare.style.opacity = "0";
   const selfEndPopup = createPopup("My Dest.");
   const orangeStart = createMarkerEl(RiderStart);
   const redStart = createMarkerEl(redCircle);
@@ -82,19 +79,15 @@ export const viewRoute = (props: ViewRouteProps) => {
       .setPopup(otherUserStartPopup)
       .addTo(props.map);
     const otherUserEndPopup = createPopup(otherRole + " Dest.");
-    const otherUserEndMarker = new mapboxgl.Marker({
-      element: redSquare,
-    })
+    otherUserEndPopup
       .setLngLat([
         props.otherUser.companyCoordLng,
         props.otherUser.companyCoordLat,
       ])
-      .setPopup(otherUserEndPopup)
       .addTo(props.map);
     otherUserStartMarker.togglePopup();
-    otherUserEndMarker.togglePopup();
     previousMarkers.push(otherUserStartMarker);
-    previousMarkers.push(otherUserEndMarker);
+    previousMarkers.push(otherUserEndPopup);
   }
 
   selfEndPopup
@@ -103,7 +96,6 @@ export const viewRoute = (props: ViewRouteProps) => {
   selfStartPopup
     .setLngLat([props.userCoord.startLng, props.userCoord.startLat])
     .addTo(props.map);
-
   previousMarkers.push(selfEndPopup);
   previousMarkers.push(selfStartPopup);
   let startPoiLng = props.user.startPOICoordLng;
