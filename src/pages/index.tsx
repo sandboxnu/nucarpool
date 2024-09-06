@@ -21,7 +21,7 @@ import {
   EnhancedPublicUser,
   PublicUser,
 } from "../utils/types";
-import { User } from "@prisma/client";
+import { Role, User } from "@prisma/client";
 import { useGetDirections, viewRoute } from "../utils/map/viewRoute";
 import { MapConnectPortal } from "../components/MapConnectPortal";
 import useSearch from "../utils/search";
@@ -145,7 +145,12 @@ const Home: NextPage<any> = () => {
     };
     if (mapState) {
       updateUserLocation(mapState, userStartLng, userStartLat);
-      updateCompanyLocation(mapState, userCompanyLng, userCompanyLat);
+      updateCompanyLocation(
+        mapState,
+        userCompanyLng,
+        userCompanyLat,
+        user.role
+      );
       const viewProps = {
         user,
         otherUser,
@@ -210,7 +215,8 @@ const Home: NextPage<any> = () => {
           updateCompanyLocation(
             newMap,
             user.companyCoordLng,
-            user.companyCoordLat
+            user.companyCoordLat,
+            user.role
           );
         }
         addMapEvents(newMap, user, setPopupUser);
@@ -230,7 +236,8 @@ const Home: NextPage<any> = () => {
       updateCompanyLocation(
         mapState,
         companyAddressSelected.center[0],
-        companyAddressSelected.center[1]
+        companyAddressSelected.center[1],
+        Role.VIEWER
       );
       if (mapState.getLayer("route") && user && otherUser) {
         onViewRouteClick(user, otherUser);

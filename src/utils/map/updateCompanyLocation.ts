@@ -1,14 +1,22 @@
 import mapboxgl from "mapbox-gl";
 import BlueEnd from "../../../public/user-dest.png";
+import BlueDriverEnd from "../../../public/user-dest-driver.png";
+
+import { Role } from "@prisma/client";
 
 let companyMarkerSourceId = "company-marker-source"; // Source ID for reference
 const updateCompanyLocation = (
   map: mapboxgl.Map,
   companyLongitude: number,
-  companyLatitude: number
+  companyLatitude: number,
+  role: Role
 ): void => {
+  let img = BlueEnd.src;
+  if (role === Role.DRIVER) {
+    img = BlueDriverEnd.src;
+  }
   map.loadImage(
-    BlueEnd.src,
+    img,
     (
       error: Error | undefined,
       image: HTMLImageElement | ImageBitmap | undefined

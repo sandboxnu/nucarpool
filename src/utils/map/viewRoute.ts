@@ -98,16 +98,17 @@ export const viewRoute = (props: ViewRouteProps) => {
     .addTo(props.map);
   previousMarkers.push(selfEndPopup);
   previousMarkers.push(selfStartPopup);
-  let startPoiLng = props.user.startPOICoordLng;
-  let startPoiLat = props.user.startPOICoordLat;
-  let endPoiLng = props.user.companyPOICoordLng;
-  let endPoiLat = props.user.companyPOICoordLat;
+  let startPoiLng = props.userCoord.startLng;
+  let startPoiLat = props.userCoord.startLat;
+  let endPoiLng = props.userCoord.endLng;
+  let endPoiLat = props.userCoord.endLat;
   if (props.otherUser) {
     startPoiLng = props.otherUser.startPOICoordLng;
     startPoiLat = props.otherUser.startPOICoordLat;
     endPoiLng = props.otherUser.companyCoordLng;
     endPoiLat = props.otherUser.companyCoordLat;
   }
+
   props.map.fitBounds([
     [
       Math.min(startPoiLng, endPoiLng) - 0.0075,
