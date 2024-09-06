@@ -10,14 +10,9 @@ import { UserContext } from "../../utils/userContext";
 import Spinner from "../Spinner";
 import { classNames } from "../../utils/classNames";
 import { User } from "@prisma/client";
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import LineIcon from '../../../public/line.png';
-import StartIcon from '../../../public/start.png';
-import EndIcon from '../../../public/end.png';
+import StartIcon from "../../../public/start.png";
+import EndIcon from "../../../public/end.png";
 import Image from "next/image";
-
-
-
 
 interface UserCardProps {
   otherUser: EnhancedPublicUser;
@@ -110,7 +105,6 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
             ) : (
               <p className="font-semibold">{props.otherUser.preferredName}</p>
             )}
-
           </div>
         </div>
         <Rating
@@ -120,22 +114,27 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
           value={props.otherUser.isFavorited ? 1 : 0}
           max={1}
         />
-        
       </div>
       {/* second row */}
 
-    <div className="flex items-center">
-      <Image src={StartIcon} alt="Start icon" />
-      <p className="font-semibold text-sm ml-2">{props.otherUser.startPOILocation}</p>
-    </div>
+      <div className="flex items-center">
+        <div className="flex w-7 items-center justify-center">
+          <Image src={StartIcon} width={25} height={25} alt="Start icon" />
+        </div>
+        <p className="ml-2 text-sm font-semibold">
+          {props.otherUser.startPOILocation}
+        </p>
+      </div>
 
-
-{/* third row */}
-  <div className="flex items-center">
-      <Image src={EndIcon} alt="End icon" />
-      <p className="font-semibold text-sm ml-2">{props.otherUser.companyName}</p>
-    </div>
-
+      {/* third row */}
+      <div className="flex items-center">
+        <div className="flex w-7 items-center justify-center">
+          <Image src={EndIcon} width={21} height={25} alt="End icon" />
+        </div>
+        <p className="ml-2 text-sm font-semibold">
+          {props.otherUser.companyName}
+        </p>
+      </div>
 
       <div className="flex w-full items-center gap-4">
         {DaysWorkingDisplay(props.otherUser.daysWorking)}
@@ -160,7 +159,6 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       {/* request.message goes over here for displaying the request message */}
       {/* fifth row */}
 
- 
       {props.otherUser.role === "DRIVER" && (
         <div className="flex flex-row text-sm">
           <div className="mr-1">Seats Available: </div>
