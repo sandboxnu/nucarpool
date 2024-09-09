@@ -21,7 +21,7 @@ import {
   EnhancedPublicUser,
   PublicUser,
 } from "../utils/types";
-import { User } from "@prisma/client";
+import { Role, User } from "@prisma/client";
 import { useGetDirections, viewRoute } from "../utils/map/viewRoute";
 import { MapConnectPortal } from "../components/MapConnectPortal";
 import useSearch from "../utils/search";
@@ -29,7 +29,7 @@ import AddressCombobox from "../components/Map/AddressCombobox";
 import updateUserLocation from "../utils/map/updateUserLocation";
 import { MapLegend } from "../components/MapLegend";
 import Image from "next/image";
-import BlueSquare from "../../public/blue-square.png";
+import BlueSquare from "../../public/user-dest.png";
 import BlueCircle from "../../public/blue-circle.png";
 import VisibilityToggle from "../components/Map/VisibilityToggle";
 import updateCompanyLocation from "../utils/map/updateCompanyLocation";
@@ -107,8 +107,6 @@ const Home: NextPage<any> = () => {
     []
   );
 
-  useGetDirections({ points: points, map: mapState! });
-
   const extendPublicUser = (user: PublicUser): EnhancedPublicUser => {
     return {
       ...user,
@@ -147,7 +145,12 @@ const Home: NextPage<any> = () => {
     };
     if (mapState) {
       updateUserLocation(mapState, userStartLng, userStartLat);
-      updateCompanyLocation(mapState, userCompanyLng, userCompanyLat);
+      updateCompanyLocation(
+        mapState,
+        userCompanyLng,
+        userCompanyLat,
+        user.role
+      );
       const viewProps = {
         user,
         otherUser,
@@ -212,12 +215,12 @@ const Home: NextPage<any> = () => {
           updateCompanyLocation(
             newMap,
             user.companyCoordLng,
-            user.companyCoordLat
+            user.companyCoordLat,
+            user.role
           );
         }
         addMapEvents(newMap, user, setPopupUser);
       });
-
       setMapState(newMap);
     }
   }, [user, geoJsonUsers]);
@@ -233,13 +236,55 @@ const Home: NextPage<any> = () => {
       updateCompanyLocation(
         mapState,
         companyAddressSelected.center[0],
-        companyAddressSelected.center[1]
+        companyAddressSelected.center[1],
+        Role.VIEWER
       );
       if (mapState.getLayer("route") && user && otherUser) {
         onViewRouteClick(user, otherUser);
       }
     }
   }, [companyAddressSelected, startAddressSelected]);
+
+  useEffect(() => {
+    // useEffect for initial route rendering
+    if (
+      user &&
+      !otherUser &&
+      mapState &&
+      (user.role !== "VIEWER" ||
+        (startAddressSelected.center[0] !== 0 &&
+          companyAddressSelected.center[0] !== 0))
+    ) {
+      let userCoord = {
+        startLat: user.startCoordLat,
+        startLng: user.startCoordLng,
+        endLat: user.companyCoordLat,
+        endLng: user.companyCoordLng,
+      };
+      if (user.role == "VIEWER") {
+        userCoord = {
+          startLng: startAddressSelected.center[0],
+          startLat: startAddressSelected.center[1],
+          endLng: companyAddressSelected.center[0],
+          endLat: companyAddressSelected.center[1],
+        };
+      }
+
+      const viewProps = {
+        user,
+        otherUser: undefined,
+        map: mapState,
+        userCoord,
+      };
+
+      // Set initial points for directions or route viewing
+      setPoints([
+        [userCoord.startLng, userCoord.startLat],
+        [userCoord.endLng, userCoord.endLat],
+      ]);
+      viewRoute(viewProps);
+    }
+  }, [companyAddressSelected, mapState, otherUser, startAddressSelected, user]);
   useSearch({
     value: companyAddress,
     type: "address%2Cpostcode",
@@ -251,6 +296,8 @@ const Home: NextPage<any> = () => {
     type: "address%2Cpostcode",
     setFunc: setStartAddressSuggestions,
   });
+  useGetDirections({ points: points, map: mapState! });
+
   if (!user) {
     return <Spinner />;
   }
@@ -258,7 +305,7 @@ const Home: NextPage<any> = () => {
   const viewerBox = (
     <div className="absolute left-0 top-0 z-10 m-2 flex min-w-[25rem] flex-col rounded-xl bg-white p-4 shadow-lg ">
       <div className="flex items-center space-x-4">
-        <Image className="h-8 w-8" src={BlueCircle} width={30} height={30} />
+        <Image className="h-8 w-8" src={BlueCircle} width={32} height={32} />
         <AddressCombobox
           name="startAddress"
           placeholder="Input start address"
@@ -271,7 +318,7 @@ const Home: NextPage<any> = () => {
       </div>
 
       <div className="mt-4 flex items-center space-x-4">
-        <Image className="h-8 w-8 " src={BlueSquare} width={32} height={32} />
+        <Image className="h-8 w-8 " src={BlueSquare} width={32} height={42} />
         <AddressCombobox
           name="companyAddress"
           placeholder="Input company address"
