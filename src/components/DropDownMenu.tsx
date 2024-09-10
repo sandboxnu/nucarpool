@@ -39,16 +39,16 @@ const DropDownMenu = () => {
         </div>
       )}
       <Menu>
-        <Menu.Button className="rounded-full bg-gray-400 p-2">
+        <Menu.Button className="h-12 w-12 overflow-hidden rounded-full">
           {profileImageUrl ? (
             <Image
               src={profileImageUrl}
               alt="Profile Image"
-              width={40}
-              height={40}
+              width={50}
+              height={50}
             />
           ) : (
-            <AiOutlineUser className="h-7 w-7 bg-gray-400" />
+            <AiOutlineUser className="h-12 w-12 rounded-full bg-gray-400" />
           )}
         </Menu.Button>
 
