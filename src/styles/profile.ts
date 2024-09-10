@@ -5,7 +5,7 @@ import styled from "styled-components";
  */
 
 export const CompleteProfileButton = styled.button`
-  background: #b12424;
+  background: #c8102e;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 10px;
   font-family: "Montserrat", sans-serif;
