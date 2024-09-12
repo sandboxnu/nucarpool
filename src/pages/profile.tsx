@@ -260,8 +260,9 @@ const Profile: NextPage = () => {
       utils.user.invalidate();
       utils.user.recommendations.me.refetch();
       utils.mapbox.geoJsonUserList.refetch();
-      router.push("/");
-      setIsLoading(false);
+      router.push("/").then(() => {
+        setIsLoading(false);
+      });
     },
     onError: (error) => {
       toast.error(`Something went wrong: ${error.message}`);
