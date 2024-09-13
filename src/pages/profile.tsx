@@ -381,6 +381,7 @@ const Profile: NextPage = () => {
                           id="seatAvail"
                           error={errors.seatAvail}
                           type="number"
+                          min="0"
                           {...register("seatAvail", { valueAsNumber: true })}
                         />
                       </div>
