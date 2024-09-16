@@ -18,7 +18,7 @@ interface UserCardProps {
   otherUser: EnhancedPublicUser;
   rightButton: ButtonInfo;
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
-  message: string;
+  message?: string;
 }
 
 const getButtonClassName = (button: ButtonInfo): string => {
