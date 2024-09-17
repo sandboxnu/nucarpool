@@ -18,6 +18,7 @@ interface UserCardProps {
   otherUser: EnhancedPublicUser;
   rightButton: ButtonInfo;
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
+  message?: string;
 }
 
 const getButtonClassName = (button: ButtonInfo): string => {
@@ -28,6 +29,9 @@ const getButtonClassName = (button: ButtonInfo): string => {
     } rounded-md p-1 my-1 text-center text-white`
   );
 };
+
+
+
 
 export const UserCard = (props: UserCardProps): JSX.Element => {
   const trpcUtils = trpc.useContext();
@@ -58,7 +62,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
    */
   const DaysWorkingDisplay = (daysWorking: string) => {
     const boxes: JSX.Element[] = [];
-    const days: string[] = ["S", "M", "T", "W", "Th", "F", "Sa"];
+    const days: string[] = ["S", "M", "Tu", "W", "Th", "F", "Sa"];
     for (let i = 0; i < daysWorking.length; i = i + 2) {
       let backgroundColor = "";
       let textColor = "";
@@ -93,7 +97,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       }
     >
       <div className="flex justify-between">
-        {/* top row */}
+        {/* top row - Username*/}
 
         {/* Profile picture goes here */}
         <div className="flex">
@@ -115,7 +119,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
           max={1}
         />
       </div>
-      {/* second row */}
+      {/* second row - Start location*/}
 
       <div className="flex items-center">
         <div className="flex w-7 items-center justify-center">
@@ -126,7 +130,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         </p>
       </div>
 
-      {/* third row */}
+      {/* third row - End location*/}
       <div className="flex items-center">
         <div className="flex w-7 items-center justify-center">
           <Image src={EndIcon} width={21} height={25} alt="End icon" />
@@ -136,11 +140,19 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         </p>
       </div>
 
+
+      {/* Fourth row - messaging bubble */}
+      {props.message && (
+          <div className="mt-2 w-full rounded-lg bg-gray-200 p-2 text-sm">
+            {props.message}
+          </div>
+        )} 
+
       <div className="flex w-full items-center gap-4">
         {DaysWorkingDisplay(props.otherUser.daysWorking)}
       </div>
 
-      {/* fourth row */}
+      {/* Fifth row - Start and end times */}
 
       <div className="m-0 flex w-full justify-between align-middle">
         <div className="flex text-sm font-normal">
@@ -156,8 +168,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         </div>
       </div>
 
-      {/* request.message goes over here for displaying the request message */}
-      {/* fifth row */}
+      {/* Sixth row - Seats avaliable*/}
 
       {props.otherUser.role === "DRIVER" && (
         <div className="flex flex-row text-sm">
@@ -165,6 +176,10 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
           <div className="font-semibold">{props.otherUser.seatAvail}</div>
         </div>
       )}
+
+
+      {/* Seventh row - Buttons*/}
+
       <div className="flex flex-row justify-between gap-2">
         <button
           onClick={() => props.onViewRouteClick(user, props.otherUser)}

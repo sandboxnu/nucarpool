@@ -9,7 +9,7 @@ const HeaderDiv = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  background-color: #b12424;
+  background-color: #c8102e;
   padding: 0 40px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.25);
   height: 8.5%;

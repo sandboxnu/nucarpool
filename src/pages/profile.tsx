@@ -260,10 +260,13 @@ const Profile: NextPage = () => {
       utils.user.invalidate();
       utils.user.recommendations.me.refetch();
       utils.mapbox.geoJsonUserList.refetch();
-      router.push("/");
+      router.push("/").then(() => {
+        setIsLoading(false);
+      });
     },
     onError: (error) => {
       toast.error(`Something went wrong: ${error.message}`);
+      setIsLoading(false);
     },
   });
 
@@ -314,8 +317,6 @@ const Profile: NextPage = () => {
       bio: userInfo.bio,
       licenseSigned: true,
     });
-
-    setIsLoading(false);
   };
 
   if (isLoading) {
