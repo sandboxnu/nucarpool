@@ -6,7 +6,6 @@ import Spinner from "./Spinner";
 import React, { Fragment, useEffect, useState } from "react";
 import { AiOutlineUser } from "react-icons/ai";
 import { useRouter } from "next/router";
-import { generatePresignedUrl } from "../utils/uploadToS3";
 import { trpc } from "../utils/trpc";
 
 const DropDownMenu = () => {
@@ -14,16 +13,27 @@ const DropDownMenu = () => {
   const router = useRouter();
   const [profileImageUrl, setProfileImageUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [imageLoadError, setImageLoadError] = useState(false);
+
   const logout = () => {
     signOut();
   };
-  const { data: presignedData } = trpc.user.getPresignedDownloadUrl.useQuery();
+
+  const { data: presignedData, error: presignedError } =
+    trpc.user.getPresignedDownloadUrl.useQuery();
 
   useEffect(() => {
-    if (presignedData?.url && !isLoading) {
+    if (presignedData?.url) {
       setProfileImageUrl(presignedData.url);
+    } else {
+      setProfileImageUrl("");
     }
-  }, [presignedData, isLoading]);
+  }, [presignedData]);
+
+  useEffect(() => {
+    setImageLoadError(false);
+  }, [profileImageUrl]);
+
   const handleProfileClick = async () => {
     setIsLoading(true);
     await router.push("/profile");
@@ -33,18 +43,19 @@ const DropDownMenu = () => {
   return (
     <div className="z-30">
       {isLoading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white ">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
           <Spinner />
         </div>
       )}
       <Menu>
         <Menu.Button className="h-12 w-12 overflow-hidden rounded-full">
-          {profileImageUrl ? (
+          {profileImageUrl && !imageLoadError ? (
             <Image
               src={profileImageUrl}
               alt="Profile Image"
               width={50}
               height={50}
+              onError={() => setImageLoadError(true)}
             />
           ) : (
             <AiOutlineUser className="h-12 w-12 rounded-full bg-gray-400" />

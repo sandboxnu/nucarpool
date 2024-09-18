@@ -110,7 +110,7 @@ export const userRouter = router({
     )
     .query(async ({ ctx, input }) => {
       const { contentType } = input;
-      const fileName = ctx.session.user?.id;
+      const fileName = ctx.session.user?.id + "1";
       if (fileName) {
         try {
           const url = await generatePresignedUrl(fileName, contentType);
