@@ -8,6 +8,7 @@ import { User } from "@prisma/client";
 
 interface SentCardProps {
   otherUser: EnhancedPublicUser;
+  message: string;
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
 }
 
@@ -30,6 +31,7 @@ export const SentCard = (props: SentCardProps): JSX.Element => {
         otherUser={props.otherUser}
         rightButton={connectButtonInfo}
         onViewRouteClick={props.onViewRouteClick}
+        message={props.message}
       />
       {showModal &&
         user &&

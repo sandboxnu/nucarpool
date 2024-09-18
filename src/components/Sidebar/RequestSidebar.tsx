@@ -9,10 +9,15 @@ interface RequestSidebarProps {
   viewRoute: (user: User, otherUser: PublicUser) => void;
   disabled: boolean;
 }
-
+const msgList = [
+  "Hello",
+  "I'd Like to connect",
+  "Hello",
+  "I'd Like to connect",
+];
 const RequestSidebar = (props: RequestSidebarProps) => {
   const [curOption, setCurOption] = useState<"received" | "sent">("received");
-
+  const [curCard, setCurCard] = useState<number>(0);
   return (
     <div className="z-10 flex h-full flex-shrink-0 flex-col bg-white px-5 text-left">
       <div className="flex-row py-3">
@@ -25,8 +30,6 @@ const RequestSidebar = (props: RequestSidebarProps) => {
             }
             onClick={() => {
               setCurOption("received");
-              // don't see a reason for clearing markers
-              //clearMarkers();
             }}
           >
             Received

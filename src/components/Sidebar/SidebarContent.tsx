@@ -71,6 +71,7 @@ const renderUserCard = (
             key={otherUser.id}
             otherUser={otherUser}
             onViewRouteClick={onViewRouteClick}
+            message={otherUser.outgoingRequest.message}
           />
         );
       }
@@ -81,6 +82,7 @@ const renderUserCard = (
             key={otherUser.id}
             otherUser={otherUser}
             onViewRouteClick={onViewRouteClick}
+            message={otherUser.incomingRequest.message}
           />
         );
       }

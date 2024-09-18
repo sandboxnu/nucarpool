@@ -96,6 +96,31 @@ export type ResolvedRequest = {
   toUser: User | PublicUser | null;
   id: string;
 };
+export interface Request {
+  id: string;
+  message: string;
+  fromUserId: string;
+  toUserId: string;
+  fromUser: User | PublicUser;
+  toUser: User | PublicUser;
+  conversation?: Conversation | null;
+}
+
+export interface Conversation {
+  id: string;
+  requestId: string;
+  request: Request;
+  messages: Message[];
+}
+export interface Message {
+  id: string;
+  conversationId: string;
+  conversation: Conversation;
+  content: string;
+  isRead: boolean;
+  userId?: string | null;
+  user?: PublicUser | null;
+}
 
 type Admin = {
   iso_3166_1_alpha3: string;

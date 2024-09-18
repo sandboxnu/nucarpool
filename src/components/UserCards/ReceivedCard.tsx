@@ -12,6 +12,7 @@ import ReceivedRequestModal from "../Modals/ReceivedRequestModal";
 
 interface ReceivedCardProps {
   otherUser: EnhancedPublicUser;
+  message: string;
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
 }
 export const ReceivedCard = (props: ReceivedCardProps): JSX.Element => {
@@ -35,6 +36,7 @@ export const ReceivedCard = (props: ReceivedCardProps): JSX.Element => {
         otherUser={props.otherUser}
         rightButton={connectButtonInfo}
         onViewRouteClick={props.onViewRouteClick}
+        message={props.message}
       />
       {showModal &&
         user &&

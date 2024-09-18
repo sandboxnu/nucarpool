@@ -1,0 +1,75 @@
+{
+  "users": [
+    {
+      "id": "user1",
+      "name": "Alice"
+    },
+    {
+      "id": "user2",
+      "name": "Bob"
+    },
+    {
+      "id": "user3",
+      "name": "Charlie"
+    }
+  ],
+  "requests": [
+    {
+      "id": "req1",
+      "message": "Hey Bob, would you like to join my project?",
+      "fromUserId": "user1",
+      "toUserId": "user2",
+      "fromUser": {
+        "id": "user1",
+        "name": "Alice"
+      },
+      "toUser": {
+        "id": "user2",
+        "name": "Bob"
+      },
+      "conversation": {
+        "id": "conv1",
+        "requestId": "req1",
+        "messages": [
+          {
+            "id": "msg1",
+            "conversationId": "conv1",
+            "content": "Hi Alice, I'd love to! Tell me more.",
+            "isRead": true,
+            "userId": "user2",
+            "User": {
+              "id": "user2",
+              "name": "Bob"
+            }
+          },
+          {
+            "id": "msg2",
+            "conversationId": "conv1",
+            "content": "Great! Let's schedule a meeting.",
+            "isRead": false,
+            "userId": "user1",
+            "User": {
+              "id": "user1",
+              "name": "Alice"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "req2",
+      "message": "Hi Alice, could you help me with this task?",
+      "fromUserId": "user3",
+      "toUserId": "user1",
+      "fromUser": {
+        "id": "user3",
+        "name": "Charlie"
+      },
+      "toUser": {
+        "id": "user1",
+        "name": "Alice"
+      },
+      "conversation": null
+    }
+  ]
+}
