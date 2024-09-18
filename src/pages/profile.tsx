@@ -40,6 +40,7 @@ import { createPortal } from "react-dom";
 import { ComplianceModal } from "../components/CompliancePortal";
 import ProfilePicture from "../components/Profile/ProfilePicture";
 import Spinner from "../components/Spinner";
+import { getPresignedImageUrl } from "../utils/uploadToS3";
 
 // Inputs to the onboarding form.
 export type OnboardingFormInputs = {
@@ -605,16 +606,10 @@ const Profile: NextPage = () => {
                 <PersonalInfoSection>
                   <ProfileHeader>Personal Info</ProfileHeader>
                   <div className="flex w-full flex-col ">
-                    <div className="w-full">
-                      <LightEntryLabel error={!!errors.profilePicture}>
-                        Profile Picture
-                      </LightEntryLabel>
-                      <ProfilePicture
-                        initialImageUrl={""}
-                        onFileSelected={setSelectedFile}
-                      />
+                    <div className="mb-10 w-full ">
+                      <ProfilePicture onFileSelected={setSelectedFile} />
                     </div>
-                    <div className="flex w-full flex-row space-x-6">
+                    <div className="flex w-full flex-row  space-x-6">
                       {/* Preferred Name field  */}
 
                       <div className="flex w-3/5 flex-col">
