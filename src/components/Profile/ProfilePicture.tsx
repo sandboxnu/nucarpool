@@ -113,20 +113,20 @@ const ProfilePicture = (props: ProfilePictureProps) => {
   return (
     <div>
       {previewUrl && showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div
             ref={modalContentRef}
-            className="relative mx-auto w-full max-w-xs rounded bg-white"
+            className="relative mx-auto inline-block rounded bg-white text-center"
           >
             <img
               ref={imageElement}
               src={previewUrl}
               alt="Crop this image"
-              style={{ display: "block", width: "100%" }}
+              style={{ display: "block", maxWidth: "50vw", maxHeight: "50vh" }}
             />
             <button
               onClick={handleCropClick}
-              className="w-full bg-northeastern-red font-bold text-white hover:bg-red-700"
+              className="w-full rounded-b bg-northeastern-red p-2 text-white hover:bg-red-700"
             >
               Crop Image
             </button>
@@ -164,7 +164,7 @@ const ProfilePicture = (props: ProfilePictureProps) => {
         <div className="ml-4">
           <label
             htmlFor="fileInput"
-            className="ml-10 inline-block cursor-pointer rounded-full bg-northeastern-red px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+            className="text-md ml-10 inline-block cursor-pointer rounded-full bg-northeastern-red px-4 py-2  text-white hover:bg-red-700"
           >
             Upload Profile Picture
           </label>
