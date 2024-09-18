@@ -53,6 +53,27 @@ const ProfilePicture = (props: ProfilePictureProps) => {
     };
   }, [previewUrl, showModal]);
 
+  const modalContentRef = useRef<HTMLDivElement>(null);
+
+  // use effect for modal click
+  useEffect(() => {
+    if (showModal) {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (
+          modalContentRef.current &&
+          !modalContentRef.current.contains(event.target as Node)
+        ) {
+          setShowModal(false);
+        }
+      };
+      document.addEventListener("mousedown", handleClickOutside);
+
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
+  }, [showModal]);
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newFile = event.target.files?.[0];
     if (newFile) {
@@ -92,8 +113,11 @@ const ProfilePicture = (props: ProfilePictureProps) => {
   return (
     <div>
       {previewUrl && showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="relative mx-auto w-full max-w-xs rounded bg-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            ref={modalContentRef}
+            className="relative mx-auto w-full max-w-xs rounded bg-white"
+          >
             <img
               ref={imageElement}
               src={previewUrl}
