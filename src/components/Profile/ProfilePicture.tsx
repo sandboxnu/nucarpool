@@ -12,11 +12,12 @@ interface ProfilePictureProps {
 const ProfilePicture = (props: ProfilePictureProps) => {
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [croppedImageUrl, setCroppedImageUrl] = useState<string>("");
+  const [imageLoadError, setImageLoadError] = useState<boolean>(false);
   const imageElement = useRef<HTMLImageElement>(null);
   const [cropper, setCropper] = useState<Cropper | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  // Use tRPC to fetch the profile picture URL
+  // fetch the profile picture URL
   const {
     data: profilePictureData,
     isLoading,
@@ -29,6 +30,11 @@ const ProfilePicture = (props: ProfilePictureProps) => {
       setPreviewUrl(profilePictureData.url);
     }
   }, [profilePictureData]);
+
+  // Reset imageLoadError when the image URLs change
+  useEffect(() => {
+    setImageLoadError(false);
+  }, [croppedImageUrl, previewUrl]);
 
   // Initialize the cropper when previewUrl changes
   useEffect(() => {
@@ -105,7 +111,7 @@ const ProfilePicture = (props: ProfilePictureProps) => {
       )}
 
       <div className="mt-2 flex items-center">
-        {croppedImageUrl ? (
+        {croppedImageUrl && !imageLoadError ? (
           <div className="h-40 w-40 overflow-hidden rounded-full">
             <Image
               src={croppedImageUrl}
@@ -113,9 +119,10 @@ const ProfilePicture = (props: ProfilePictureProps) => {
               width={160}
               height={160}
               objectFit="cover"
+              onError={() => setImageLoadError(true)}
             />
           </div>
-        ) : previewUrl ? (
+        ) : previewUrl && !imageLoadError ? (
           <div className="h-40 w-40 overflow-hidden rounded-full">
             <Image
               src={previewUrl}
@@ -123,6 +130,7 @@ const ProfilePicture = (props: ProfilePictureProps) => {
               width={160}
               height={160}
               objectFit="cover"
+              onError={() => setImageLoadError(true)}
             />
           </div>
         ) : (

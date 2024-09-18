@@ -21,7 +21,6 @@ const DropDownMenu = () => {
 
   useEffect(() => {
     if (presignedData?.url && !isLoading) {
-      console.log(presignedData.url);
       setProfileImageUrl(presignedData.url);
     }
   }, [presignedData, isLoading]);
