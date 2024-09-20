@@ -38,7 +38,9 @@ import ControlledAddressCombobox from "../components/Profile/ControlledAddressCo
 import { getSession, useSession } from "next-auth/react";
 import { createPortal } from "react-dom";
 import { ComplianceModal } from "../components/CompliancePortal";
+import ProfilePicture from "../components/Profile/ProfilePicture";
 import Spinner from "../components/Spinner";
+import { getPresignedImageUrl } from "../utils/uploadToS3";
 
 // Inputs to the onboarding form.
 export type OnboardingFormInputs = {
@@ -46,6 +48,7 @@ export type OnboardingFormInputs = {
   status: Status;
   seatAvail: number;
   companyName: string;
+  profilePicture: string;
   companyAddress: string;
   startAddress: string;
   preferredName: string;
@@ -150,6 +153,39 @@ const Profile: NextPage = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const utils = trpc.useContext();
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const useUploadFile = (selectedFile: File | null) => {
+    const { data: presignedData, error } = trpc.user.getPresignedUrl.useQuery(
+      {
+        contentType: selectedFile?.type || "",
+      },
+      { enabled: !!selectedFile }
+    );
+    const uploadFile = async () => {
+      if (presignedData?.url && selectedFile) {
+        const url = presignedData.url;
+
+        const response = await fetch(url, {
+          method: "PUT",
+          headers: {
+            "Content-Type": selectedFile.type,
+          },
+          body: selectedFile,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to upload file: ${response.statusText}`);
+        }
+
+        console.log("File uploaded successfully!");
+      }
+    };
+
+    return { uploadFile, error };
+  };
+  const { uploadFile, error } = useUploadFile(selectedFile);
+
   const { data: session } = useSession();
   const { data: user } = trpc.user.me.useQuery(undefined, {
     refetchOnMount: true,
@@ -168,6 +204,7 @@ const Profile: NextPage = () => {
       status: Status.ACTIVE,
       seatAvail: 0,
       companyName: "",
+      profilePicture: "",
       companyAddress: "",
       startAddress: "",
       preferredName: "",
@@ -294,6 +331,13 @@ const Profile: NextPage = () => {
       .join(",");
 
     const sessionName = session?.user?.name ?? "";
+    if (selectedFile) {
+      try {
+        await uploadFile();
+      } catch (error) {
+        console.error("File upload failed:", error);
+      }
+    }
 
     editUserMutation.mutate({
       role: userInfo.role,
@@ -473,120 +517,129 @@ const Profile: NextPage = () => {
                   {errors.companyAddress && (
                     <ErrorDisplay>{errors.companyAddress.message}</ErrorDisplay>
                   )}
+                  <CommutingScheduleSection>
+                    <ProfileHeader className={"mt-4"}>
+                      Commuting Schedule
+                    </ProfileHeader>
+                    {/* Days working field  */}
+                    <div className="mb-2  aspect-[7/1] w-full max-w-[360px] md:my-4">
+                      <div className="flex h-full w-full items-center justify-evenly border-l border-l-black">
+                        {daysOfWeek.map((day, index) => (
+                          <Controller
+                            key={day + index.toString()}
+                            name={`daysWorking.${index}`}
+                            control={control}
+                            render={({
+                              field: { onChange, value },
+                              formState: { defaultValues },
+                            }) => (
+                              <Checkbox
+                                key={day + index.toString()}
+                                sx={{
+                                  input: { width: 1, height: 1 },
+                                  aspectRatio: 1,
+                                  width: 1,
+                                  height: 1,
+                                  padding: 0,
+                                }}
+                                disabled={isViewer}
+                                checked={value}
+                                onChange={onChange}
+                                checkedIcon={
+                                  <DayBox day={day} isSelected={true} />
+                                }
+                                icon={<DayBox day={day} isSelected={false} />}
+                              />
+                            )}
+                          />
+                        ))}
+                      </div>
+
+                      {errors.daysWorking && (
+                        <ErrorDisplay>
+                          {errors.daysWorking.message}
+                        </ErrorDisplay>
+                      )}
+                    </div>
+
+                    {/* Start/End Time Fields  */}
+                    <div className="flex w-full justify-between gap-6 pb-4 md:w-96">
+                      <div className="flex flex-1 flex-col gap-2">
+                        <EntryLabel
+                          required={true}
+                          error={errors.startTime}
+                          label="Start Time"
+                        />
+                        <ControlledTimePicker
+                          isDisabled={isViewer}
+                          control={control}
+                          name={"startTime"}
+                          value={user?.startTime ? user.startTime : undefined}
+                        />
+                      </div>
+                      <div className="flex flex-1 flex-col gap-2">
+                        <EntryLabel
+                          required={true}
+                          error={errors.endTime}
+                          label="End Time"
+                        />
+                        <ControlledTimePicker
+                          isDisabled={isViewer}
+                          control={control}
+                          name={"endTime"}
+                          value={user?.endTime ? user.endTime : undefined}
+                        />
+                      </div>
+                    </div>
+                    <Note className="py-4 md:w-96">
+                      Please input the start and end times of your work, rather
+                      than your departure times. If your work hours are
+                      flexible, coordinate directly with potential riders or
+                      drivers to inform them.
+                    </Note>
+                    <div className="flex flex-col space-y-2"></div>
+                  </CommutingScheduleSection>
                 </BottomProfileSection>
               </ProfileColumn>
 
               <ProfileColumn>
-                <CommutingScheduleSection>
-                  <ProfileHeader>Commuting Schedule</ProfileHeader>
-                  {/* Days working field  */}
-                  <div className="mb-2 aspect-[7/1] w-full max-w-[360px] md:my-4">
-                    <div className="flex h-full w-full items-center justify-evenly border-l border-l-black">
-                      {daysOfWeek.map((day, index) => (
-                        <Controller
-                          key={day + index.toString()}
-                          name={`daysWorking.${index}`}
-                          control={control}
-                          render={({
-                            field: { onChange, value },
-                            formState: { defaultValues },
-                          }) => (
-                            <Checkbox
-                              key={day + index.toString()}
-                              sx={{
-                                input: { width: 1, height: 1 },
-                                aspectRatio: 1,
-                                width: 1,
-                                height: 1,
-                                padding: 0,
-                              }}
-                              disabled={isViewer}
-                              checked={value}
-                              onChange={onChange}
-                              checkedIcon={
-                                <DayBox day={day} isSelected={true} />
-                              }
-                              icon={<DayBox day={day} isSelected={false} />}
-                            />
-                          )}
-                        />
-                      ))}
-                    </div>
-
-                    {errors.daysWorking && (
-                      <ErrorDisplay>{errors.daysWorking.message}</ErrorDisplay>
-                    )}
-                  </div>
-
-                  {/* Start/End Time Fields  */}
-                  <div className="flex w-full justify-between gap-6 pb-4 md:w-96">
-                    <div className="flex flex-1 flex-col gap-2">
-                      <EntryLabel
-                        required={true}
-                        error={errors.startTime}
-                        label="Start Time"
-                      />
-                      <ControlledTimePicker
-                        isDisabled={isViewer}
-                        control={control}
-                        name={"startTime"}
-                        value={user?.startTime ? user.startTime : undefined}
-                      />
-                    </div>
-                    <div className="flex flex-1 flex-col gap-2">
-                      <EntryLabel
-                        required={true}
-                        error={errors.endTime}
-                        label="End Time"
-                      />
-                      <ControlledTimePicker
-                        isDisabled={isViewer}
-                        control={control}
-                        name={"endTime"}
-                        value={user?.endTime ? user.endTime : undefined}
-                      />
-                    </div>
-                  </div>
-                  <Note className="py-4 md:w-96">
-                    Please input the start and end times of your work, rather
-                    than your departure times. If your work hours are flexible,
-                    coordinate directly with potential riders or drivers to
-                    inform them.
-                  </Note>
-                  <div className="flex flex-col space-y-2"></div>
-                </CommutingScheduleSection>
-
                 <PersonalInfoSection>
                   <ProfileHeader>Personal Info</ProfileHeader>
-                  <div className="flex w-full flex-row space-x-6">
-                    {/* Preferred Name field  */}
-                    <div className="flex w-3/5 flex-col">
-                      <LightEntryLabel error={!!errors.preferredName}>
-                        Preferred Name
-                      </LightEntryLabel>
-                      <TextField
-                        id="preferredName"
-                        error={errors.preferredName}
-                        isDisabled={isViewer}
-                        type="text"
-                        inputClassName={`h-12`}
-                        {...register("preferredName")}
-                      />
+                  <div className="flex w-full flex-col ">
+                    <div className="mb-10 w-full ">
+                      <ProfilePicture onFileSelected={setSelectedFile} />
                     </div>
+                    <div className="flex w-full flex-row  space-x-6">
+                      {/* Preferred Name field  */}
 
-                    {/* Pronouns field  */}
-                    <div className="w-2/6 flex-1">
-                      <LightEntryLabel error={!!errors.pronouns}>
-                        Pronouns
-                      </LightEntryLabel>
-                      <TextField
-                        id="pronouns"
-                        inputClassName={`h-12`}
-                        error={errors.pronouns}
-                        isDisabled={isViewer}
-                        type="text"
-                        {...register("pronouns")}
-                      />
+                      <div className="flex w-3/5 flex-col">
+                        <LightEntryLabel error={!!errors.preferredName}>
+                          Preferred Name
+                        </LightEntryLabel>
+                        <TextField
+                          id="preferredName"
+                          error={errors.preferredName}
+                          isDisabled={isViewer}
+                          type="text"
+                          inputClassName={`h-12`}
+                          {...register("preferredName")}
+                        />
+                      </div>
+
+                      {/* Pronouns field  */}
+                      <div className="w-2/6 flex-1">
+                        <LightEntryLabel error={!!errors.pronouns}>
+                          Pronouns
+                        </LightEntryLabel>
+                        <TextField
+                          id="pronouns"
+                          inputClassName={`h-12`}
+                          error={errors.pronouns}
+                          isDisabled={isViewer}
+                          type="text"
+                          {...register("pronouns")}
+                        />
+                      </div>
                     </div>
                   </div>
                   {/* Bio field */}
