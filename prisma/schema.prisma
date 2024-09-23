@@ -3,15 +3,15 @@
 
 // Specify the DB type and the connection string AKA DB_URL
 datasource db {
-  provider             = "mysql"
-  url                  = env("DATABASE_URL")
-  relationMode =  "prisma"
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 // Boilerplate--we would only change this if we wanted to change how 
 // the Prisma Client is generated.
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 // Represents a Role.
@@ -29,8 +29,8 @@ enum Status {
 
 // Represents an Account--need this for NextAuth.
 model Account {
-  id                String  @id @default(cuid()) //primary key
-  userId            String  @map(name: "user_id") //foreign key
+  id                String  @id @default(cuid()) // primary key
+  userId            String  @map(name: "user_id") // foreign key
   type              String
   provider          String
   providerAccountId String  @map(name: "provider_account_id")
@@ -41,7 +41,7 @@ model Account {
   token_type        String?
   scope             String? @db.MediumText
   id_token          String? @db.MediumText
-  session_state     String? 
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -65,69 +65,96 @@ model Session {
 
 // Represents an Invitation to a user
 model Request {
-  id         String @id @default(cuid()) // primary key
-  message    String @db.VarChar(255)
-  fromUserId String // foreign key
-  toUserId   String // foreign key
-  fromUser   User   @relation("sentRequests", fields: [fromUserId], references: [id])
-  toUser     User   @relation("receivedRequests", fields: [toUserId], references: [id])
+  id           String        @id @default(cuid()) // primary key
+  message      String        @db.VarChar(255)
+  fromUserId   String // foreign key
+  toUserId     String // foreign key
+  fromUser     User          @relation("sentRequests", fields: [fromUserId], references: [id])
+  toUser       User          @relation("receivedRequests", fields: [toUserId], references: [id])
+  conversation Conversation?
 
   @@index([fromUserId])
   @@index([toUserId])
   @@map(name: "request")
 }
 
+// Represents a Conversation between two users
+model Conversation {
+  id        String    @id @default(cuid())
+  requestId String    @unique
+  request   Request   @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  messages  Message[]
+
+  @@map(name: "conversation")
+}
+
+// Represents a Message sent by a User
+model Message {
+  id             String       @id @default(cuid()) // Primary key
+  conversationId String // Foreign key
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  content        String       @db.VarChar(255)
+  isRead         Boolean      @default(false)
+  User           User?        @relation(fields: [userId], references: [id])
+  userId         String?
+
+  @@index([conversationId])
+  @@index([userId])
+  @@map(name: "message")
+}
+
 // Represents a group of users
 model CarpoolGroup {
-  id    String @id @default(cuid()) // primary key
+  id      String @id @default(cuid()) // primary key
   message String
-  users User[]
+  users   User[]
 
   @@map(name: "group")
 }
 
 // Represents a User--need this for NextAuth and the data it stores.
 model User {
-  id                 String         @id @default(cuid()) // primary key
+  id                 String        @id @default(cuid()) // primary key
   name               String?
-  email              String?        @unique
-  emailVerified      DateTime?      @map(name: "email_verified")
-  image              String?        @db.MediumText
-  bio                String         @default("")
-  preferredName      String         @default("")
-  pronouns           String         @default("")
+  email              String?       @unique
+  emailVerified      DateTime?     @map(name: "email_verified")
+  image              String?       @db.MediumText
+  bio                String        @default("")
+  preferredName      String        @default("")
+  pronouns           String        @default("")
   accounts           Account[] // can have multiple accounts
   sessions           Session[] // can have multiple settings
-  role               Role           @default(RIDER)
-  status             Status         @default(ACTIVE)
-  seatAvail          Int            @default(0) @map("seat_avail")
-  companyName        String         @default("") @map("company_name")
-  companyAddress     String         @default("") @map("company_address")
-  companyCoordLng    Float          @default(0) @map("company_coord_lng")
-  companyCoordLat    Float          @default(0) @map("company_coord_lat")
-  startAddress       String         @default("") @map("start_address")
-  startCoordLng      Float          @default(0) @map("start_coord_lng")
-  startCoordLat      Float          @default(0) @map("start_coord_lat")
-  companyPOIAddress  String         @default("") @map("company_poi_address")
-  companyPOICoordLng Float          @default(0) @map("company_poi_coord_lng")
-  companyPOICoordLat Float          @default(0) @map("company_poi_coord_lat")
-  startPOILocation   String         @default("") @map("start_poi_location")
-  startPOICoordLng   Float          @default(0) @map("start_poi_coord_lng")
-  startPOICoordLat   Float          @default(0) @map("start_poi_coord_lat")
-  isOnboarded        Boolean        @default(false) @map("is_onboarded")
-  licenseSigned      Boolean        @default(false) @map("license_signed")
-  daysWorking        String         @default("") @map("days_working")
-  startTime          DateTime?      @map("start_time") @db.Time(0)
-  endTime            DateTime?      @map("end_time") @db.Time(0)
-  favoritedBy        User[]         @relation("Favorites")
-  favorites          User[]         @relation("Favorites")
-  sentRequests       Request[]      @relation("sentRequests")
-  receivedRequests   Request[]      @relation("receivedRequests")
-  carpool            CarpoolGroup?   @relation(fields: [carpoolId], references: [id])
+  role               Role          @default(RIDER)
+  status             Status        @default(ACTIVE)
+  seatAvail          Int           @default(0) @map("seat_avail")
+  companyName        String        @default("") @map("company_name")
+  companyAddress     String        @default("") @map("company_address")
+  companyCoordLng    Float         @default(0) @map("company_coord_lng")
+  companyCoordLat    Float         @default(0) @map("company_coord_lat")
+  startAddress       String        @default("") @map("start_address")
+  startCoordLng      Float         @default(0) @map("start_coord_lng")
+  startCoordLat      Float         @default(0) @map("start_coord_lat")
+  companyPOIAddress  String        @default("") @map("company_poi_address")
+  companyPOICoordLng Float         @default(0) @map("company_poi_coord_lng")
+  companyPOICoordLat Float         @default(0) @map("company_poi_coord_lat")
+  startPOILocation   String        @default("") @map("start_poi_location")
+  startPOICoordLng   Float         @default(0) @map("start_poi_coord_lng")
+  startPOICoordLat   Float         @default(0) @map("start_poi_coord_lat")
+  isOnboarded        Boolean       @default(false) @map("is_onboarded")
+  licenseSigned      Boolean       @default(false) @map("license_signed")
+  daysWorking        String        @default("") @map("days_working")
+  startTime          DateTime?     @map("start_time") @db.Time(0)
+  endTime            DateTime?     @map("end_time") @db.Time(0)
+  favoritedBy        User[]        @relation("Favorites")
+  favorites          User[]        @relation("Favorites")
+  sentRequests       Request[]     @relation("sentRequests")
+  receivedRequests   Request[]     @relation("receivedRequests")
+  carpool            CarpoolGroup? @relation(fields: [carpoolId], references: [id])
   carpoolId          String?
+  SentMessages       Message[]
 
-  @@map(name: "user")
   @@index([carpoolId])
+  @@map(name: "user")
 }
 
 // Represents a VerificationToken--need this for NextAuth.
