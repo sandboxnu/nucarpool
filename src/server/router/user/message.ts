@@ -19,7 +19,6 @@ export const messageRouter = router({
         conversation: {
           request: {
             OR: [
-              { fromUserId: userId },
               { toUserId: userId },
             ],
           },
@@ -32,7 +31,7 @@ export const messageRouter = router({
     });
   }),
 
-  getConversations: protectedRouter.query(async ({ ctx }) => {
+  getRequests: protectedRouter.query(async ({ ctx }) => {
     const userId = ctx.session.user?.id;
     if (!userId) {
       throw new TRPCError({
@@ -40,36 +39,62 @@ export const messageRouter = router({
         message: "User not authenticated",
       });
     }
-
-    return ctx.prisma.conversation.findMany({
+  
+    return ctx.prisma.request.findMany({
       where: {
-        request: {
-          OR: [
-            { fromUserId: userId },
-            { toUserId: userId },
-          ],
-        },
+        OR: [
+          { fromUserId: userId },
+          { toUserId: userId },
+        ],
       },
       include: {
-        request: {
+        fromUser: {
+          select: {
+            id: true,
+            name: true,
+            preferredName: true,
+            image: true,
+            bio: true,
+            pronouns: true,
+            role: true,
+            status: true,
+            seatAvail: true,
+            companyName: true,
+            startAddress: true,
+            daysWorking: true,
+            startTime: true,
+            endTime: true,
+          },
+        },
+        toUser: {
+          select: {
+            id: true,
+            name: true,
+            preferredName: true,
+            image: true,
+            bio: true,
+            pronouns: true,
+            role: true,
+            status: true,
+            seatAvail: true,
+            companyName: true,
+            startAddress: true,
+            daysWorking: true,
+            startTime: true,
+            endTime: true,
+          },
+        },
+        conversation: {
           include: {
-            fromUser: {
-              select: { id: true, name: true, preferredName: true, image: true },
-            },
-            toUser: {
-              select: { id: true, name: true, preferredName: true, image: true },
+            messages: {
+              orderBy: { id: 'desc' },
+              take: 1,
             },
           },
         },
-        messages: {
-          orderBy: { id: 'desc' },
-          take: 1,
-          include: {
-            User: {
-              select: { id: true, name: true, preferredName: true },
-            },
-          },
-        },
+      },
+      orderBy: {
+        id: 'desc', // This will return the most recent requests first
       },
     });
   }),
