@@ -72,6 +72,7 @@ const messages: Mess[] = [
 
 const MessageContent = ({ currentUser }: MessageContentProps) => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
