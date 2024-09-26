@@ -1,4 +1,4 @@
-import { Request, Role } from "@prisma/client";
+import { Role } from "@prisma/client";
 import { Status } from "@prisma/client";
 import { Feature } from "geojson";
 import type { AppRouter } from "../server/router";
@@ -92,14 +92,41 @@ export type ButtonInfo = {
 };
 
 export type ResolvedRequest = {
-  fromUser: User | PublicUser | null;
-  toUser: User | PublicUser | null;
+  fromUser: PublicUser | null;
+  toUser: PublicUser | null;
   id: string;
 };
 
 type Admin = {
   iso_3166_1_alpha3: string;
   iso_3166_1: string;
+};
+
+export type Request = {
+  id: string;
+  message: string;
+  fromUserId: string;
+  toUserId: string;
+  fromUser: User | PublicUser | null;
+  toUser: User | PublicUser | null;
+  conversation?: Conversation | null;
+};
+
+export type Conversation = {
+  id: string;
+  requestId: string;
+  request: Request;
+  messages: Message[];
+};
+
+export type Message = {
+  id: string;
+  conversationId: string;
+  conversation: Conversation;
+  content: string;
+  isRead: boolean;
+  user?: User | null;
+  userId?: string | null;
 };
 
 type Notification = {

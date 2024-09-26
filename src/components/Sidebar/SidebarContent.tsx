@@ -10,6 +10,7 @@ interface SidebarContentProps {
   userCardList: EnhancedPublicUser[];
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
   disabled: boolean;
+  onCardClick: (user: EnhancedPublicUser) => void;
 }
 
 const emptyMessages = {
@@ -45,8 +46,10 @@ const emptyMessage = (card: string, disabled: boolean): string => {
 const renderUserCard = (
   subType: string,
   otherUser: EnhancedPublicUser,
-  onViewRouteClick: (user: User, otherUser: PublicUser) => void
+  onViewRouteClick: (user: User, otherUser: PublicUser) => void,
+  onCardClick: (user: EnhancedPublicUser) => void
 ): JSX.Element => {
+  const handleClick = () => onCardClick(otherUser);
   switch (subType) {
     case "recommendations":
       return (
@@ -71,6 +74,7 @@ const renderUserCard = (
             key={otherUser.id}
             otherUser={otherUser}
             onViewRouteClick={onViewRouteClick}
+            onClick={handleClick}
           />
         );
       }
@@ -81,6 +85,7 @@ const renderUserCard = (
             key={otherUser.id}
             otherUser={otherUser}
             onViewRouteClick={onViewRouteClick}
+            onClick={handleClick}
           />
         );
       }
@@ -99,7 +104,12 @@ export const SidebarContent = (props: SidebarContentProps) => {
         </div>
       ) : (
         props.userCardList.map((otherUser: EnhancedPublicUser) =>
-          renderUserCard(props.subType, otherUser, props.onViewRouteClick)
+          renderUserCard(
+            props.subType,
+            otherUser,
+            props.onViewRouteClick,
+            props.onCardClick
+          )
         )
       )}
     </div>

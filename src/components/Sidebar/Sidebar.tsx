@@ -17,6 +17,7 @@ interface SidebarProps {
   received: EnhancedPublicUser[];
   sent: EnhancedPublicUser[];
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
+  onUserSelect: (user: EnhancedPublicUser) => void;
 }
 
 export const SidebarPage = (props: SidebarProps) => {
@@ -40,6 +41,7 @@ export const SidebarPage = (props: SidebarProps) => {
         sent={props.sent.reverse()}
         disabled={disabled}
         viewRoute={props.onViewRouteClick}
+        onUserSelect={props.onUserSelect}
       />
     );
   }

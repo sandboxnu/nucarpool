@@ -1,0 +1,138 @@
+{
+  "users": [
+    {
+      "id": "user1",
+      "name": "Alice",
+      "email": "alice@example.com",
+      "emailVerified": null,
+      "image": null,
+      "bio": "Bio of Alice",
+      "preferredName": "Ally",
+      "pronouns": "she/her",
+      "role": "user"
+    },
+    {
+      "id": "user2",
+      "name": "Bob",
+      "email": "bob@example.com",
+      "emailVerified": null,
+      "image": null,
+      "bio": "Bio of Bob",
+      "preferredName": "Bobby",
+      "pronouns": "he/him",
+      "role": "user"
+    },
+    {
+      "id": "user3",
+      "name": "Charlie",
+      "email": "charlie@example.com",
+      "emailVerified": null,
+      "image": null,
+      "bio": "Bio of Charlie",
+      "preferredName": "Chuck",
+      "pronouns": "they/them",
+      "role": "user"
+    }
+  ],
+  "requests": [
+    {
+      "id": "request1",
+      "message": "Hello Bob",
+      "fromUserId": "user1",
+      "toUserId": "user2",
+      "fromUser": {
+        "id": "user1",
+        "name": "Alice",
+        "email": "alice@example.com",
+        "emailVerified": null,
+        "image": null,
+        "bio": "Bio of Alice",
+        "preferredName": "Ally",
+        "pronouns": "she/her",
+        "role": "user"
+      },
+      "toUser": {
+        "id": "user2",
+        "name": "Bob",
+        "email": "bob@example.com",
+        "emailVerified": null,
+        "image": null,
+        "bio": "Bio of Bob",
+        "preferredName": "Bobby",
+        "pronouns": "he/him",
+        "role": "user"
+      },
+      "conversation": {
+        "id": "conversation1",
+        "requestId": "request1",
+        "messages": [
+          {
+            "id": "message1",
+            "conversationId": "conversation1",
+            "content": "Hi Alice!",
+            "isRead": false,
+            "user": {
+              "id": "user2",
+              "name": "Bob",
+              "email": "bob@example.com",
+              "emailVerified": null,
+              "image": null,
+              "bio": "Bio of Bob",
+              "preferredName": "Bobby",
+              "pronouns": "he/him",
+              "role": "user"
+            },
+            "userId": "user2"
+          },
+          {
+            "id": "message2",
+            "conversationId": "conversation1",
+            "content": "How are you?",
+            "isRead": false,
+            "user": {
+              "id": "user1",
+              "name": "Alice",
+              "email": "alice@example.com",
+              "emailVerified": null,
+              "image": null,
+              "bio": "Bio of Alice",
+              "preferredName": "Ally",
+              "pronouns": "she/her",
+              "role": "user"
+            },
+            "userId": "user1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "request2",
+      "message": "Hey Charlie",
+      "fromUserId": "user1",
+      "toUserId": "user3",
+      "fromUser": {
+        "id": "user1",
+        "name": "Alice",
+        "email": "alice@example.com",
+        "emailVerified": null,
+        "image": null,
+        "bio": "Bio of Alice",
+        "preferredName": "Ally",
+        "pronouns": "she/her",
+        "role": "user"
+      },
+      "toUser": {
+        "id": "user3",
+        "name": "Charlie",
+        "email": "charlie@example.com",
+        "emailVerified": null,
+        "image": null,
+        "bio": "Bio of Charlie",
+        "preferredName": "Chuck",
+        "pronouns": "they/them",
+        "role": "user"
+      },
+      "conversation": null
+    }
+  ]
+}

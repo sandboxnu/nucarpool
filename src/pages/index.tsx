@@ -33,6 +33,7 @@ import BlueSquare from "../../public/user-dest.png";
 import BlueCircle from "../../public/blue-circle.png";
 import VisibilityToggle from "../components/Map/VisibilityToggle";
 import updateCompanyLocation from "../utils/map/updateCompanyLocation";
+import MessagePanel from "../components/Messages/MessagePanel";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -71,6 +72,12 @@ const Home: NextPage<any> = () => {
   });
   const { data: requests = { sent: [], received: [] } } =
     trpc.user.requests.me.useQuery();
+  const [selectedUser, setSelectedUser] = useState<EnhancedPublicUser | null>(
+    null
+  );
+  const handleUserSelect = (user: EnhancedPublicUser) => {
+    setSelectedUser(user);
+  };
   const [otherUser, setOtherUser] = useState<PublicUser | null>(null);
   const [mapState, setMapState] = useState<mapboxgl.Map>();
   const [sidebarType, setSidebarType] = useState<HeaderOptions>("explore");
@@ -370,6 +377,7 @@ const Home: NextPage<any> = () => {
                     received={enhancedReceivedUsers}
                     sent={enhancedSentUsers}
                     onViewRouteClick={onViewRouteClick}
+                    onUserSelect={handleUserSelect}
                   />
                 )}
               </div>
@@ -381,22 +389,32 @@ const Home: NextPage<any> = () => {
                 <RiFocus3Line />
               </button>
               <div className="relative flex-auto">
-                <div
-                  ref={mapContainerRef}
-                  id="map"
-                  className={"h-full w-full flex-auto"}
-                >
-                  {user.role === "VIEWER" && viewerBox}
-                  <MapLegend role={user.role} />
-                  <MapConnectPortal
-                    otherUser={popupUser}
-                    extendUser={extendPublicUser}
-                    onViewRouteClick={onViewRouteClick}
-                    onClose={() => {
-                      setPopupUser(null);
-                    }}
+                {selectedUser ? (
+                  <MessagePanel
+                    selectedUser={selectedUser}
+                    currentUser={user}
+                    messages={
+                      selectedUser.outgoingRequest?.conversation?.messages
+                    }
                   />
-                </div>
+                ) : (
+                  <div
+                    ref={mapContainerRef}
+                    id="map"
+                    className={"h-full w-full flex-auto"}
+                  >
+                    {user.role === "VIEWER" && viewerBox}
+                    <MapLegend role={user.role} />
+                    <MapConnectPortal
+                      otherUser={popupUser}
+                      extendUser={extendPublicUser}
+                      onViewRouteClick={onViewRouteClick}
+                      onClose={() => {
+                        setPopupUser(null);
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>

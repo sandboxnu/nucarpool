@@ -9,6 +9,7 @@ import { User } from "@prisma/client";
 interface SentCardProps {
   otherUser: EnhancedPublicUser;
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
+  onClick: () => void;
 }
 
 export const SentCard = (props: SentCardProps): JSX.Element => {
@@ -26,11 +27,13 @@ export const SentCard = (props: SentCardProps): JSX.Element => {
   };
   return (
     <>
-      <UserCard
-        otherUser={props.otherUser}
-        rightButton={connectButtonInfo}
-        onViewRouteClick={props.onViewRouteClick}
-      />
+      <div onClick={props.onClick} className="cursor-pointer">
+        <UserCard
+          otherUser={props.otherUser}
+          rightButton={connectButtonInfo}
+          onViewRouteClick={props.onViewRouteClick}
+        />
+      </div>
       {showModal &&
         user &&
         props.otherUser.outgoingRequest &&

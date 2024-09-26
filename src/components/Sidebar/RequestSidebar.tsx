@@ -2,17 +2,24 @@ import React, { useState } from "react";
 import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
 import { SidebarContent } from "./SidebarContent";
 import { clearMarkers } from "../../utils/map/viewRoute";
-
+import { useRequests } from "../../utils/requestContext";
 interface RequestSidebarProps {
   received: EnhancedPublicUser[];
   sent: EnhancedPublicUser[];
   viewRoute: (user: User, otherUser: PublicUser) => void;
   disabled: boolean;
+  onUserSelect: (user: EnhancedPublicUser) => void;
 }
 
 const RequestSidebar = (props: RequestSidebarProps) => {
   const [curOption, setCurOption] = useState<"received" | "sent">("received");
+  const [selectedUser, setSelectedUser] = useState<EnhancedPublicUser | null>(
+    null
+  );
 
+  const handleCardClick = (user: EnhancedPublicUser) => {
+    props.onUserSelect(user);
+  };
   return (
     <div className="z-10 flex h-full flex-shrink-0 flex-col bg-white px-5 text-left">
       <div className="flex-row py-3">
@@ -51,6 +58,7 @@ const RequestSidebar = (props: RequestSidebarProps) => {
         subType={curOption}
         disabled={props.disabled}
         onViewRouteClick={props.viewRoute}
+        onCardClick={handleCardClick}
       />
     </div>
   );
