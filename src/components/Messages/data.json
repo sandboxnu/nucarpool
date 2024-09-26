@@ -41,7 +41,7 @@
       "fromUserId": "user1",
       "toUserId": "user2",
       "fromUser": {
-        "id": "user1",
+        "id": "1",
         "name": "Alice",
         "email": "alice@example.com",
         "emailVerified": null,

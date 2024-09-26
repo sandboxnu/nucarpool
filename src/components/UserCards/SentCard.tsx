@@ -10,6 +10,7 @@ interface SentCardProps {
   otherUser: EnhancedPublicUser;
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
   onClick: () => void;
+  selectedUser: EnhancedPublicUser | null;
 }
 
 export const SentCard = (props: SentCardProps): JSX.Element => {
@@ -30,8 +31,11 @@ export const SentCard = (props: SentCardProps): JSX.Element => {
       <div onClick={props.onClick} className="cursor-pointer">
         <UserCard
           otherUser={props.otherUser}
-          rightButton={connectButtonInfo}
-          onViewRouteClick={props.onViewRouteClick}
+          classname={
+            props.selectedUser?.id === props.otherUser.id
+              ? "border-l-northeastern-red drop-shadow-lg"
+              : ""
+          }
         />
       </div>
       {showModal &&

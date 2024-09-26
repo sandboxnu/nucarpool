@@ -3,6 +3,7 @@
 import React from "react";
 import { EnhancedPublicUser } from "../../utils/types";
 import { AiOutlineUser } from "react-icons/ai";
+import { FiMoreHorizontal } from "react-icons/fi";
 
 interface MessageHeaderProps {
   selectedUser: EnhancedPublicUser;
@@ -18,24 +19,24 @@ const MessageHeader = ({
   return (
     <div className="flex items-center justify-between border-b p-4">
       <div className="flex items-center">
-        <AiOutlineUser className="h-10 w-10" rounded-full />
+        <AiOutlineUser className="h-14 w-14 rounded-full bg-gray-500" />
 
-        <span className="text-xl font-semibold">{selectedUser.name}</span>
+        <span className="pl-10 text-xl font-semibold">{selectedUser.name}</span>
       </div>
       <div className="flex items-center">
         <button
           onClick={onAccept}
-          className="mr-2 rounded bg-northeastern-red px-4 py-2 text-white hover:bg-red-700"
+          className="mr-2 rounded-xl bg-northeastern-red px-4 py-2 text-center text-white hover:bg-red-700"
         >
           Accept
         </button>
         <button
           onClick={onReject}
-          className="mr-2 rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+          className="mr-2 rounded-xl bg-white px-4 py-2 text-center text-black hover:bg-gray-300"
         >
           Reject
         </button>
-        <button className="text-gray-600 hover:text-gray-800">✕</button>
+        <FiMoreHorizontal className="inline-block" />{" "}
       </div>
     </div>
   );

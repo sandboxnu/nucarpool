@@ -16,9 +16,10 @@ import Image from "next/image";
 
 interface UserCardProps {
   otherUser: EnhancedPublicUser;
-  rightButton: ButtonInfo;
-  onViewRouteClick: (user: User, otherUser: PublicUser) => void;
+  rightButton?: ButtonInfo;
+  onViewRouteClick?: (user: User, otherUser: PublicUser) => void;
   message?: string;
+  classname?: string;
 }
 
 const getButtonClassName = (button: ButtonInfo): string => {
@@ -29,9 +30,6 @@ const getButtonClassName = (button: ButtonInfo): string => {
     } rounded-md p-1 my-1 text-center text-white`
   );
 };
-
-
-
 
 export const UserCard = (props: UserCardProps): JSX.Element => {
   const trpcUtils = trpc.useContext();
@@ -92,9 +90,11 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
   }
   return (
     <div
-      className={
-        "align-center m-3.5 flex flex-col gap-2 rounded-xl border-l-[13px] border-l-busy-red bg-stone-100 px-6 py-4 text-left shadow-md"
-      }
+      className={classNames(
+        "align-center m-3.5 flex flex-col gap-2 rounded-xl bg-stone-100 px-6 py-4 text-left shadow-md",
+        "border-l-[13px] border-l-busy-red",
+        props.classname
+      )}
     >
       <div className="flex justify-between">
         {/* top row - Username*/}
@@ -140,13 +140,12 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         </p>
       </div>
 
-
       {/* Fourth row - messaging bubble */}
       {props.message && (
-          <div className="mt-2 w-full rounded-lg bg-gray-200 p-2 text-sm">
-            {props.message}
-          </div>
-        )} 
+        <div className="mt-2 w-full rounded-lg bg-white p-2 text-sm">
+          {props.message}
+        </div>
+      )}
 
       <div className="flex w-full items-center gap-4">
         {DaysWorkingDisplay(props.otherUser.daysWorking)}
@@ -177,24 +176,30 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         </div>
       )}
 
-
       {/* Seventh row - Buttons*/}
-
-      <div className="flex flex-row justify-between gap-2">
-        <button
-          onClick={() => props.onViewRouteClick(user, props.otherUser)}
-          className="my-1 w-1/2 rounded-md border border-black p-1 text-center hover:bg-stone-200"
-        >
-          View Route
-        </button>
-        <button
-          onClick={() => props.rightButton.onPress(props.otherUser)}
-          disabled={user.role === "VIEWER" || user.status === "INACTIVE"}
-          className={getButtonClassName(props.rightButton)}
-        >
-          {props.rightButton.text}
-        </button>
-      </div>
+      {props.onViewRouteClick && props.rightButton ? (
+        <div className="flex flex-row justify-between gap-2">
+          <button
+            onClick={() =>
+              props.onViewRouteClick &&
+              props.onViewRouteClick(user, props.otherUser)
+            }
+            className="my-1 w-1/2 rounded-md border border-black p-1 text-center hover:bg-stone-200"
+          >
+            View Route
+          </button>
+          <button
+            onClick={() =>
+              props.rightButton?.onPress &&
+              props.rightButton.onPress(props.otherUser)
+            }
+            disabled={user.role === "VIEWER" || user.status === "INACTIVE"}
+            className={getButtonClassName(props.rightButton)}
+          >
+            {props.rightButton?.text}
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 };

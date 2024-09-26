@@ -9,6 +9,7 @@ interface RequestSidebarProps {
   viewRoute: (user: User, otherUser: PublicUser) => void;
   disabled: boolean;
   onUserSelect: (user: EnhancedPublicUser) => void;
+  selectedUser: EnhancedPublicUser | null;
 }
 
 const RequestSidebar = (props: RequestSidebarProps) => {
@@ -59,6 +60,7 @@ const RequestSidebar = (props: RequestSidebarProps) => {
         disabled={props.disabled}
         onViewRouteClick={props.viewRoute}
         onCardClick={handleCardClick}
+        selectedUser={props.selectedUser}
       />
     </div>
   );

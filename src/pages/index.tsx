@@ -378,6 +378,7 @@ const Home: NextPage<any> = () => {
                     sent={enhancedSentUsers}
                     onViewRouteClick={onViewRouteClick}
                     onUserSelect={handleUserSelect}
+                    selectedUser={selectedUser}
                   />
                 )}
               </div>

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Request } from "./types";
-import data from "./data.json";
+import data from "../components/Messages/data.json";
 
 interface RequestProviderProps {
   children: React.ReactNode;

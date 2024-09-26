@@ -11,6 +11,7 @@ interface SidebarContentProps {
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
   disabled: boolean;
   onCardClick: (user: EnhancedPublicUser) => void;
+  selectedUser: EnhancedPublicUser | null;
 }
 
 const emptyMessages = {
@@ -47,7 +48,8 @@ const renderUserCard = (
   subType: string,
   otherUser: EnhancedPublicUser,
   onViewRouteClick: (user: User, otherUser: PublicUser) => void,
-  onCardClick: (user: EnhancedPublicUser) => void
+  onCardClick: (user: EnhancedPublicUser) => void,
+  selectedUser: EnhancedPublicUser | null
 ): JSX.Element => {
   const handleClick = () => onCardClick(otherUser);
   switch (subType) {
@@ -75,6 +77,7 @@ const renderUserCard = (
             otherUser={otherUser}
             onViewRouteClick={onViewRouteClick}
             onClick={handleClick}
+            selectedUser={selectedUser}
           />
         );
       }
@@ -86,6 +89,7 @@ const renderUserCard = (
             otherUser={otherUser}
             onViewRouteClick={onViewRouteClick}
             onClick={handleClick}
+            selectedUser={selectedUser}
           />
         );
       }
@@ -95,6 +99,7 @@ const renderUserCard = (
 };
 
 export const SidebarContent = (props: SidebarContentProps) => {
+  console.log(props.selectedUser);
   return (
     <div id="scrollableDiv" className="overflow-auto">
       {props.userCardList.length === 0 ||
@@ -108,7 +113,8 @@ export const SidebarContent = (props: SidebarContentProps) => {
             props.subType,
             otherUser,
             props.onViewRouteClick,
-            props.onCardClick
+            props.onCardClick,
+            props.selectedUser
           )
         )
       )}

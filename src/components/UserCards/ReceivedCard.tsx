@@ -14,10 +14,13 @@ interface ReceivedCardProps {
   otherUser: EnhancedPublicUser;
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
   onClick: () => void;
+  selectedUser: EnhancedPublicUser | null;
 }
 export const ReceivedCard = (props: ReceivedCardProps): JSX.Element => {
   const user = useContext(UserContext);
   const [showModal, setShowModal] = useState(false);
+
+  console.log(props.selectedUser);
 
   const handleManageReceived = () => {
     setShowModal(true);
@@ -35,9 +38,12 @@ export const ReceivedCard = (props: ReceivedCardProps): JSX.Element => {
       <div onClick={props.onClick} className="cursor-pointer">
         <UserCard
           otherUser={props.otherUser}
-          rightButton={connectButtonInfo}
-          onViewRouteClick={props.onViewRouteClick}
           message={props.otherUser.outgoingRequest?.message}
+          classname={
+            props.selectedUser?.id === props.otherUser.id
+              ? "border-l-northeastern-red drop-shadow-lg"
+              : ""
+          }
         />
       </div>
       {showModal &&
