@@ -31,21 +31,24 @@ const MessagePanel = ({
   const handleRejectRequest = () => {};
   let className = "bg-white";
   if (showState == 0) {
-    className = "bg-transparent pointer-events-none";
+    className = "bg-transparent ";
   }
   return (
-    <div className={"flex h-full w-full flex-col  " + className}>
-      <button onClick={clickHandler}> Map</button>
+    <div className={"flex h-full w-full   flex-col "}>
+      <button className="pointer-events-auto" onClick={clickHandler}>
+        {" "}
+        Map
+      </button>
       <MessageHeader
         selectedUser={selectedUser}
         onAccept={handleAcceptRequest}
         onReject={handleRejectRequest}
       />
       {showState == 1 ? (
-        <>
+        <div className={className + " pointer-events-none"}>
           <MessageContent currentUser={currentUser} messages={messages} />
           <SendBar onSendMessage={handleSendMessage} />
-        </>
+        </div>
       ) : (
         <> </>
       )}

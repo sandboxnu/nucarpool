@@ -392,7 +392,7 @@ const Home: NextPage<any> = () => {
               <div className="relative flex-auto">
                 {/* Message Panel */}
                 {selectedUser && (
-                  <div className="absolute inset-0 z-10 h-full w-full">
+                  <div className="pointer-events-none absolute inset-0 z-10 h-full w-full">
                     <MessagePanel
                       selectedUser={selectedUser}
                       currentUser={user}
@@ -407,7 +407,7 @@ const Home: NextPage<any> = () => {
                 <div
                   ref={mapContainerRef}
                   id="map"
-                  className="relative  z-0 h-full w-full flex-auto"
+                  className="pointer-events-auto relative  z-0 h-full w-full flex-auto"
                 >
                   {user.role === "VIEWER" && viewerBox}
                   <MapLegend role={user.role} />

@@ -17,7 +17,7 @@ const MessageHeader = ({
   onReject,
 }: MessageHeaderProps) => {
   return (
-    <div className="flex items-center justify-between border-b p-4">
+    <div className="flex items-center justify-between border-b bg-white p-4">
       <div className="flex items-center">
         <AiOutlineUser className="h-14 w-14 rounded-full bg-gray-500" />
 
