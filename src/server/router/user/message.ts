@@ -3,7 +3,6 @@ import { router, protectedRouter } from "../createRouter";
 import _ from "lodash";
 import { z } from "zod";
 
-// use this router to manage messaging
 export const messageRouter = router({
   getUnreadMessageCount: protectedRouter.query(async ({ ctx }) => {
     const userId = ctx.session.user?.id;
@@ -87,14 +86,19 @@ export const messageRouter = router({
         conversation: {
           include: {
             messages: {
-              orderBy: { id: 'desc' },
+              orderBy: { dateCreated: 'desc' },
               take: 1,
+              include: {
+                User: {
+                  select: { id: true, name: true, preferredName: true, image: true },
+                },
+              },
             },
           },
         },
       },
       orderBy: {
-        id: 'desc', // This will return the most recent requests first
+        id: 'desc',
       },
     });
   }),
@@ -110,7 +114,7 @@ export const messageRouter = router({
 
     return ctx.prisma.message.findMany({
       where: { conversationId },
-      orderBy: { id: 'asc' },
+      orderBy: { dateCreated: 'asc' },
       include: {
         User: {
           select: { id: true, name: true, preferredName: true, image: true },
@@ -120,7 +124,7 @@ export const messageRouter = router({
   }),
 
   sendMessage: protectedRouter.input(z.object({
-    conversationId: z.string(),
+    requestId: z.string(),
     content: z.string(),
   })).mutation(async ({ ctx, input }) => {
     const userId = ctx.session.user?.id;
@@ -131,11 +135,23 @@ export const messageRouter = router({
       });
     }
 
+    // Check if a conversation exists for this request, if not create one
+    let conversation = await ctx.prisma.conversation.findUnique({
+      where: { requestId: input.requestId },
+    });
+
+    if (!conversation) {
+      conversation = await ctx.prisma.conversation.create({
+        data: { requestId: input.requestId },
+      });
+    }
+
     return ctx.prisma.message.create({
       data: {
-        conversationId: input.conversationId,
+        conversationId: conversation.id,
         content: input.content,
         userId: userId,
+        dateCreated: new Date(),  // Add creation date to the message
       },
     });
   }),
