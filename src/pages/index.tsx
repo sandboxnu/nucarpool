@@ -390,32 +390,36 @@ const Home: NextPage<any> = () => {
                 <RiFocus3Line />
               </button>
               <div className="relative flex-auto">
-                {selectedUser ? (
-                  <MessagePanel
-                    selectedUser={selectedUser}
-                    currentUser={user}
-                    messages={
-                      selectedUser.outgoingRequest?.conversation?.messages
-                    }
-                  />
-                ) : (
-                  <div
-                    ref={mapContainerRef}
-                    id="map"
-                    className={"h-full w-full flex-auto"}
-                  >
-                    {user.role === "VIEWER" && viewerBox}
-                    <MapLegend role={user.role} />
-                    <MapConnectPortal
-                      otherUser={popupUser}
-                      extendUser={extendPublicUser}
-                      onViewRouteClick={onViewRouteClick}
-                      onClose={() => {
-                        setPopupUser(null);
-                      }}
+                {/* Message Panel */}
+                {selectedUser && (
+                  <div className="absolute inset-0 z-10 h-full w-full">
+                    <MessagePanel
+                      selectedUser={selectedUser}
+                      currentUser={user}
+                      messages={
+                        selectedUser.outgoingRequest?.conversation?.messages
+                      }
                     />
                   </div>
                 )}
+
+                {/* Map Container */}
+                <div
+                  ref={mapContainerRef}
+                  id="map"
+                  className="relative  z-0 h-full w-full flex-auto"
+                >
+                  {user.role === "VIEWER" && viewerBox}
+                  <MapLegend role={user.role} />
+                  <MapConnectPortal
+                    otherUser={popupUser}
+                    extendUser={extendPublicUser}
+                    onViewRouteClick={onViewRouteClick}
+                    onClose={() => {
+                      setPopupUser(null);
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>

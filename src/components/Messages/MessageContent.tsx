@@ -77,7 +77,7 @@ const MessageContent = ({ currentUser }: MessageContentProps) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
   return (
-    <div className="flex-1 overflow-y-auto bg-white p-4">
+    <div className="flex-1 overflow-y-auto bg-white p-4 ">
       {messages?.map((message) => (
         <div
           key={message.id}

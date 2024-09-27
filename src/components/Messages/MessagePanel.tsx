@@ -20,10 +20,22 @@ const MessagePanel = ({
   const handleSendMessage = (content: string) => {};
 
   const handleAcceptRequest = () => {};
+  const clickHandler = () => {
+    if (showState) {
+      setShowState(0);
+    } else {
+      setShowState(1);
+    }
+  };
 
   const handleRejectRequest = () => {};
+  let className = "bg-white";
+  if (showState == 0) {
+    className = "bg-transparent pointer-events-none";
+  }
   return (
-    <div className="flex h-full w-full flex-col bg-white ">
+    <div className={"flex h-full w-full flex-col  " + className}>
+      <button onClick={clickHandler}> Map</button>
       <MessageHeader
         selectedUser={selectedUser}
         onAccept={handleAcceptRequest}
