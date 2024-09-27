@@ -23,20 +23,20 @@ const MessageHeader = ({
 
         <span className="pl-10 text-xl font-semibold">{selectedUser.name}</span>
       </div>
-      <div className="flex items-center">
+      <div className="flex   ">
         <button
           onClick={onAccept}
-          className="mr-2 rounded-xl bg-northeastern-red px-4 py-2 text-center text-white hover:bg-red-700"
+          className="mr-2 rounded-lg bg-northeastern-red px-8  text-center text-white hover:bg-red-700"
         >
           Accept
         </button>
         <button
           onClick={onReject}
-          className="mr-2 rounded-xl bg-white px-4 py-2 text-center text-black hover:bg-gray-300"
+          className="mr-2 rounded-lg border-2 border-black  bg-white px-8 text-center text-black hover:bg-gray-300"
         >
           Reject
         </button>
-        <FiMoreHorizontal className="inline-block" />{" "}
+        <FiMoreHorizontal className="j  inline-block h-10 w-20 space-x-10 justify-self-end" />{" "}
       </div>
     </div>
   );

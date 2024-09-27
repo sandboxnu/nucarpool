@@ -16,14 +16,14 @@ const MessagePanel = ({
   selectedUser,
   messages,
 }: MessagePanelProps) => {
-  const [showState, setShowState] = useState<Number>(0);
+  const [showState, setShowState] = useState<Number>(1);
   const handleSendMessage = (content: string) => {};
 
   const handleAcceptRequest = () => {};
 
   const handleRejectRequest = () => {};
   return (
-    <div className="flex h-full w-full flex-col bg-transparent ">
+    <div className="flex h-full w-full flex-col bg-white ">
       <MessageHeader
         selectedUser={selectedUser}
         onAccept={handleAcceptRequest}
