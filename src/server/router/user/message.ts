@@ -87,7 +87,6 @@ export const messageRouter = router({
           include: {
             messages: {
               orderBy: { dateCreated: 'desc' },
-              take: 1,
               include: {
                 User: {
                   select: { id: true, name: true, preferredName: true, image: true },
