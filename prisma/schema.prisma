@@ -72,6 +72,7 @@ model Request {
   fromUser     User          @relation("sentRequests", fields: [fromUserId], references: [id])
   toUser       User          @relation("receivedRequests", fields: [toUserId], references: [id])
   conversation Conversation?
+  dateCreated  DateTime      @default(now())
 
   @@index([fromUserId])
   @@index([toUserId])
@@ -97,6 +98,7 @@ model Message {
   isRead         Boolean      @default(false)
   User           User?        @relation(fields: [userId], references: [id])
   userId         String?
+  dateCreated    DateTime     @default(now())
 
   @@index([conversationId])
   @@index([userId])

@@ -19,6 +19,7 @@ interface UserCardProps {
   rightButton?: ButtonInfo;
   onViewRouteClick?: (user: User, otherUser: PublicUser) => void;
   message?: string;
+  isUnread?: boolean;
   classname?: string;
 }
 
@@ -66,7 +67,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       let textColor = "";
       let dayIndex = Math.floor(i / 2);
       if (daysWorking[i] == "1") {
-        backgroundColor = " bg-red-500";
+        backgroundColor = " bg-northeastern-red";
         textColor = " text-white";
       }
       boxes.push(
@@ -142,7 +143,11 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
 
       {/* Fourth row - messaging bubble */}
       {props.message && (
-        <div className="mt-2 w-full rounded-lg bg-white p-2 text-sm">
+        <div
+          className={`mt-2 inline-block max-w-full break-words rounded-lg bg-white p-2 text-sm ${
+            props.isUnread ? "font-bold" : ""
+          }`}
+        >
           {props.message}
         </div>
       )}

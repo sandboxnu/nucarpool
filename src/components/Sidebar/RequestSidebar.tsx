@@ -2,13 +2,12 @@ import React, { useState } from "react";
 import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
 import { SidebarContent } from "./SidebarContent";
 import { clearMarkers } from "../../utils/map/viewRoute";
-import { useRequests } from "../../utils/requestContext";
 interface RequestSidebarProps {
   received: EnhancedPublicUser[];
   sent: EnhancedPublicUser[];
   viewRoute: (user: User, otherUser: PublicUser) => void;
   disabled: boolean;
-  onUserSelect: (user: EnhancedPublicUser) => void;
+  onUserSelect: (userId: string) => void;
   selectedUser: EnhancedPublicUser | null;
 }
 
@@ -18,8 +17,8 @@ const RequestSidebar = (props: RequestSidebarProps) => {
     null
   );
 
-  const handleCardClick = (user: EnhancedPublicUser) => {
-    props.onUserSelect(user);
+  const handleCardClick = (userId: string) => {
+    props.onUserSelect(userId);
   };
   return (
     <div className="z-10 flex h-full flex-shrink-0 flex-col bg-white px-5 text-left">

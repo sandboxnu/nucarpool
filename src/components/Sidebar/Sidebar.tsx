@@ -17,7 +17,7 @@ interface SidebarProps {
   received: EnhancedPublicUser[];
   sent: EnhancedPublicUser[];
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
-  onUserSelect: (user: EnhancedPublicUser) => void;
+  onUserSelect: (userId: string) => void;
   selectedUser: EnhancedPublicUser | null;
 }
 

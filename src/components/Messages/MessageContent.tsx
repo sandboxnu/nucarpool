@@ -1,99 +1,120 @@
-// MessageContent.tsx
+import React, { useContext, useEffect, useRef } from "react";
+import { EnhancedPublicUser } from "../../utils/types";
+import { format, isSameDay } from "date-fns";
+import { trpc } from "../../utils/trpc";
+import { UserContext } from "../../utils/userContext";
 
-import React, { useEffect, useRef } from "react";
-import { User, Message, Conversation } from "../../utils/types";
 interface MessageContentProps {
-  currentUser: User;
-  messages: Mess[] | undefined;
+  selectedUser: EnhancedPublicUser;
 }
-type Mess = {
-  id: string;
-  content: string;
-  isRead: boolean;
-  userId?: string | null;
-};
 
-const messages: Mess[] = [
-  {
-    id: "1",
-    content: "Hey, how are you?",
-    isRead: true,
-    userId: "1", // Message from userId 1
-  },
-  {
-    id: "2",
-    content: "I'm good, thanks! How about you?",
-    isRead: true,
-    userId: "0", // Message from userId 0
-  },
-  {
-    id: "3",
-    content: "Doing well, just finishing up some work.",
-    isRead: true,
-    userId: "1",
-  },
-  {
-    id: "4",
-    content: "Nice! What are you working on?",
-    isRead: true,
-    userId: "0",
-  },
-  {
-    id: "5",
-    content: "Just a few React components for a project.",
-    isRead: true,
-    userId: "1",
-  },
-  {
-    id: "6",
-    content: "Sounds interesting!",
-    isRead: false,
-    userId: "0",
-  },
-  {
-    id: "7",
-    content: "Yeah, it’s fun. What about you? Any plans for the weekend?",
-    isRead: true,
-    userId: "1",
-  },
-  {
-    id: "8",
-    content: "Not yet, thinking about going hiking.",
-    isRead: true,
-    userId: "0",
-  },
-  {
-    id: "9",
-    content: "That sounds like a great idea. Have fun!",
-    isRead: false,
-    userId: "1",
-  },
-];
-
-const MessageContent = ({ currentUser }: MessageContentProps) => {
+const MessageContent = ({ selectedUser }: MessageContentProps) => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const request = selectedUser.incomingRequest || selectedUser.outgoingRequest;
+  const utils = trpc.useContext();
+  const user = useContext(UserContext);
 
+  const conversationMessages = request?.conversation?.messages || [];
+
+  const initialMessage = {
+    id: "initial",
+    content: request?.message,
+    userId: request?.fromUserId,
+    dateCreated: request?.dateCreated || new Date().toISOString(),
+    isRead: true,
+  };
+
+  const allMessages = [initialMessage, ...conversationMessages];
+
+  const markMessagesAsRead = trpc.user.messages.markMessagesAsRead.useMutation({
+    onSuccess: () => {
+      utils.user.requests.me.invalidate();
+    },
+    onError: (error) => {
+      console.error("Failed to mark messages as read:", error);
+    },
+  });
+
+  // Effect to mark messages as read when the component mounts
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (user) {
+      const unreadMessageIds = allMessages
+        .filter(
+          (message) =>
+            !message.isRead &&
+            message.userId !== user.id &&
+            message.id !== "initial"
+        )
+        .map((message) => message.id);
+
+      if (unreadMessageIds.length > 0) {
+        markMessagesAsRead.mutate({ messageIds: unreadMessageIds });
+      }
+    }
+  }, []);
+
+  // Group messages by date
+  const messagesByDate = [];
+  let currentDate: Date | null = null;
+  let currentMessages: typeof allMessages = [];
+
+  allMessages.forEach((message) => {
+    const messageDate = message.dateCreated
+      ? new Date(message.dateCreated)
+      : new Date();
+
+    if (!currentDate || !isSameDay(currentDate, messageDate)) {
+      if (currentMessages.length > 0) {
+        messagesByDate.push({ date: currentDate, messages: currentMessages });
+      }
+      currentDate = messageDate;
+      currentMessages = [message];
+    } else {
+      currentMessages.push(message);
+    }
+  });
+
+  if (currentMessages.length > 0) {
+    messagesByDate.push({ date: currentDate, messages: currentMessages });
+  }
+
+  const currentUserId = request?.fromUserId;
+
   return (
-    <div className="flex-1 overflow-y-auto bg-white p-4 ">
-      {messages?.map((message) => (
-        <div
-          key={message.id}
-          className={`mb-4 flex ${
-            message.userId === "0" ? "justify-end pr-20" : "justify-start pl-20"
-          }`}
-        >
-          <div
-            className={`max-w-xs rounded-lg px-4 py-2 ${
-              message.userId === "0"
-                ? "bg-northeastern-red text-white"
-                : "bg-gray-300 text-black"
-            }`}
-          >
-            {message.content}
+    <div className="flex h-full flex-1 flex-col overflow-y-auto overflow-x-hidden bg-white p-4">
+      {messagesByDate.map(({ date, messages }) => (
+        <div key={date}>
+          <div className="text-md my-2 text-center text-gray-500">
+            {date ? format(date, "EEEE, MMMM d, yyyy") : ""}
           </div>
+          {messages.map((message) => {
+            const isFromCurrentUser = message.userId === currentUserId;
+            const messageTime = message.dateCreated
+              ? format(new Date(message.dateCreated), "h:mm aa")
+              : "";
+
+            return (
+              <div
+                key={message.id}
+                className={`mb-4 flex flex-col ${
+                  isFromCurrentUser ? "items-end pr-10" : "items-start pl-10"
+                }`}
+              >
+                <span className="mb-1 text-xs text-gray-500">
+                  {messageTime}
+                </span>
+                <div
+                  className={`max-w-xs rounded-lg px-4 py-2 text-lg ${
+                    isFromCurrentUser
+                      ? "bg-northeastern-red text-white"
+                      : "bg-gray-200 text-black"
+                  }`}
+                >
+                  {message.content}
+                </div>
+              </div>
+            );
+          })}
         </div>
       ))}
       <div ref={messagesEndRef} />

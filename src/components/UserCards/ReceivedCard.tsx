@@ -4,6 +4,7 @@ import {
   PublicUser,
   User,
 } from "../../utils/types";
+import { getLatestMessageForRequest } from "../../utils/latestMessage";
 import { UserCard } from "./UserCard";
 import { useContext, useState } from "react";
 import { UserContext } from "../../utils/userContext";
@@ -20,11 +21,16 @@ export const ReceivedCard = (props: ReceivedCardProps): JSX.Element => {
   const user = useContext(UserContext);
   const [showModal, setShowModal] = useState(false);
 
-  console.log(props.selectedUser);
-
   const handleManageReceived = () => {
     setShowModal(true);
   };
+
+  const latestMessage =
+    props.otherUser.incomingRequest && user
+      ? getLatestMessageForRequest(props.otherUser.incomingRequest, user.id)
+      : null;
+
+  const isUnread = latestMessage ? !latestMessage.isRead : false;
 
   // TODO: Need to create a leftButton props for UserCard component so that each card can have custom things
 
@@ -38,7 +44,8 @@ export const ReceivedCard = (props: ReceivedCardProps): JSX.Element => {
       <div onClick={props.onClick} className="cursor-pointer">
         <UserCard
           otherUser={props.otherUser}
-          message={props.otherUser.outgoingRequest?.message}
+          message={latestMessage?.content}
+          isUnread={isUnread}
           classname={
             props.selectedUser?.id === props.otherUser.id
               ? "border-l-northeastern-red drop-shadow-lg"

@@ -9,23 +9,29 @@ import { PublicUser, ResolvedRequest } from "../../../utils/types";
 // use this router to manage invitations
 export const requestsRouter = router({
   me: protectedRouter.query(async ({ ctx }) => {
-    const id = ctx.session.user?.id;
-    const user = await ctx.prisma.user.findUnique({
-      where: { id },
-    });
+    const userId = ctx.session.user?.id;
 
-    // throws TRPCError if no user with ID exists
-    if (!user) {
+    if (!userId) {
       throw new TRPCError({
-        code: "NOT_FOUND",
-        message: `No profile with id '${id}'`,
+        code: "UNAUTHORIZED",
+        message: "User not authenticated",
       });
     }
 
-    const resolveRequest = async (
-      req: Request
-    ): Promise<ResolvedRequest & Request> => {
-      let [from, to] = await Promise.all([
+    const user = await ctx.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    // Throw error if no user with ID exists
+    if (!user) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `No profile with id '${userId}'`,
+      });
+    }
+
+    const resolveRequest = async (req: Request) => {
+      const [from, to] = await Promise.all([
         ctx.prisma.user.findUnique({
           where: { id: req.fromUserId },
         }),
@@ -51,30 +57,50 @@ export const requestsRouter = router({
       let toUser: User | PublicUser;
       let fromUser: User | PublicUser;
 
-      if (from?.id === ctx.session.user?.id) {
+      if (from.id === userId) {
         fromUser = from;
       } else {
         fromUser = convertToPublic(from);
       }
 
-      if (to?.id === ctx.session.user?.id) {
+      if (to.id === userId) {
         toUser = to;
       } else {
         toUser = convertToPublic(to);
       }
 
-      return { ...req, fromUser, toUser };
-    };
+      // Fetch conversation and messages associated with the request
+      const conversation = await ctx.prisma.conversation.findUnique({
+        where: { requestId: req.id },
+        include: {
+          messages: {
+            orderBy: { dateCreated: "asc" },
+            include: {
+              User: {
+                select: {
+                  id: true,
+                  name: true,
+                  preferredName: true,
+                  image: true,
+                },
+              },
+            },
+          },
+        },
+      });
 
+      return { ...req, fromUser, toUser, conversation };
+    };
+    // Fetch sent and received requests and include conversations and messages
     const [sent, received] = await Promise.all([
       ctx.prisma.request
         .findMany({
-          where: { fromUserId: id },
+          where: { fromUserId: userId },
         })
         .then((reqs) => Promise.all(reqs.map(resolveRequest))),
       ctx.prisma.request
         .findMany({
-          where: { toUserId: id },
+          where: { toUserId: userId },
         })
         .then((reqs) => Promise.all(reqs.map(resolveRequest))),
     ]);

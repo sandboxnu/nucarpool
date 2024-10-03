@@ -70,13 +70,15 @@ const Home: NextPage<any> = () => {
   const { data: favorites = [] } = trpc.user.favorites.me.useQuery(undefined, {
     refetchOnMount: true,
   });
-  const { data: requests = { sent: [], received: [] } } =
-    trpc.user.requests.me.useQuery();
-  const [selectedUser, setSelectedUser] = useState<EnhancedPublicUser | null>(
-    null
-  );
-  const handleUserSelect = (user: EnhancedPublicUser) => {
-    setSelectedUser(user);
+
+  const requestsQuery = trpc.user.requests.me.useQuery(undefined, {
+    refetchOnMount: true,
+  });
+  const { data: requests = { sent: [], received: [] } } = requestsQuery;
+  const utils = trpc.useContext();
+
+  const handleUserSelect = (userId: string) => {
+    setSelectedUserId(userId);
   };
   const [otherUser, setOtherUser] = useState<PublicUser | null>(null);
   const [mapState, setMapState] = useState<mapboxgl.Map>();
@@ -124,6 +126,26 @@ const Home: NextPage<any> = () => {
       outgoingRequest: requests.sent.find((req) => req.toUserId === user.id),
     };
   };
+  const handleMessageSent = (selectedUserId: string) => {
+    utils.user.requests.me.invalidate();
+    requestsQuery.refetch();
+    setSelectedUserId(selectedUserId);
+  };
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
+  const selectedUser: EnhancedPublicUser | null = useMemo(() => {
+    if (!selectedUserId || !requests) return null;
+    const allRequests = [...requests.sent, ...requests.received];
+    for (const request of allRequests) {
+      const user: any =
+        request.fromUser.id === selectedUserId
+          ? request.fromUser
+          : request.toUser;
+      if (user.id === selectedUserId)
+        return extendPublicUser(user) as EnhancedPublicUser;
+    }
+    return null;
+  }, [selectedUserId, requests]);
 
   const onViewRouteClick = (user: User, otherUser: PublicUser) => {
     setOtherUser(otherUser);
@@ -251,7 +273,9 @@ const Home: NextPage<any> = () => {
       }
     }
   }, [companyAddressSelected, startAddressSelected]);
-
+  useEffect(() => {
+    setSelectedUserId(null);
+  }, [sidebarType]);
   useEffect(() => {
     // useEffect for initial route rendering
     if (
@@ -392,13 +416,11 @@ const Home: NextPage<any> = () => {
               <div className="relative flex-auto">
                 {/* Message Panel */}
                 {selectedUser && (
-                  <div className="pointer-events-none absolute inset-0 z-10 h-full w-full">
+                  <div className=" pointer-events-none absolute inset-0 z-10 h-full w-full">
                     <MessagePanel
                       selectedUser={selectedUser}
-                      currentUser={user}
-                      messages={
-                        selectedUser.outgoingRequest?.conversation?.messages
-                      }
+                      onMessageSent={handleMessageSent}
+                      onViewRouteClick={onViewRouteClick}
                     />
                   </div>
                 )}

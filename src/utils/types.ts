@@ -109,7 +109,8 @@ export type Request = {
   toUserId: string;
   fromUser: User | PublicUser | null;
   toUser: User | PublicUser | null;
-  conversation?: Conversation | null;
+  conversation?: Conversation;
+  dateCreated?: Date;
 };
 
 export type Conversation = {
@@ -122,11 +123,12 @@ export type Conversation = {
 export type Message = {
   id: string;
   conversationId: string;
-  conversation: Conversation;
+  conversation?: Conversation;
   content: string;
   isRead: boolean;
-  user?: User | null;
-  userId?: string | null;
+  user?: PublicUser | null;
+  userId: string;
+  dateCreated: Date;
 };
 
 type Notification = {

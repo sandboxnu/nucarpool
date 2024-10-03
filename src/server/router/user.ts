@@ -8,6 +8,7 @@ import _ from "lodash";
 import { favoritesRouter } from "./user/favorites";
 import { groupsRouter } from "./user/groups";
 import { requestsRouter } from "./user/requests";
+import { messageRouter } from "./user/message";
 import { recommendationsRouter } from "./user/recommendations";
 import { emailsRouter } from "./user/email";
 import {
@@ -140,6 +141,7 @@ export const userRouter = router({
 
   //merging secondary user routes
   favorites: favoritesRouter,
+  messages: messageRouter,
   recommendations: recommendationsRouter,
   requests: requestsRouter,
   groups: groupsRouter,

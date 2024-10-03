@@ -10,7 +10,7 @@ interface SidebarContentProps {
   userCardList: EnhancedPublicUser[];
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
   disabled: boolean;
-  onCardClick: (user: EnhancedPublicUser) => void;
+  onCardClick: (userId: string) => void;
   selectedUser: EnhancedPublicUser | null;
 }
 
@@ -48,10 +48,10 @@ const renderUserCard = (
   subType: string,
   otherUser: EnhancedPublicUser,
   onViewRouteClick: (user: User, otherUser: PublicUser) => void,
-  onCardClick: (user: EnhancedPublicUser) => void,
+  onCardClick: (userId: string) => void,
   selectedUser: EnhancedPublicUser | null
 ): JSX.Element => {
-  const handleClick = () => onCardClick(otherUser);
+  const handleClick = () => onCardClick(otherUser.id);
   switch (subType) {
     case "recommendations":
       return (
