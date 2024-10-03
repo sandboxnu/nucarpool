@@ -78,7 +78,7 @@ const MessageContent = ({ selectedUser }: MessageContentProps) => {
     messagesByDate.push({ date: currentDate, messages: currentMessages });
   }
 
-  const currentUserId = request?.fromUserId;
+  const currentUserId = user?.id;
 
   return (
     <div className="flex h-full flex-1 flex-col overflow-y-auto overflow-x-hidden bg-white p-4">

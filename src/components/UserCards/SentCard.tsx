@@ -26,7 +26,10 @@ export const SentCard = (props: SentCardProps): JSX.Element => {
       ? getLatestMessageForRequest(props.otherUser.outgoingRequest, user.id)
       : null;
 
-  const isUnread = latestMessage ? !latestMessage.isRead : false;
+  let isUnread = latestMessage ? !latestMessage.isRead : false;
+  if (user?.id === latestMessage?.userId) {
+    isUnread = false;
+  }
   const connectButtonInfo: ButtonInfo = {
     text: "Manage",
     onPress: () => handleManageSent(),

@@ -76,7 +76,7 @@ const Home: NextPage<any> = () => {
   });
   const { data: requests = { sent: [], received: [] } } = requestsQuery;
   const utils = trpc.useContext();
-
+  console.log(requests);
   const handleUserSelect = (userId: string) => {
     setSelectedUserId(userId);
   };

@@ -41,57 +41,16 @@ export const messageRouter = router({
         OR: [{ fromUserId: userId }, { toUserId: userId }],
       },
       include: {
-        fromUser: {
-          select: {
-            id: true,
-            name: true,
-            preferredName: true,
-            image: true,
-            bio: true,
-            pronouns: true,
-            role: true,
-            status: true,
-            seatAvail: true,
-            companyName: true,
-            startAddress: true,
-            daysWorking: true,
-            startTime: true,
-            endTime: true,
-          },
-        },
-        toUser: {
-          select: {
-            id: true,
-            name: true,
-            preferredName: true,
-            image: true,
-            bio: true,
-            pronouns: true,
-            role: true,
-            status: true,
-            seatAvail: true,
-            companyName: true,
-            startAddress: true,
-            daysWorking: true,
-            startTime: true,
-            endTime: true,
-          },
-        },
+        fromUser: true,
+        toUser: true,
         conversation: {
           include: {
             messages: {
-              orderBy: { dateCreated: "desc" },
-              include: {
-                User: {
-                  select: {
-                    id: true,
-                    name: true,
-                    preferredName: true,
-                    image: true,
-                  },
-                },
+              orderBy: {
+                dateCreated: "desc",
               },
             },
+            request: true,
           },
         },
       },

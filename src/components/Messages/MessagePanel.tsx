@@ -1,22 +1,25 @@
 import React, { useState, useContext } from "react";
-import { EnhancedPublicUser } from "../../utils/types";
+import { EnhancedPublicUser, PublicUser } from "../../utils/types";
 import MessageHeader from "./MessageHeader";
 import MessageContent from "./MessageContent";
 import SendBar from "./SendBar";
 import { trpc } from "../../utils/trpc";
 import { createRequestHandlers } from "../../utils/requestHandlers";
 import { UserContext } from "../../utils/userContext";
+import { User } from "@prisma/client";
 
 interface MessagePanelProps {
   selectedUser: EnhancedPublicUser;
   onMessageSent: (selectedUserId: string) => void;
   onCloseConversation: () => void;
+  onViewRouteClick: (user: User, otherUser: PublicUser) => void;
 }
 
 const MessagePanel = ({
   selectedUser,
   onMessageSent,
   onCloseConversation,
+  onViewRouteClick,
 }: MessagePanelProps) => {
   const [activeTab, setActiveTab] = useState<"message" | "map">("message");
   const utils = trpc.useContext();
@@ -59,7 +62,12 @@ const MessagePanel = ({
 
     await handleRejectRequest(user, selectedUser, request);
   };
-
+  const handleMapSwitch = () => {
+    setActiveTab("map");
+    if (user) {
+      onViewRouteClick(user, selectedUser);
+    }
+  };
   return (
     <div className="flex h-full w-full flex-col">
       {/* Header and Tabs */}
@@ -88,7 +96,7 @@ const MessagePanel = ({
                 ? "border-b-2 border-northeastern-red text-northeastern-red"
                 : ""
             }`}
-            onClick={() => setActiveTab("map")}
+            onClick={() => handleMapSwitch()}
           >
             Map
           </button>

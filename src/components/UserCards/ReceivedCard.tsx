@@ -30,8 +30,10 @@ export const ReceivedCard = (props: ReceivedCardProps): JSX.Element => {
       ? getLatestMessageForRequest(props.otherUser.incomingRequest, user.id)
       : null;
 
-  const isUnread = latestMessage ? !latestMessage.isRead : false;
-
+  let isUnread = latestMessage ? !latestMessage.isRead : false;
+  if (user?.id === latestMessage?.userId) {
+    isUnread = false;
+  }
   // TODO: Need to create a leftButton props for UserCard component so that each card can have custom things
 
   const connectButtonInfo: ButtonInfo = {
