@@ -3,6 +3,7 @@ import styled from "styled-components";
 import DropDownMenu from "./DropDownMenu";
 import { createPortal } from "react-dom";
 import { GroupPage } from "./GroupPage";
+import { trpc } from "../utils/trpc";
 
 const HeaderDiv = styled.div`
   display: flex;
@@ -39,6 +40,9 @@ interface HeaderProps {
 export type HeaderOptions = "explore" | "requests";
 
 const Header = (props: HeaderProps) => {
+  const { data: unreadMessagesCount } =
+    trpc.user.messages.getUnreadMessageCount.useQuery();
+
   const [displayGroup, setDisplayGroup] = useState<boolean>(false);
   const renderClassName = (sidebarValue: string, sidebarText: string) => {
     if (sidebarValue == "explore" && sidebarText == "explore") {
@@ -59,7 +63,7 @@ const Header = (props: HeaderProps) => {
       return "rounded-xl p-4 font-medium text-xl text-white";
     }
   };
-
+  console.log(unreadMessagesCount);
   const renderSidebarOptions = ({
     sidebarValue,
     setSidebar,
@@ -67,6 +71,7 @@ const Header = (props: HeaderProps) => {
     sidebarValue: string;
     setSidebar: Dispatch<SetStateAction<HeaderOptions>>;
   }) => {
+    // @ts-ignore
     return (
       <div className="pr-12">
         <button
@@ -81,9 +86,16 @@ const Header = (props: HeaderProps) => {
           onClick={() => {
             setSidebar("requests");
           }}
-          className={renderClassName(sidebarValue, "requests")}
+          className={`${renderClassName(sidebarValue, "requests")} relative`}
         >
           Requests
+          {unreadMessagesCount > 0 && (
+            <span className="absolute right-0 top-0 flex h-6 w-6 items-center justify-center rounded-full bg-white">
+              <span className="text-xs font-bold text-northeastern-red">
+                {unreadMessagesCount}
+              </span>
+            </span>
+          )}
         </button>
         <button
           onClick={() => setDisplayGroup(true)}

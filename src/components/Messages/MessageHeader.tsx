@@ -18,9 +18,9 @@ const MessageHeader = ({
   const hasOutgoingRequest = !!selectedUser.outgoingRequest;
 
   return (
-    <div className="flex items-center justify-between border-b bg-white p-4">
+    <div className="flex items-center justify-between border-b bg-white p-8">
       <div className="flex items-center">
-        <AiOutlineUser className="h-16 w-16 rounded-full bg-gray-200" />
+        <AiOutlineUser className="h-20 w-20 rounded-full bg-gray-200" />
 
         <span className="pl-10 text-xl font-medium ">
           {selectedUser.preferredName}

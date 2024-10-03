@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { router, protectedRouter } from "../createRouter";
+import { protectedRouter, router } from "../createRouter";
 import { z } from "zod";
 
 export const messageRouter = router({
@@ -14,14 +14,14 @@ export const messageRouter = router({
 
     return ctx.prisma.message.count({
       where: {
+        isRead: false,
+        userId: {
+          not: userId,
+        },
         conversation: {
           request: {
-            OR: [{ toUserId: userId }],
+            OR: [{ fromUserId: userId }, { toUserId: userId }],
           },
-        },
-        isRead: false,
-        User: {
-          id: { not: userId },
         },
       },
     });

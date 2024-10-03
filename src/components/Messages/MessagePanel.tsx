@@ -81,7 +81,7 @@ const MessagePanel = ({
         {/* Tab Strip */}
         <div className="flex border-b border-gray-200 bg-white">
           <button
-            className={`font-md flex-1 py-2 text-center text-lg ${
+            className={`flex-1 py-3 text-center text-lg font-medium ${
               activeTab === "message"
                 ? "border-b-2 border-northeastern-red text-northeastern-red"
                 : ""
@@ -91,7 +91,7 @@ const MessagePanel = ({
             Message
           </button>
           <button
-            className={`font-md flex-1 py-2 text-center text-lg ${
+            className={` flex-1 py-3 text-center text-lg font-medium ${
               activeTab === "map"
                 ? "border-b-2 border-northeastern-red text-northeastern-red"
                 : ""
