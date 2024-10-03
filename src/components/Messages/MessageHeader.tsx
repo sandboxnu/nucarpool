@@ -49,7 +49,7 @@ const MessageHeader = ({
           <AiOutlineUser className="h-20 w-20 rounded-full bg-gray-200" />
         )}
 
-        <span className="pl-10 text-xl font-medium ">
+        <span className="pl-10 font-medium sm:text-lg md:text-xl lg:text-2xl ">
           {selectedUser.preferredName}
         </span>
       </div>
