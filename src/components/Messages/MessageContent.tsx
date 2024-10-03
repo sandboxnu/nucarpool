@@ -104,7 +104,7 @@ const MessageContent = ({ selectedUser }: MessageContentProps) => {
                   {messageTime}
                 </span>
                 <div
-                  className={`max-w-xs rounded-lg px-4 py-2 text-lg ${
+                  className={`xl:max-w-xl max-w-xs rounded-lg px-4 py-2 text-base sm:max-w-sm sm:text-lg md:max-w-md md:text-xl lg:max-w-lg lg:text-2xl ${
                     isFromCurrentUser
                       ? "bg-northeastern-red text-white"
                       : "bg-gray-200 text-black"

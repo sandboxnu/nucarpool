@@ -19,8 +19,11 @@ const DropDownMenu = () => {
     signOut();
   };
 
-  const { data: presignedData, error: presignedError } =
-    trpc.user.getPresignedDownloadUrl.useQuery();
+  const {
+    data: presignedData,
+    error: presignedError,
+    refetch,
+  } = trpc.user.getPresignedDownloadUrl.useQuery({ userId: undefined });
 
   useEffect(() => {
     if (presignedData?.url) {
@@ -29,6 +32,12 @@ const DropDownMenu = () => {
       setProfileImageUrl("");
     }
   }, [presignedData]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      refetch();
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [refetch]);
 
   useEffect(() => {
     setImageLoadError(false);
