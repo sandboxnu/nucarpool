@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Image from "next/image";
 import sendIcon from "../../../public/sendIcon.png";
 
@@ -8,11 +8,15 @@ interface SendBarProps {
 
 const SendBar = ({ onSendMessage }: SendBarProps) => {
   const [messageContent, setMessageContent] = useState("");
+  const messageInputRef = useRef<HTMLDivElement>(null);
 
   const handleSend = () => {
     if (messageContent.trim()) {
       onSendMessage(messageContent.trim());
       setMessageContent("");
+      if (messageInputRef.current) {
+        messageInputRef.current.textContent = "";
+      }
     }
   };
 
@@ -30,6 +34,7 @@ const SendBar = ({ onSendMessage }: SendBarProps) => {
           contentEditable="true"
           className="w-full flex-1 resize-none border-0 bg-gray-100 p-2 text-lg focus:outline-none"
           placeholder="Type a message..."
+          ref={messageInputRef}
           style={{
             minHeight: "20px",
             maxHeight: "100px",
@@ -39,11 +44,7 @@ const SendBar = ({ onSendMessage }: SendBarProps) => {
             overflowY: "auto",
             overflowWrap: "break-word",
           }}
-          onInput={(e) =>
-            setMessageContent(
-              e.currentTarget.textContent!! ? e.currentTarget.textContent : ""
-            )
-          }
+          onInput={(e) => setMessageContent(e.currentTarget.textContent || "")}
           onKeyDown={handleKeyPress}
         ></div>
         <div className="h-10 w-px bg-gray-300" />
