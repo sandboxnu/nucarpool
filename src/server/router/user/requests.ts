@@ -20,9 +20,36 @@ export const requestsRouter = router({
 
     const user = await ctx.prisma.user.findUnique({
       where: { id: userId },
+      include: {
+        sentRequests: {
+          include: {
+            toUser: true,
+            conversation: {
+              include: {
+                messages: {
+                  orderBy: { dateCreated: "asc" },
+                  include: { User: true },
+                },
+              },
+            },
+          },
+        },
+        receivedRequests: {
+          include: {
+            fromUser: true,
+            conversation: {
+              include: {
+                messages: {
+                  orderBy: { dateCreated: "asc" },
+                  include: { User: true },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
-    // Throw error if no user with ID exists
     if (!user) {
       throw new TRPCError({
         code: "NOT_FOUND",
@@ -30,80 +57,39 @@ export const requestsRouter = router({
       });
     }
 
-    const resolveRequest = async (req: Request) => {
-      const [from, to] = await Promise.all([
-        ctx.prisma.user.findUnique({
-          where: { id: req.fromUserId },
-        }),
-        ctx.prisma.user.findUnique({
-          where: { id: req.toUserId },
-        }),
-      ]);
+    const sent = user.sentRequests.map((req) => {
+      return {
+        ...req,
+        fromUser: convertToPublic(user),
+        toUser: convertToPublic(req.toUser),
+        conversation: req.conversation
+          ? {
+              ...req.conversation,
+              messages: req.conversation.messages.map((message) => ({
+                ...message,
+                userId: message.userId ?? "",
+              })),
+            }
+          : null,
+      };
+    });
 
-      if (!from) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `No user with id '${req.fromUserId}'`,
-        });
-      }
-
-      if (!to) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `No user with id '${req.toUserId}'`,
-        });
-      }
-
-      let toUser: User | PublicUser;
-      let fromUser: User | PublicUser;
-
-      if (from.id === userId) {
-        fromUser = from;
-      } else {
-        fromUser = convertToPublic(from);
-      }
-
-      if (to.id === userId) {
-        toUser = to;
-      } else {
-        toUser = convertToPublic(to);
-      }
-
-      // Fetch conversation and messages associated with the request
-      const conversation = await ctx.prisma.conversation.findUnique({
-        where: { requestId: req.id },
-        include: {
-          messages: {
-            orderBy: { dateCreated: "asc" },
-            include: {
-              User: {
-                select: {
-                  id: true,
-                  name: true,
-                  preferredName: true,
-                  image: true,
-                },
-              },
-            },
-          },
-        },
-      });
-
-      return { ...req, fromUser, toUser, conversation };
-    };
-    // Fetch sent and received requests and include conversations and messages
-    const [sent, received] = await Promise.all([
-      ctx.prisma.request
-        .findMany({
-          where: { fromUserId: userId },
-        })
-        .then((reqs) => Promise.all(reqs.map(resolveRequest))),
-      ctx.prisma.request
-        .findMany({
-          where: { toUserId: userId },
-        })
-        .then((reqs) => Promise.all(reqs.map(resolveRequest))),
-    ]);
+    const received = user.receivedRequests.map((req) => {
+      return {
+        ...req,
+        fromUser: convertToPublic(req.fromUser),
+        toUser: convertToPublic(user),
+        conversation: req.conversation
+          ? {
+              ...req.conversation,
+              messages: req.conversation.messages.map((message) => ({
+                ...message,
+                userId: message.userId ?? "",
+              })),
+            }
+          : null,
+      };
+    });
 
     return { sent, received };
   }),

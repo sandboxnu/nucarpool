@@ -11,7 +11,7 @@ import { User } from "@prisma/client";
 interface MessagePanelProps {
   selectedUser: EnhancedPublicUser;
   onMessageSent: (selectedUserId: string) => void;
-  onCloseConversation: () => void;
+  onCloseConversation: (userId: string) => void;
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
 }
 
@@ -50,7 +50,7 @@ const MessagePanel = ({
     if (!request) return;
 
     await handleAcceptRequest(user, selectedUser, request);
-    onCloseConversation(); // Close the conversation if needed
+    onCloseConversation(""); // Close the conversation after accepting
   };
 
   const handleReject = async () => {

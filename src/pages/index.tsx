@@ -20,6 +20,7 @@ import {
   CarpoolFeature,
   EnhancedPublicUser,
   PublicUser,
+  Request,
 } from "../utils/types";
 import { Role, User } from "@prisma/client";
 import { useGetDirections, viewRoute } from "../utils/map/viewRoute";
@@ -117,15 +118,21 @@ const Home: NextPage<any> = () => {
   );
 
   const extendPublicUser = (user: PublicUser): EnhancedPublicUser => {
+    const incomingReq: Request | undefined = requests.received.find(
+      (req) => req.fromUserId === user.id
+    );
+    const outgoingReq: Request | undefined = requests.sent.find(
+      (req) => req.toUserId === user.id
+    );
+
     return {
       ...user,
       isFavorited: favorites.some((favs) => favs.id === user.id),
-      incomingRequest: requests.received.find(
-        (req) => req.fromUserId === user.id
-      ),
-      outgoingRequest: requests.sent.find((req) => req.toUserId === user.id),
+      incomingRequest: incomingReq,
+      outgoingRequest: outgoingReq,
     };
   };
+
   const handleMessageSent = (selectedUserId: string) => {
     utils.user.requests.me.invalidate();
     requestsQuery.refetch();
@@ -421,6 +428,7 @@ const Home: NextPage<any> = () => {
                       selectedUser={selectedUser}
                       onMessageSent={handleMessageSent}
                       onViewRouteClick={onViewRouteClick}
+                      onCloseConversation={handleUserSelect}
                     />
                   </div>
                 )}
