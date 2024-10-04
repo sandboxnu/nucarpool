@@ -53,6 +53,8 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
         subType={curOption}
         disabled={props.disabled}
         onViewRouteClick={props.viewRoute}
+        onCardClick={() => {}}
+        selectedUser={null}
       />
     </div>
   );

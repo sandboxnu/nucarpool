@@ -20,6 +20,7 @@ import {
   CarpoolFeature,
   EnhancedPublicUser,
   PublicUser,
+  Request,
 } from "../utils/types";
 import { Role, User } from "@prisma/client";
 import { useGetDirections, viewRoute } from "../utils/map/viewRoute";
@@ -33,6 +34,7 @@ import BlueSquare from "../../public/user-dest.png";
 import BlueCircle from "../../public/blue-circle.png";
 import VisibilityToggle from "../components/Map/VisibilityToggle";
 import updateCompanyLocation from "../utils/map/updateCompanyLocation";
+import MessagePanel from "../components/Messages/MessagePanel";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -69,8 +71,16 @@ const Home: NextPage<any> = () => {
   const { data: favorites = [] } = trpc.user.favorites.me.useQuery(undefined, {
     refetchOnMount: true,
   });
-  const { data: requests = { sent: [], received: [] } } =
-    trpc.user.requests.me.useQuery();
+
+  const requestsQuery = trpc.user.requests.me.useQuery(undefined, {
+    refetchOnMount: true,
+  });
+  const { data: requests = { sent: [], received: [] } } = requestsQuery;
+  const utils = trpc.useContext();
+  console.log(requests);
+  const handleUserSelect = (userId: string) => {
+    setSelectedUserId(userId);
+  };
   const [otherUser, setOtherUser] = useState<PublicUser | null>(null);
   const [mapState, setMapState] = useState<mapboxgl.Map>();
   const [sidebarType, setSidebarType] = useState<HeaderOptions>("explore");
@@ -108,15 +118,41 @@ const Home: NextPage<any> = () => {
   );
 
   const extendPublicUser = (user: PublicUser): EnhancedPublicUser => {
+    const incomingReq: Request | undefined = requests.received.find(
+      (req) => req.fromUserId === user.id
+    );
+    const outgoingReq: Request | undefined = requests.sent.find(
+      (req) => req.toUserId === user.id
+    );
+
     return {
       ...user,
       isFavorited: favorites.some((favs) => favs.id === user.id),
-      incomingRequest: requests.received.find(
-        (req) => req.fromUserId === user.id
-      ),
-      outgoingRequest: requests.sent.find((req) => req.toUserId === user.id),
+      incomingRequest: incomingReq,
+      outgoingRequest: outgoingReq,
     };
   };
+
+  const handleMessageSent = (selectedUserId: string) => {
+    utils.user.requests.me.invalidate();
+    requestsQuery.refetch();
+    setSelectedUserId(selectedUserId);
+  };
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
+  const selectedUser: EnhancedPublicUser | null = useMemo(() => {
+    if (!selectedUserId || !requests) return null;
+    const allRequests = [...requests.sent, ...requests.received];
+    for (const request of allRequests) {
+      const user: any =
+        request.fromUser.id === selectedUserId
+          ? request.fromUser
+          : request.toUser;
+      if (user.id === selectedUserId)
+        return extendPublicUser(user) as EnhancedPublicUser;
+    }
+    return null;
+  }, [selectedUserId, requests]);
 
   const onViewRouteClick = (user: User, otherUser: PublicUser) => {
     setOtherUser(otherUser);
@@ -244,7 +280,9 @@ const Home: NextPage<any> = () => {
       }
     }
   }, [companyAddressSelected, startAddressSelected]);
-
+  useEffect(() => {
+    setSelectedUserId(null);
+  }, [sidebarType]);
   useEffect(() => {
     // useEffect for initial route rendering
     if (
@@ -370,6 +408,8 @@ const Home: NextPage<any> = () => {
                     received={enhancedReceivedUsers}
                     sent={enhancedSentUsers}
                     onViewRouteClick={onViewRouteClick}
+                    onUserSelect={handleUserSelect}
+                    selectedUser={selectedUser}
                   />
                 )}
               </div>
@@ -381,10 +421,23 @@ const Home: NextPage<any> = () => {
                 <RiFocus3Line />
               </button>
               <div className="relative flex-auto">
+                {/* Message Panel */}
+                {selectedUser && (
+                  <div className=" pointer-events-none absolute inset-0 z-10 h-full w-full">
+                    <MessagePanel
+                      selectedUser={selectedUser}
+                      onMessageSent={handleMessageSent}
+                      onViewRouteClick={onViewRouteClick}
+                      onCloseConversation={handleUserSelect}
+                    />
+                  </div>
+                )}
+
+                {/* Map Container */}
                 <div
                   ref={mapContainerRef}
                   id="map"
-                  className={"h-full w-full flex-auto"}
+                  className="pointer-events-auto relative  z-0 h-full w-full flex-auto"
                 >
                   {user.role === "VIEWER" && viewerBox}
                   <MapLegend role={user.role} />

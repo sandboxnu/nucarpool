@@ -22,7 +22,7 @@ const ProfilePicture = (props: ProfilePictureProps) => {
     data: profilePictureData,
     isLoading,
     error,
-  } = trpc.user.getPresignedDownloadUrl.useQuery();
+  } = trpc.user.getPresignedDownloadUrl.useQuery({ userId: undefined });
 
   // Update previewUrl when profilePictureData is available
   useEffect(() => {

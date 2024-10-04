@@ -9,75 +9,87 @@ import { PublicUser, ResolvedRequest } from "../../../utils/types";
 // use this router to manage invitations
 export const requestsRouter = router({
   me: protectedRouter.query(async ({ ctx }) => {
-    const id = ctx.session.user?.id;
-    const user = await ctx.prisma.user.findUnique({
-      where: { id },
-    });
+    const userId = ctx.session.user?.id;
 
-    // throws TRPCError if no user with ID exists
-    if (!user) {
+    if (!userId) {
       throw new TRPCError({
-        code: "NOT_FOUND",
-        message: `No profile with id '${id}'`,
+        code: "UNAUTHORIZED",
+        message: "User not authenticated",
       });
     }
 
-    const resolveRequest = async (
-      req: Request
-    ): Promise<ResolvedRequest & Request> => {
-      let [from, to] = await Promise.all([
-        ctx.prisma.user.findUnique({
-          where: { id: req.fromUserId },
-        }),
-        ctx.prisma.user.findUnique({
-          where: { id: req.toUserId },
-        }),
-      ]);
+    const user = await ctx.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        sentRequests: {
+          include: {
+            toUser: true,
+            conversation: {
+              include: {
+                messages: {
+                  orderBy: { dateCreated: "asc" },
+                  include: { User: true },
+                },
+              },
+            },
+          },
+        },
+        receivedRequests: {
+          include: {
+            fromUser: true,
+            conversation: {
+              include: {
+                messages: {
+                  orderBy: { dateCreated: "asc" },
+                  include: { User: true },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
 
-      if (!from) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `No user with id '${req.fromUserId}'`,
-        });
-      }
+    if (!user) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `No profile with id '${userId}'`,
+      });
+    }
 
-      if (!to) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `No user with id '${req.toUserId}'`,
-        });
-      }
+    const sent = user.sentRequests.map((req) => {
+      return {
+        ...req,
+        fromUser: convertToPublic(user),
+        toUser: convertToPublic(req.toUser),
+        conversation: req.conversation
+          ? {
+              ...req.conversation,
+              messages: req.conversation.messages.map((message) => ({
+                ...message,
+                userId: message.userId ?? "",
+              })),
+            }
+          : null,
+      };
+    });
 
-      let toUser: User | PublicUser;
-      let fromUser: User | PublicUser;
-
-      if (from?.id === ctx.session.user?.id) {
-        fromUser = from;
-      } else {
-        fromUser = convertToPublic(from);
-      }
-
-      if (to?.id === ctx.session.user?.id) {
-        toUser = to;
-      } else {
-        toUser = convertToPublic(to);
-      }
-
-      return { ...req, fromUser, toUser };
-    };
-
-    const [sent, received] = await Promise.all([
-      ctx.prisma.request
-        .findMany({
-          where: { fromUserId: id },
-        })
-        .then((reqs) => Promise.all(reqs.map(resolveRequest))),
-      ctx.prisma.request
-        .findMany({
-          where: { toUserId: id },
-        })
-        .then((reqs) => Promise.all(reqs.map(resolveRequest))),
-    ]);
+    const received = user.receivedRequests.map((req) => {
+      return {
+        ...req,
+        fromUser: convertToPublic(req.fromUser),
+        toUser: convertToPublic(user),
+        conversation: req.conversation
+          ? {
+              ...req.conversation,
+              messages: req.conversation.messages.map((message) => ({
+                ...message,
+                userId: message.userId ?? "",
+              })),
+            }
+          : null,
+      };
+    });
 
     return { sent, received };
   }),
