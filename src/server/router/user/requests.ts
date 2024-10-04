@@ -62,15 +62,6 @@ export const requestsRouter = router({
         ...req,
         fromUser: convertToPublic(user),
         toUser: convertToPublic(req.toUser),
-        conversation: req.conversation
-          ? {
-              ...req.conversation,
-              messages: req.conversation.messages.map((message) => ({
-                ...message,
-                userId: message.userId ?? "",
-              })),
-            }
-          : null,
       };
     });
 
@@ -79,15 +70,6 @@ export const requestsRouter = router({
         ...req,
         fromUser: convertToPublic(req.fromUser),
         toUser: convertToPublic(user),
-        conversation: req.conversation
-          ? {
-              ...req.conversation,
-              messages: req.conversation.messages.map((message) => ({
-                ...message,
-                userId: message.userId ?? "",
-              })),
-            }
-          : null,
       };
     });
 

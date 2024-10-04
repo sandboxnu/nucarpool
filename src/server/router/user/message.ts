@@ -100,7 +100,6 @@ export const messageRouter = router({
         });
       }
 
-      // Check if a conversation exists for this request, if not create one
       let conversation = await ctx.prisma.conversation.findUnique({
         where: { requestId: input.requestId },
       });
@@ -108,6 +107,11 @@ export const messageRouter = router({
       if (!conversation) {
         conversation = await ctx.prisma.conversation.create({
           data: { requestId: input.requestId },
+        });
+
+        await ctx.prisma.request.update({
+          where: { id: input.requestId },
+          data: { conversationId: conversation.id },
         });
       }
 
