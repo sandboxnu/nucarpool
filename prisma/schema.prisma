@@ -86,7 +86,7 @@ model Conversation {
   id        String    @id @default(cuid())
   requestId String    @unique
   messages  Message[]
-  Request   Request[]
+  request   Request[]
 
   @@map(name: "conversation")
 }

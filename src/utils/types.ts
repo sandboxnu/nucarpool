@@ -110,6 +110,7 @@ export type Request = {
   fromUser: User | PublicUser;
   toUser: User | PublicUser;
   conversation?: Conversation | null;
+  conversationId: string | null;
   dateCreated: Date;
 };
 

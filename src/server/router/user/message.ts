@@ -20,7 +20,9 @@ export const messageRouter = router({
         },
         conversation: {
           request: {
-            OR: [{ fromUserId: userId }, { toUserId: userId }],
+            some: {
+              OR: [{ fromUserId: userId }, { toUserId: userId }],
+            },
           },
         },
       },
@@ -138,7 +140,9 @@ export const messageRouter = router({
           id: { in: input.messageIds },
           conversation: {
             request: {
-              OR: [{ fromUserId: userId }, { toUserId: userId }],
+              some: {
+                OR: [{ fromUserId: userId }, { toUserId: userId }],
+              },
             },
           },
         },
