@@ -8,7 +8,18 @@ import {
   SendTemplatedEmailCommandInput,
 } from "@aws-sdk/client-ses";
 
-const gmailEmailSchema = z.string().email().refine((email) => email.toLowerCase().includes('@gmail'));
+const gmailEmailSchema = z.string().email().refine(
+  (email) => {
+    if (!email.toLowerCase().endsWith('@gmail.com')) {
+      console.log("Not accepted - non gmail.com email");
+      return false;
+    }
+    return true;
+  },
+  {
+    message: "Only gmail.com email addresses are accepted",
+  }
+);
 
 export const emailsRouter = router({
   connectEmail: protectedRouter
