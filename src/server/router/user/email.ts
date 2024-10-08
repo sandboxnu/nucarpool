@@ -8,14 +8,16 @@ import {
   SendTemplatedEmailCommandInput,
 } from "@aws-sdk/client-ses";
 
+const gmailEmailSchema = z.string().email().refine((email) => email.toLowerCase().includes('@gmail'));
+
 export const emailsRouter = router({
   connectEmail: protectedRouter
     .input(
       z.object({
         sendingUserName: z.string(),
-        sendingUserEmail: z.string(),
+        sendingUserEmail: gmailEmailSchema,
         receivingUserName: z.string(),
-        receivingUserEmail: z.string(),
+        receivingUserEmail: gmailEmailSchema,
         body: z.string(),
       })
     )
