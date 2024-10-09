@@ -1,31 +1,60 @@
 import { z } from "zod";
 import { router, protectedRouter } from "../createRouter";
-import _ from "lodash";
-import { generateConnectEmailparams } from "../../../utils/email";
-import {
-  SendEmailCommand,
-  SendTemplatedEmailCommand,
-  SendTemplatedEmailCommandInput,
-} from "@aws-sdk/client-ses";
+import { generateEmailParams, RequestEmailSchema, MessageEmailSchema, AcceptanceEmailSchema } from "../../../utils/email";
+import { SendTemplatedEmailCommand } from "@aws-sdk/client-ses";
+
+const gmailEmailSchema = z.string().email().refine(
+  (email) => email.toLowerCase().endsWith('@gmail.com'),
+  { message: "Only gmail.com email addresses are accepted" }
+);
 
 export const emailsRouter = router({
-  connectEmail: protectedRouter
+  sendRequestNotification: protectedRouter
     .input(
       z.object({
-        sendingUserName: z.string(),
-        sendingUserEmail: z.string(),
-        receivingUserName: z.string(),
-        receivingUserEmail: z.string(),
-        body: z.string(),
+        senderName: z.string(),
+        senderEmail: gmailEmailSchema,
+        receiverName: z.string(),
+        receiverEmail: gmailEmailSchema,
+        isDriver: z.boolean(),
+        messagePreview: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const connectEmailParams: SendTemplatedEmailCommandInput =
-        generateConnectEmailparams(input);
+      const emailParams = generateEmailParams(input as RequestEmailSchema, 'request');
+      const response = await ctx.sesClient.send(new SendTemplatedEmailCommand(emailParams));
+      return response;
+    }),
 
-      const response = await ctx.sesClient.send(
-        new SendTemplatedEmailCommand(connectEmailParams)
-      );
+  sendMessageNotification: protectedRouter
+    .input(
+      z.object({
+        senderName: z.string(),
+        senderEmail: gmailEmailSchema,
+        receiverName: z.string(),
+        receiverEmail: gmailEmailSchema,
+        messageText: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const emailParams = generateEmailParams(input as MessageEmailSchema, 'message');
+      const response = await ctx.sesClient.send(new SendTemplatedEmailCommand(emailParams));
+      return response;
+    }),
+
+  sendAcceptanceNotification: protectedRouter
+    .input(
+      z.object({
+        senderName: z.string(),
+        senderEmail: gmailEmailSchema,
+        receiverName: z.string(),
+        receiverEmail: gmailEmailSchema,
+        isDriver: z.boolean(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const emailParams = generateEmailParams(input as AcceptanceEmailSchema, 'acceptance');
+      const response = await ctx.sesClient.send(new SendTemplatedEmailCommand(emailParams));
       return response;
     }),
 });
