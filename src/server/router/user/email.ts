@@ -21,9 +21,16 @@ export const emailsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const emailParams = generateEmailParams(input as RequestEmailSchema, 'request');
-      const response = await ctx.sesClient.send(new SendTemplatedEmailCommand(emailParams));
-      return response;
+      const emailParams = generateEmailParams(input, 'request');
+      try {
+        const response = await ctx.sesClient.send(new SendTemplatedEmailCommand(emailParams));
+        console.log(`Email sent successfully to ${input.receiverEmail}. CC: ${input.senderEmail}`);
+        console.log('SES Response:', JSON.stringify(response, null, 2));
+        return response;
+      } catch (error) {
+        console.error('Error sending email:', error);
+        throw error;
+      }
     }),
 
   sendMessageNotification: protectedRouter
@@ -37,9 +44,16 @@ export const emailsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const emailParams = generateEmailParams(input as MessageEmailSchema, 'message');
-      const response = await ctx.sesClient.send(new SendTemplatedEmailCommand(emailParams));
-      return response;
+      const emailParams = generateEmailParams(input, 'message');
+      try {
+        const response = await ctx.sesClient.send(new SendTemplatedEmailCommand(emailParams));
+        console.log(`Message notification sent successfully to ${input.receiverEmail}`);
+        console.log('SES Response:', JSON.stringify(response, null, 2));
+        return response;
+      } catch (error) {
+        console.error('Error sending message notification:', error);
+        throw error;
+      }
     }),
 
   sendAcceptanceNotification: protectedRouter
@@ -53,8 +67,45 @@ export const emailsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const emailParams = generateEmailParams(input as AcceptanceEmailSchema, 'acceptance');
-      const response = await ctx.sesClient.send(new SendTemplatedEmailCommand(emailParams));
-      return response;
+      const emailParams = generateEmailParams(input, 'acceptance');
+      try {
+        const response = await ctx.sesClient.send(new SendTemplatedEmailCommand(emailParams));
+        console.log(`Acceptance notification sent successfully to ${input.receiverEmail}. CC: ${input.senderEmail}`);
+        console.log('SES Response:', JSON.stringify(response, null, 2));
+        return response;
+      } catch (error) {
+        console.error('Error sending acceptance notification:', error);
+        throw error;
+      }
+    }),
+
+  // Add the connectEmail mutation
+  connectEmail: protectedRouter
+    .input(
+      z.object({
+        sendingUserName: z.string(),
+        sendingUserEmail: gmailEmailSchema,
+        receivingUserName: z.string(),
+        receivingUserEmail: gmailEmailSchema,
+        body: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const emailParams = generateEmailParams({
+        senderName: input.sendingUserName,
+        senderEmail: input.sendingUserEmail,
+        receiverName: input.receivingUserName,
+        receiverEmail: input.receivingUserEmail,
+        messageText: input.body,
+      }, 'message');
+      try {
+        const response = await ctx.sesClient.send(new SendTemplatedEmailCommand(emailParams));
+        console.log(`Connect email sent successfully to ${input.receivingUserEmail}. CC: ${input.sendingUserEmail}`);
+        console.log('SES Response:', JSON.stringify(response, null, 2));
+        return response;
+      } catch (error) {
+        console.error('Error sending connect email:', error);
+        throw error;
+      }
     }),
 });
