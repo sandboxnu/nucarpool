@@ -1,23 +1,4 @@
 import React from "react";
-import styled from "styled-components";
-
-const BaseBox = styled.div`
-  border: 1px solid black;
-  border-left: 0rem solid;
-  color: black;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
-`;
-const StyledCheckedBox = styled(BaseBox)`
-  background-color: #c7efb3;
-`;
-
-const StyledUncheckedBox = styled(BaseBox)``;
 
 const DayBox = ({
   day,
@@ -26,11 +7,14 @@ const DayBox = ({
   day: string;
   isSelected: boolean;
 }): React.ReactElement => {
-  if (isSelected) {
-    return <StyledCheckedBox>{day}</StyledCheckedBox>;
-  } else {
-    return <StyledUncheckedBox>{day}</StyledUncheckedBox>;
-  }
+  const baseClasses =
+    "flex md:h-14 md:w-14 lg:h-16 lg:w-16 items-center justify-center rounded-full ml-2 border border-black lg:text-2xl md:text-lg";
+
+  const selectedClasses = isSelected
+    ? "bg-northeastern-red text-white"
+    : "bg-white text-black";
+
+  return <div className={`${baseClasses} ${selectedClasses}`}>{day}</div>;
 };
 
 export default DayBox;
