@@ -76,6 +76,8 @@ const MessagePanel = ({
           selectedUser={selectedUser}
           onAccept={handleAccept}
           onReject={handleReject}
+          onClose={onCloseConversation}
+          groupId={user!.carpoolId}
         />
 
         {/* Tab Strip */}

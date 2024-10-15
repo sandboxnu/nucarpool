@@ -60,6 +60,7 @@ const RequestSidebar = (props: RequestSidebarProps) => {
         onViewRouteClick={props.viewRoute}
         onCardClick={handleCardClick}
         selectedUser={props.selectedUser}
+        onViewRequest={props.onUserSelect}
       />
     </div>
   );
