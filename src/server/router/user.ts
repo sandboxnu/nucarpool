@@ -55,6 +55,8 @@ export const userRouter = router({
         daysWorking: z.string(),
         startTime: z.optional(z.string()),
         endTime: z.optional(z.string()),
+        coopEndDate: z.optional(z.string()),
+        coopStartDate: z.optional(z.string()),
         bio: z.string(),
         licenseSigned: z.boolean(),
       })
@@ -65,6 +67,12 @@ export const userRouter = router({
         : undefined;
       const endTimeDate = input.endTime
         ? new Date(Date.parse(input.endTime))
+        : undefined;
+      const coopStart = input.coopStartDate
+        ? new Date(Date.parse(input.coopStartDate))
+        : undefined;
+      const coopEnd = input.coopEndDate
+        ? new Date(Date.parse(input.coopEndDate))
         : undefined;
       const [startPOIData, endPOIData] = await Promise.all([
         generatePoiData(input.startCoordLng, input.startCoordLat),
@@ -97,6 +105,8 @@ export const userRouter = router({
           daysWorking: input.daysWorking,
           startTime: startTimeDate,
           endTime: endTimeDate,
+          coopEndDate: coopEnd,
+          coopStartDate: coopStart,
           bio: input.bio,
           licenseSigned: input.licenseSigned,
         },

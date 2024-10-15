@@ -56,6 +56,8 @@ export type OnboardingFormInputs = {
   daysWorking: boolean[];
   startTime: Date | null;
   endTime: Date | null;
+  coopStartDate: Date | null;
+  coopEndDate: Date | null;
   timeDiffers: boolean;
   bio: string;
 };
@@ -213,6 +215,8 @@ const Profile: NextPage = () => {
       startTime: undefined,
       endTime: undefined,
       timeDiffers: false,
+      coopStartDate: undefined,
+      coopEndDate: undefined,
       bio: "",
     },
     resolver: zodResolver(onboardSchema),
@@ -274,6 +278,8 @@ const Profile: NextPage = () => {
       daysWorking: user.daysWorking.split(",").map((bit) => bit === "1"),
       startTime: user.startTime,
       endTime: user.endTime,
+      coopStartDate: user.coopStartDate,
+      coopEndDate: user.coopEndDate,
       timeDiffers: false,
       bio: user.bio,
     });
@@ -359,6 +365,8 @@ const Profile: NextPage = () => {
       startTime: userInfo.startTime?.toISOString(),
       endTime: userInfo.endTime?.toISOString(),
       bio: userInfo.bio,
+      coOpStartDate: values.coopStartDate,
+      coOpEndDate: values.coopEndDate,
       licenseSigned: true,
     });
   };
@@ -603,6 +611,48 @@ const Profile: NextPage = () => {
               </ProfileColumn>
 
               <ProfileColumn>
+                <ProfileHeader>
+                  Co-op Term Dates{" "}
+                  <span className="text-northeastern-red">*</span>
+                </ProfileHeader>
+                <div className="flex w-full gap-4">
+                  <div className="flex flex-1 flex-col">
+                    <EntryLabel
+                      required={true}
+                      error={errors.coopStartDate}
+                      label="Start Date"
+                    />
+                    <TextField
+                      type="month"
+                      inputClassName="h-14 text-lg"
+                      isDisabled={false}
+                      id="coOpStartDate"
+                      error={errors.coopStartDate}
+                      {...register("coopStartDate")}
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col">
+                    <EntryLabel
+                      required={true}
+                      error={errors.coopEndDate}
+                      label="End Date"
+                    />
+                    <TextField
+                      type="month"
+                      inputClassName="h-14 text-lg"
+                      isDisabled={false}
+                      id="coOpEndDate"
+                      error={errors.coopEndDate}
+                      {...register("coopEndDate")}
+                    />
+                  </div>
+                </div>
+                <Note className="py-2">
+                  Please indicate the start and the end dates of your co-op. If
+                  you don`&apos;`t know exact dates, you can use approximate
+                  dates.
+                </Note>
+
                 <PersonalInfoSection>
                   <ProfileHeader>Personal Info</ProfileHeader>
                   <div className="flex w-full flex-col ">
