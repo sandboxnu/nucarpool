@@ -33,7 +33,6 @@ export const userRouter = router({
         message: `No profile with id '${id}'`,
       });
     }
-    console.log(user.coopEndDate);
     return user;
   }),
 
