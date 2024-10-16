@@ -16,8 +16,8 @@ export type Recommendation = {
 const cutoffs = {
   startDistance: 4, // miles
   endDistance: 4, // miles
-  startTime: 60, // minutes
-  endTime: 60, // minutes
+  startTime: 80, // minutes
+  endTime: 80, // minutes
   days: 5,
 };
 
