@@ -41,6 +41,7 @@ import { ComplianceModal } from "../components/CompliancePortal";
 import ProfilePicture from "../components/Profile/ProfilePicture";
 import Spinner from "../components/Spinner";
 import { getPresignedImageUrl } from "../utils/uploadToS3";
+import { userInfo } from "node:os";
 
 // Inputs to the onboarding form.
 export type OnboardingFormInputs = {
@@ -56,6 +57,8 @@ export type OnboardingFormInputs = {
   daysWorking: boolean[];
   startTime: Date | null;
   endTime: Date | null;
+  coopStartDate: Date | null;
+  coopEndDate: Date | null;
   timeDiffers: boolean;
   bio: string;
 };
@@ -79,6 +82,8 @@ const onboardSchema = z
     bio: z.string().optional(),
     startTime: z.date().nullable().optional(),
     endTime: z.date().nullable().optional(),
+    coopStartDate: z.date(),
+    coopEndDate: z.date(),
     timeDiffers: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
@@ -192,6 +197,7 @@ const Profile: NextPage = () => {
   });
   const {
     register,
+    setValue,
     formState: { errors },
     watch,
     handleSubmit,
@@ -213,13 +219,27 @@ const Profile: NextPage = () => {
       startTime: undefined,
       endTime: undefined,
       timeDiffers: false,
+      coopStartDate: undefined,
+      coopEndDate: undefined,
       bio: "",
     },
     resolver: zodResolver(onboardSchema),
   });
   const role = watch("role");
   const isViewer = role === "VIEWER";
-
+  const handleMonthChange = (field: any) => (event: any) => {
+    const [year, month] = event.target.value.split("-").map(Number);
+    const lastDay = new Date(year, month, 0);
+    setValue(field, lastDay);
+  };
+  const formatDateToMonth = (date: Date | null) => {
+    if (!date) {
+      return undefined;
+    }
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    return `${year}-${month}`;
+  };
   const [companyAddressSuggestions, setCompanyAddressSuggestions] = useState<
     CarpoolFeature[]
   >([]);
@@ -274,6 +294,8 @@ const Profile: NextPage = () => {
       daysWorking: user.daysWorking.split(",").map((bit) => bit === "1"),
       startTime: user.startTime,
       endTime: user.endTime,
+      coopStartDate: user.coopStartDate!,
+      coopEndDate: user.coopEndDate!,
       timeDiffers: false,
       bio: user.bio,
     });
@@ -338,7 +360,6 @@ const Profile: NextPage = () => {
         console.error("File upload failed:", error);
       }
     }
-
     editUserMutation.mutate({
       role: userInfo.role,
       status: userInfo.status,
@@ -359,6 +380,8 @@ const Profile: NextPage = () => {
       startTime: userInfo.startTime?.toISOString(),
       endTime: userInfo.endTime?.toISOString(),
       bio: userInfo.bio,
+      coopStartDate: userInfo.coopStartDate!,
+      coopEndDate: userInfo.coopEndDate!,
       licenseSigned: true,
     });
   };
@@ -523,7 +546,7 @@ const Profile: NextPage = () => {
                     </ProfileHeader>
                     {/* Days working field  */}
                     <div className="mb-2  aspect-[7/1] w-full max-w-[360px] md:my-4">
-                      <div className="flex h-full w-full items-center justify-evenly border-l border-l-black">
+                      <div className="flex h-full w-full items-center justify-evenly ">
                         {daysOfWeek.map((day, index) => (
                           <Controller
                             key={day + index.toString()}
@@ -603,12 +626,102 @@ const Profile: NextPage = () => {
               </ProfileColumn>
 
               <ProfileColumn>
+                <ProfileHeader>
+                  Co-op Term Dates{" "}
+                  <span className="text-northeastern-red">*</span>
+                </ProfileHeader>
+                <div className="flex w-full gap-4">
+                  <div className="flex flex-1 flex-col">
+                    <EntryLabel
+                      required={true}
+                      error={errors.coopStartDate}
+                      label="Start Date"
+                    />
+                    <TextField
+                      type="month"
+                      inputClassName="h-14 text-lg"
+                      isDisabled={isViewer}
+                      id="coopStartDate"
+                      error={errors.coopStartDate}
+                      onChange={handleMonthChange("coopStartDate")}
+                      defaultValue={
+                        formatDateToMonth(watch("coopStartDate")) || undefined
+                      }
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col">
+                    <EntryLabel
+                      required={true}
+                      error={errors.coopEndDate}
+                      label="End Date"
+                    />
+                    <TextField
+                      type="month"
+                      inputClassName="h-14 text-lg"
+                      isDisabled={isViewer}
+                      id="coopEndDate"
+                      error={errors.coopEndDate}
+                      onChange={handleMonthChange("coopEndDate")}
+                      defaultValue={
+                        formatDateToMonth(watch("coopEndDate")) || undefined
+                      }
+                    />
+                  </div>
+                </div>
+                <Note className="py-2">
+                  Please indicate the start and the end dates of your co-op. If
+                  you don&apos;t know exact dates, you can use approximate
+                  dates.
+                </Note>
+
                 <PersonalInfoSection>
                   <ProfileHeader>Personal Info</ProfileHeader>
                   <div className="flex w-full flex-col ">
-                    <div className="mb-10 w-full ">
+                    <div className=" w-full ">
                       <ProfilePicture onFileSelected={setSelectedFile} />
                     </div>
+                    <div className="mb-5 mt-2 w-full">
+                      {!isViewer && (
+                        <Controller
+                          name="status"
+                          control={control}
+                          render={({ field }) => (
+                            <div className="flex items-start">
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={field.value === Status.INACTIVE}
+                                    onChange={(e) =>
+                                      field.onChange(
+                                        e.target.checked
+                                          ? Status.INACTIVE
+                                          : Status.ACTIVE
+                                      )
+                                    }
+                                    inputProps={{
+                                      "aria-label": "Mark profile inactive",
+                                    }}
+                                  />
+                                }
+                                label="Mark profile inactive"
+                              />
+                              <Note className="ml-2 w-1/2 text-sm text-gray-500">
+                                <p>
+                                  Marking your profile inactive removes you from
+                                  the map for other users.
+                                  <strong className="font-semibold">
+                                    &nbsp;You should leave this box unchecked if
+                                    you&apos;re creating your profile for the
+                                    first time.
+                                  </strong>
+                                </p>
+                              </Note>
+                            </div>
+                          )}
+                        />
+                      )}
+                    </div>
+
                     <div className="flex w-full flex-row  space-x-6">
                       {/* Preferred Name field  */}
 
@@ -660,38 +773,6 @@ const Profile: NextPage = () => {
                       This intro will be shared with people you choose to
                       connect with.
                     </Note>
-                    {!isViewer && (
-                      <Controller
-                        name="status"
-                        control={control}
-                        render={({ field }) => (
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={field.value === Status.INACTIVE}
-                                onChange={(e) =>
-                                  field.onChange(
-                                    e.target.checked
-                                      ? Status.INACTIVE
-                                      : Status.ACTIVE
-                                  )
-                                }
-                                inputProps={{ "aria-label": "Inactive status" }}
-                              />
-                            }
-                            label="Mark as Inactive"
-                          />
-                        )}
-                      />
-                    )}
-                    {!isViewer && (
-                      <Note>
-                        <span>
-                          Marking as inactive will hide your profile from all
-                          searches and matches.
-                        </span>
-                      </Note>
-                    )}
                   </div>
                 </PersonalInfoSection>
                 <CompleteProfileButton type="submit">

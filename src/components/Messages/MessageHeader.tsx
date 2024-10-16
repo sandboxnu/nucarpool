@@ -4,17 +4,22 @@ import { AiOutlineUser } from "react-icons/ai";
 import { FiMoreHorizontal } from "react-icons/fi";
 import { trpc } from "../../utils/trpc";
 import Image from "next/image";
+import getRouteFromAssetPath from "next/dist/shared/lib/router/utils/get-route-from-asset-path";
 
 interface MessageHeaderProps {
   selectedUser: EnhancedPublicUser;
   onAccept: () => void;
   onReject: () => void;
+  onClose: (userId: string) => void;
+  groupId: string | null;
 }
 
 const MessageHeader = ({
   selectedUser,
   onAccept,
   onReject,
+  onClose,
+  groupId,
 }: MessageHeaderProps) => {
   const [profileImageUrl, setProfileImageUrl] = useState<string>("");
   const [imageLoadError, setImageLoadError] = useState<boolean>(false);
@@ -29,7 +34,9 @@ const MessageHeader = ({
       setProfileImageUrl("");
     }
   }, [presignedData]);
-
+  const handleClose = (e: React.MouseEvent) => {
+    onClose("");
+  };
   useEffect(() => {
     setImageLoadError(false);
   }, [profileImageUrl]);
@@ -54,32 +61,46 @@ const MessageHeader = ({
         </span>
       </div>
       <div className="flex">
-        {hasIncomingRequest && (
+        {hasIncomingRequest && !groupId && (
           <>
             <button
               onClick={onReject}
-              className="mr-10 rounded-lg border-2 border-black bg-white px-20 py-2 text-center text-lg font-medium text-black hover:bg-gray-100"
+              className="md:px-15 mr-10 rounded-lg border-2 border-black bg-white py-2 text-center text-lg  font-medium text-black hover:bg-gray-100 sm:px-10 lg:px-20"
             >
               Reject
             </button>
             <button
               onClick={onAccept}
-              className="mr-10 rounded-lg bg-northeastern-red px-20 py-2 text-center text-lg font-medium text-white hover:bg-red-700"
+              className=" md:px-15 mr-10 rounded-lg  bg-northeastern-red py-2 text-center text-lg  font-medium text-white hover:bg-red-700 sm:px-10 lg:px-20"
             >
               Accept
             </button>
           </>
         )}
-        {hasOutgoingRequest && !hasIncomingRequest && (
+        {hasOutgoingRequest && !hasIncomingRequest && !groupId && (
           <button
             onClick={onReject}
-            className="mr-10 rounded-lg border-2 border-black bg-white px-20 py-2 text-center text-lg font-medium text-black hover:bg-gray-100"
+            className=" mr-10 rounded-lg border-2 border-black bg-white px-20 py-2 text-center text-lg font-medium text-black hover:bg-gray-100"
           >
             Withdraw Request
           </button>
         )}
+        {groupId && (
+          <button
+            onClick={onReject}
+            className=" mr-10 rounded-lg border-2 border-black bg-white px-20 py-2 text-center text-lg font-medium text-black hover:bg-gray-100"
+          >
+            Leave Conversation
+          </button>
+        )}
 
-        <FiMoreHorizontal className="inline-block h-10 w-10" />
+        <button
+          onClick={handleClose}
+          className="flex h-14 w-14 cursor-pointer items-center  justify-center text-black md:text-2xl lg:text-3xl"
+          aria-label="Close"
+        >
+          &times;
+        </button>
       </div>
     </div>
   );

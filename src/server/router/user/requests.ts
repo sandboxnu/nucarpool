@@ -85,6 +85,13 @@ export const requestsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user?.id;
+      if (!userId) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User not authenticated",
+        });
+      }
       const existingRequests = await ctx.prisma.request.findMany({
         where: {
           OR: [
@@ -107,15 +114,41 @@ export const requestsRouter = router({
         });
       }
 
-      await ctx.prisma.request.create({
+      const request = await ctx.prisma.request.create({
         data: {
-          message: input.message,
+          message: "",
           fromUser: {
             connect: { id: input.fromId },
           },
           toUser: {
             connect: { id: input.toId },
           },
+        },
+      });
+      let conversation = await ctx.prisma.conversation.findUnique({
+        where: { requestId: request.id },
+      });
+
+      if (!conversation) {
+        conversation = await ctx.prisma.conversation.create({
+          data: {
+            requestId: request.id,
+          },
+        });
+
+        // Update the request with the conversation ID
+        await ctx.prisma.request.update({
+          where: { id: request.id },
+          data: { conversationId: conversation.id },
+        });
+      }
+
+      //  Create the initial message in the conversation
+      await ctx.prisma.message.create({
+        data: {
+          conversationId: conversation.id,
+          content: input.message,
+          userId: userId,
         },
       });
     }),

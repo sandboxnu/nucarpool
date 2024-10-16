@@ -446,6 +446,7 @@ const Home: NextPage<any> = () => {
                     otherUser={popupUser}
                     extendUser={extendPublicUser}
                     onViewRouteClick={onViewRouteClick}
+                    onViewRequest={handleUserSelect}
                     onClose={() => {
                       setPopupUser(null);
                     }}

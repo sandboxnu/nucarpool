@@ -18,13 +18,17 @@ const MessageContent = ({ selectedUser }: MessageContentProps) => {
 
   const initialMessage = {
     id: "initial",
-    content: request?.message,
-    userId: request?.fromUserId,
-    dateCreated: request?.dateCreated || new Date().toISOString(),
+    content: request?.message || "",
+    conversationId: "initial",
+    userId: request!.fromUserId,
+    dateCreated: request?.dateCreated || new Date(),
     isRead: true,
   };
+  let allMessages = [...conversationMessages];
 
-  const allMessages = [initialMessage, ...conversationMessages];
+  if (request?.message) {
+    allMessages = [initialMessage, ...conversationMessages];
+  }
 
   const markMessagesAsRead = trpc.user.messages.markMessagesAsRead.useMutation({
     onSuccess: () => {

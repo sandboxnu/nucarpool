@@ -149,6 +149,8 @@ model User {
   daysWorking        String        @default("") @map("days_working")
   startTime          DateTime?     @map("start_time") @db.Time(0)
   endTime            DateTime?     @map("end_time") @db.Time(0)
+  coopStartDate      DateTime?     @map("coop_start_date") @db.Date
+  coopEndDate        DateTime?     @map("coop_end_date") @db.Date
   favoritedBy        User[]        @relation("Favorites")
   favorites          User[]        @relation("Favorites")
   sentRequests       Request[]     @relation("sentRequests")

@@ -34,6 +34,7 @@ export const SidebarPage = (props: SidebarProps) => {
         favs={props.favs}
         disabled={disabled}
         viewRoute={props.onViewRouteClick}
+        onViewRequest={props.onUserSelect}
       />
     );
   } else {

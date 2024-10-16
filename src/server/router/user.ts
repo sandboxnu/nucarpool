@@ -33,6 +33,7 @@ export const userRouter = router({
         message: `No profile with id '${id}'`,
       });
     }
+    console.log(user.coopEndDate);
     return user;
   }),
 
@@ -55,6 +56,8 @@ export const userRouter = router({
         daysWorking: z.string(),
         startTime: z.optional(z.string()),
         endTime: z.optional(z.string()),
+        coopEndDate: z.date(),
+        coopStartDate: z.date(),
         bio: z.string(),
         licenseSigned: z.boolean(),
       })
@@ -66,6 +69,7 @@ export const userRouter = router({
       const endTimeDate = input.endTime
         ? new Date(Date.parse(input.endTime))
         : undefined;
+
       const [startPOIData, endPOIData] = await Promise.all([
         generatePoiData(input.startCoordLng, input.startCoordLat),
         generatePoiData(input.companyCoordLng, input.companyCoordLat),
@@ -97,6 +101,8 @@ export const userRouter = router({
           daysWorking: input.daysWorking,
           startTime: startTimeDate,
           endTime: endTimeDate,
+          coopEndDate: input.coopEndDate,
+          coopStartDate: input.coopStartDate,
           bio: input.bio,
           licenseSigned: input.licenseSigned,
         },

@@ -259,6 +259,8 @@ const genRandomUsers = ({
       startPOICoordLat: startCoordLat,
       startCoordLng: startCoordLng - coordOffset + rand(doubleOffset),
       startPOICoordLng: startCoordLat,
+      coopEndDate: null,
+      coopStartDate: null,
       // Generates an end time between 16:00 - 19:45
       endTime: 16 + Math.floor(rand(3)) + ":" + (endMin == 0 ? "00" : endMin),
       companyCoordLat: companyCoordLat - coordOffset + rand(doubleOffset),
