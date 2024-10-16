@@ -7,17 +7,19 @@ import {
   SendTemplatedEmailCommand,
   SendTemplatedEmailCommandInput,
 } from "@aws-sdk/client-ses";
-
 const gmailEmailSchema = z.string().email().refine(
   (email) => {
-    if (!email.toLowerCase().endsWith('@gmail.com')) {
-      console.log("Not accepted - non gmail.com email");
-      return false;
+    if (process.env.NEXT_PUBLIC_ENV === 'staging') {
+      if (!email.toLowerCase().endsWith('@gmail.com')) {
+        console.log("Not accepted - non gmail.com email");
+        return false;
+      }
+      return true;
     }
     return true;
   },
   {
-    message: "Only gmail.com email addresses are accepted",
+    message: "Only gmail.com email addresses are accepted in staging environment",
   }
 );
 
