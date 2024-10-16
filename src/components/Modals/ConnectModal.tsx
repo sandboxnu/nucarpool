@@ -85,9 +85,10 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
                   Send a message to connect!
                 </Dialog.Title>
                 <div className="text-sm">
-                  Use the space below to write out a message to{" "}
-                  {props.otherUser.preferredName} and start a conversation. An
-                  email will be sent to notify {props.otherUser.preferredName}.
+                  Use the space below to write out a message to&nbsp;
+                  {props.otherUser.preferredName} with any details you want them
+                  to know about your request. We&apos;ll also connect you via
+                  email.
                 </div>
                 <textarea
                   className="form-input h-24 min-h-[120px] w-full resize-none rounded-md px-3 py-2 shadow-sm"
