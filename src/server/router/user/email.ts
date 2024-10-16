@@ -4,11 +4,6 @@ import { generateEmailParams, RequestEmailSchema, MessageEmailSchema, Acceptance
 import { SendTemplatedEmailCommand } from "@aws-sdk/client-ses";
 
 const gmailEmailSchema = z.string().email().refine(
-  (email) => email.toLowerCase().endsWith('@gmail.com'),
-  { message: "Only gmail.com email addresses are accepted" }
-);
-
-const gmailEmailSchema = z.string().email().refine(
   (email) => {
     if (!email.toLowerCase().endsWith('@gmail.com')) {
       console.log("Not accepted - non gmail.com email");
