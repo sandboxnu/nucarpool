@@ -22,6 +22,8 @@ const relativeOrderBaseDriver: User = generateUser({
   startPOICoordLng: 42.34,
   startPOICoordLat: -71.09,
   daysWorking: "0,1,1,1,1,1,0",
+  coopStartDate: null,
+  coopEndDate: null,
   startTime: "9:00",
   endTime: "17:00",
 }).create;
