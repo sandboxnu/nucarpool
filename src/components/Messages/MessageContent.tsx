@@ -53,8 +53,8 @@ const MessageContent = ({ selectedUser }: MessageContentProps) => {
   }, [initialMessage, conversationMessages, request?.message]);
 
   const onSuccess = useCallback(() => {
-    utils.user.requests.me.invalidate();
-  }, [utils.user.requests.me]);
+    utils.user.messages.getUnreadMessageCount.invalidate();
+  }, [utils.user.messages.getUnreadMessageCount]);
 
   const onError = useCallback((error: any) => {
     console.error("Failed to mark messages as read:", error);
