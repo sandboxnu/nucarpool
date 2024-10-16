@@ -189,6 +189,8 @@ export type GenerateUserInput = {
   startTime: string;
   endTime: string;
   carpoolId?: string;
+  coopStartDate: Date | null;
+  coopEndDate: Date | null;
 };
 
 /**
@@ -208,6 +210,8 @@ export const generateUser = ({
   daysWorking,
   startTime,
   endTime,
+  coopStartDate,
+  coopEndDate,
 }: GenerateUserInput & { id: string }) => {
   if (daysWorking.length != 13) {
     throw new Error("Given an invalid string for daysWorking");
@@ -256,6 +260,8 @@ export const generateUser = ({
     daysWorking: daysWorking,
     startTime: startDate,
     endTime: endDate,
+    coopEndDate: coopEndDate,
+    coopStartDate: coopStartDate,
     carpoolId: null,
     licenseSigned: true,
   };
