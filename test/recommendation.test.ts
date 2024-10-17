@@ -43,11 +43,11 @@ const usersToBeCutoff: User[] = [
   },
   {
     ...relativeOrderBaseRider,
-    startTime: dayjs.tz("2022-11-01 07:59:00", "UTC").toDate(),
+    startTime: dayjs.tz("2022-11-01 06:59:00", "UTC").toDate(),
   },
   {
     ...relativeOrderBaseRider,
-    endTime: dayjs.tz("2022-11-01 18:01:00", "UTC").toDate(),
+    endTime: dayjs.tz("2022-11-01 20:01:00", "UTC").toDate(),
   },
   {
     ...relativeOrderBaseRider,
