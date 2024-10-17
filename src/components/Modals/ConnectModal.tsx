@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useToasts } from "react-toast-notifications";
 import { EnhancedPublicUser, User } from "../../utils/types";
 import { toast } from "react-toastify";
-import { emailSchema } from "../../utils/email";
+import { BaseEmailSchema } from "../../utils/email";
 import { trpc } from "../../utils/trpc";
 
 interface ConnectModalProps {

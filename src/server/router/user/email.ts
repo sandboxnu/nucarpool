@@ -1,18 +1,25 @@
 import { z } from "zod";
 import { router, protectedRouter } from "../createRouter";
-import { generateEmailParams, RequestEmailSchema, MessageEmailSchema, AcceptanceEmailSchema } from "../../../utils/email";
-import { SendTemplatedEmailCommand } from "@aws-sdk/client-ses";
-
+import _ from "lodash";
+import { generateEmailParams } from "../../../utils/email";
+import {
+  SendEmailCommand,
+  SendTemplatedEmailCommand,
+  SendTemplatedEmailCommandInput,
+} from "@aws-sdk/client-ses";
 const gmailEmailSchema = z.string().email().refine(
   (email) => {
-    if (!email.toLowerCase().endsWith('@gmail.com')) {
-      console.log("Not accepted - non gmail.com email");
-      return false;
+    if (process.env.NEXT_PUBLIC_ENV === 'staging') {
+      if (!email.toLowerCase().endsWith('@gmail.com')) {
+        console.log("Not accepted - non gmail.com email");
+        return false;
+      }
+      return true;
     }
     return true;
   },
   {
-    message: "Only gmail.com email addresses are accepted",
+    message: "Request successfully sent without email portion as only gmail.com email addresses are accepted in staging environment",
   }
 );
 
