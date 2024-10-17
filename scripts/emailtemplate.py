@@ -27,7 +27,7 @@ templates = [
         "HtmlPart": """
         <p>Hello {{preferredName}},</p>
         <p>{{OtherUser}} has sent a request to join your Carpool group. Here's a preview of their message:</p>
-        <p>{{message}}</p>
+        <p><strong>{{message}}</strong></p>
         <p><a href="https://carpoolnu.com">Click here to accept or reject the request</a></p>
         """,
         "TextPart": """
@@ -46,7 +46,7 @@ templates = [
         "HtmlPart": """
         <p>Hello {{preferredName}},</p>
         <p>{{OtherUser}} sent a request for you to join their Carpool group. Here's a preview of their message:</p>
-        <p>{{message}}</p>
+        <p><strong>{{message}}</strong></p>
         <p><a href="https://carpoolnu.com">Click here to see accept or reject the request</a></p>
         """,
         "TextPart": """
@@ -65,7 +65,7 @@ templates = [
         "HtmlPart": """
         <p>Hello {{preferredName}},</p>
         <p>{{OtherUser}} sent you a message in Carpool NU:</p>
-        <p>{{message}}</p>
+        <p><strong>{{message}}</strong></p>
         <p><a href="https://carpoolnu.com">Click here to open Carpool NU</a></p>
         """,
         "TextPart": """

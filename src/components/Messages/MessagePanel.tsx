@@ -58,7 +58,7 @@ const MessagePanel = ({
       sendMessageNotification({
         senderName: user.preferredName || "",
         senderEmail: user.email,
-        receiverName: selectedUser.name || "",
+        receiverName: selectedUser.preferredName || "",
         receiverEmail: selectedUser.email,
         messageText: content,
       });
