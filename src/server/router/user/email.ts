@@ -19,7 +19,7 @@ const gmailEmailSchema = z.string().email().refine(
     return true;
   },
   {
-    message: "Only gmail.com email addresses are accepted in staging environment",
+    message: "Request successfully sent without email portion as only gmail.com email addresses are accepted in staging environment",
   }
 );
 
