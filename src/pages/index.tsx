@@ -77,7 +77,6 @@ const Home: NextPage<any> = () => {
   });
   const { data: requests = { sent: [], received: [] } } = requestsQuery;
   const utils = trpc.useContext();
-  console.log(requests);
   const handleUserSelect = (userId: string) => {
     setSelectedUserId(userId);
   };
@@ -342,7 +341,7 @@ const Home: NextPage<any> = () => {
 
   const viewerBox = (
     <div className="absolute left-0 top-0 z-10 m-2 flex min-w-[25rem] flex-col rounded-xl bg-white p-4 shadow-lg ">
-      <h2 className="text-xl mb-4">Search my route</h2>
+      <h2 className="mb-4 text-xl">Search my route</h2>
       <div className="flex items-center space-x-4">
         <Image className="h-8 w-8" src={BlueCircle} width={32} height={32} />
         <AddressCombobox
@@ -446,6 +445,7 @@ const Home: NextPage<any> = () => {
                     otherUser={popupUser}
                     extendUser={extendPublicUser}
                     onViewRouteClick={onViewRouteClick}
+                    onViewRequest={handleUserSelect}
                     onClose={() => {
                       setPopupUser(null);
                     }}

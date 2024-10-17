@@ -85,6 +85,8 @@ export const mapboxRouter = router({
         startPOICoordLng: true,
         startPOICoordLat: true,
         startPOILocation: true,
+        coopEndDate: true,
+        coopStartDate: true,
         startTime: true,
         endTime: true,
         startCoordLat: true,

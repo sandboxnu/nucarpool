@@ -35,7 +35,6 @@ export const SentCard = (props: SentCardProps): JSX.Element => {
     onPress: () => handleManageSent(),
     color: "bg-northeastern-red",
   };
-  console.log(latestMessage);
   return (
     <>
       <div onClick={props.onClick} className="cursor-pointer">

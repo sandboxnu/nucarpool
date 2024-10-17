@@ -12,6 +12,7 @@ interface SidebarContentProps {
   disabled: boolean;
   onCardClick: (userId: string) => void;
   selectedUser: EnhancedPublicUser | null;
+  onViewRequest: (userId: string) => void;
 }
 
 const emptyMessages = {
@@ -49,7 +50,8 @@ const renderUserCard = (
   otherUser: EnhancedPublicUser,
   onViewRouteClick: (user: User, otherUser: PublicUser) => void,
   onCardClick: (userId: string) => void,
-  selectedUser: EnhancedPublicUser | null
+  selectedUser: EnhancedPublicUser | null,
+  onViewRequest: (userId: string) => void
 ): JSX.Element => {
   const handleClick = () => onCardClick(otherUser.id);
   switch (subType) {
@@ -59,6 +61,7 @@ const renderUserCard = (
           key={otherUser.id}
           otherUser={otherUser}
           onViewRouteClick={onViewRouteClick}
+          onViewRequest={onViewRequest}
         />
       );
     case "favorites":
@@ -67,6 +70,7 @@ const renderUserCard = (
           key={otherUser.id}
           otherUser={otherUser}
           onViewRouteClick={onViewRouteClick}
+          onViewRequest={onViewRequest}
         />
       );
     case "sent":
@@ -99,7 +103,6 @@ const renderUserCard = (
 };
 
 export const SidebarContent = (props: SidebarContentProps) => {
-  console.log(props.selectedUser);
   return (
     <div id="scrollableDiv" className="overflow-auto">
       {props.userCardList.length === 0 ||
@@ -114,7 +117,8 @@ export const SidebarContent = (props: SidebarContentProps) => {
             otherUser,
             props.onViewRouteClick,
             props.onCardClick,
-            props.selectedUser
+            props.selectedUser,
+            props.onViewRequest
           )
         )
       )}
