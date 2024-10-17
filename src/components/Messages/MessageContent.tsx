@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useRef } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import { EnhancedPublicUser } from "../../utils/types";
 import { format, isSameDay } from "date-fns";
 import { trpc } from "../../utils/trpc";
@@ -8,50 +14,79 @@ interface MessageContentProps {
   selectedUser: EnhancedPublicUser;
 }
 
+import { isEqual } from "lodash";
+
 const MessageContent = ({ selectedUser }: MessageContentProps) => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const request = selectedUser.incomingRequest || selectedUser.outgoingRequest;
   const utils = trpc.useContext();
   const user = useContext(UserContext);
 
-  const conversationMessages = request?.conversation?.messages || [];
+  const request = useMemo(
+    () => selectedUser.incomingRequest || selectedUser.outgoingRequest,
+    [selectedUser.incomingRequest, selectedUser.outgoingRequest]
+  );
 
-  const initialMessage = {
-    id: "initial",
-    content: request?.message,
-    userId: request?.fromUserId,
-    dateCreated: request?.dateCreated || new Date().toISOString(),
-    isRead: true,
-  };
+  // Persist default date r
+  const defaultDateCreatedRef = useRef(new Date());
 
-  const allMessages = [initialMessage, ...conversationMessages];
+  const initialMessage = useMemo(() => {
+    const dateCreated = request?.dateCreated || defaultDateCreatedRef.current;
+    return {
+      id: "initial",
+      content: request?.message || "",
+      conversationId: "initial",
+      userId: request?.fromUserId || "",
+      dateCreated,
+      isRead: true,
+    };
+  }, [request?.message, request?.dateCreated, request?.fromUserId]);
 
-  const markMessagesAsRead = trpc.user.messages.markMessagesAsRead.useMutation({
-    onSuccess: () => {
-      utils.user.requests.me.invalidate();
-    },
-    onError: (error) => {
-      console.error("Failed to mark messages as read:", error);
-    },
-  });
+  const conversationMessages = useMemo(() => {
+    return request?.conversation?.messages || [];
+  }, [request?.conversation?.messages]);
 
-  // Effect to mark messages as read when the component mounts
+  const allMessages = useMemo(() => {
+    if (request?.message) {
+      return [initialMessage, ...conversationMessages];
+    }
+    return [...conversationMessages];
+  }, [initialMessage, conversationMessages, request?.message]);
+
+  const onSuccess = useCallback(() => {
+    utils.user.messages.getUnreadMessageCount.invalidate();
+  }, [utils.user.messages.getUnreadMessageCount]);
+
+  const onError = useCallback((error: any) => {
+    console.error("Failed to mark messages as read:", error);
+  }, []);
+
+  const markMessagesAsRead = trpc.user.messages.markMessagesAsRead.useMutation(
+    useMemo(
+      () => ({
+        onSuccess,
+        onError,
+      }),
+      [onSuccess, onError]
+    )
+  );
+
+  // useref to store previous unread messages
+  const prevUnreadMessageIdsRef = useRef<string[]>([]);
+
   useEffect(() => {
     if (user) {
       const unreadMessageIds = allMessages
-        .filter(
-          (message) =>
-            !message.isRead &&
-            message.userId !== user.id &&
-            message.id !== "initial"
-        )
+        .filter((message) => !message.isRead && message.userId !== user.id)
         .map((message) => message.id);
 
-      if (unreadMessageIds.length > 0) {
-        markMessagesAsRead.mutate({ messageIds: unreadMessageIds });
+      if (!isEqual(unreadMessageIds, prevUnreadMessageIdsRef.current)) {
+        if (unreadMessageIds.length > 0) {
+          markMessagesAsRead.mutate({ messageIds: unreadMessageIds });
+        }
+        prevUnreadMessageIdsRef.current = unreadMessageIds;
       }
     }
-  }, []);
+  }, [user, allMessages]);
 
   // Group messages by date
   const messagesByDate = [];

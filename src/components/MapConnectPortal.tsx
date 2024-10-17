@@ -7,6 +7,7 @@ interface ConnectPortalProps {
   otherUser: PublicUser | null;
   extendUser: (user: PublicUser) => EnhancedPublicUser;
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
+  onViewRequest: (userId: string) => void;
   onClose: () => void;
 }
 
@@ -26,6 +27,7 @@ export const MapConnectPortal = (props: ConnectPortalProps) => {
                   <ConnectCard
                     otherUser={props.extendUser(props.otherUser)}
                     onViewRouteClick={props.onViewRouteClick}
+                    onViewRequest={props.onViewRequest}
                     onClose={(string) => {
                       string == "connect" ? props.onClose() : {};
                     }}

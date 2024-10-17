@@ -171,17 +171,33 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
           </p>
         </div>
       </div>
+      {/* Sixth row - coop Start and end dates */}
+      {props.otherUser.coopStartDate && props.otherUser.coopEndDate && (
+        <div className="m-0 flex w-full justify-between align-middle">
+          <div className="flex text-sm font-normal">
+            <p className="pr-1">From:</p>
+            <p className="font-semibold">
+              {dayjs(props.otherUser.coopStartDate).format("MMMM")}
+            </p>
+            <p className="px-2 font-semibold">|</p>
+            <p className="pr-1">To:</p>
+            <p className="font-semibold">
+              {dayjs(props.otherUser.coopEndDate).format("MMMM")}
+            </p>
+          </div>
+        </div>
+      )}
 
-      {/* Sixth row - Seats avaliable*/}
+      {/* Seventh row - Seats avaliable*/}
 
       {props.otherUser.role === "DRIVER" && (
         <div className="flex flex-row text-sm">
-          <div className="mr-1">Seats Available: </div>
+          <div className="mr-1">Seats Available:</div>
           <div className="font-semibold">{props.otherUser.seatAvail}</div>
         </div>
       )}
 
-      {/* Seventh row - Buttons*/}
+      {/* 8th row - Buttons*/}
       {props.onViewRouteClick && props.rightButton ? (
         <div className="flex flex-row justify-between gap-2">
           <button

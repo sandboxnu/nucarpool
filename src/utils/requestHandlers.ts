@@ -124,7 +124,6 @@ export const createRequestHandlers = (
   ) => {
     if (validateRequestAcceptance(user, otherUser)) {
       await initiateGroup(user, otherUser);
-      await handleDelete(request.id);
       toast.success(
         `${otherUser.preferredName}'s request to carpool with you has been accepted.`
       );

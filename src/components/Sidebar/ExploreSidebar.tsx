@@ -9,6 +9,7 @@ interface ExploreSidebarProps {
   favs: EnhancedPublicUser[];
   disabled: boolean;
   viewRoute: (user: User, otherUser: PublicUser) => void;
+  onViewRequest: (userId: string) => void;
 }
 
 const ExploreSidebar = (props: ExploreSidebarProps) => {
@@ -55,6 +56,7 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
         onViewRouteClick={props.viewRoute}
         onCardClick={() => {}}
         selectedUser={null}
+        onViewRequest={props.onViewRequest}
       />
     </div>
   );

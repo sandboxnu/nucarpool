@@ -33,6 +33,8 @@ export type MapUser = {
   daysWorking: string;
   startTime: Date | null;
   endTime: Date | null;
+  coopStartDate: Date | null;
+  coopEndDate: Date | null;
   preferredName: string;
   startPOILocation: string;
   startPOICoordLng: number;
@@ -67,6 +69,8 @@ export type PublicUser = {
   daysWorking: string;
   startTime: Date | null;
   endTime: Date | null;
+  coopStartDate: Date | null;
+  coopEndDate: Date | null;
   carpoolId: string | null;
 };
 

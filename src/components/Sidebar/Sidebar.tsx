@@ -23,7 +23,6 @@ interface SidebarProps {
 
 export const SidebarPage = (props: SidebarProps) => {
   let disabled = false;
-  console.log(props.selectedUser);
   if (props.role === "VIEWER") {
     disabled = true;
   }
@@ -34,6 +33,7 @@ export const SidebarPage = (props: SidebarProps) => {
         favs={props.favs}
         disabled={disabled}
         viewRoute={props.onViewRouteClick}
+        onViewRequest={props.onUserSelect}
       />
     );
   } else {

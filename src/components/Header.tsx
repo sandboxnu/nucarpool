@@ -63,7 +63,6 @@ const Header = (props: HeaderProps) => {
       return "rounded-xl p-4 font-medium text-xl text-white";
     }
   };
-  console.log(unreadMessagesCount);
   const renderSidebarOptions = ({
     sidebarValue,
     setSidebar,
