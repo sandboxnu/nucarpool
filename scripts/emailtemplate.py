@@ -25,20 +25,17 @@ templates = [
         "TemplateName": "DriverRequestTemplate",
         "SubjectPart": "New Carpool Request",
         "HtmlPart": """
-        <h1>New Carpool Request</h1>
         <p>Hello {{preferredName}},</p>
         <p>{{OtherUser}} has sent a request to join your Carpool group. Here's a preview of their message:</p>
-        <blockquote>{{message}}</blockquote>
+        <p>{{message}}</p>
         <p><a href="https://carpoolnu.com">Click here to accept or reject the request</a></p>
         """,
         "TextPart": """
-        New Carpool Request
-
         Hello {{preferredName}},
 
         {{OtherUser}} has sent a request to join your Carpool group. Here's a preview of their message:
 
-        "{{message}}"
+        {{message}}
 
         To accept or reject the request, visit: https://carpoolnu.com
         """
@@ -47,20 +44,17 @@ templates = [
         "TemplateName": "RiderRequestTemplate",
         "SubjectPart": "New Carpool Invitation",
         "HtmlPart": """
-        <h1>New Carpool Invitation</h1>
         <p>Hello {{preferredName}},</p>
         <p>{{OtherUser}} sent a request for you to join their Carpool group. Here's a preview of their message:</p>
-        <blockquote>{{message}}</blockquote>
+        <p>{{message}}</p>
         <p><a href="https://carpoolnu.com">Click here to see accept or reject the request</a></p>
         """,
         "TextPart": """
-        New Carpool Invitation
-
         Hello {{preferredName}},
 
         {{OtherUser}} sent a request for you to join their Carpool group. Here's a preview of their message:
 
-        "{{message}}"
+        {{message}}
 
         To accept or reject the request, visit: https://carpoolnu.com
         """
@@ -69,20 +63,17 @@ templates = [
         "TemplateName": "MessageNotificationTemplate",
         "SubjectPart": "New Message in Carpool NU",
         "HtmlPart": """
-        <h1>New Message in Carpool NU</h1>
         <p>Hello {{preferredName}},</p>
         <p>{{OtherUser}} sent you a message in Carpool NU:</p>
-        <blockquote>{{message}}</blockquote>
+        <p>{{message}}</p>
         <p><a href="https://carpoolnu.com">Click here to open Carpool NU</a></p>
         """,
         "TextPart": """
-        New Message in Carpool NU
-
         Hello {{preferredName}},
 
         {{OtherUser}} sent you a message in Carpool NU:
 
-        "{{message}}"
+        {{message}}
 
         To view the message, visit: https://carpoolnu.com
         """
@@ -91,14 +82,11 @@ templates = [
         "TemplateName": "DriverAcceptanceTemplate",
         "SubjectPart": "Request Accepted",
         "HtmlPart": """
-        <h1>Request Accepted</h1>
         <p>Hello {{preferredName}},</p>
         <p>{{OtherUser}} has accepted your request for them to join your group.</p>
         <p><a href="https://carpoolnu.com">Click here to open Carpool NU</a></p>
         """,
         "TextPart": """
-        Request Accepted
-
         Hello {{preferredName}},
 
         {{OtherUser}} has accepted your request for them to join your group.
@@ -110,14 +98,11 @@ templates = [
         "TemplateName": "RiderAcceptanceTemplate",
         "SubjectPart": "Request Accepted",
         "HtmlPart": """
-        <h1>Request Accepted</h1>
         <p>Hello {{preferredName}},</p>
         <p>{{OtherUser}} has accepted your request to join their Carpool group.</p>
         <p><a href="https://carpoolnu.com">Click here to open Carpool NU</a></p>
         """,
         "TextPart": """
-        Request Accepted
-
         Hello {{preferredName}},
 
         {{OtherUser}} has accepted your request to join their Carpool group.
