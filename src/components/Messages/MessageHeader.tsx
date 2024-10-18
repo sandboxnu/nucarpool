@@ -65,13 +65,13 @@ const MessageHeader = ({
           <>
             <button
               onClick={onReject}
-              className="md:px-15 mr-10 rounded-lg border-2 border-black bg-white py-2 text-center text-lg  font-medium text-black hover:bg-gray-100 sm:px-10 lg:px-20"
+              className="mr-10 rounded-lg border-2 border-black bg-white py-2 text-center text-lg font-medium  text-black hover:bg-gray-100 sm:px-10 md:px-12 lg:px-20"
             >
               Reject
             </button>
             <button
               onClick={onAccept}
-              className=" md:px-15 mr-10 rounded-lg  bg-northeastern-red py-2 text-center text-lg  font-medium text-white hover:bg-red-700 sm:px-10 lg:px-20"
+              className=" mr-10 rounded-lg bg-northeastern-red  py-2 text-center text-lg font-medium  text-white hover:bg-red-700 sm:px-10 md:px-12 lg:px-20"
             >
               Accept
             </button>
@@ -80,7 +80,7 @@ const MessageHeader = ({
         {hasOutgoingRequest && !hasIncomingRequest && !groupId && (
           <button
             onClick={onReject}
-            className=" mr-10 rounded-lg border-2 border-black bg-white px-20 py-2 text-center text-lg font-medium text-black hover:bg-gray-100"
+            className=" mr-10 rounded-lg border-2 border-black bg-white py-2 text-center text-lg font-medium text-black hover:bg-gray-100 md:px-12 lg:px-20"
           >
             Withdraw Request
           </button>
@@ -88,7 +88,7 @@ const MessageHeader = ({
         {groupId && (
           <button
             onClick={onReject}
-            className=" mr-10 rounded-lg border-2 border-black bg-white px-20 py-2 text-center text-lg font-medium text-black hover:bg-gray-100"
+            className=" mr-10 rounded-lg border-2 border-black bg-white py-2 text-center text-lg font-medium text-black hover:bg-gray-100 md:px-12 lg:px-20"
           >
             Leave Conversation
           </button>
@@ -96,7 +96,7 @@ const MessageHeader = ({
 
         <button
           onClick={handleClose}
-          className="flex h-14 w-14 cursor-pointer items-center  justify-center text-black md:text-2xl lg:text-3xl"
+          className="flex h-14 w-14 cursor-pointer items-center  justify-center text-3xl text-black"
           aria-label="Close"
         >
           &times;

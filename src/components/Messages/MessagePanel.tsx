@@ -7,6 +7,7 @@ import { trpc } from "../../utils/trpc";
 import { createRequestHandlers } from "../../utils/requestHandlers";
 import { UserContext } from "../../utils/userContext";
 import { User } from "@prisma/client";
+import { toast } from "react-toastify";
 
 interface MessagePanelProps {
   selectedUser: EnhancedPublicUser;
@@ -35,13 +36,46 @@ const MessagePanel = ({
     },
   });
 
+  const { mutate: sendMessageNotification } = 
+    trpc.user.emails.sendMessageNotification.useMutation({
+      onError: (error: any) => {
+        toast.error(`Something went wrong: ${error.message}`);
+      },
+      onSuccess() {
+        console.log("Message notification email sent successfully");
+      },
+    });
+
   const handleSendMessage = (content: string) => {
     const requestId =
       selectedUser.incomingRequest?.id || selectedUser.outgoingRequest?.id;
     if (!requestId) return;
 
     sendMessage.mutate({ requestId, content });
+
+    // Send email notification
+    if (user && user.email && selectedUser.email) {
+      sendMessageNotification({
+        senderName: user.preferredName || "",
+        senderEmail: user.email,
+        receiverName: selectedUser.preferredName || "",
+        receiverEmail: selectedUser.email,
+        messageText: content,
+      });
+    } else {
+      console.error("Unable to send message notification: Missing email address");
+    }
   };
+
+  const { mutate: sendAcceptanceNotification } = 
+    trpc.user.emails.sendAcceptanceNotification.useMutation({
+      onError: (error: any) => {
+        toast.error(`Failed to send acceptance notification: ${error.message}`);
+      },
+      onSuccess() {
+        console.log("Acceptance notification email sent successfully");
+      },
+    });
 
   const handleAccept = async () => {
     if (!user || !selectedUser) return;
@@ -50,6 +84,20 @@ const MessagePanel = ({
     if (!request) return;
 
     await handleAcceptRequest(user, selectedUser, request);
+
+    // Send acceptance notification email
+    if (user.email && selectedUser.email) {
+      sendAcceptanceNotification({
+        senderName: user.preferredName || "",
+        senderEmail: user.email,
+        receiverName: selectedUser.preferredName || "",
+        receiverEmail: selectedUser.email,
+        isDriver: user.role === 'DRIVER',
+      });
+    } else {
+      console.error("Unable to send acceptance notification: Missing email address");
+    }
+
     onCloseConversation(""); // Close the conversation after accepting
   };
 

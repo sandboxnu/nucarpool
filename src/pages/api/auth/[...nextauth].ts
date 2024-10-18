@@ -48,17 +48,27 @@ export const authOptions: NextAuthOptions = {
     },
   },
   adapter: CustomPrismaAdapter(prisma),
-  providers: [
-    GoogleProvider({
-      clientId: serverEnv.GOOGLE_CLIENT_ID,
-      clientSecret: serverEnv.GOOGLE_CLIENT_SECRET,
-    }),
-    AzureADProvider({
-      clientId: serverEnv.AZURE_CLIENT_ID,
-      clientSecret: serverEnv.AZURE_CLIENT_SECRET,
-      tenantId: serverEnv.AZURE_TENANT_ID,
-    }),
-  ],
+
+  providers:
+    process.env.NEXT_PUBLIC_ENV === "staging"
+      ? [
+          GoogleProvider({
+            clientId: serverEnv.GOOGLE_CLIENT_ID,
+            clientSecret: serverEnv.GOOGLE_CLIENT_SECRET,
+          }),
+          AzureADProvider({
+            clientId: serverEnv.AZURE_CLIENT_ID,
+            clientSecret: serverEnv.AZURE_CLIENT_SECRET,
+            tenantId: serverEnv.AZURE_TENANT_ID,
+          }),
+        ]
+      : [
+          AzureADProvider({
+            clientId: serverEnv.AZURE_CLIENT_ID,
+            clientSecret: serverEnv.AZURE_CLIENT_SECRET,
+            tenantId: serverEnv.AZURE_TENANT_ID,
+          }),
+        ],
 };
 
 export default NextAuth(authOptions);

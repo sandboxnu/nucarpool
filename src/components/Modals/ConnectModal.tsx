@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useToasts } from "react-toast-notifications";
 import { EnhancedPublicUser, User } from "../../utils/types";
 import { toast } from "react-toastify";
+import { BaseEmailSchema } from "../../utils/email";
 import { trpc } from "../../utils/trpc";
 
 interface ConnectModalProps {
@@ -38,7 +39,7 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
     },
   });
   const { mutate: sendConnectEmail } =
-    trpc.user.emails.connectEmail.useMutation({
+    trpc.user.emails.sendRequestNotification.useMutation({
       onError: (error: any) => {
         toast.error(`Something went wrong: ${error.message}`);
       },
@@ -51,11 +52,12 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
   const handleOnClick = () => {
     if (props.user.email && props.otherUser.email) {
       sendConnectEmail({
-        sendingUserName: props.user.preferredName,
-        sendingUserEmail: props.user.email,
-        receivingUserName: props.otherUser.preferredName,
-        receivingUserEmail: props.otherUser.email,
-        body: customMessage,
+        senderName: props.user.preferredName,
+        senderEmail: props.user.email,
+        receiverName: props.otherUser.preferredName,
+        receiverEmail: props.otherUser.email,
+        isDriver: props.otherUser.role === "DRIVER",
+        messagePreview: customMessage,
       });
       createRequests({
         fromId: props.user.id,
