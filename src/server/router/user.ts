@@ -55,8 +55,8 @@ export const userRouter = router({
         daysWorking: z.string(),
         startTime: z.optional(z.string()),
         endTime: z.optional(z.string()),
-        coopEndDate: z.date(),
-        coopStartDate: z.date(),
+        coopStartDate: z.date().nullable(),
+        coopEndDate: z.date().nullable(),
         bio: z.string(),
         licenseSigned: z.boolean(),
       })

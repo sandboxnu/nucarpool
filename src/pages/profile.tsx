@@ -82,12 +82,26 @@ const onboardSchema = z
     bio: z.string().optional(),
     startTime: z.date().nullable().optional(),
     endTime: z.date().nullable().optional(),
-    coopStartDate: z.date(),
-    coopEndDate: z.date(),
+    coopStartDate: z.date().nullable().optional(),
+    coopEndDate: z.date().nullable().optional(),
     timeDiffers: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.role !== Role.VIEWER) {
+      if (!data.coopEndDate) {
+        ctx.addIssue({
+          code: custom,
+          path: ["coopEndDate"],
+          message: "Cannot be empty",
+        });
+      }
+      if (!data.coopStartDate) {
+        ctx.addIssue({
+          code: custom,
+          path: ["coopStartDate"],
+          message: "Cannot be empty",
+        });
+      }
       if (!data.seatAvail && data.seatAvail !== 0)
         ctx.addIssue({
           code: custom,
@@ -219,8 +233,8 @@ const Profile: NextPage = () => {
       startTime: undefined,
       endTime: undefined,
       timeDiffers: false,
-      coopStartDate: undefined,
-      coopEndDate: undefined,
+      coopStartDate: null,
+      coopEndDate: null,
       bio: "",
     },
     resolver: zodResolver(onboardSchema),
@@ -475,7 +489,7 @@ const Profile: NextPage = () => {
                   <ProfileHeader>Locations</ProfileHeader>
                   {/* Starting Location field  */}
                   <EntryLabel
-                    required={true}
+                    required={!isViewer}
                     error={errors.startAddress}
                     label="Home Address"
                   />
@@ -503,7 +517,7 @@ const Profile: NextPage = () => {
                 {/* Role field  */}
                 <BottomProfileSection>
                   <EntryLabel
-                    required={true}
+                    required={!isViewer}
                     error={errors.companyName}
                     label="Workplace Name"
                   />
@@ -519,7 +533,7 @@ const Profile: NextPage = () => {
                   />
                   {/* Company Address field  */}
                   <EntryLabel
-                    required={true}
+                    required={!isViewer}
                     error={errors.companyAddress}
                     label="Workplace Address"
                   />
@@ -589,7 +603,7 @@ const Profile: NextPage = () => {
                     <div className="flex w-full justify-between gap-6 pb-4 md:w-96">
                       <div className="flex flex-1 flex-col gap-2">
                         <EntryLabel
-                          required={true}
+                          required={!isViewer}
                           error={errors.startTime}
                           label="Start Time"
                         />
@@ -602,7 +616,7 @@ const Profile: NextPage = () => {
                       </div>
                       <div className="flex flex-1 flex-col gap-2">
                         <EntryLabel
-                          required={true}
+                          required={!isViewer}
                           error={errors.endTime}
                           label="End Time"
                         />
@@ -628,12 +642,14 @@ const Profile: NextPage = () => {
               <ProfileColumn>
                 <ProfileHeader>
                   Co-op Term Dates{" "}
-                  <span className="text-northeastern-red">*</span>
+                  {!isViewer && (
+                    <span className="text-northeastern-red">*</span>
+                  )}
                 </ProfileHeader>
                 <div className="flex w-full gap-4">
                   <div className="flex flex-1 flex-col">
                     <EntryLabel
-                      required={true}
+                      required={!isViewer}
                       error={errors.coopStartDate}
                       label="Start Date"
                     />
@@ -651,7 +667,7 @@ const Profile: NextPage = () => {
                   </div>
                   <div className="flex flex-1 flex-col">
                     <EntryLabel
-                      required={true}
+                      required={!isViewer}
                       error={errors.coopEndDate}
                       label="End Date"
                     />
