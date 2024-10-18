@@ -1,27 +1,70 @@
-import { SendEmailCommandInput } from "@aws-sdk/client-ses";
+import { SendTemplatedEmailCommandInput } from "@aws-sdk/client-ses";
 
-export const generateConnectEmailparams = (schema: emailSchema) => {
-  console.log(schema.sendingUserEmail);
-  const params = {
+export interface BaseEmailSchema {
+  senderName: string;
+  senderEmail: string;
+  receiverName: string;
+  receiverEmail: string;
+}
+
+export interface RequestEmailSchema extends BaseEmailSchema {
+  messagePreview: string;
+  isDriver: boolean;
+}
+
+export interface MessageEmailSchema extends BaseEmailSchema {
+  messageText: string;
+}
+
+export interface AcceptanceEmailSchema extends BaseEmailSchema {
+  isDriver: boolean;
+}
+
+export function generateEmailParams(
+  schema: RequestEmailSchema | MessageEmailSchema | AcceptanceEmailSchema,
+  type: 'request' | 'message' | 'acceptance'
+): SendTemplatedEmailCommandInput {
+  let templateName: string;
+  let templateData: Record<string, any>;
+
+  switch (type) {
+    case 'request':
+      const requestSchema = schema as RequestEmailSchema;
+      templateName = requestSchema.isDriver ? 'DriverRequestTemplate' : 'RiderRequestTemplate';
+      templateData = {
+        preferredName: requestSchema.receiverName,
+        OtherUser: requestSchema.senderName,
+        message: requestSchema.messagePreview,
+      };
+      break;
+    case 'message':
+      const messageSchema = schema as MessageEmailSchema;
+      templateName = 'MessageNotificationTemplate';
+      templateData = {
+        preferredName: messageSchema.receiverName,
+        OtherUser: messageSchema.senderName,
+        message: messageSchema.messageText,
+      };
+      break;
+    case 'acceptance':
+      const acceptanceSchema = schema as AcceptanceEmailSchema;
+      templateName = acceptanceSchema.isDriver ? 'DriverAcceptanceTemplate' : 'RiderAcceptanceTemplate';
+      templateData = {
+        preferredName: acceptanceSchema.receiverName,
+        OtherUser: acceptanceSchema.senderName,
+      };
+      break;
+    default:
+      throw new Error('Invalid email type');
+  }
+
+  return {
     Source: "no-reply@carpoolnu.com",
     Destination: {
-      ToAddresses: [schema.receivingUserEmail],
-      CcAddresses: [schema.sendingUserEmail],
+      ToAddresses: [schema.receiverEmail],
+      CcAddresses: [schema.senderEmail],
     },
-    Template: "UserReceivedRequest",
-    TemplateData: JSON.stringify({
-      preferredName: schema.receivingUserName,
-      OtherUser: schema.sendingUserName,
-      message: schema.body,
-    }),
+    Template: templateName,
+    TemplateData: JSON.stringify(templateData),
   };
-  return params;
-};
-
-export interface emailSchema {
-  sendingUserName: string;
-  sendingUserEmail: string;
-  receivingUserName: string;
-  receivingUserEmail: string;
-  body: string;
 }

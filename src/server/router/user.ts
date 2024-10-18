@@ -8,9 +8,16 @@ import _ from "lodash";
 import { favoritesRouter } from "./user/favorites";
 import { groupsRouter } from "./user/groups";
 import { requestsRouter } from "./user/requests";
+import { messageRouter } from "./user/message";
 import { recommendationsRouter } from "./user/recommendations";
 import { emailsRouter } from "./user/email";
-
+import {
+  generatePresignedUrl,
+  getPresignedImageUrl,
+} from "../../utils/uploadToS3";
+const getPresignedDownloadUrlInput = z.object({
+  userId: z.string().optional(),
+});
 // user router to get information about or edit users
 export const userRouter = router({
   me: protectedRouter.query(async ({ ctx }) => {
@@ -48,6 +55,8 @@ export const userRouter = router({
         daysWorking: z.string(),
         startTime: z.optional(z.string()),
         endTime: z.optional(z.string()),
+        coopEndDate: z.date(),
+        coopStartDate: z.date(),
         bio: z.string(),
         licenseSigned: z.boolean(),
       })
@@ -59,6 +68,7 @@ export const userRouter = router({
       const endTimeDate = input.endTime
         ? new Date(Date.parse(input.endTime))
         : undefined;
+
       const [startPOIData, endPOIData] = await Promise.all([
         generatePoiData(input.startCoordLng, input.startCoordLat),
         generatePoiData(input.companyCoordLng, input.companyCoordLat),
@@ -90,6 +100,8 @@ export const userRouter = router({
           daysWorking: input.daysWorking,
           startTime: startTimeDate,
           endTime: endTimeDate,
+          coopEndDate: input.coopEndDate,
+          coopStartDate: input.coopStartDate,
           bio: input.bio,
           licenseSigned: input.licenseSigned,
         },
@@ -98,8 +110,47 @@ export const userRouter = router({
       return user;
     }),
 
+  getPresignedUrl: protectedRouter
+    .input(
+      z.object({
+        contentType: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { contentType } = input;
+      const fileName = ctx.session.user?.id;
+      if (fileName) {
+        try {
+          const url = await generatePresignedUrl(fileName, contentType);
+          return { url };
+        } catch (error) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to generate a pre-signed URL",
+          });
+        }
+      }
+    }),
+  getPresignedDownloadUrl: protectedRouter
+    .input(getPresignedDownloadUrlInput)
+    .query(async ({ ctx, input }) => {
+      const userId = input.userId ?? ctx.session.user?.id;
+      if (userId) {
+        try {
+          const url = await getPresignedImageUrl(userId);
+          return { url };
+        } catch (error) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to generate a pre-signed URL",
+          });
+        }
+      }
+    }),
+
   //merging secondary user routes
   favorites: favoritesRouter,
+  messages: messageRouter,
   recommendations: recommendationsRouter,
   requests: requestsRouter,
   groups: groupsRouter,

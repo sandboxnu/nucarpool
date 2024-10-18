@@ -68,7 +68,7 @@ const ControlledAddressCombobox = (props: ControlledAddressComboboxProps) => {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Combobox.Options className="absolute w-full rounded-md bg-white text-base shadow-lg focus:outline-none ">
+            <Combobox.Options className="absolute z-10 w-full rounded-md bg-white text-base shadow-lg focus:outline-none ">
               {props.addressSuggestions.length === 0 ? (
                 <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
                   Nothing found.

@@ -1,4 +1,4 @@
-import { Request, Role } from "@prisma/client";
+import { Role } from "@prisma/client";
 import { Status } from "@prisma/client";
 import { Feature } from "geojson";
 import type { AppRouter } from "../server/router";
@@ -33,6 +33,8 @@ export type MapUser = {
   daysWorking: string;
   startTime: Date | null;
   endTime: Date | null;
+  coopStartDate: Date | null;
+  coopEndDate: Date | null;
   preferredName: string;
   startPOILocation: string;
   startPOICoordLng: number;
@@ -67,6 +69,8 @@ export type PublicUser = {
   daysWorking: string;
   startTime: Date | null;
   endTime: Date | null;
+  coopStartDate: Date | null;
+  coopEndDate: Date | null;
   carpoolId: string | null;
 };
 
@@ -92,14 +96,41 @@ export type ButtonInfo = {
 };
 
 export type ResolvedRequest = {
-  fromUser: User | PublicUser | null;
-  toUser: User | PublicUser | null;
+  fromUser: PublicUser | null;
+  toUser: PublicUser | null;
   id: string;
 };
 
 type Admin = {
   iso_3166_1_alpha3: string;
   iso_3166_1: string;
+};
+
+export type Request = {
+  id: string;
+  message: string;
+  fromUserId: string;
+  toUserId: string;
+  fromUser: User | PublicUser;
+  toUser: User | PublicUser;
+  conversation?: Conversation | null;
+  conversationId: string | null;
+  dateCreated: Date;
+};
+
+export type Conversation = {
+  id: string;
+  requestId: string;
+  messages: Message[];
+};
+
+export type Message = {
+  id: string;
+  conversationId: string;
+  content: string;
+  isRead: boolean;
+  userId: string;
+  dateCreated: Date;
 };
 
 type Notification = {

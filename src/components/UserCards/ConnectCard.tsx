@@ -16,6 +16,7 @@ interface ConnectCardProps {
   otherUser: EnhancedPublicUser;
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
   onClose?: (action: string) => void;
+  onViewRequest: (userId: string) => void;
 }
 
 export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
@@ -85,6 +86,7 @@ export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
           <ConnectModal
             user={user}
             otherUser={props.otherUser}
+            onViewRequest={props.onViewRequest}
             onClose={onClose}
           />,
           document.body

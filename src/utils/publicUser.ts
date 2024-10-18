@@ -25,6 +25,8 @@ export const convertToPublic = (user: User): PublicUser => {
     daysWorking: user.daysWorking,
     startTime: user.startTime,
     endTime: user.endTime,
+    coopEndDate: user.coopEndDate,
+    coopStartDate: user.coopStartDate,
     startPOILocation: user.startPOILocation,
     startPOICoordLng: user.startPOICoordLng,
     startPOICoordLat: user.startPOICoordLat,

@@ -10,6 +10,9 @@ interface SidebarContentProps {
   userCardList: EnhancedPublicUser[];
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
   disabled: boolean;
+  onCardClick: (userId: string) => void;
+  selectedUser: EnhancedPublicUser | null;
+  onViewRequest: (userId: string) => void;
 }
 
 const emptyMessages = {
@@ -45,8 +48,12 @@ const emptyMessage = (card: string, disabled: boolean): string => {
 const renderUserCard = (
   subType: string,
   otherUser: EnhancedPublicUser,
-  onViewRouteClick: (user: User, otherUser: PublicUser) => void
+  onViewRouteClick: (user: User, otherUser: PublicUser) => void,
+  onCardClick: (userId: string) => void,
+  selectedUser: EnhancedPublicUser | null,
+  onViewRequest: (userId: string) => void
 ): JSX.Element => {
+  const handleClick = () => onCardClick(otherUser.id);
   switch (subType) {
     case "recommendations":
       return (
@@ -54,6 +61,7 @@ const renderUserCard = (
           key={otherUser.id}
           otherUser={otherUser}
           onViewRouteClick={onViewRouteClick}
+          onViewRequest={onViewRequest}
         />
       );
     case "favorites":
@@ -62,6 +70,7 @@ const renderUserCard = (
           key={otherUser.id}
           otherUser={otherUser}
           onViewRouteClick={onViewRouteClick}
+          onViewRequest={onViewRequest}
         />
       );
     case "sent":
@@ -71,6 +80,8 @@ const renderUserCard = (
             key={otherUser.id}
             otherUser={otherUser}
             onViewRouteClick={onViewRouteClick}
+            onClick={handleClick}
+            selectedUser={selectedUser}
           />
         );
       }
@@ -81,6 +92,8 @@ const renderUserCard = (
             key={otherUser.id}
             otherUser={otherUser}
             onViewRouteClick={onViewRouteClick}
+            onClick={handleClick}
+            selectedUser={selectedUser}
           />
         );
       }
@@ -99,7 +112,14 @@ export const SidebarContent = (props: SidebarContentProps) => {
         </div>
       ) : (
         props.userCardList.map((otherUser: EnhancedPublicUser) =>
-          renderUserCard(props.subType, otherUser, props.onViewRouteClick)
+          renderUserCard(
+            props.subType,
+            otherUser,
+            props.onViewRouteClick,
+            props.onCardClick,
+            props.selectedUser,
+            props.onViewRequest
+          )
         )
       )}
     </div>

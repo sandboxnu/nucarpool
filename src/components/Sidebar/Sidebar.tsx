@@ -17,6 +17,8 @@ interface SidebarProps {
   received: EnhancedPublicUser[];
   sent: EnhancedPublicUser[];
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
+  onUserSelect: (userId: string) => void;
+  selectedUser: EnhancedPublicUser | null;
 }
 
 export const SidebarPage = (props: SidebarProps) => {
@@ -31,6 +33,7 @@ export const SidebarPage = (props: SidebarProps) => {
         favs={props.favs}
         disabled={disabled}
         viewRoute={props.onViewRouteClick}
+        onViewRequest={props.onUserSelect}
       />
     );
   } else {
@@ -40,6 +43,8 @@ export const SidebarPage = (props: SidebarProps) => {
         sent={props.sent.reverse()}
         disabled={disabled}
         viewRoute={props.onViewRouteClick}
+        onUserSelect={props.onUserSelect}
+        selectedUser={props.selectedUser}
       />
     );
   }

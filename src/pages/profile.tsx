@@ -38,7 +38,10 @@ import ControlledAddressCombobox from "../components/Profile/ControlledAddressCo
 import { getSession, useSession } from "next-auth/react";
 import { createPortal } from "react-dom";
 import { ComplianceModal } from "../components/CompliancePortal";
+import ProfilePicture from "../components/Profile/ProfilePicture";
 import Spinner from "../components/Spinner";
+import { getPresignedImageUrl } from "../utils/uploadToS3";
+import { userInfo } from "node:os";
 
 // Inputs to the onboarding form.
 export type OnboardingFormInputs = {
@@ -46,6 +49,7 @@ export type OnboardingFormInputs = {
   status: Status;
   seatAvail: number;
   companyName: string;
+  profilePicture: string;
   companyAddress: string;
   startAddress: string;
   preferredName: string;
@@ -53,6 +57,8 @@ export type OnboardingFormInputs = {
   daysWorking: boolean[];
   startTime: Date | null;
   endTime: Date | null;
+  coopStartDate: Date | null;
+  coopEndDate: Date | null;
   timeDiffers: boolean;
   bio: string;
 };
@@ -76,6 +82,8 @@ const onboardSchema = z
     bio: z.string().optional(),
     startTime: z.date().nullable().optional(),
     endTime: z.date().nullable().optional(),
+    coopStartDate: z.date(),
+    coopEndDate: z.date(),
     timeDiffers: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
@@ -150,12 +158,46 @@ const Profile: NextPage = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const utils = trpc.useContext();
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const useUploadFile = (selectedFile: File | null) => {
+    const { data: presignedData, error } = trpc.user.getPresignedUrl.useQuery(
+      {
+        contentType: selectedFile?.type || "",
+      },
+      { enabled: !!selectedFile }
+    );
+    const uploadFile = async () => {
+      if (presignedData?.url && selectedFile) {
+        const url = presignedData.url;
+
+        const response = await fetch(url, {
+          method: "PUT",
+          headers: {
+            "Content-Type": selectedFile.type,
+          },
+          body: selectedFile,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to upload file: ${response.statusText}`);
+        }
+
+        console.log("File uploaded successfully!");
+      }
+    };
+
+    return { uploadFile, error };
+  };
+  const { uploadFile, error } = useUploadFile(selectedFile);
+
   const { data: session } = useSession();
   const { data: user } = trpc.user.me.useQuery(undefined, {
     refetchOnMount: true,
   });
   const {
     register,
+    setValue,
     formState: { errors },
     watch,
     handleSubmit,
@@ -168,6 +210,7 @@ const Profile: NextPage = () => {
       status: Status.ACTIVE,
       seatAvail: 0,
       companyName: "",
+      profilePicture: "",
       companyAddress: "",
       startAddress: "",
       preferredName: "",
@@ -176,13 +219,27 @@ const Profile: NextPage = () => {
       startTime: undefined,
       endTime: undefined,
       timeDiffers: false,
+      coopStartDate: undefined,
+      coopEndDate: undefined,
       bio: "",
     },
     resolver: zodResolver(onboardSchema),
   });
   const role = watch("role");
   const isViewer = role === "VIEWER";
-
+  const handleMonthChange = (field: any) => (event: any) => {
+    const [year, month] = event.target.value.split("-").map(Number);
+    const lastDay = new Date(year, month, 0);
+    setValue(field, lastDay);
+  };
+  const formatDateToMonth = (date: Date | null) => {
+    if (!date) {
+      return undefined;
+    }
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    return `${year}-${month}`;
+  };
   const [companyAddressSuggestions, setCompanyAddressSuggestions] = useState<
     CarpoolFeature[]
   >([]);
@@ -237,6 +294,8 @@ const Profile: NextPage = () => {
       daysWorking: user.daysWorking.split(",").map((bit) => bit === "1"),
       startTime: user.startTime,
       endTime: user.endTime,
+      coopStartDate: user.coopStartDate!,
+      coopEndDate: user.coopEndDate!,
       timeDiffers: false,
       bio: user.bio,
     });
@@ -294,7 +353,13 @@ const Profile: NextPage = () => {
       .join(",");
 
     const sessionName = session?.user?.name ?? "";
-
+    if (selectedFile) {
+      try {
+        await uploadFile();
+      } catch (error) {
+        console.error("File upload failed:", error);
+      }
+    }
     editUserMutation.mutate({
       role: userInfo.role,
       status: userInfo.status,
@@ -315,6 +380,8 @@ const Profile: NextPage = () => {
       startTime: userInfo.startTime?.toISOString(),
       endTime: userInfo.endTime?.toISOString(),
       bio: userInfo.bio,
+      coopStartDate: userInfo.coopStartDate!,
+      coopEndDate: userInfo.coopEndDate!,
       licenseSigned: true,
     });
   };
@@ -473,120 +540,219 @@ const Profile: NextPage = () => {
                   {errors.companyAddress && (
                     <ErrorDisplay>{errors.companyAddress.message}</ErrorDisplay>
                   )}
+                  <CommutingScheduleSection>
+                    <ProfileHeader className={"mt-4"}>
+                      Commuting Schedule
+                    </ProfileHeader>
+                    {/* Days working field  */}
+                    <div className="mb-2  aspect-[7/1] w-full max-w-[360px] md:my-4">
+                      <div className="flex h-full w-full items-center justify-evenly ">
+                        {daysOfWeek.map((day, index) => (
+                          <Controller
+                            key={day + index.toString()}
+                            name={`daysWorking.${index}`}
+                            control={control}
+                            render={({
+                              field: { onChange, value },
+                              formState: { defaultValues },
+                            }) => (
+                              <Checkbox
+                                key={day + index.toString()}
+                                sx={{
+                                  input: { width: 1, height: 1 },
+                                  aspectRatio: 1,
+                                  width: 1,
+                                  height: 1,
+                                  padding: 0,
+                                }}
+                                disabled={isViewer}
+                                checked={value}
+                                onChange={onChange}
+                                checkedIcon={
+                                  <DayBox day={day} isSelected={true} />
+                                }
+                                icon={<DayBox day={day} isSelected={false} />}
+                              />
+                            )}
+                          />
+                        ))}
+                      </div>
+
+                      {errors.daysWorking && (
+                        <ErrorDisplay>
+                          {errors.daysWorking.message}
+                        </ErrorDisplay>
+                      )}
+                    </div>
+
+                    {/* Start/End Time Fields  */}
+                    <div className="flex w-full justify-between gap-6 pb-4 md:w-96">
+                      <div className="flex flex-1 flex-col gap-2">
+                        <EntryLabel
+                          required={true}
+                          error={errors.startTime}
+                          label="Start Time"
+                        />
+                        <ControlledTimePicker
+                          isDisabled={isViewer}
+                          control={control}
+                          name={"startTime"}
+                          value={user?.startTime ? user.startTime : undefined}
+                        />
+                      </div>
+                      <div className="flex flex-1 flex-col gap-2">
+                        <EntryLabel
+                          required={true}
+                          error={errors.endTime}
+                          label="End Time"
+                        />
+                        <ControlledTimePicker
+                          isDisabled={isViewer}
+                          control={control}
+                          name={"endTime"}
+                          value={user?.endTime ? user.endTime : undefined}
+                        />
+                      </div>
+                    </div>
+                    <Note className="py-4 md:w-96">
+                      Please input the start and end times of your work, rather
+                      than your departure times. If your work hours are
+                      flexible, coordinate directly with potential riders or
+                      drivers to inform them.
+                    </Note>
+                    <div className="flex flex-col space-y-2"></div>
+                  </CommutingScheduleSection>
                 </BottomProfileSection>
               </ProfileColumn>
 
               <ProfileColumn>
-                <CommutingScheduleSection>
-                  <ProfileHeader>Commuting Schedule</ProfileHeader>
-                  {/* Days working field  */}
-                  <div className="mb-2 aspect-[7/1] w-full max-w-[360px] md:my-4">
-                    <div className="flex h-full w-full items-center justify-evenly border-l border-l-black">
-                      {daysOfWeek.map((day, index) => (
-                        <Controller
-                          key={day + index.toString()}
-                          name={`daysWorking.${index}`}
-                          control={control}
-                          render={({
-                            field: { onChange, value },
-                            formState: { defaultValues },
-                          }) => (
-                            <Checkbox
-                              key={day + index.toString()}
-                              sx={{
-                                input: { width: 1, height: 1 },
-                                aspectRatio: 1,
-                                width: 1,
-                                height: 1,
-                                padding: 0,
-                              }}
-                              disabled={isViewer}
-                              checked={value}
-                              onChange={onChange}
-                              checkedIcon={
-                                <DayBox day={day} isSelected={true} />
-                              }
-                              icon={<DayBox day={day} isSelected={false} />}
-                            />
-                          )}
-                        />
-                      ))}
-                    </div>
-
-                    {errors.daysWorking && (
-                      <ErrorDisplay>{errors.daysWorking.message}</ErrorDisplay>
-                    )}
+                <ProfileHeader>
+                  Co-op Term Dates{" "}
+                  <span className="text-northeastern-red">*</span>
+                </ProfileHeader>
+                <div className="flex w-full gap-4">
+                  <div className="flex flex-1 flex-col">
+                    <EntryLabel
+                      required={true}
+                      error={errors.coopStartDate}
+                      label="Start Date"
+                    />
+                    <TextField
+                      type="month"
+                      inputClassName="h-14 text-lg"
+                      isDisabled={isViewer}
+                      id="coopStartDate"
+                      error={errors.coopStartDate}
+                      onChange={handleMonthChange("coopStartDate")}
+                      defaultValue={
+                        formatDateToMonth(watch("coopStartDate")) || undefined
+                      }
+                    />
                   </div>
-
-                  {/* Start/End Time Fields  */}
-                  <div className="flex w-full justify-between gap-6 pb-4 md:w-96">
-                    <div className="flex flex-1 flex-col gap-2">
-                      <EntryLabel
-                        required={true}
-                        error={errors.startTime}
-                        label="Start Time"
-                      />
-                      <ControlledTimePicker
-                        isDisabled={isViewer}
-                        control={control}
-                        name={"startTime"}
-                        value={user?.startTime ? user.startTime : undefined}
-                      />
-                    </div>
-                    <div className="flex flex-1 flex-col gap-2">
-                      <EntryLabel
-                        required={true}
-                        error={errors.endTime}
-                        label="End Time"
-                      />
-                      <ControlledTimePicker
-                        isDisabled={isViewer}
-                        control={control}
-                        name={"endTime"}
-                        value={user?.endTime ? user.endTime : undefined}
-                      />
-                    </div>
+                  <div className="flex flex-1 flex-col">
+                    <EntryLabel
+                      required={true}
+                      error={errors.coopEndDate}
+                      label="End Date"
+                    />
+                    <TextField
+                      type="month"
+                      inputClassName="h-14 text-lg"
+                      isDisabled={isViewer}
+                      id="coopEndDate"
+                      error={errors.coopEndDate}
+                      onChange={handleMonthChange("coopEndDate")}
+                      defaultValue={
+                        formatDateToMonth(watch("coopEndDate")) || undefined
+                      }
+                    />
                   </div>
-                  <Note className="py-4 md:w-96">
-                    Please input the start and end times of your work, rather
-                    than your departure times. If your work hours are flexible,
-                    coordinate directly with potential riders or drivers to
-                    inform them.
-                  </Note>
-                  <div className="flex flex-col space-y-2"></div>
-                </CommutingScheduleSection>
+                </div>
+                <Note className="py-2">
+                  Please indicate the start and the end dates of your co-op. If
+                  you don&apos;t know exact dates, you can use approximate
+                  dates.
+                </Note>
 
                 <PersonalInfoSection>
                   <ProfileHeader>Personal Info</ProfileHeader>
-                  <div className="flex w-full flex-row space-x-6">
-                    {/* Preferred Name field  */}
-                    <div className="flex w-3/5 flex-col">
-                      <LightEntryLabel error={!!errors.preferredName}>
-                        Preferred Name
-                      </LightEntryLabel>
-                      <TextField
-                        id="preferredName"
-                        error={errors.preferredName}
-                        isDisabled={isViewer}
-                        type="text"
-                        inputClassName={`h-12`}
-                        {...register("preferredName")}
-                      />
+                  <div className="flex w-full flex-col ">
+                    <div className=" w-full ">
+                      <ProfilePicture onFileSelected={setSelectedFile} />
+                    </div>
+                    <div className="mb-5 mt-2 w-full">
+                      {!isViewer && (
+                        <Controller
+                          name="status"
+                          control={control}
+                          render={({ field }) => (
+                            <div className="flex items-start">
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={field.value === Status.INACTIVE}
+                                    onChange={(e) =>
+                                      field.onChange(
+                                        e.target.checked
+                                          ? Status.INACTIVE
+                                          : Status.ACTIVE
+                                      )
+                                    }
+                                    inputProps={{
+                                      "aria-label": "Mark profile inactive",
+                                    }}
+                                  />
+                                }
+                                label="Mark profile inactive"
+                              />
+                              <Note className="ml-2 w-1/2 text-sm text-gray-500">
+                                <p>
+                                  Marking your profile inactive removes you from
+                                  the map for other users.
+                                  <strong className="font-semibold">
+                                    &nbsp;You should leave this box unchecked if
+                                    you&apos;re creating your profile for the
+                                    first time.
+                                  </strong>
+                                </p>
+                              </Note>
+                            </div>
+                          )}
+                        />
+                      )}
                     </div>
 
-                    {/* Pronouns field  */}
-                    <div className="w-2/6 flex-1">
-                      <LightEntryLabel error={!!errors.pronouns}>
-                        Pronouns
-                      </LightEntryLabel>
-                      <TextField
-                        id="pronouns"
-                        inputClassName={`h-12`}
-                        error={errors.pronouns}
-                        isDisabled={isViewer}
-                        type="text"
-                        {...register("pronouns")}
-                      />
+                    <div className="flex w-full flex-row  space-x-6">
+                      {/* Preferred Name field  */}
+
+                      <div className="flex w-3/5 flex-col">
+                        <LightEntryLabel error={!!errors.preferredName}>
+                          Preferred Name
+                        </LightEntryLabel>
+                        <TextField
+                          id="preferredName"
+                          error={errors.preferredName}
+                          isDisabled={isViewer}
+                          type="text"
+                          inputClassName={`h-12`}
+                          {...register("preferredName")}
+                        />
+                      </div>
+
+                      {/* Pronouns field  */}
+                      <div className="w-2/6 flex-1">
+                        <LightEntryLabel error={!!errors.pronouns}>
+                          Pronouns
+                        </LightEntryLabel>
+                        <TextField
+                          id="pronouns"
+                          inputClassName={`h-12`}
+                          error={errors.pronouns}
+                          isDisabled={isViewer}
+                          type="text"
+                          {...register("pronouns")}
+                        />
+                      </div>
                     </div>
                   </div>
                   {/* Bio field */}
@@ -607,38 +773,6 @@ const Profile: NextPage = () => {
                       This intro will be shared with people you choose to
                       connect with.
                     </Note>
-                    {!isViewer && (
-                      <Controller
-                        name="status"
-                        control={control}
-                        render={({ field }) => (
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={field.value === Status.INACTIVE}
-                                onChange={(e) =>
-                                  field.onChange(
-                                    e.target.checked
-                                      ? Status.INACTIVE
-                                      : Status.ACTIVE
-                                  )
-                                }
-                                inputProps={{ "aria-label": "Inactive status" }}
-                              />
-                            }
-                            label="Mark as Inactive"
-                          />
-                        )}
-                      />
-                    )}
-                    {!isViewer && (
-                      <Note>
-                        <span>
-                          Marking as inactive will hide your profile from all
-                          searches and matches.
-                        </span>
-                      </Note>
-                    )}
                   </div>
                 </PersonalInfoSection>
                 <CompleteProfileButton type="submit">
