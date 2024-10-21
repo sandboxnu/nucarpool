@@ -83,10 +83,11 @@ model Request {
 
 // Represents a Conversation between two users
 model Conversation {
-  id        String    @id @default(cuid())
-  requestId String    @unique
-  messages  Message[]
-  request   Request[]
+  id          String    @id @default(cuid())
+  requestId   String    @unique
+  messages    Message[]
+  request     Request[]
+  dateCreated DateTime  @default(now())
 
   @@map(name: "conversation")
 }
@@ -109,9 +110,10 @@ model Message {
 
 // Represents a group of users
 model CarpoolGroup {
-  id      String @id @default(cuid()) // primary key
-  message String
-  users   User[]
+  id          String   @id @default(cuid()) // primary key
+  message     String
+  users       User[]
+  dateCreated DateTime @default(now())
 
   @@map(name: "group")
 }
@@ -158,6 +160,8 @@ model User {
   carpool            CarpoolGroup? @relation(fields: [carpoolId], references: [id])
   carpoolId          String?
   Message            Message[]
+  dateCreated        DateTime      @default(now())
+  dateModified       DateTime      @default(now()) @updatedAt
 
   @@index([carpoolId])
   @@map(name: "user")

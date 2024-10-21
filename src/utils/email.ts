@@ -22,7 +22,8 @@ export interface AcceptanceEmailSchema extends BaseEmailSchema {
 
 export function generateEmailParams(
   schema: RequestEmailSchema | MessageEmailSchema | AcceptanceEmailSchema,
-  type: 'request' | 'message' | 'acceptance'
+  type: 'request' | 'message' | 'acceptance',
+  includeCc: boolean
 ): SendTemplatedEmailCommandInput {
   let templateName: string;
   let templateData: Record<string, any>;
@@ -58,12 +59,17 @@ export function generateEmailParams(
       throw new Error('Invalid email type');
   }
 
+  const destination: { ToAddresses: string[], CcAddresses?: string[] } = {
+    ToAddresses: [schema.receiverEmail],
+  };
+
+  if (includeCc) {
+    destination.CcAddresses = [schema.senderEmail];
+  }
+
   return {
     Source: "no-reply@carpoolnu.com",
-    Destination: {
-      ToAddresses: [schema.receiverEmail],
-      CcAddresses: [schema.senderEmail],
-    },
+    Destination: destination,
     Template: templateName,
     TemplateData: JSON.stringify(templateData),
   };
