@@ -15,7 +15,7 @@ export const ComplianceModal = () => {
             <div className="scroll overflow-y-auto">
               <p>
               This application and any related transportation arrangements and
-              services are provided on an "AS IS" basis and without any warranty
+              services are provided on an ”AS IS” basis and without any warranty
               or condition, express, implied or statutory. User agrees and
               acknowledges that they assume full, exclusive and sole
               responsibility for the use of and reliance on any services through
@@ -51,15 +51,11 @@ export const ComplianceModal = () => {
               services. 
               </p> <br/>
               <p>
-              By agreeing to these terms and using the Carpool service, you hereby consent to receive
-              emails from us, which may include but are not limited to notifications of system events,
-              actions taken by other users, updates to the service, and announcements about new
-              features or products. You also acknowledge and agree that we may share your email
-              address with other users in connection with any carpool-related arrangements or
-              interactions facilitated through the service. Your acceptance of these terms is
-              confirmed when you click the "I Agree" button during sign up for the Carpool service,
-              which signifies that you have read, understood, and agree to these terms and any
-              updates thereto.
+              By using the Carpool service, you acknowledge that you may receive emails related to system events, 
+              actions taken by other users, updates to the service, and announcements about new features or products. 
+              You also acknowledge that your email address may be shared with other users as necessary to facilitate carpool-related arrangements or interactions through the service. 
+              By clicking the ”I Agree” button below, you confirm that you understand and accept these terms. 
+              These terms are subject to updates, and continued use of the service constitutes acknowledgment of those updates.
               </p>
             </div>
             <button
