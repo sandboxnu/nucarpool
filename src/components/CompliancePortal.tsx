@@ -13,6 +13,7 @@ export const ComplianceModal = () => {
               Carpool Terms and Conditions
             </Dialog.Title>
             <div className="scroll overflow-y-auto">
+              <p>
               This application and any related transportation arrangements and
               services are provided on an "AS IS" basis and without any warranty
               or condition, express, implied or statutory. User agrees and
@@ -32,35 +33,34 @@ export const ComplianceModal = () => {
               Northeastern University has no control over and is not responsible
               for this application or the safety of users or the suitability,
               quality, safety, maintenance, licensure, registration or insurance
-              of any drivers, passengers or vehicles. User also agrees that
-              Northeastern University is not responsible for the security or
-              privacy of any data users provide or is collected by the use of
-              the application. By using this application and participating in
-              any transportation services or arrangements, the user agrees to
-              accept all such risks and agrees that Northeastern University is
-              not responsible for the acts or omissions of any users and is not
-              liable for claims or damages, including property damage or
-              personal injury, arising out of or related to use of the
-              application or the transportation services or arrangements engaged
-              in by users. User agrees to indemnify and hold harmless
-              Northeastern, including all affiliates, subsidiaries, parents,
-              successors and assigns, directors, employees, agents, from and
-              against any claims, actions, suits, losses, costs, liabilities and
-              expenses (including reasonable attorneys' fees) relating to or
-              arising out of your use of this application and any related
-              transportation arrangements and services. By agreeing to these
-              terms and using the Carpool service, you hereby consent to receive
-              emails from us, which may include but are not limited to
-              notifications of system events, actions taken by other users,
-              updates to the service, and announcements about new features or
-              products. You also acknowledge and agree that we may share your
-              email address with other users in connection with any
-              carpool-related arrangements or interactions facilitated through
-              the service. Your acceptance of these terms is confirmed when you
-              click the "I Agree" button during sign up for the Carpool service,
-              which signifies that you have read, understood, and agree to be
-              legally bound by these terms and any updates thereto.
-
+              of any drivers, passengers or vehicles.
+              </p> <br/>
+              <p>
+              User also agrees that Northeastern University is not responsible for the security or
+              privacy of any data users provide or is collected by the use of the application. By
+              using this application and participating in any transportation services or
+              arrangements, the user agrees to accept all such risks and agrees that Northeastern
+              University is not responsible for the acts or omissions of any users and is not liable
+              for claims or damages, including property damage or personal injury, arising out of or
+              related to use of the application or the transportation services or arrangements
+              engaged in by users. User agrees to indemnify and hold harmless Northeastern,
+              including all affiliates, subsidiaries, parents, successors and assigns, directors,
+              employees, agents, from and against any claims, actions, suits, losses, costs,
+              liabilities and expenses (including reasonable attorneys' fees) relating to or arising
+              out of your use of this application and any related transportation arrangements and
+              services. 
+              </p> <br/>
+              <p>
+              By agreeing to these terms and using the Carpool service, you hereby consent to receive
+              emails from us, which may include but are not limited to notifications of system events,
+              actions taken by other users, updates to the service, and announcements about new
+              features or products. You also acknowledge and agree that we may share your email
+              address with other users in connection with any carpool-related arrangements or
+              interactions facilitated through the service. Your acceptance of these terms is
+              confirmed when you click the "I Agree" button during sign up for the Carpool service,
+              which signifies that you have read, understood, and agree to these terms and any
+              updates thereto.
+              </p>
             </div>
             <button
               className="w-25 rounded-md border-2 border-red-700 bg-red-700 p-1 text-slate-50 "
