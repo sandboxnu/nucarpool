@@ -15,7 +15,7 @@ export const ComplianceModal = () => {
             <div className="scroll overflow-y-auto">
               <p>
               This application and any related transportation arrangements and
-              services are provided on an ”AS IS” basis and without any warranty
+              services are provided on an AS IS basis and without any warranty
               or condition, express, implied or statutory. User agrees and
               acknowledges that they assume full, exclusive and sole
               responsibility for the use of and reliance on any services through
@@ -46,7 +46,7 @@ export const ComplianceModal = () => {
               engaged in by users. User agrees to indemnify and hold harmless Northeastern,
               including all affiliates, subsidiaries, parents, successors and assigns, directors,
               employees, agents, from and against any claims, actions, suits, losses, costs,
-              liabilities and expenses (including reasonable attorneys' fees) relating to or arising
+              liabilities and expenses (including reasonable attorneys fees) relating to or arising
               out of your use of this application and any related transportation arrangements and
               services. 
               </p> <br/>
@@ -54,7 +54,7 @@ export const ComplianceModal = () => {
               By using the Carpool service, you acknowledge that you may receive emails related to system events, 
               actions taken by other users, updates to the service, and announcements about new features or products. 
               You also acknowledge that your email address may be shared with other users as necessary to facilitate carpool-related arrangements or interactions through the service. 
-              By clicking the ”I Agree” button below, you confirm that you understand and accept these terms. 
+              By clicking the I Agree button below, you confirm that you understand and accept these terms. 
               These terms are subject to updates, and continued use of the service constitutes acknowledgment of those updates.
               </p>
             </div>
