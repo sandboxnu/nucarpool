@@ -264,6 +264,8 @@ export const generateUser = ({
     coopStartDate: coopStartDate,
     carpoolId: null,
     licenseSigned: true,
+    dateCreated: new Date(),
+    dateModified: new Date(),
   };
   return {
     where: { id: id },
