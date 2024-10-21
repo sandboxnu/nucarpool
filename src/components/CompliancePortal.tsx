@@ -14,7 +14,7 @@ export const ComplianceModal = () => {
             </Dialog.Title>
             <div className="scroll overflow-y-auto">
               This application and any related transportation arrangements and
-              services are provided on an “AS IS” basis and without any warranty
+              services are provided on an "AS IS" basis and without any warranty
               or condition, express, implied or statutory. User agrees and
               acknowledges that they assume full, exclusive and sole
               responsibility for the use of and reliance on any services through
@@ -46,9 +46,21 @@ export const ComplianceModal = () => {
               Northeastern, including all affiliates, subsidiaries, parents,
               successors and assigns, directors, employees, agents, from and
               against any claims, actions, suits, losses, costs, liabilities and
-              expenses (including reasonable attorneys’ fees) relating to or
+              expenses (including reasonable attorneys' fees) relating to or
               arising out of your use of this application and any related
-              transportation arrangements and services.
+              transportation arrangements and services. By agreeing to these
+              terms and using the Carpool service, you hereby consent to receive
+              emails from us, which may include but are not limited to
+              notifications of system events, actions taken by other users,
+              updates to the service, and announcements about new features or
+              products. You also acknowledge and agree that we may share your
+              email address with other users in connection with any
+              carpool-related arrangements or interactions facilitated through
+              the service. Your acceptance of these terms is confirmed when you
+              click the "I Agree" button during sign up for the Carpool service,
+              which signifies that you have read, understood, and agree to be
+              legally bound by these terms and any updates thereto.
+
             </div>
             <button
               className="w-25 rounded-md border-2 border-red-700 bg-red-700 p-1 text-slate-50 "
