@@ -30,7 +30,7 @@ export const emailsRouter = router({
       const emailParams = generateEmailParams(input, 'request', false);
       try {
         const response = await ctx.sesClient.send(new SendTemplatedEmailCommand(emailParams));
-        console.log(`Request email sent successfully to ${input.receiverEmail}. CC: ${input.senderEmail}`);
+        console.log(`Request email sent successfully to ${input.receiverEmail}.`);
         console.log('SES Response:', JSON.stringify(response, null, 2));
         return response;
       } catch (error) {
