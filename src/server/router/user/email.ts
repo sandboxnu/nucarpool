@@ -27,7 +27,7 @@ export const emailsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const emailParams = generateEmailParams(input, 'request');
+      const emailParams = generateEmailParams(input, 'request', false);
       try {
         const response = await ctx.sesClient.send(new SendTemplatedEmailCommand(emailParams));
         console.log(`Request email sent successfully to ${input.receiverEmail}. CC: ${input.senderEmail}`);
@@ -50,7 +50,7 @@ export const emailsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const emailParams = generateEmailParams(input, 'message');
+      const emailParams = generateEmailParams(input, 'message', false);
       try {
         const response = await ctx.sesClient.send(new SendTemplatedEmailCommand(emailParams));
         console.log(`Message notification sent successfully to ${input.receiverEmail}`);
@@ -73,7 +73,7 @@ export const emailsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const emailParams = generateEmailParams(input, 'acceptance');
+      const emailParams = generateEmailParams(input, 'acceptance', true);
       try {
         const response = await ctx.sesClient.send(new SendTemplatedEmailCommand(emailParams));
         console.log(`Acceptance notification sent successfully to ${input.receiverEmail}. CC: ${input.senderEmail}`);
@@ -103,7 +103,7 @@ export const emailsRouter = router({
         receiverName: input.receivingUserName,
         receiverEmail: input.receivingUserEmail,
         messageText: input.body,
-      }, 'message');
+      }, 'message', false);
       try {
         const response = await ctx.sesClient.send(new SendTemplatedEmailCommand(emailParams));
         console.log(`Connect email sent successfully to ${input.receivingUserEmail}. CC: ${input.sendingUserEmail}`);
