@@ -83,7 +83,7 @@ const Home: NextPage<any> = () => {
   const [otherUser, setOtherUser] = useState<PublicUser | null>(null);
   const [mapState, setMapState] = useState<mapboxgl.Map>();
   const [sidebarType, setSidebarType] = useState<HeaderOptions>("explore");
-  const [popupUser, setPopupUser] = useState<PublicUser | null>(null);
+  const [popupUsers, setPopupUsers] = useState<PublicUser[] | null>(null);
   const mapContainerRef = useRef(null);
   const [points, setPoints] = useState<[number, number][]>([]);
   const [companyAddressSuggestions, setCompanyAddressSuggestions] = useState<
@@ -254,7 +254,7 @@ const Home: NextPage<any> = () => {
             user.role
           );
         }
-        addMapEvents(newMap, user, setPopupUser);
+        addMapEvents(newMap, user, setPopupUsers);
       });
       setMapState(newMap);
     }
@@ -442,12 +442,12 @@ const Home: NextPage<any> = () => {
                   {user.role === "VIEWER" && viewerBox}
                   <MapLegend role={user.role} />
                   <MapConnectPortal
-                    otherUser={popupUser}
+                    otherUsers={popupUsers}
                     extendUser={extendPublicUser}
                     onViewRouteClick={onViewRouteClick}
                     onViewRequest={handleUserSelect}
                     onClose={() => {
-                      setPopupUser(null);
+                      setPopupUsers(null);
                     }}
                   />
                 </div>
