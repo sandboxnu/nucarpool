@@ -15,6 +15,7 @@ const updateCompanyLocation = (
   if (role === Role.DRIVER) {
     img = BlueDriverEnd.src;
   }
+
   map.loadImage(
     img,
     (

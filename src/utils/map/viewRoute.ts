@@ -1,6 +1,5 @@
 import mapboxgl from "mapbox-gl";
 import { CarpoolAddress, CarpoolFeature, PublicUser, User } from "../types";
-import { Role } from "@prisma/client";
 import { trpc } from "../trpc";
 import { SetStateAction, useEffect } from "react";
 import { toast } from "react-toastify";
@@ -47,28 +46,35 @@ interface ViewRouteProps {
   user: User;
   otherUser: PublicUser | undefined;
   map: mapboxgl.Map;
-  userCoord: {
-    startLat: number;
-    startLng: number;
-    endLat: number;
-    endLng: number;
-  };
+  userCoord:
+    | {
+        startLat: number;
+        startLng: number;
+        endLat: number;
+        endLng: number;
+      }
+    | undefined;
 }
 
 // Creates MapBox markers showing user's start address and the start area of the other user.
 export const viewRoute = (props: ViewRouteProps) => {
   clearMarkers();
   clearDirections(props.map);
+  console.log(props.userCoord);
   const redCircle = createMarkerEl(DriverStart);
   const selfStartPopup = createPopup("My Start");
   const selfEndPopup = createPopup("My Dest.");
   const orangeStart = createMarkerEl(RiderStart);
   const redStart = createMarkerEl(redCircle);
+
+  let startPoiLng, startPoiLat, endPoiLng, endPoiLat;
+
   if (props.otherUser !== undefined) {
     const otherRole =
       props.otherUser.role.charAt(0).toUpperCase() +
       props.otherUser.role.slice(1).toLowerCase();
-    const otherUserStartPopup = createPopup(otherRole + " Start");
+
+    const otherUserStartPopup = createPopup(`${otherRole} Start`);
     const otherUserStartMarker = new mapboxgl.Marker({
       element: otherRole === "Rider" ? orangeStart : redStart,
     })
@@ -78,47 +84,56 @@ export const viewRoute = (props: ViewRouteProps) => {
       ])
       .setPopup(otherUserStartPopup)
       .addTo(props.map);
-    const otherUserEndPopup = createPopup(otherRole + " Dest.");
+
+    const otherUserEndPopup = createPopup(`${otherRole} Dest.`);
     otherUserEndPopup
       .setLngLat([
         props.otherUser.companyCoordLng,
         props.otherUser.companyCoordLat,
       ])
       .addTo(props.map);
+
     otherUserStartMarker.togglePopup();
     previousMarkers.push(otherUserStartMarker);
     previousMarkers.push(otherUserEndPopup);
-  }
 
-  selfEndPopup
-    .setLngLat([props.userCoord.endLng, props.userCoord.endLat])
-    .addTo(props.map);
-  selfStartPopup
-    .setLngLat([props.userCoord.startLng, props.userCoord.startLat])
-    .addTo(props.map);
-  previousMarkers.push(selfEndPopup);
-  previousMarkers.push(selfStartPopup);
-  let startPoiLng = props.userCoord.startLng;
-  let startPoiLat = props.userCoord.startLat;
-  let endPoiLng = props.userCoord.endLng;
-  let endPoiLat = props.userCoord.endLat;
-  if (props.otherUser) {
     startPoiLng = props.otherUser.startPOICoordLng;
     startPoiLat = props.otherUser.startPOICoordLat;
     endPoiLng = props.otherUser.companyCoordLng;
     endPoiLat = props.otherUser.companyCoordLat;
+  } else if (props.userCoord !== undefined) {
+    selfStartPopup
+      .setLngLat([props.userCoord.startLng, props.userCoord.startLat])
+      .addTo(props.map);
+
+    selfEndPopup
+      .setLngLat([props.userCoord.endLng, props.userCoord.endLat])
+      .addTo(props.map);
+
+    previousMarkers.push(selfStartPopup);
+    previousMarkers.push(selfEndPopup);
+
+    startPoiLng = props.userCoord.startLng;
+    startPoiLat = props.userCoord.startLat;
+    endPoiLng = props.userCoord.endLng;
+    endPoiLat = props.userCoord.endLat;
+  } else {
+    return;
   }
 
-  props.map.fitBounds([
+  props.map.fitBounds(
     [
-      Math.min(startPoiLng, endPoiLng) - 0.0075,
-      Math.max(startPoiLat, endPoiLat) + 0.0075,
+      [
+        Math.min(startPoiLng, endPoiLng) - 0.0075,
+        Math.min(startPoiLat, endPoiLat) - 0.0075,
+      ],
+      [
+        Math.max(startPoiLng, endPoiLng) + 0.0075,
+        Math.max(startPoiLat, endPoiLat) + 0.0075,
+      ],
     ],
-    [
-      Math.max(startPoiLng, endPoiLng) + 0.0075,
-      Math.min(startPoiLat, endPoiLat) - 0.0075,
-    ],
-  ]);
+    { padding: 20 }
+  );
 };
 
 export function useGetDirections({

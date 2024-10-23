@@ -34,6 +34,7 @@ interface HeaderProps {
   data?: {
     sidebarValue: string;
     setSidebar: Dispatch<SetStateAction<HeaderOptions>>;
+    disabled: boolean;
   };
 }
 
@@ -66,9 +67,11 @@ const Header = (props: HeaderProps) => {
   const renderSidebarOptions = ({
     sidebarValue,
     setSidebar,
+    disabled,
   }: {
     sidebarValue: string;
     setSidebar: Dispatch<SetStateAction<HeaderOptions>>;
+    disabled: boolean;
   }) => {
     // @ts-ignore
     return (
@@ -77,6 +80,7 @@ const Header = (props: HeaderProps) => {
           onClick={() => {
             setSidebar("explore");
           }}
+          disabled={disabled}
           className={renderClassName(sidebarValue, "explore")}
         >
           Explore
@@ -85,6 +89,7 @@ const Header = (props: HeaderProps) => {
           onClick={() => {
             setSidebar("requests");
           }}
+          disabled={disabled}
           className={`${renderClassName(sidebarValue, "requests")} relative`}
         >
           Requests
@@ -98,6 +103,7 @@ const Header = (props: HeaderProps) => {
         </button>
         <button
           onClick={() => setDisplayGroup(true)}
+          disabled={disabled}
           className={renderClassName(sidebarValue, "filler")}
         >
           My Group
