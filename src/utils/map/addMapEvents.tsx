@@ -1,17 +1,19 @@
-import {
+import mapboxgl, {
   GeoJSONSource,
   Map,
+  MapboxGeoJSONFeature,
   MapLayerMouseEvent,
   NavigationControl,
 } from "mapbox-gl";
 import { PublicUser } from "../types";
 import { User } from "../types";
 import { Dispatch, SetStateAction } from "react";
+import { GeoJSON } from "geojson";
 
 const addMapEvents = (
   map: Map,
   user: User,
-  setPopupUser: Dispatch<SetStateAction<PublicUser | null>>
+  setPopupUser: Dispatch<SetStateAction<PublicUser[] | null>>
 ) => {
   map.addControl(new NavigationControl(), "bottom-right");
 
@@ -36,15 +38,25 @@ const addMapEvents = (
   });
   function handlePointClick(e: MapLayerMouseEvent) {
     if (!e.features) return;
-    if (e.features[0]!.geometry.type != "Point") return;
 
-    const coordinates = e.features[0]!.geometry.coordinates;
-    const otherUser = e.features[0]!.properties as PublicUser;
+    const pointFeatures = e.features.filter(
+      (
+        feature
+      ): feature is MapboxGeoJSONFeature & { geometry: GeoJSON.Point } =>
+        feature.geometry.type === "Point"
+    );
 
-    while (Math.abs(e.lngLat.lng - coordinates[0]!) > 180) {
-      coordinates[0] += e.lngLat.lng > coordinates[0]! ? 360 : -360;
+    if (pointFeatures.length === 0) return;
+
+    const users = pointFeatures.map(
+      (feature) => feature.properties as PublicUser
+    );
+
+    const coordinates = pointFeatures[0].geometry.coordinates.slice();
+    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+      coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
     }
-    setPopupUser(otherUser);
+    setPopupUser(users);
   }
 
   map.on("click", "riders", handlePointClick);

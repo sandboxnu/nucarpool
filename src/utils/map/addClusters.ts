@@ -13,7 +13,7 @@ const addClusters = (map: Map, geoJsonUsers: GeoJsonUsers) => {
     type: "geojson",
     data: geoJsonUsers,
     cluster: true,
-    clusterMaxZoom: 10,
+    clusterMaxZoom: 12,
     clusterRadius: 50,
   });
 
@@ -26,6 +26,8 @@ const addClusters = (map: Map, geoJsonUsers: GeoJsonUsers) => {
       "circle-color": [
         "step",
         ["get", "point_count"],
+        "#66c2a5",
+        2,
         "#51bbd6",
         20,
         "#f1f075",
