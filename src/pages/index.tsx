@@ -341,6 +341,7 @@ const Home: NextPage<any> = () => {
     type: "address%2Cpostcode",
     setFunc: setStartAddressSuggestions,
   });
+
   useGetDirections({ points: points, map: mapState! });
 
   if (!user) {

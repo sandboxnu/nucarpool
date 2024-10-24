@@ -101,7 +101,9 @@ export const viewRoute = (props: ViewRouteProps) => {
     startPoiLat = props.otherUser.startPOICoordLat;
     endPoiLng = props.otherUser.companyCoordLng;
     endPoiLat = props.otherUser.companyCoordLat;
-  } else if (props.userCoord !== undefined) {
+  }
+  if (props.userCoord !== undefined) {
+    console.log("adding popups");
     selfStartPopup
       .setLngLat([props.userCoord.startLng, props.userCoord.startLat])
       .addTo(props.map);
@@ -109,7 +111,6 @@ export const viewRoute = (props: ViewRouteProps) => {
     selfEndPopup
       .setLngLat([props.userCoord.endLng, props.userCoord.endLat])
       .addTo(props.map);
-
     previousMarkers.push(selfStartPopup);
     previousMarkers.push(selfEndPopup);
 
@@ -117,7 +118,15 @@ export const viewRoute = (props: ViewRouteProps) => {
     startPoiLat = props.userCoord.startLat;
     endPoiLng = props.userCoord.endLng;
     endPoiLat = props.userCoord.endLat;
-  } else {
+  }
+  if (
+    !startPoiLat ||
+    !startPoiLat ||
+    !endPoiLat ||
+    !endPoiLat ||
+    !startPoiLng ||
+    !endPoiLng
+  ) {
     return;
   }
 
