@@ -24,6 +24,7 @@ export const MapConnectPortal = (props: ConnectPortalProps) => {
           <Dialog.Panel>
             <div className="relative mt-10 w-96 ">
               <div
+                tabIndex={0}
                 className="scrollbar-thumb-rounded-full  scrollbar-track-rounded-full max-h-[calc(100vh-8rem)] w-96 overflow-y-scroll scrollbar scrollbar-track-transparent scrollbar-thumb-northeastern-red"
                 style={{
                   maskImage:
