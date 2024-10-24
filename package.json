@@ -81,6 +81,7 @@
     "@types/lodash": "^4.14.182",
     "@types/mapbox-gl": "^2.7.3",
     "@types/mapbox__polyline": "^1.0.2",
+    "@types/mixpanel-browser": "^2.50.1",
     "@types/node": "18.0.0",
     "@types/random-seed": "^0.3.3",
     "@types/react": "18.0.14",
