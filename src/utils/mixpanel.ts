@@ -1,6 +1,13 @@
 import mixpanel from 'mixpanel-browser';
+import { browserEnv } from './env/browser';
 
-mixpanel.init(process.env.MIXPANEL_PROJECT_TOKEN, {
+const mixpanelToken = browserEnv.NEXT_PUBLIC_MIXPANEL_PROJECT_TOKEN;
+
+if (!mixpanelToken) {
+  throw new Error('NEXT_PUBLIC_MIXPANEL_PROJECT_TOKEN is not defined');
+}
+
+mixpanel.init(mixpanelToken, {
   debug: process.env.NODE_ENV !== 'production',
   track_pageview: true,
   persistence: 'localStorage'
