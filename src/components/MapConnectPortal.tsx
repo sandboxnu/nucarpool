@@ -2,9 +2,10 @@ import { EnhancedPublicUser, PublicUser } from "../utils/types";
 import { User } from "@prisma/client";
 import { ConnectCard } from "./UserCards/ConnectCard";
 import { Dialog } from "@headlessui/react";
+import { useRef } from "react";
 
 interface ConnectPortalProps {
-  otherUser: PublicUser | null;
+  otherUsers: PublicUser[] | null;
   extendUser: (user: PublicUser) => EnhancedPublicUser;
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
   onViewRequest: (userId: string) => void;
@@ -14,25 +15,41 @@ interface ConnectPortalProps {
 export const MapConnectPortal = (props: ConnectPortalProps) => {
   return (
     <Dialog
-      open={!!props.otherUser}
+      open={!!(props.otherUsers && props.otherUsers.length > 0)}
       onClose={props.onClose}
       className="relative z-50"
     >
       <div className="fixed inset-0" aria-hidden="true">
-        <div className="fixed inset-0 mt-16 flex items-start justify-end pt-2">
+        <div className="fixed inset-0 mt-20 flex items-start justify-end pt-4">
           <Dialog.Panel>
-            <div>
-              <div tabIndex={0} className="w-96">
-                {props.otherUser && (
-                  <ConnectCard
-                    otherUser={props.extendUser(props.otherUser)}
-                    onViewRouteClick={props.onViewRouteClick}
-                    onViewRequest={props.onViewRequest}
-                    onClose={(string) => {
-                      string == "connect" ? props.onClose() : {};
-                    }}
-                  />
-                )}
+            <div className="max-h-100vh relative mt-11 w-96 ">
+              <div
+                tabIndex={0}
+                className="mr-3  max-h-[calc(100vh-8rem)] overflow-y-scroll  scrollbar  scrollbar-track-transparent scrollbar-thumb-northeastern-red scrollbar-track-rounded-full scrollbar-thumb-rounded-full"
+                style={{
+                  maskImage:
+                    "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)",
+                  maskSize: "100% 100%",
+                  maskRepeat: "no-repeat",
+                  marginTop: "-8%",
+                  paddingTop: "15%",
+                  marginBottom: "15%",
+                  paddingBottom: "15%",
+                }}
+              >
+                {props.otherUsers &&
+                  props.otherUsers.map((user: PublicUser) => (
+                    <div key={user.id}>
+                      <ConnectCard
+                        otherUser={props.extendUser(user)}
+                        onViewRouteClick={props.onViewRouteClick}
+                        onViewRequest={props.onViewRequest}
+                        onClose={(action) => {
+                          if (action === "connect") props.onClose();
+                        }}
+                      />
+                    </div>
+                  ))}
               </div>
             </div>
           </Dialog.Panel>

@@ -35,6 +35,7 @@ import BlueCircle from "../../public/blue-circle.png";
 import VisibilityToggle from "../components/Map/VisibilityToggle";
 import updateCompanyLocation from "../utils/map/updateCompanyLocation";
 import MessagePanel from "../components/Messages/MessagePanel";
+import InactiveBlocker from "../components/Map/InactiveBlocker";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -71,7 +72,6 @@ const Home: NextPage<any> = () => {
   const { data: favorites = [] } = trpc.user.favorites.me.useQuery(undefined, {
     refetchOnMount: true,
   });
-
   const requestsQuery = trpc.user.requests.me.useQuery(undefined, {
     refetchOnMount: true,
   });
@@ -83,7 +83,7 @@ const Home: NextPage<any> = () => {
   const [otherUser, setOtherUser] = useState<PublicUser | null>(null);
   const [mapState, setMapState] = useState<mapboxgl.Map>();
   const [sidebarType, setSidebarType] = useState<HeaderOptions>("explore");
-  const [popupUser, setPopupUser] = useState<PublicUser | null>(null);
+  const [popupUsers, setPopupUsers] = useState<PublicUser[] | null>(null);
   const mapContainerRef = useRef(null);
   const [points, setPoints] = useState<[number, number][]>([]);
   const [companyAddressSuggestions, setCompanyAddressSuggestions] = useState<
@@ -172,20 +172,26 @@ const Home: NextPage<any> = () => {
     const userCompanyLat = isViewerAddressSelected
       ? companyCord[1]
       : user.companyCoordLat;
-    const userCoord = {
-      startLat: userStartLat,
-      startLng: userStartLng,
-      endLat: userCompanyLat,
-      endLng: userCompanyLng,
-    };
+    const userCoord =
+      !isViewerAddressSelected && user.role === "VIEWER"
+        ? undefined
+        : {
+            startLat: userStartLat,
+            startLng: userStartLng,
+            endLat: userCompanyLat,
+            endLng: userCompanyLng,
+          };
+
     if (mapState) {
-      updateUserLocation(mapState, userStartLng, userStartLat);
-      updateCompanyLocation(
-        mapState,
-        userCompanyLng,
-        userCompanyLat,
-        user.role
-      );
+      if (user.role !== "VIEWER") {
+        updateUserLocation(mapState, userStartLng, userStartLat);
+        updateCompanyLocation(
+          mapState,
+          userCompanyLng,
+          userCompanyLat,
+          user.role
+        );
+      }
       const viewProps = {
         user,
         otherUser,
@@ -245,7 +251,7 @@ const Home: NextPage<any> = () => {
       newMap.setMaxZoom(13);
       newMap.on("load", () => {
         addClusters(newMap, geoJsonUsers);
-        if (!isViewer) {
+        if (user.role !== "VIEWER") {
           updateUserLocation(newMap, user.startCoordLng, user.startCoordLat);
           updateCompanyLocation(
             newMap,
@@ -254,7 +260,7 @@ const Home: NextPage<any> = () => {
             user.role
           );
         }
-        addMapEvents(newMap, user, setPopupUser);
+        addMapEvents(newMap, user, setPopupUsers);
       });
       setMapState(newMap);
     }
@@ -263,17 +269,19 @@ const Home: NextPage<any> = () => {
   // separate use effect for user location rendering
   useEffect(() => {
     if (mapState) {
-      updateUserLocation(
-        mapState,
-        startAddressSelected.center[0],
-        startAddressSelected.center[1]
-      );
-      updateCompanyLocation(
-        mapState,
-        companyAddressSelected.center[0],
-        companyAddressSelected.center[1],
-        Role.VIEWER
-      );
+      if (user!.role === "VIEWER") {
+        updateUserLocation(
+          mapState,
+          startAddressSelected.center[0],
+          startAddressSelected.center[1]
+        );
+        updateCompanyLocation(
+          mapState,
+          companyAddressSelected.center[0],
+          companyAddressSelected.center[1],
+          Role.VIEWER
+        );
+      }
       if (mapState.getLayer("route") && user && otherUser) {
         onViewRouteClick(user, otherUser);
       }
@@ -333,6 +341,7 @@ const Home: NextPage<any> = () => {
     type: "address%2Cpostcode",
     setFunc: setStartAddressSuggestions,
   });
+
   useGetDirections({ points: points, map: mapState! });
 
   if (!user) {
@@ -343,7 +352,13 @@ const Home: NextPage<any> = () => {
     <div className="absolute left-0 top-0 z-10 m-2 flex min-w-[25rem] flex-col rounded-xl bg-white p-4 shadow-lg ">
       <h2 className="mb-4 text-xl">Search my route</h2>
       <div className="flex items-center space-x-4">
-        <Image className="h-8 w-8" src={BlueCircle} width={32} height={32} />
+        <Image
+          className="h-8 w-8"
+          src={BlueCircle}
+          alt="start"
+          width={32}
+          height={32}
+        />
         <AddressCombobox
           name="startAddress"
           placeholder="Enter start address"
@@ -356,7 +371,13 @@ const Home: NextPage<any> = () => {
       </div>
 
       <div className="mt-4 flex items-center space-x-4">
-        <Image className="h-8 w-8 " src={BlueSquare} width={32} height={42} />
+        <Image
+          className="h-8 w-8 "
+          alt="end"
+          src={BlueSquare}
+          width={32}
+          height={42}
+        />
         <AddressCombobox
           name="companyAddress"
           placeholder="Enter company address"
@@ -394,7 +415,11 @@ const Home: NextPage<any> = () => {
           </Head>
           <div className="m-0 h-full max-h-screen w-full">
             <Header
-              data={{ sidebarValue: sidebarType, setSidebar: setSidebarType }}
+              data={{
+                sidebarValue: sidebarType,
+                setSidebar: setSidebarType,
+                disabled: user.status === "INACTIVE" && user.role !== "VIEWER",
+              }}
             />
             <div className="flex h-[91.5%] flex-auto">
               <div className="w-96">
@@ -442,14 +467,17 @@ const Home: NextPage<any> = () => {
                   {user.role === "VIEWER" && viewerBox}
                   <MapLegend role={user.role} />
                   <MapConnectPortal
-                    otherUser={popupUser}
+                    otherUsers={popupUsers}
                     extendUser={extendPublicUser}
                     onViewRouteClick={onViewRouteClick}
                     onViewRequest={handleUserSelect}
                     onClose={() => {
-                      setPopupUser(null);
+                      setPopupUsers(null);
                     }}
                   />
+                  {user.status === "INACTIVE" && user.role !== "VIEWER" && (
+                    <InactiveBlocker />
+                  )}
                 </div>
               </div>
             </div>
