@@ -20,3 +20,8 @@ export const trackEvent = (eventName: string, properties?: Record<string, any>) 
 export const setUserProperties = (properties: Record<string, any>) => {
   mixpanel.people.set(properties);
 };
+
+// Add this new function
+export const trackProfileCompletion = (role: string, status: string) => {
+  trackEvent('Profile Completed', { role, status });
+};

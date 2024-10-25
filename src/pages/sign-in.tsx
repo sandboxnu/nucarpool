@@ -3,6 +3,7 @@ import { getSession, signIn } from "next-auth/react";
 import React from "react";
 import Head from "next/head";
 import Header from "../components/Header";
+import { trackEvent } from "../utils/mixpanel";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getSession(context);
@@ -34,6 +35,7 @@ const SignIn: NextPage = () => {
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
     e.preventDefault();
+    trackEvent("Sign In Attempt", { provider: "Northeastern" });
     signIn("azure-ad", {
       callbackUrl: "/",
     });
@@ -43,6 +45,7 @@ const SignIn: NextPage = () => {
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
     e.preventDefault();
+    trackEvent("Sign In Attempt", { provider: "Google" });
     signIn("google", {
       callbackUrl: "/",
     });

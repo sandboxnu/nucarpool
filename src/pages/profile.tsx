@@ -42,6 +42,7 @@ import ProfilePicture from "../components/Profile/ProfilePicture";
 import Spinner from "../components/Spinner";
 import { getPresignedImageUrl } from "../utils/uploadToS3";
 import { userInfo } from "node:os";
+import { trackProfileCompletion } from "../utils/mixpanel";
 
 // Inputs to the onboarding form.
 export type OnboardingFormInputs = {
@@ -398,6 +399,9 @@ const Profile: NextPage = () => {
       coopEndDate: userInfo.coopEndDate!,
       licenseSigned: true,
     });
+
+    // Track profile completion
+    trackProfileCompletion(userInfo.role, userInfo.status);
   };
 
   if (isLoading) {
