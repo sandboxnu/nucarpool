@@ -65,10 +65,20 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 
 const Home: NextPage<any> = () => {
-  const { data: geoJsonUsers } = trpc.mapbox.geoJsonUserList.useQuery();
+  const [filters, setFilters] = useState({
+    days: 0,
+    startDistance: 21,
+    endDistance: 21,
+    startTime: 241,
+    endTime: 241,
+    startDate: Date.now(),
+    endDate: Date.now(),
+    dateOverlap: 0,
+  });
+  const { data: geoJsonUsers } = trpc.mapbox.geoJsonUserList.useQuery(filters);
   const { data: user = null } = trpc.user.me.useQuery();
   const { data: recommendations = [] } =
-    trpc.user.recommendations.me.useQuery();
+    trpc.user.recommendations.me.useQuery(filters);
   const { data: favorites = [] } = trpc.user.favorites.me.useQuery(undefined, {
     refetchOnMount: true,
   });

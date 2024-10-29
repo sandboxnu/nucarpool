@@ -3,8 +3,8 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import _ from "lodash";
-import dayConversion from "./dayConversion";
 import { MapUser } from "./types";
+import { z } from "zod";
 
 /** Type for storing recommendation scores associated with a particular user */
 export type Recommendation = {
@@ -12,60 +12,61 @@ export type Recommendation = {
   score: number;
 };
 
-/** Maximum cutoffs for recommendation calculations */
+/** Default cutoffs for scoring recommendation calculations */
 const cutoffs = {
-  startDistance: 4, // miles
-  endDistance: 4, // miles
+  startDistance: 6, // miles
+  endDistance: 6, // miles
   startTime: 80, // minutes
   endTime: 80, // minutes
-  days: 5,
+  days: 3,
 };
 
 /** Weights for each portion of the recommendation score */
 const weights = {
   startDistance: 0.2,
-  endDistance: 0.3,
-  startTime: 0.15,
-  endTime: 0.15,
-  days: 0.2,
+  endDistance: 0.4,
+  startTime: 0.1,
+  endTime: 0.1,
+  days: 0.1,
+  overlap: 0.1,
+};
+
+export type Inputs = {
+  startDistance: number; // max 20, greater = any
+  endDistance: number;
+  startTime: number; // max = 4 hours (240min), greater = any
+  endTime: number;
+  days: number; /// 0 for any, 1 for exact
+  startDate: number;
+  endDate: number;
+  dateOverlap: number; // 0 any, 1 partial, 2 full
 };
 
 /** Provides a very approximate coordinate distance to mile conversion */
 const coordToMile = (dist: number) => dist * 88;
 
-export const distanceBasedRecs = (
-  currentUser: User
-): ((user: MapUser) => Recommendation | undefined) => {
-  return (user: MapUser) => {
-    if (
-      (currentUser.role === "RIDER" &&
-        (user.role === "RIDER" || user.seatAvail === 0)) ||
-      (currentUser.role === "DRIVER" && user.role === "DRIVER") ||
-      (currentUser.role === "DRIVER" && currentUser.seatAvail === 0) ||
-      (currentUser.carpoolId && currentUser.carpoolId === user.carpoolId)
-    ) {
-      return undefined;
-    }
-
-    const startDistance = coordToMile(
-      Math.sqrt(
-        Math.pow(currentUser.startCoordLat - user.startCoordLat, 2) +
-          Math.pow(currentUser.startCoordLng - user.startCoordLng, 2)
-      )
-    );
-
-    const endDistance = coordToMile(
-      Math.sqrt(
-        Math.pow(currentUser.companyCoordLat - user.companyCoordLat, 2) +
-          Math.pow(currentUser.companyCoordLng - user.companyCoordLng, 2)
-      )
-    );
-
-    return {
-      id: user.id,
-      score: startDistance + endDistance,
-    };
-  };
+interface CommonUser {
+  id: string;
+  role: string;
+  seatAvail: number;
+  coopStartDate: Date | null;
+  coopEndDate: Date | null;
+  startCoordLat: number;
+  startCoordLng: number;
+  companyCoordLat: number;
+  companyCoordLng: number;
+  carpoolId?: string | null;
+  startTime?: Date | null;
+  endTime?: Date | null;
+  daysWorking: string;
+}
+/**
+ * Converts a comma separated string representing user's days working to a boolean array
+ * @param user The user to calculate days for
+ * @returns a boolean array corresponding to `user.daysWorking` - index 0 is Sunday
+ */
+const dayConversion = (user: CommonUser) => {
+  return user.daysWorking.split(",").map((str) => str === "1");
 };
 
 /**
@@ -74,14 +75,18 @@ export const distanceBasedRecs = (
  * Scores are scaled to be between 0 and 1, where 0 indicates a perfect match.
  *
  * @param currentUser The user to generate a recommendation callback for
+ * @param inputs The filter inputs to replace 'cutoffs'
+ * @param sort The input to be sorted for, 'any' is default
  * @returns A function that takes in a user and returns their score relative to `currentUser`
  */
-export const calculateScore = (
-  currentUser: User
-): ((user: User) => Recommendation | undefined) => {
+export const calculateScore = <T extends CommonUser>(
+  currentUser: T,
+  inputs: Inputs,
+  sort: string
+): ((user: T) => Recommendation | undefined) => {
   const currentUserDays = dayConversion(currentUser);
 
-  return (user: User) => {
+  return (user: T) => {
     if (
       (currentUser.role === "RIDER" &&
         (user.role === "RIDER" || user.seatAvail === 0)) ||
@@ -107,21 +112,10 @@ export const calculateScore = (
     );
 
     const userDays = dayConversion(user);
-    // get the number of days that both user A AND user B are NOT going in
+    // check number of days users differ
     let days = currentUserDays
-      .map((day, index) => !(day && userDays[index]))
+      .map((day, index) => day !== userDays[index])
       .reduce((prev, curr) => (curr ? prev + 1 : prev), 0);
-
-    // if both users are going in all 5 days of the week, then weekend days off should not affect score
-    if (
-      days === 2 &&
-      !currentUserDays[0] &&
-      !currentUserDays[6] &&
-      !userDays[0] &&
-      !userDays[6]
-    ) {
-      days = 0;
-    }
 
     let startTime: number | undefined;
     let endTime: number | undefined;
@@ -141,30 +135,92 @@ export const calculateScore = (
         Math.abs(currentUser.endTime.getHours() - user.endTime.getHours()) *
           60 +
         Math.abs(currentUser.endTime.getMinutes() - user.endTime.getMinutes());
-      if (startTime > cutoffs.startTime || endTime > cutoffs.endTime) {
+      if (
+        (startTime > inputs.startTime && inputs.startTime <= 240) ||
+        (endTime > inputs.endTime && inputs.endTime <= 240)
+      ) {
         return undefined;
       }
     }
 
     if (
-      startDistance > cutoffs.startDistance ||
-      endDistance > cutoffs.endDistance ||
-      days > cutoffs.days
+      (startDistance > inputs.startDistance && inputs.startDistance <= 20) ||
+      (endDistance > inputs.endDistance && inputs.endDistance <= 20) ||
+      (inputs.days == 1 && days != 0)
     ) {
       return undefined;
     }
+    const currentStart = currentUser.coopStartDate;
+    const currentEnd = currentUser.coopEndDate;
+    const userStart = user.coopStartDate;
+    const userEnd = user.coopEndDate;
+    let dateScore = 1;
+    let partialOverlap = false;
+    let fullOverlap = false;
+    if (currentStart && currentEnd && userStart && userEnd) {
+      partialOverlap = !(
+        (currentStart <= userStart && currentEnd >= userStart) ||
+        (currentEnd >= userEnd && currentStart <= userEnd)
+      );
+      fullOverlap = userStart <= currentStart && userEnd >= currentEnd;
+      if (inputs.dateOverlap !== 0) {
+        if (inputs.dateOverlap === 1 && !partialOverlap) {
+          return undefined;
+        } else if (inputs.dateOverlap === 2 && !fullOverlap) {
+          return undefined;
+        }
+      }
+    } else if (inputs.dateOverlap !== 0) {
+      return undefined;
+    }
 
-    let finalScore =
-      (startDistance / cutoffs.startDistance) * weights.startDistance +
-      (endDistance / cutoffs.endDistance) * weights.endDistance +
-      (days / cutoffs.days) * weights.days;
+    if (fullOverlap) {
+      dateScore = 0;
+    } else if (partialOverlap) {
+      dateScore = 0.5;
+    }
+    let sDistanceScore;
+    let eDistanceScore;
+    let finalScore = 0;
+    let daysScore;
+    // Sorting portion
+    if (sort == "any") {
+      sDistanceScore =
+        startDistance > cutoffs.startDistance
+          ? 1
+          : startDistance / cutoffs.startDistance;
+      eDistanceScore =
+        endDistance > cutoffs.endDistance
+          ? 1
+          : endDistance / cutoffs.endDistance;
+      daysScore = days > cutoffs.days ? 1 : days / cutoffs.days;
+      finalScore =
+        (startDistance / cutoffs.startDistance) * weights.startDistance +
+        (endDistance / cutoffs.endDistance) * weights.endDistance +
+        (days / cutoffs.days) * weights.days +
+        dateScore * weights.overlap;
 
-    if (startTime !== undefined && endTime !== undefined) {
-      finalScore +=
-        (startTime / cutoffs.startTime) * weights.startTime +
-        (endTime / cutoffs.endTime) * weights.endTime;
-    } else {
-      finalScore += weights.startTime + weights.endTime;
+      if (startTime !== undefined && endTime !== undefined) {
+        let eTimeScore =
+          endTime > cutoffs.endTime ? 1 : endTime / cutoffs.endTime;
+        let sTimeScore =
+          startTime > cutoffs.startTime ? 1 : startTime / cutoffs.startTime;
+
+        finalScore +=
+          sDistanceScore * weights.startDistance +
+          eDistanceScore * weights.endDistance +
+          sTimeScore * weights.startTime +
+          eTimeScore * weights.endTime +
+          daysScore * weights.days;
+      } else {
+        finalScore +=
+          weights.startTime +
+          weights.endTime +
+          sDistanceScore * weights.startDistance +
+          eDistanceScore * weights.endDistance;
+      }
+    } else if (sort == "distance") {
+      finalScore = startDistance + endDistance;
     }
 
     return {
