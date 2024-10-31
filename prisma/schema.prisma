@@ -130,7 +130,7 @@ model User {
   pronouns           String        @default("")
   accounts           Account[] // can have multiple accounts
   sessions           Session[] // can have multiple settings
-  role               Role          @default(RIDER)
+  role               Role          @default(VIEWER)
   status             Status        @default(ACTIVE)
   seatAvail          Int           @default(0) @map("seat_avail")
   companyName        String        @default("") @map("company_name")
