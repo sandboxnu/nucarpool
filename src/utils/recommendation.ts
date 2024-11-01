@@ -37,8 +37,8 @@ export type Inputs = {
   startTime: number; // max = 4 hours (240min), greater = any
   endTime: number;
   days: number; /// 0 for any, 1 for exact
-  startDate: number;
-  endDate: number;
+  startDate: Date;
+  endDate: Date;
   dateOverlap: number; // 0 any, 1 partial, 2 full
 };
 

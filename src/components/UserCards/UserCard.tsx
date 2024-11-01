@@ -58,7 +58,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
   dayjs.extend(timezone);
 
   /** Creates a div with 7 boxes, each representing a day of the week.
-   *  Background color is green if the user is working on that day.
+   *  Background color is red if the user is working on that day.
    */
   const DaysWorkingDisplay = (daysWorking: string) => {
     const boxes: JSX.Element[] = [];
