@@ -11,6 +11,7 @@ import { createPortal } from "react-dom";
 import ConnectModal from "../Modals/ConnectModal";
 import { UserContext } from "../../utils/userContext";
 import { Role } from "@prisma/client";
+import { trackEvent } from "../../utils/mixpanel";
 
 interface ConnectCardProps {
   otherUser: EnhancedPublicUser;
@@ -52,6 +53,12 @@ export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
   };
 
   const handleConnect = (otherUser: EnhancedPublicUser) => {
+    trackEvent("Connect Button Clicked", {
+      userRole: user?.role,
+      hasIncomingRequest: otherUser.incomingRequest,
+      hasOutgoingRequest: otherUser.outgoingRequest,
+    });
+
     if (otherUser.incomingRequest) {
       handleExistingReceivedRequest();
     } else if (otherUser.outgoingRequest) {

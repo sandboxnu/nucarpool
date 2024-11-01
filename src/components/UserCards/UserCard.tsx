@@ -13,6 +13,7 @@ import { User } from "@prisma/client";
 import StartIcon from "../../../public/start.png";
 import EndIcon from "../../../public/end.png";
 import Image from "next/image";
+import { trackViewRoute } from "../../utils/mixpanel";
 
 interface UserCardProps {
   otherUser: EnhancedPublicUser;
@@ -201,10 +202,12 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       {props.onViewRouteClick && props.rightButton ? (
         <div className="flex flex-row justify-between gap-2">
           <button
-            onClick={() =>
-              props.onViewRouteClick &&
-              props.onViewRouteClick(user, props.otherUser)
-            }
+            onClick={() => {
+              if (props.onViewRouteClick && user) {
+                props.onViewRouteClick(user, props.otherUser);
+                trackViewRoute();
+              }
+            }}
             className="my-1 w-1/2 rounded-md border border-black p-1 text-center hover:bg-stone-200"
           >
             View Route

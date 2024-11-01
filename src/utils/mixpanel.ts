@@ -25,3 +25,17 @@ export const setUserProperties = (properties: Record<string, any>) => {
 export const trackProfileCompletion = (role: string, status: string) => {
   trackEvent('Profile Completed', { role, status });
 };
+
+// Add this new function
+export const trackViewRoute = () => {
+  trackEvent('View Route Clicked', {
+    timestamp: new Date().toISOString()
+  });
+};
+
+export const trackRequestResponse = (action: 'accept' | 'decline') => {
+  trackEvent('Request Response', {
+    action,
+    timestamp: new Date().toISOString()
+  });
+};
