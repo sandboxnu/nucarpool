@@ -1,8 +1,14 @@
 import { useState } from "react";
 import { Dialog } from "@headlessui/react";
+import { trackEvent } from '../utils/mixpanel'; // Import the trackEvent function
 
 export const ComplianceModal = () => {
   const [isOpen, setIsOpen] = useState<boolean>(true);
+
+  const handleAgreeClick = () => {
+    trackEvent('Compliance Agreement Accepted'); // Track the event
+    setIsOpen(false);
+  };
 
   return (
     <Dialog open={isOpen} onClose={() => {}}>
@@ -60,7 +66,7 @@ export const ComplianceModal = () => {
             </div>
             <button
               className="w-25 rounded-md border-2 border-red-700 bg-red-700 p-1 text-slate-50 "
-              onClick={() => setIsOpen(false)}
+              onClick={handleAgreeClick} // Use the event handler
             >
               I Agree
             </button>

@@ -13,6 +13,7 @@ import { User } from "@prisma/client";
 import StartIcon from "../../../public/start.png";
 import EndIcon from "../../../public/end.png";
 import Image from "next/image";
+import { trackViewRoute } from "../../utils/mixpanel";
 
 interface UserCardProps {
   otherUser: EnhancedPublicUser;
@@ -211,10 +212,12 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
             View Route
           </button>
           <button
-            onClick={() =>
-              props.rightButton?.onPress &&
-              props.rightButton.onPress(props.otherUser)
-            }
+            onClick={() => {
+              if (props.rightButton?.onPress) {
+                trackViewRoute();
+                props.rightButton.onPress(props.otherUser);
+              }
+            }}
             disabled={user.role === "VIEWER" || user.status === "INACTIVE"}
             className={getButtonClassName(props.rightButton)}
           >
