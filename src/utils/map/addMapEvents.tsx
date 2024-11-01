@@ -38,13 +38,9 @@ const addMapEvents = (
   });
   function handlePointClick(e: MapLayerMouseEvent) {
     if (!e.features) return;
-
-    const pointFeatures = e.features.filter(
-      (
-        feature
-      ): feature is MapboxGeoJSONFeature & { geometry: GeoJSON.Point } =>
-        feature.geometry.type === "Point"
-    );
+    const layers = ["riders", "drivers"];
+    e;
+    const pointFeatures = map.queryRenderedFeatures(e.point, { layers });
 
     if (pointFeatures.length === 0) return;
 
@@ -52,10 +48,6 @@ const addMapEvents = (
       (feature) => feature.properties as PublicUser
     );
 
-    const coordinates = pointFeatures[0].geometry.coordinates.slice();
-    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-      coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-    }
     setPopupUser(users);
   }
 
