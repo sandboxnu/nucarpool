@@ -42,7 +42,7 @@ interface FiltersProps {
 }
 
 const Filters = ({ onClose, filters, setFilters }: FiltersProps) => {
-  const [distanceOpen, setDistanceOpen] = useState(true);
+  const [distanceOpen, setDistanceOpen] = useState(false);
   const [daysMatchOpen, setDaysMatchOpen] = useState(false);
   const [startTimeOpen, setStartTimeOpen] = useState(false);
   const [termDatesOpen, setTermDatesOpen] = useState(false);
@@ -52,7 +52,7 @@ const Filters = ({ onClose, filters, setFilters }: FiltersProps) => {
     (field: keyof FiltersState) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const [year, month] = event.target.value.split("-").map(Number);
-      const lastDay = new Date(year, month - 1, 0);
+      const lastDay = new Date(year, month, 0);
       setFilters((prev) => ({
         ...prev,
         [field]: lastDay,
@@ -88,6 +88,9 @@ const Filters = ({ onClose, filters, setFilters }: FiltersProps) => {
       };
     });
   };
+  const selectedDaysCount = filters.daysWorking
+    .split(",")
+    .filter((day) => day === "1").length;
 
   return (
     <div className="h-full w-full select-none overflow-y-auto bg-white p-1">
@@ -98,14 +101,8 @@ const Filters = ({ onClose, filters, setFilters }: FiltersProps) => {
         </button>
       </div>
       <div className="border-b border-gray-200 " />
-
-      <FilterSection
-        title="Distance"
-        isOpen={distanceOpen}
-        toggleOpen={() => setDistanceOpen(!distanceOpen)}
-      >
-        <style>
-          {`
+      <style>
+        {`
           input[type="range"]::-webkit-slider-thumb {
             appearance: none;
             height: 25px;
@@ -125,7 +122,12 @@ const Filters = ({ onClose, filters, setFilters }: FiltersProps) => {
             cursor: pointer;
           }
         `}
-        </style>
+      </style>
+      <FilterSection
+        title="Distance"
+        isOpen={distanceOpen}
+        toggleOpen={() => setDistanceOpen(!distanceOpen)}
+      >
         <div className="mt-3">
           <label className="mb-2 block">Max distance from start (miles)</label>
           <div className="flex flex-col items-center gap-3">
@@ -267,12 +269,15 @@ const Filters = ({ onClose, filters, setFilters }: FiltersProps) => {
                   <input
                     type="number"
                     min="1"
-                    max="5"
+                    max={selectedDaysCount}
                     value={filters.flexDays}
                     onChange={(e) => {
                       const newFlexDays = Math.max(
                         1,
-                        Math.min(5, parseInt(e.target.value, 10))
+                        Math.min(
+                          selectedDaysCount,
+                          parseInt(e.target.value, 10)
+                        )
                       );
                       if (!isNaN(newFlexDays)) {
                         setFilters((prevFilters) => ({
@@ -408,7 +413,7 @@ const Filters = ({ onClose, filters, setFilters }: FiltersProps) => {
               <label className="mb-2 block font-semibold">Start Date</label>
               <TextField
                 type="month"
-                inputClassName="h-14 text-lg"
+                inputClassName="h-14 text-md"
                 isDisabled={filters.dateOverlap === 0}
                 id="coopStartDate"
                 value={formatDateToMonth(filters.startDate)}
@@ -419,7 +424,7 @@ const Filters = ({ onClose, filters, setFilters }: FiltersProps) => {
               <label className="mb-2 block font-semibold">End Date</label>
               <TextField
                 type="month"
-                inputClassName="h-14 text-lg"
+                inputClassName="h-14 text-mdd"
                 isDisabled={filters.dateOverlap === 0}
                 id="coopEndDate"
                 value={formatDateToMonth(filters.endDate)}

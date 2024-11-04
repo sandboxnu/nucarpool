@@ -38,6 +38,7 @@ import VisibilityToggle from "../components/Map/VisibilityToggle";
 import updateCompanyLocation from "../utils/map/updateCompanyLocation";
 import MessagePanel from "../components/Messages/MessagePanel";
 import InactiveBlocker from "../components/Map/InactiveBlocker";
+import updateGeoJsonUsers from "../utils/map/updateGeoJsonUsers";
 
 mapboxgl.accessToken = browserEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -70,7 +71,7 @@ const Home: NextPage<any> = () => {
   const [filters, setFilters] = useState<FiltersState>({
     sort: "any",
     days: 0,
-    flexDays: 0,
+    flexDays: 1,
     startDistance: 20,
     endDistance: 20,
     daysWorking: "",
@@ -275,18 +276,10 @@ const Home: NextPage<any> = () => {
       }));
     }
   }, [user]);
-  const updateGeoJsonUsers = (map: Map, geoJsonUsers: GeoJsonUsers) => {
-    if (map.getSource("company-locations")) {
-      const source = map.getSource(
-        "company-locations"
-      ) as mapboxgl.GeoJSONSource;
-      source.setData(geoJsonUsers);
-    } else {
-      addClusters(map, geoJsonUsers);
-    }
-  };
+
   useEffect(() => {
-    if (user && geoJsonUsers && mapContainerRef.current) {
+    // Map initialization
+    if (!mapState && user && mapContainerRef.current) {
       const isViewer = user.role === "VIEWER";
       const neuLat = 42.33907;
       const neuLng = -71.088748;
@@ -298,9 +291,13 @@ const Home: NextPage<any> = () => {
           : [user.companyCoordLng, user.companyCoordLat],
         zoom: 10,
       });
-      newMap.setMaxZoom(13);
+
       newMap.on("load", () => {
-        addClusters(newMap, geoJsonUsers);
+        newMap.setMaxZoom(13);
+        setMapState(newMap);
+        addMapEvents(newMap, user, setPopupUsers);
+
+        // Initial setting of user and company locations
         if (user.role !== "VIEWER") {
           updateUserLocation(newMap, user.startCoordLng, user.startCoordLat);
           updateCompanyLocation(
@@ -310,11 +307,14 @@ const Home: NextPage<any> = () => {
             user.role
           );
         }
-        addMapEvents(newMap, user, setPopupUsers);
       });
-      setMapState(newMap);
     }
-  }, [user, geoJsonUsers]);
+  }, [mapState, mapContainerRef, user]);
+  useEffect(() => {
+    if (mapState && geoJsonUsers) {
+      updateGeoJsonUsers(mapState, geoJsonUsers);
+    }
+  }, [mapState, geoJsonUsers]);
 
   // separate use effect for user location rendering
   useEffect(() => {

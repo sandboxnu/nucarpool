@@ -86,7 +86,7 @@ export const mapboxRouter = router({
           OR: [{ role: oppRole }, { role: viewCheck }],
         },
       });
-
+      input.sort = "distance";
       const filtered = _.compact(users.map(calculateScore(currentUser, input)));
       filtered.sort((a, b) => a.score - b.score);
       const sortedUsers = _.compact(

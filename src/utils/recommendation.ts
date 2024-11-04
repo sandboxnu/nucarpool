@@ -18,7 +18,6 @@ const cutoffs = {
   endDistance: 6, // miles
   startTime: 80, // minutes
   endTime: 80, // minutes
-  days: 3,
 };
 
 /** Weights for each portion of the recommendation score */
@@ -42,6 +41,7 @@ export type FInputs = {
   endDate: Date;
   dateOverlap: number; // 0 any, 1 partial, 2 full
   sort: string;
+  daysWorking: string;
 };
 
 /** Provides a very approximate coordinate distance to mile conversion */
@@ -84,7 +84,9 @@ export const calculateScore = <T extends CommonUser>(
   currentUser: T,
   inputs: FInputs
 ): ((user: T) => Recommendation | undefined) => {
-  const currentUserDays = dayConversion(currentUser);
+  const currentUserDays = inputs.daysWorking
+    .split(",")
+    .map((str) => str === "1");
 
   return (user: T) => {
     if (
@@ -110,13 +112,21 @@ export const calculateScore = <T extends CommonUser>(
           Math.pow(currentUser.companyCoordLng - user.companyCoordLng, 2)
       )
     );
-
     const userDays = dayConversion(user);
-    // check number of days users differ
-    let days = currentUserDays
-      .map((day, index) => day !== userDays[index])
-      .reduce((prev, curr) => (curr ? prev + 1 : prev), 0);
+    // check number of days users both go in, also count number of days current user goes in
+    const daysHelper = currentUserDays.reduce(
+      (acc, currentUserDay, index) => {
+        if (currentUserDay) {
+          acc.currentUserDays++;
 
+          if (userDays[index]) {
+            acc.bothUsersDays++;
+          }
+        }
+        return acc;
+      },
+      { currentUserDays: 0, bothUsersDays: 0 }
+    );
     let startTime: number | undefined;
     let endTime: number | undefined;
     if (
@@ -146,7 +156,9 @@ export const calculateScore = <T extends CommonUser>(
     if (
       (startDistance > inputs.startDistance && inputs.startDistance < 20) ||
       (endDistance > inputs.endDistance && inputs.endDistance < 20) ||
-      (inputs.days == 1 && days != 0)
+      (inputs.days == 1 &&
+        daysHelper.bothUsersDays !== daysHelper.currentUserDays) ||
+      (inputs.days === 2 && daysHelper.bothUsersDays < inputs.flexDays)
     ) {
       return undefined;
     }
@@ -193,11 +205,11 @@ export const calculateScore = <T extends CommonUser>(
         endDistance > cutoffs.endDistance
           ? 1
           : endDistance / cutoffs.endDistance;
-      daysScore = days > cutoffs.days ? 1 : days / cutoffs.days;
+      daysScore = 1 - daysHelper.bothUsersDays / daysHelper.currentUserDays;
       finalScore =
         (startDistance / cutoffs.startDistance) * weights.startDistance +
         (endDistance / cutoffs.endDistance) * weights.endDistance +
-        (days / cutoffs.days) * weights.days +
+        daysScore * weights.days +
         dateScore * weights.overlap;
 
       if (startTime !== undefined && endTime !== undefined) {
