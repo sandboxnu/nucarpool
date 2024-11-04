@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
+import {
+  EnhancedPublicUser,
+  FiltersState,
+  PublicUser,
+  User,
+} from "../../utils/types";
 import _ from "lodash";
 import { SidebarContent } from "./SidebarContent";
 import { clearMarkers } from "../../utils/map/viewRoute";
@@ -10,6 +15,8 @@ import { mockSession } from "next-auth/client/__tests__/helpers/mocks";
 interface ExploreSidebarProps {
   recs: EnhancedPublicUser[];
   favs: EnhancedPublicUser[];
+  setFilters: React.Dispatch<React.SetStateAction<FiltersState>>;
+  filters: FiltersState;
   disabled: boolean;
   viewRoute: (user: User, otherUser: PublicUser) => void;
   onViewRequest: (userId: string) => void;
@@ -63,7 +70,11 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
       </div>
       <div className="relative">
         {filtersOpen ? (
-          <Filters onClose={() => setFiltersOpen(false)} />
+          <Filters
+            setFilters={props.setFilters}
+            filters={props.filters}
+            onClose={() => setFiltersOpen(false)}
+          />
         ) : (
           <SidebarContent
             userCardList={

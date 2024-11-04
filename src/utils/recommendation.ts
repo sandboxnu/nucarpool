@@ -31,15 +31,17 @@ const weights = {
   overlap: 0.1,
 };
 
-export type Inputs = {
-  startDistance: number; // max 20, greater = any
+export type FInputs = {
+  startDistance: number; // max 19, greater = any
   endDistance: number;
-  startTime: number; // max = 4 hours (240min), greater = any
+  startTime: number; // max = 3 hours (180min), greater = any
   endTime: number;
   days: number; /// 0 for any, 1 for exact
+  flexDays: number; // minimum # of days to match
   startDate: Date;
   endDate: Date;
   dateOverlap: number; // 0 any, 1 partial, 2 full
+  sort: string;
 };
 
 /** Provides a very approximate coordinate distance to mile conversion */
@@ -76,13 +78,11 @@ const dayConversion = (user: CommonUser) => {
  *
  * @param currentUser The user to generate a recommendation callback for
  * @param inputs The filter inputs to replace 'cutoffs'
- * @param sort The input to be sorted for, 'any' is default
  * @returns A function that takes in a user and returns their score relative to `currentUser`
  */
 export const calculateScore = <T extends CommonUser>(
   currentUser: T,
-  inputs: Inputs,
-  sort: string
+  inputs: FInputs
 ): ((user: T) => Recommendation | undefined) => {
   const currentUserDays = dayConversion(currentUser);
 
@@ -136,16 +136,16 @@ export const calculateScore = <T extends CommonUser>(
           60 +
         Math.abs(currentUser.endTime.getMinutes() - user.endTime.getMinutes());
       if (
-        (startTime > inputs.startTime && inputs.startTime <= 240) ||
-        (endTime > inputs.endTime && inputs.endTime <= 240)
+        (startTime > inputs.startTime * 60 && inputs.startTime < 4) ||
+        (endTime > inputs.endTime * 60 && inputs.endTime < 4)
       ) {
         return undefined;
       }
     }
 
     if (
-      (startDistance > inputs.startDistance && inputs.startDistance <= 20) ||
-      (endDistance > inputs.endDistance && inputs.endDistance <= 20) ||
+      (startDistance > inputs.startDistance && inputs.startDistance < 20) ||
+      (endDistance > inputs.endDistance && inputs.endDistance < 20) ||
       (inputs.days == 1 && days != 0)
     ) {
       return undefined;
@@ -184,7 +184,7 @@ export const calculateScore = <T extends CommonUser>(
     let finalScore = 0;
     let daysScore;
     // Sorting portion
-    if (sort == "any") {
+    if (inputs.sort == "any") {
       sDistanceScore =
         startDistance > cutoffs.startDistance
           ? 1
@@ -219,7 +219,7 @@ export const calculateScore = <T extends CommonUser>(
           sDistanceScore * weights.startDistance +
           eDistanceScore * weights.endDistance;
       }
-    } else if (sort == "distance") {
+    } else if (inputs.sort == "distance") {
       finalScore = startDistance + endDistance;
     }
 
@@ -314,8 +314,8 @@ export const generateUser = ({
     startPOICoordLat: startCoordLat,
     isOnboarded: true,
     daysWorking: daysWorking,
-    startTime: startDate,
-    endTime: endDate,
+    startTime: startTime,
+    endTime: endTime,
     coopEndDate: coopEndDate,
     coopStartDate: coopStartDate,
     carpoolId: null,

@@ -44,12 +44,15 @@ export const mapboxRouter = router({
     .input(
       z.object({
         days: z.number(), /// 0 for any, 1 for exact
+        daysWorking: z.string(),
+        flexDays: z.number(),
         startDistance: z.number(), // max 20, greater = any
         endDistance: z.number(),
         startTime: z.number(), // max = 4 hours, greater = any
         endTime: z.number(),
-        startDate: z.number(),
-        endDate: z.number(),
+        sort: z.string(),
+        startDate: z.date(),
+        endDate: z.date(),
         dateOverlap: z.number(), // 0 any, 1 partial, 2 full
       })
     )
@@ -84,12 +87,10 @@ export const mapboxRouter = router({
         },
       });
 
-      const distances = _.compact(
-        users.map(calculateScore(currentUser, input, "distance"))
-      );
-      distances.sort((a, b) => a.score - b.score);
+      const filtered = _.compact(users.map(calculateScore(currentUser, input)));
+      filtered.sort((a, b) => a.score - b.score);
       const sortedUsers = _.compact(
-        distances.map((rec) => users.find((user) => user.id === rec.id))
+        filtered.map((rec) => users.find((user) => user.id === rec.id))
       );
       const finalUsers = isViewer ? sortedUsers : sortedUsers.slice(0, 50);
 

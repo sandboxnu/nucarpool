@@ -19,6 +19,8 @@ import {
   CarpoolAddress,
   CarpoolFeature,
   EnhancedPublicUser,
+  FiltersState,
+  GeoJsonUsers,
   PublicUser,
   Request,
 } from "../utils/types";
@@ -65,17 +67,36 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 
 const Home: NextPage<any> = () => {
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<FiltersState>({
+    sort: "any",
     days: 0,
-    startDistance: 21,
-    endDistance: 21,
-    startTime: 241,
-    endTime: 241,
-    startDate: Date.now(),
-    endDate: Date.now(),
+    flexDays: 0,
+    startDistance: 20,
+    endDistance: 20,
+    daysWorking: "",
+    startTime: 4,
+    endTime: 4,
+    startDate: new Date(Date.now()),
+    endDate: new Date(Date.now()),
     dateOverlap: 0,
   });
-  const { data: geoJsonUsers } = trpc.mapbox.geoJsonUserList.useQuery(filters);
+  const [debouncedFilters, setDebouncedFilters] = useState(filters);
+  const [otherUser, setOtherUser] = useState<PublicUser | null>(null);
+
+  useEffect(() => {
+    const handler = debounce(() => {
+      setOtherUser(null);
+      setDebouncedFilters(filters);
+    }, 300);
+
+    handler();
+
+    return () => {
+      handler.cancel();
+    };
+  }, [filters]);
+  const { data: geoJsonUsers } =
+    trpc.mapbox.geoJsonUserList.useQuery(debouncedFilters);
   const { data: user = null } = trpc.user.me.useQuery();
   const { data: recommendations = [] } =
     trpc.user.recommendations.me.useQuery(filters);
@@ -90,7 +111,6 @@ const Home: NextPage<any> = () => {
   const handleUserSelect = (userId: string) => {
     setSelectedUserId(userId);
   };
-  const [otherUser, setOtherUser] = useState<PublicUser | null>(null);
   const [mapState, setMapState] = useState<mapboxgl.Map>();
   const [sidebarType, setSidebarType] = useState<HeaderOptions>("explore");
   const [popupUsers, setPopupUsers] = useState<PublicUser[] | null>(null);
@@ -244,7 +264,27 @@ const Home: NextPage<any> = () => {
     "id"
   ).map(extendPublicUser);
   const enhancedFavs = favorites.map(extendPublicUser);
-
+  useEffect(() => {
+    if (user && user.role !== "VIEWER") {
+      // update filter params
+      setFilters((prev) => ({
+        ...prev,
+        startDate: user.coopStartDate ? user.coopStartDate : prev.startDate,
+        endDate: user.coopEndDate ? user.coopEndDate : prev.endDate,
+        daysWorking: user.daysWorking,
+      }));
+    }
+  }, [user]);
+  const updateGeoJsonUsers = (map: Map, geoJsonUsers: GeoJsonUsers) => {
+    if (map.getSource("company-locations")) {
+      const source = map.getSource(
+        "company-locations"
+      ) as mapboxgl.GeoJSONSource;
+      source.setData(geoJsonUsers);
+    } else {
+      addClusters(map, geoJsonUsers);
+    }
+  };
   useEffect(() => {
     if (user && geoJsonUsers && mapContainerRef.current) {
       const isViewer = user.role === "VIEWER";
@@ -278,7 +318,7 @@ const Home: NextPage<any> = () => {
 
   // separate use effect for user location rendering
   useEffect(() => {
-    if (mapState) {
+    if (mapState !== undefined) {
       if (user!.role === "VIEWER") {
         updateUserLocation(
           mapState,
@@ -300,12 +340,13 @@ const Home: NextPage<any> = () => {
   useEffect(() => {
     setSelectedUserId(null);
   }, [sidebarType]);
+
   useEffect(() => {
     // useEffect for initial route rendering
     if (
       user &&
       !otherUser &&
-      mapState &&
+      mapState !== undefined &&
       (user.role !== "VIEWER" ||
         (startAddressSelected.center[0] !== 0 &&
           companyAddressSelected.center[0] !== 0))
@@ -351,7 +392,6 @@ const Home: NextPage<any> = () => {
     type: "address%2Cpostcode",
     setFunc: setStartAddressSuggestions,
   });
-
   useGetDirections({ points: points, map: mapState! });
 
   if (!user) {
@@ -435,6 +475,8 @@ const Home: NextPage<any> = () => {
               <div className="w-96">
                 {mapState && (
                   <SidebarPage
+                    setFilters={setFilters}
+                    filters={filters}
                     sidebarType={sidebarType}
                     role={user.role}
                     map={mapState}

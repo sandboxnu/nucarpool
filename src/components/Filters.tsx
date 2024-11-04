@@ -5,7 +5,7 @@ import { Controller } from "react-hook-form";
 import Checkbox from "@mui/material/Checkbox";
 import DayBox from "./Profile/DayBox";
 import { User } from "@prisma/client";
-import { EnhancedPublicUser } from "../utils/types";
+import { EnhancedPublicUser, FiltersState } from "../utils/types";
 import { UserContext } from "../utils/userContext";
 import { TextField } from "./TextField";
 import { setValue } from "rc-field-form/es/utils/valueUtil";
@@ -37,37 +37,26 @@ const FilterSection = ({
 
 interface FiltersProps {
   onClose: () => void;
+  setFilters: React.Dispatch<React.SetStateAction<FiltersState>>;
+  filters: FiltersState;
 }
 
-const Filters = ({ onClose }: FiltersProps) => {
-  const user = useContext(UserContext);
-  const [daysFilter, setDaysFilter] = useState(0);
-  const [datesFilter, setDatesFilter] = useState(0);
+const Filters = ({ onClose, filters, setFilters }: FiltersProps) => {
   const [distanceOpen, setDistanceOpen] = useState(true);
   const [daysMatchOpen, setDaysMatchOpen] = useState(false);
   const [startTimeOpen, setStartTimeOpen] = useState(false);
   const [termDatesOpen, setTermDatesOpen] = useState(false);
-  const [maxDistanceStart, setMaxDistanceStart] = useState(20);
-  const [maxDistanceEnd, setMaxDistanceEnd] = useState(20);
-  const [maxStartTime, setMaxStartTime] = useState(4);
-  const [maxEndTime, setMaxEndTime] = useState(4);
-  const [selectedDays, setSelectedDays] = useState<boolean[]>(
-    user?.daysWorking
-      ? user.daysWorking.split(",").map((day) => day === "1")
-      : Array(7).fill(false)
-  );
-  const [selectedMonths, setSelectedMonths] = useState<{
-    [key: string]: Date | null;
-  }>({
-    coopStartDate: user?.coopStartDate ? new Date(user.coopStartDate) : null,
-    coopEndDate: user?.coopEndDate ? new Date(user.coopEndDate) : null,
-  });
   const daysOfWeek = ["Su", "M", "Tu", "W", "Th", "F", "S"];
+
   const handleMonthChange =
-    (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    (field: keyof FiltersState) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
       const [year, month] = event.target.value.split("-").map(Number);
-      const lastDay = new Date(year, month, 0);
-      setSelectedMonths((prev) => ({ ...prev, [field]: lastDay }));
+      const lastDay = new Date(year, month - 1, 0);
+      setFilters((prev) => ({
+        ...prev,
+        [field]: lastDay,
+      }));
     };
 
   const formatDateToMonth = (date: Date | null) => {
@@ -79,17 +68,24 @@ const Filters = ({ onClose }: FiltersProps) => {
     return `${year}-${month}`;
   };
   const handleRangeChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    setValue: React.Dispatch<React.SetStateAction<number>>
+    field: keyof FiltersState,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const value = parseInt(e.target.value, 10);
-    setValue(value);
+    const value = parseInt(event.target.value, 10);
+    setFilters((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
+
   const toggleDaySelection = (index: number) => {
-    setSelectedDays((prev) => {
-      const updatedDays = [...prev];
-      updatedDays[index] = !updatedDays[index];
-      return updatedDays;
+    setFilters((prev) => {
+      const daysArray = prev.daysWorking.split(",").map((day) => day === "1");
+      daysArray[index] = !daysArray[index];
+      return {
+        ...prev,
+        daysWorking: daysArray.map((day) => (day ? "1" : "0")).join(","),
+      };
     });
   };
 
@@ -137,23 +133,25 @@ const Filters = ({ onClose }: FiltersProps) => {
               type="range"
               min="0"
               max="20"
-              value={maxDistanceStart}
-              onChange={(e) => handleRangeChange(e, setMaxDistanceStart)}
+              value={filters.startDistance}
+              onChange={(e) => handleRangeChange("startDistance", e)}
               className="h-2 w-full appearance-none rounded-full focus:outline-none focus:ring-2 focus:ring-northeastern-red"
               style={{
                 WebkitAppearance: "none",
                 appearance: "none",
                 background: `linear-gradient(to right, #C8102E 0%, #C8102E ${
-                  (maxDistanceStart / 20) * 100
-                }%, #d3d3d3 ${(maxDistanceStart / 20) * 100}%, #d3d3d3 100%)`,
+                  (filters.startDistance / 20) * 100
+                }%, #d3d3d3 ${
+                  (filters.startDistance / 20) * 100
+                }%, #d3d3d3 100%)`,
                 height: "8px",
                 borderRadius: "5px",
               }}
             />
             <div className="text-lg font-semibold text-northeastern-red">
-              {maxDistanceStart === 20
-                ? `${maxDistanceStart}+`
-                : maxDistanceStart}
+              {filters.startDistance === 20
+                ? `${filters.startDistance}+`
+                : filters.startDistance}
             </div>
           </div>
 
@@ -165,21 +163,25 @@ const Filters = ({ onClose }: FiltersProps) => {
               type="range"
               min="0"
               max="20"
-              value={maxDistanceEnd}
-              onChange={(e) => handleRangeChange(e, setMaxDistanceEnd)}
+              value={filters.endDistance}
+              onChange={(e) => handleRangeChange("endDistance", e)}
               className="h-2 w-full appearance-none rounded-full focus:outline-none focus:ring-2 focus:ring-northeastern-red"
               style={{
                 WebkitAppearance: "none",
                 appearance: "none",
                 background: `linear-gradient(to right, #C8102E 0%, #C8102E ${
-                  (maxDistanceEnd / 20) * 100
-                }%, #d3d3d3 ${(maxDistanceEnd / 20) * 100}%, #d3d3d3 100%)`,
+                  (filters.endDistance / 20) * 100
+                }%, #d3d3d3 ${
+                  (filters.endDistance / 20) * 100
+                }%, #d3d3d3 100%)`,
                 height: "8px",
                 borderRadius: "5px",
               }}
             />
             <div className="text-lg font-semibold text-northeastern-red">
-              {maxDistanceEnd === 20 ? `${maxDistanceEnd}+` : maxDistanceEnd}
+              {filters.endDistance === 20
+                ? `${filters.endDistance}+`
+                : filters.endDistance}
             </div>
           </div>
         </div>
@@ -194,71 +196,96 @@ const Filters = ({ onClose }: FiltersProps) => {
           <div className="text-md flex gap-2 font-semibold">
             <button
               className={`rounded-full px-4 py-2  ${
-                daysFilter === 0
+                filters.days === 0
                   ? "border-2 border-black bg-northeastern-red text-white"
                   : "bg-gray-300"
               }`}
-              onClick={() => setDaysFilter(0)}
+              onClick={() =>
+                setFilters((prev) => ({
+                  ...prev,
+                  days: 0,
+                }))
+              }
             >
               Any days
             </button>
             <button
               className={`rounded-full px-4 py-2 ${
-                daysFilter === 1
+                filters.days === 1
                   ? "border-2 border-black bg-northeastern-red text-white"
                   : "bg-gray-300"
               }`}
-              onClick={() => setDaysFilter(1)}
+              onClick={() =>
+                setFilters((prev) => ({
+                  ...prev,
+                  days: 1,
+                }))
+              }
             >
               Exact days
             </button>
             <button
               className={`rounded-full px-4 py-2 ${
-                daysFilter === 2
+                filters.days === 2
                   ? "border-2 border-black bg-northeastern-red text-white"
                   : "bg-gray-300"
               }`}
-              onClick={() => setDaysFilter(2)}
+              onClick={() =>
+                setFilters((prev) => ({
+                  ...prev,
+                  days: 2,
+                }))
+              }
             >
               Flex days
             </button>
           </div>
 
-          {daysFilter === 1 ? (
-            <div className="mt-4 flex flex-wrap items-start">
-              {daysOfWeek.map((day, index) => (
-                <Checkbox
-                  key={day + index.toString()}
-                  sx={{
-                    padding: 0,
-                  }}
-                  checked={selectedDays[index]}
-                  onChange={() => toggleDaySelection(index)}
-                  checkedIcon={<StaticDayBox day={day} isSelected={true} />}
-                  icon={<StaticDayBox day={day} isSelected={false} />}
-                />
-              ))}
-            </div>
-          ) : daysFilter === 2 ? (
-            <div className="flex w-full flex-col justify-center">
-              <label className="mb-2 mt-4 self-center">
-                Minimum shared carpool days
-              </label>
-              <input
-                type="number"
-                min="1"
-                max="5"
-                onInput={(e) => {
-                  const target = e.target as HTMLInputElement;
-                  if (parseInt(target.value) > 5) {
-                    target.value = "5";
-                  } else if (parseInt(target.value) < 1) {
-                    target.value = "1";
-                  }
-                }}
-                className="flex h-10 w-16  self-center rounded-full border border-gray-400 p-2 text-center focus:border-transparent focus:ring-2  focus:ring-northeastern-red "
-              />
-            </div>
+          {filters.days === 1 || filters.days === 2 ? (
+            <>
+              <div className="mt-4 flex flex-wrap items-start">
+                {daysOfWeek.map((day, index) => (
+                  <Checkbox
+                    key={day + index.toString()}
+                    sx={{ padding: 0 }}
+                    checked={
+                      filters.daysWorking.split(",").map((d) => d === "1")[
+                        index
+                      ]
+                    }
+                    onChange={() => toggleDaySelection(index)}
+                    checkedIcon={<StaticDayBox day={day} isSelected={true} />}
+                    icon={<StaticDayBox day={day} isSelected={false} />}
+                  />
+                ))}
+              </div>
+              {filters.days === 2 && (
+                <div className="mt-4 flex w-full flex-col justify-center">
+                  <label className="mb-2 self-center">
+                    Minimum shared carpool days
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={filters.flexDays}
+                    onChange={(e) => {
+                      const newFlexDays = Math.max(
+                        1,
+                        Math.min(5, parseInt(e.target.value, 10))
+                      );
+                      if (!isNaN(newFlexDays)) {
+                        setFilters((prevFilters) => ({
+                          ...prevFilters,
+                          flexDays: newFlexDays,
+                        }));
+                      }
+                    }}
+                    className="flex h-10 w-16 self-center rounded-full border border-gray-400 p-2 text-center focus:border-transparent focus:ring-2 focus:ring-northeastern-red "
+                  />
+                </div>
+              )}
+            </>
           ) : null}
         </div>
       </FilterSection>
@@ -276,21 +303,23 @@ const Filters = ({ onClose }: FiltersProps) => {
               type="range"
               min="0"
               max="4"
-              value={maxStartTime}
-              onChange={(e) => handleRangeChange(e, setMaxStartTime)}
+              value={filters.startTime}
+              onChange={(e) => handleRangeChange("startTime", e)}
               className="h-2 w-full appearance-none rounded-full focus:outline-none focus:ring-2 focus:ring-northeastern-red"
               style={{
                 WebkitAppearance: "none",
                 appearance: "none",
                 background: `linear-gradient(to right, #C8102E 0%, #C8102E ${
-                  (maxStartTime / 4) * 100
-                }%, #d3d3d3 ${(maxStartTime / 4) * 100}%,  #d3d3d3 100%)`,
+                  (filters.startTime / 4) * 100
+                }%, #d3d3d3 ${(filters.startTime / 4) * 100}%,  #d3d3d3 100%)`,
                 height: "8px",
                 borderRadius: "5px",
               }}
             />
             <div className="text-lg font-semibold text-northeastern-red">
-              {maxStartTime === 4 ? `${maxStartTime}+` : maxStartTime}
+              {filters.startTime === 4
+                ? `${filters.startTime}+`
+                : filters.startTime}
             </div>
           </div>
           <label className="mb-2 mt-4 block">
@@ -301,21 +330,21 @@ const Filters = ({ onClose }: FiltersProps) => {
               type="range"
               min="0"
               max="4"
-              value={maxEndTime}
-              onChange={(e) => handleRangeChange(e, setMaxEndTime)}
+              value={filters.endTime}
+              onChange={(e) => handleRangeChange("endTime", e)}
               className="h-2 w-full appearance-none rounded-full focus:outline-none focus:ring-2 focus:ring-northeastern-red"
               style={{
                 WebkitAppearance: "none",
                 appearance: "none",
                 background: `linear-gradient(to right, #C8102E 0%, #C8102E ${
-                  (maxEndTime / 4) * 100
-                }%,#d3d3d3 ${(maxEndTime / 4) * 100}%,  #d3d3d3 100%)`,
+                  (filters.endTime / 4) * 100
+                }%,#d3d3d3 ${(filters.endTime / 4) * 100}%,  #d3d3d3 100%)`,
                 height: "8px",
                 borderRadius: "5px",
               }}
             />
             <div className="text-lg font-semibold text-northeastern-red">
-              {maxEndTime === 4 ? `${maxEndTime}+` : maxEndTime}
+              {filters.endTime === 4 ? `${filters.endTime}+` : filters.endTime}
             </div>
           </div>
         </div>
@@ -330,31 +359,46 @@ const Filters = ({ onClose }: FiltersProps) => {
           <div className="mb-4 flex gap-1 text-sm font-semibold">
             <button
               className={`rounded-full px-4 py-2 ${
-                datesFilter === 0
+                filters.dateOverlap === 0
                   ? "border border-black bg-northeastern-red text-white"
                   : "bg-gray-300"
               }`}
-              onClick={() => setDatesFilter(0)}
+              onClick={() =>
+                setFilters((prev) => ({
+                  ...prev,
+                  dateOverlap: 0,
+                }))
+              }
             >
               Any dates
             </button>
             <button
               className={`rounded-full px-4 py-2 ${
-                datesFilter === 1
+                filters.dateOverlap === 1
                   ? "border border-black bg-northeastern-red text-white"
                   : "bg-gray-300"
               }`}
-              onClick={() => setDatesFilter(1)}
+              onClick={() =>
+                setFilters((prev) => ({
+                  ...prev,
+                  dateOverlap: 1,
+                }))
+              }
             >
               Partial overlap
             </button>
             <button
               className={`rounded-full px-4 py-2 ${
-                datesFilter === 2
+                filters.dateOverlap === 2
                   ? "border border-black bg-northeastern-red text-white"
                   : "bg-gray-300"
               }`}
-              onClick={() => setDatesFilter(2)}
+              onClick={() =>
+                setFilters((prev) => ({
+                  ...prev,
+                  dateOverlap: 2,
+                }))
+              }
             >
               Full overlap
             </button>
@@ -365,10 +409,10 @@ const Filters = ({ onClose }: FiltersProps) => {
               <TextField
                 type="month"
                 inputClassName="h-14 text-lg"
-                isDisabled={datesFilter === 0}
+                isDisabled={filters.dateOverlap === 0}
                 id="coopStartDate"
-                value={formatDateToMonth(selectedMonths.coopStartDate) || ""}
-                onChange={handleMonthChange("coopStartDate")}
+                value={formatDateToMonth(filters.startDate)}
+                onChange={handleMonthChange("startDate")}
               />
             </div>
             <div className="flex min-w-0 flex-1 flex-col">
@@ -376,10 +420,10 @@ const Filters = ({ onClose }: FiltersProps) => {
               <TextField
                 type="month"
                 inputClassName="h-14 text-lg"
-                isDisabled={datesFilter === 0}
+                isDisabled={filters.dateOverlap === 0}
                 id="coopEndDate"
-                value={formatDateToMonth(selectedMonths.coopEndDate) || ""}
-                onChange={handleMonthChange("coopEndDate")}
+                value={formatDateToMonth(filters.endDate)}
+                onChange={handleMonthChange("endDate")}
               />
             </div>
           </div>

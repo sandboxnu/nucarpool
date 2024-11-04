@@ -60,7 +60,6 @@ interface ViewRouteProps {
 export const viewRoute = (props: ViewRouteProps) => {
   clearMarkers();
   clearDirections(props.map);
-  console.log(props.userCoord);
   const redCircle = createMarkerEl(DriverStart);
   const selfStartPopup = createPopup("My Start");
   const selfEndPopup = createPopup("My Dest.");
@@ -211,8 +210,8 @@ export function useGetDirections({
   );
   useEffect(() => {
     // ensures that we don't run on page load
-    if (points.length !== 0) {
+    if (points.length !== 0 && map !== undefined) {
       query.refetch();
     }
-  }, [points]);
+  }, [points, map, query]);
 }
