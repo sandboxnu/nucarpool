@@ -49,7 +49,6 @@ export const recommendationsRouter = router({
           status: Status.ACTIVE, // only include active users
         },
       });
-
       const recs = _.compact(
         users.map(calculateScore(currentUser, input.filters, input.sort))
       );

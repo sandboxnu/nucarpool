@@ -197,8 +197,6 @@ const Profile: NextPage = () => {
         if (!response.ok) {
           throw new Error(`Failed to upload file: ${response.statusText}`);
         }
-
-        console.log("File uploaded successfully!");
       }
     };
 
@@ -329,11 +327,10 @@ const Profile: NextPage = () => {
   });
 
   const editUserMutation = trpc.user.edit.useMutation({
-    onSuccess: () => {
-      utils.mapbox.geoJsonUserList.invalidate();
-      utils.user.invalidate();
-      utils.user.recommendations.me.refetch();
-      utils.mapbox.geoJsonUserList.refetch();
+    onSuccess: async () => {
+      await utils.user.me.refetch();
+      await utils.user.recommendations.me.invalidate();
+      await utils.mapbox.geoJsonUserList.invalidate();
       router.push("/").then(() => {
         setIsLoading(false);
       });
@@ -726,15 +723,13 @@ const Profile: NextPage = () => {
                                 label="Mark profile inactive"
                               />
                               <Note className="ml-2 w-1/2 text-sm text-gray-500">
-                                <p>
-                                  Marking your profile inactive removes you from
-                                  the map for other users.
-                                  <strong className="font-semibold">
-                                    &nbsp;You should leave this box unchecked if
-                                    you&apos;re creating your profile for the
-                                    first time.
-                                  </strong>
-                                </p>
+                                Marking your profile inactive removes you from
+                                the map for other users.
+                                <strong className="font-semibold">
+                                  &nbsp;You should leave this box unchecked if
+                                  you&apos;re creating your profile for the
+                                  first time.
+                                </strong>
                               </Note>
                             </div>
                           )}

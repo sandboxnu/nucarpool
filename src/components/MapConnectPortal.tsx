@@ -19,7 +19,7 @@ export const MapConnectPortal = (props: ConnectPortalProps) => {
       onClose={props.onClose}
       className="relative z-50"
     >
-      <div className="fixed inset-0" aria-hidden="true">
+      <div className="fixed inset-0">
         <div className="fixed inset-0 mt-20 flex items-start justify-end pt-4">
           <Dialog.Panel>
             <div className="max-h-100vh relative mt-11 w-96 ">

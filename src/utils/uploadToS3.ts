@@ -1,5 +1,6 @@
 import {
   GetObjectCommand,
+  HeadObjectCommand,
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
@@ -38,18 +39,24 @@ export async function generatePresignedUrl(
 }
 export async function getPresignedImageUrl(fileName: string) {
   const build = process.env.NEXT_PUBLIC_ENV;
-  const command = new GetObjectCommand({
-    Bucket: "carpoolnubucket",
-    Key: `profile-pictures/${build}/${fileName}`,
-  });
-
+  const key = `profile-pictures/${build}/${fileName}`;
   const expiry = 3600;
 
   try {
+    // Check if the object exists
+    await s3Client.send(
+      new HeadObjectCommand({ Bucket: "carpoolnubucket", Key: key })
+    );
+
+    // If the object exists, generate a pre-signed URL
+    const command = new GetObjectCommand({
+      Bucket: "carpoolnubucket",
+      Key: key,
+    });
     const url = await getSignedUrl(s3Client, command, { expiresIn: expiry });
     return url;
   } catch (error) {
-    console.error("Error generating presigned URL for getting", error);
-    throw new Error("Could not generate presigned URL for image retrieval");
+    console.error("Error getting image url", error);
+    return null;
   }
 }

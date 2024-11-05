@@ -3,7 +3,6 @@ import BlueEnd from "../../../public/user-dest.png";
 import BlueDriverEnd from "../../../public/user-dest-driver.png";
 
 import { Role } from "@prisma/client";
-import { GeoJSON } from "geojson";
 
 let companyMarkerSourceId = "company-marker-source"; // Source ID for reference
 const updateCompanyLocation = (
@@ -16,7 +15,6 @@ const updateCompanyLocation = (
   if (role === Role.DRIVER) {
     img = BlueDriverEnd.src;
   }
-
   map.loadImage(
     img,
     (
