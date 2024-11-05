@@ -5,6 +5,7 @@ import { EnhancedPublicUser, User } from "../../utils/types";
 import { Request, Role } from "@prisma/client";
 import { trpc } from "../../utils/trpc";
 import { toast } from "react-toastify";
+import { trackRequestResponse } from "../../utils/mixpanel";
 
 interface ReceivedModalProps {
   user: User;
@@ -60,6 +61,7 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
   };
 
   const handleRejectClick = () => {
+    trackRequestResponse('decline');
     handleDelete();
     onClose();
     addToast(
@@ -128,6 +130,7 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
 
   const handleAcceptClick = () => {
     if (validateRequestAcceptance()) {
+      trackRequestResponse('accept');
       initiateGroup();
       handleDelete();
       onClose();
