@@ -17,6 +17,8 @@ import React from "react";
 interface SidebarProps {
   sidebarType: HeaderOptions;
   setFilters: React.Dispatch<React.SetStateAction<FiltersState>>;
+  setSort: React.Dispatch<React.SetStateAction<string>>;
+  sort: string;
   filters: FiltersState;
   map: mapboxgl.Map;
   role: string;
@@ -38,6 +40,8 @@ export const SidebarPage = (props: SidebarProps) => {
     return (
       <ExploreSidebar
         setFilters={props.setFilters}
+        setSort={props.setSort}
+        sort={props.sort}
         filters={props.filters}
         recs={props.recs}
         favs={props.favs}

@@ -11,11 +11,14 @@ import { clearMarkers } from "../../utils/map/viewRoute";
 import Filters from "../Filters";
 import { FaFilter } from "react-icons/fa6";
 import { mockSession } from "next-auth/client/__tests__/helpers/mocks";
+import CustomSelect from "./CustomSelect";
 
 interface ExploreSidebarProps {
   recs: EnhancedPublicUser[];
   favs: EnhancedPublicUser[];
   setFilters: React.Dispatch<React.SetStateAction<FiltersState>>;
+  setSort: React.Dispatch<React.SetStateAction<string>>;
+  sort: string;
   filters: FiltersState;
   disabled: boolean;
   viewRoute: (user: User, otherUser: PublicUser) => void;
@@ -27,7 +30,11 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
     "recommendations"
   );
   const [filtersOpen, setFiltersOpen] = useState(false);
-
+  const sortOptions = [
+    { value: "any", label: "Recommended" },
+    { value: "distance", label: "Distance" },
+    { value: "time", label: "Time" },
+  ];
   return (
     <div className="z-10 flex h-full flex-shrink-0 flex-col bg-white px-5 text-left">
       <div className="flex-row py-3">
@@ -57,18 +64,25 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
             Favorites
           </button>
         </div>
-        {filtersOpen ? null : (
-          <div className="mt-3 flex justify-end">
+
+        {!filtersOpen && !props.disabled && curOption === "recommendations" && (
+          <div className="relative mx-4 mt-6 flex items-center justify-between">
+            <CustomSelect
+              value={props.sort}
+              onChange={props.setSort}
+              options={sortOptions}
+            />
             <button
-              className="mr-5 rounded-full bg-gray-300 p-3"
+              className="rounded-full bg-stone-100 p-3"
               onClick={() => setFiltersOpen(true)}
             >
-              <FaFilter className="text-xl" />
+              <FaFilter className="text-xl text-black " />
             </button>
           </div>
         )}
       </div>
-      <div className="relative">
+
+      <div className="relative h-full">
         {filtersOpen ? (
           <Filters
             setFilters={props.setFilters}

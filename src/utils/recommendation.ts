@@ -40,7 +40,6 @@ export type FInputs = {
   startDate: Date;
   endDate: Date;
   dateOverlap: number; // 0 any, 1 partial, 2 full
-  sort: string;
   daysWorking: string;
 };
 
@@ -78,11 +77,13 @@ const dayConversion = (user: CommonUser) => {
  *
  * @param currentUser The user to generate a recommendation callback for
  * @param inputs The filter inputs to replace 'cutoffs'
+ * @param sort The parameter to score by
  * @returns A function that takes in a user and returns their score relative to `currentUser`
  */
 export const calculateScore = <T extends CommonUser>(
   currentUser: T,
-  inputs: FInputs
+  inputs: FInputs,
+  sort: string
 ): ((user: T) => Recommendation | undefined) => {
   const currentUserDays = inputs.daysWorking
     .split(",")
@@ -196,7 +197,7 @@ export const calculateScore = <T extends CommonUser>(
     let finalScore = 0;
     let daysScore;
     // Sorting portion
-    if (inputs.sort == "any") {
+    if (sort == "any") {
       sDistanceScore =
         startDistance > cutoffs.startDistance
           ? 1
@@ -231,8 +232,16 @@ export const calculateScore = <T extends CommonUser>(
           sDistanceScore * weights.startDistance +
           eDistanceScore * weights.endDistance;
       }
-    } else if (inputs.sort == "distance") {
+    } else if (sort === "distance") {
       finalScore = startDistance + endDistance;
+    } else if (sort === "time") {
+      if (startTime !== undefined && endTime !== undefined) {
+        let eTimeScore =
+          endTime > cutoffs.endTime ? 1 : endTime / cutoffs.endTime;
+        let sTimeScore =
+          startTime > cutoffs.startTime ? 1 : startTime / cutoffs.startTime;
+        finalScore = eTimeScore + sTimeScore;
+      }
     }
 
     return {

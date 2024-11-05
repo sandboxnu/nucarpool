@@ -26,12 +26,13 @@ const DropDownMenu = () => {
   } = trpc.user.getPresignedDownloadUrl.useQuery({ userId: undefined });
 
   useEffect(() => {
-    if (presignedData?.url) {
+    if (presignedData?.url && !presignedError) {
       setProfileImageUrl(presignedData.url);
     } else {
       setProfileImageUrl("");
+      console.log(presignedError);
     }
-  }, [presignedData]);
+  }, [presignedData, presignedError]);
   useEffect(() => {
     const timer = setTimeout(() => {
       refetch();

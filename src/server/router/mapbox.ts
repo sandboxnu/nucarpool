@@ -50,7 +50,6 @@ export const mapboxRouter = router({
         endDistance: z.number(),
         startTime: z.number(), // max = 4 hours, greater = any
         endTime: z.number(),
-        sort: z.string(),
         startDate: z.date(),
         endDate: z.date(),
         dateOverlap: z.number(), // 0 any, 1 partial, 2 full
@@ -86,8 +85,9 @@ export const mapboxRouter = router({
           OR: [{ role: oppRole }, { role: viewCheck }],
         },
       });
-      input.sort = "distance";
-      const filtered = _.compact(users.map(calculateScore(currentUser, input)));
+      const filtered = _.compact(
+        users.map(calculateScore(currentUser, input, "distance"))
+      );
       filtered.sort((a, b) => a.score - b.score);
       const sortedUsers = _.compact(
         filtered.map((rec) => users.find((user) => user.id === rec.id))

@@ -1,7 +1,7 @@
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import type { GetServerSidePropsContext, NextPage } from "next";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { RiFocus3Line } from "react-icons/ri";
 import { ToastProvider } from "react-toast-notifications";
 import addClusters from "../utils/map/addClusters";
@@ -69,7 +69,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
 const Home: NextPage<any> = () => {
   const [filters, setFilters] = useState<FiltersState>({
-    sort: "any",
     days: 0,
     flexDays: 1,
     startDistance: 20,
@@ -81,9 +80,10 @@ const Home: NextPage<any> = () => {
     endDate: new Date(Date.now()),
     dateOverlap: 0,
   });
+  const [sort, setSort] = useState<string>("any");
   const [debouncedFilters, setDebouncedFilters] = useState(filters);
   const [otherUser, setOtherUser] = useState<PublicUser | null>(null);
-
+  const [mapStateLoaded, setMapStateLoaded] = useState(false);
   useEffect(() => {
     const handler = debounce(() => {
       setOtherUser(null);
@@ -99,8 +99,10 @@ const Home: NextPage<any> = () => {
   const { data: geoJsonUsers } =
     trpc.mapbox.geoJsonUserList.useQuery(debouncedFilters);
   const { data: user = null } = trpc.user.me.useQuery();
-  const { data: recommendations = [] } =
-    trpc.user.recommendations.me.useQuery(filters);
+  const { data: recommendations = [] } = trpc.user.recommendations.me.useQuery({
+    sort: sort,
+    filters: filters,
+  });
   const { data: favorites = [] } = trpc.user.favorites.me.useQuery(undefined, {
     refetchOnMount: true,
   });
@@ -147,21 +149,24 @@ const Home: NextPage<any> = () => {
     []
   );
 
-  const extendPublicUser = (user: PublicUser): EnhancedPublicUser => {
-    const incomingReq: Request | undefined = requests.received.find(
-      (req) => req.fromUserId === user.id
-    );
-    const outgoingReq: Request | undefined = requests.sent.find(
-      (req) => req.toUserId === user.id
-    );
+  const extendPublicUser = useCallback(
+    (user: PublicUser): EnhancedPublicUser => {
+      const incomingReq: Request | undefined = requests.received.find(
+        (req) => req.fromUserId === user.id
+      );
+      const outgoingReq: Request | undefined = requests.sent.find(
+        (req) => req.toUserId === user.id
+      );
 
-    return {
-      ...user,
-      isFavorited: favorites.some((favs) => favs.id === user.id),
-      incomingRequest: incomingReq,
-      outgoingRequest: outgoingReq,
-    };
-  };
+      return {
+        ...user,
+        isFavorited: favorites.some((favs) => favs.id === user.id),
+        incomingRequest: incomingReq,
+        outgoingRequest: outgoingReq,
+      };
+    },
+    [favorites, requests]
+  );
 
   const handleMessageSent = (selectedUserId: string) => {
     utils.user.requests.me.invalidate();
@@ -182,77 +187,80 @@ const Home: NextPage<any> = () => {
         return extendPublicUser(user) as EnhancedPublicUser;
     }
     return null;
-  }, [selectedUserId, requests]);
+  }, [selectedUserId, requests, extendPublicUser]);
 
-  const onViewRouteClick = (user: User, otherUser: PublicUser) => {
-    setOtherUser(otherUser);
-    const isViewerAddressSelected =
-      companyAddressSelected.place_name !== "" &&
-      startAddressSelected.place_name !== "";
-    const companyCord: number[] = companyAddressSelected.center;
-    const startCord: number[] = startAddressSelected.center;
-    const userStartLng = isViewerAddressSelected
-      ? startCord[0]
-      : user.startCoordLng;
-    const userStartLat = isViewerAddressSelected
-      ? startCord[1]
-      : user.startCoordLat;
-    const userCompanyLng = isViewerAddressSelected
-      ? companyCord[0]
-      : user.companyCoordLng;
-    const userCompanyLat = isViewerAddressSelected
-      ? companyCord[1]
-      : user.companyCoordLat;
-    const userCoord =
-      !isViewerAddressSelected && user.role === "VIEWER"
-        ? undefined
-        : {
-            startLat: userStartLat,
-            startLng: userStartLng,
-            endLat: userCompanyLat,
-            endLng: userCompanyLng,
-          };
+  const onViewRouteClick = useCallback(
+    (user: User, otherUser: PublicUser) => {
+      setOtherUser(otherUser);
+      const isViewerAddressSelected =
+        companyAddressSelected.place_name !== "" &&
+        startAddressSelected.place_name !== "";
+      const companyCord: number[] = companyAddressSelected.center;
+      const startCord: number[] = startAddressSelected.center;
+      const userStartLng = isViewerAddressSelected
+        ? startCord[0]
+        : user.startCoordLng;
+      const userStartLat = isViewerAddressSelected
+        ? startCord[1]
+        : user.startCoordLat;
+      const userCompanyLng = isViewerAddressSelected
+        ? companyCord[0]
+        : user.companyCoordLng;
+      const userCompanyLat = isViewerAddressSelected
+        ? companyCord[1]
+        : user.companyCoordLat;
+      const userCoord =
+        !isViewerAddressSelected && user.role === "VIEWER"
+          ? undefined
+          : {
+              startLat: userStartLat,
+              startLng: userStartLng,
+              endLat: userCompanyLat,
+              endLng: userCompanyLng,
+            };
 
-    if (mapState) {
-      if (user.role !== "VIEWER") {
-        updateUserLocation(mapState, userStartLng, userStartLat);
-        updateCompanyLocation(
-          mapState,
-          userCompanyLng,
-          userCompanyLat,
-          user.role
-        );
+      if (mapState !== undefined) {
+        if (user.role !== "VIEWER") {
+          updateUserLocation(mapState, userStartLng, userStartLat);
+          updateCompanyLocation(
+            mapState,
+            userCompanyLng,
+            userCompanyLat,
+            user.role
+          );
+        }
+        const viewProps = {
+          user,
+          otherUser,
+          map: mapState,
+          userCoord,
+        };
+
+        if (user.role === "RIDER") {
+          setPoints([
+            [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
+            [userStartLng, userStartLat],
+            [userCompanyLng, userCompanyLat],
+            [otherUser.companyCoordLng, otherUser.companyCoordLat],
+          ]);
+        } else if (isViewerAddressSelected || user.role == "DRIVER") {
+          setPoints([
+            [userStartLng, userStartLat],
+            [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
+            [otherUser.companyCoordLng, otherUser.companyCoordLat],
+            [userCompanyLng, userCompanyLat],
+          ]);
+        } else {
+          setPoints([
+            [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
+            [otherUser.companyCoordLng, otherUser.companyCoordLat],
+          ]);
+        }
+        viewRoute(viewProps);
       }
-      const viewProps = {
-        user,
-        otherUser,
-        map: mapState,
-        userCoord,
-      };
-
-      if (user.role === "RIDER") {
-        setPoints([
-          [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
-          [userStartLng, userStartLat],
-          [userCompanyLng, userCompanyLat],
-          [otherUser.companyCoordLng, otherUser.companyCoordLat],
-        ]);
-      } else if (isViewerAddressSelected || user.role == "DRIVER") {
-        setPoints([
-          [userStartLng, userStartLat],
-          [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
-          [otherUser.companyCoordLng, otherUser.companyCoordLat],
-          [userCompanyLng, userCompanyLat],
-        ]);
-      } else {
-        setPoints([
-          [otherUser.startPOICoordLng, otherUser.startPOICoordLat],
-          [otherUser.companyCoordLng, otherUser.companyCoordLat],
-        ]);
-      }
-      viewRoute(viewProps);
-    }
-  };
+    },
+    [companyAddressSelected, startAddressSelected, mapState]
+  );
   const enhancedSentUsers = requests.sent.map((request: { toUser: any }) =>
     extendPublicUser(request.toUser!)
   );
@@ -307,18 +315,20 @@ const Home: NextPage<any> = () => {
             user.role
           );
         }
+        setMapStateLoaded(true);
       });
     }
   }, [mapState, mapContainerRef, user]);
+
   useEffect(() => {
-    if (mapState && geoJsonUsers) {
+    if (mapState && geoJsonUsers && mapStateLoaded) {
       updateGeoJsonUsers(mapState, geoJsonUsers);
     }
-  }, [mapState, geoJsonUsers]);
+  }, [mapState, geoJsonUsers, mapStateLoaded]);
 
   // separate use effect for user location rendering
   useEffect(() => {
-    if (mapState !== undefined) {
+    if (mapStateLoaded && mapState) {
       if (user!.role === "VIEWER") {
         updateUserLocation(
           mapState,
@@ -336,7 +346,15 @@ const Home: NextPage<any> = () => {
         onViewRouteClick(user, otherUser);
       }
     }
-  }, [companyAddressSelected, startAddressSelected]);
+  }, [
+    companyAddressSelected,
+    mapState,
+    mapStateLoaded,
+    onViewRouteClick,
+    otherUser,
+    startAddressSelected,
+    user,
+  ]);
   useEffect(() => {
     setSelectedUserId(null);
   }, [sidebarType]);
@@ -346,7 +364,8 @@ const Home: NextPage<any> = () => {
     if (
       user &&
       !otherUser &&
-      mapState !== undefined &&
+      mapState &&
+      mapStateLoaded &&
       (user.role !== "VIEWER" ||
         (startAddressSelected.center[0] !== 0 &&
           companyAddressSelected.center[0] !== 0))
@@ -380,7 +399,14 @@ const Home: NextPage<any> = () => {
       ]);
       viewRoute(viewProps);
     }
-  }, [companyAddressSelected, mapState, otherUser, startAddressSelected, user]);
+  }, [
+    companyAddressSelected,
+    mapState,
+    mapStateLoaded,
+    otherUser,
+    startAddressSelected,
+    user,
+  ]);
   useSearch({
     value: companyAddress,
     type: "address%2Cpostcode",
@@ -471,10 +497,12 @@ const Home: NextPage<any> = () => {
                 disabled: user.status === "INACTIVE" && user.role !== "VIEWER",
               }}
             />
-            <div className="flex h-[91.5%] flex-auto">
+            <div className="flex h-[91.5%] overflow-hidden">
               <div className="w-96">
                 {mapState && (
                   <SidebarPage
+                    setSort={setSort}
+                    sort={sort}
                     setFilters={setFilters}
                     filters={filters}
                     sidebarType={sidebarType}

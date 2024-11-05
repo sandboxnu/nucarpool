@@ -22,7 +22,6 @@ export type ProfileFormInputs = {
   status: "active" | "inactive";
 };
 export type FiltersState = {
-  sort: string;
   days: number;
   flexDays: number;
   startDistance: number;
