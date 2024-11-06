@@ -17,6 +17,7 @@ interface ExploreSidebarProps {
   recs: EnhancedPublicUser[];
   favs: EnhancedPublicUser[];
   setFilters: React.Dispatch<React.SetStateAction<FiltersState>>;
+  defaultFilters: FiltersState;
   setSort: React.Dispatch<React.SetStateAction<string>>;
   sort: string;
   filters: FiltersState;
@@ -30,6 +31,23 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
     "recommendations"
   );
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const getActiveFilters = () => {
+    return {
+      days: props.defaultFilters.days !== props.filters.days,
+      dateOverlap:
+        props.defaultFilters.dateOverlap !== props.filters.dateOverlap,
+      startTime: props.defaultFilters.startTime !== props.filters.startTime,
+      endTime: props.defaultFilters.endTime !== props.filters.endTime,
+      startDistance:
+        props.defaultFilters.startDistance !== props.filters.startDistance,
+      endDistance:
+        props.defaultFilters.endDistance !== props.filters.endDistance,
+    };
+  };
+
+  const activeFilters = getActiveFilters();
+  const filtersActive = Object.values(activeFilters).some((value) => value);
+
   const sortOptions = [
     { value: "any", label: "Recommended" },
     { value: "distance", label: "Distance" },
@@ -73,10 +91,14 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
               options={sortOptions}
             />
             <button
-              className="rounded-full bg-stone-100 p-3"
+              className={`rounded-full p-3 ${
+                filtersActive
+                  ? "bg-northeastern-red text-white"
+                  : "bg-stone-100 text-black"
+              }`}
               onClick={() => setFiltersOpen(true)}
             >
-              <FaFilter className="text-xl text-black " />
+              <FaFilter className="text-xl " />
             </button>
           </div>
         )}
@@ -86,6 +108,7 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
         {filtersOpen ? (
           <Filters
             setFilters={props.setFilters}
+            activeFilters={activeFilters}
             filters={props.filters}
             onClose={() => setFiltersOpen(false)}
           />

@@ -20,6 +20,7 @@ interface SidebarProps {
   setSort: React.Dispatch<React.SetStateAction<string>>;
   sort: string;
   filters: FiltersState;
+  defaultFilters: FiltersState;
   map: mapboxgl.Map;
   role: string;
   recs: EnhancedPublicUser[];
@@ -43,6 +44,7 @@ export const SidebarPage = (props: SidebarProps) => {
         setSort={props.setSort}
         sort={props.sort}
         filters={props.filters}
+        defaultFilters={props.defaultFilters}
         recs={props.recs}
         favs={props.favs}
         disabled={disabled}

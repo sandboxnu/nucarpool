@@ -1,4 +1,4 @@
-import React, { ReactNode, useContext, useState } from "react";
+import React, { ReactNode, useContext, useEffect, useState } from "react";
 import { FaMinus, FaPlus } from "react-icons/fa6";
 import { FaTimes } from "react-icons/fa";
 import { Controller } from "react-hook-form";
@@ -39,13 +39,23 @@ interface FiltersProps {
   onClose: () => void;
   setFilters: React.Dispatch<React.SetStateAction<FiltersState>>;
   filters: FiltersState;
+  activeFilters: { [key: string]: boolean };
 }
 
-const Filters = ({ onClose, filters, setFilters }: FiltersProps) => {
-  const [distanceOpen, setDistanceOpen] = useState(false);
-  const [daysMatchOpen, setDaysMatchOpen] = useState(false);
-  const [startTimeOpen, setStartTimeOpen] = useState(false);
-  const [termDatesOpen, setTermDatesOpen] = useState(false);
+const Filters = ({
+  onClose,
+  filters,
+  setFilters,
+  activeFilters,
+}: FiltersProps) => {
+  const [distanceOpen, setDistanceOpen] = useState(
+    activeFilters.startDistance || activeFilters.endDistance
+  );
+  const [daysMatchOpen, setDaysMatchOpen] = useState(activeFilters.days);
+  const [startTimeOpen, setStartTimeOpen] = useState(
+    activeFilters.startTime || activeFilters.endTime
+  );
+  const [termDatesOpen, setTermDatesOpen] = useState(activeFilters.dateOverlap);
   const daysOfWeek = ["Su", "M", "Tu", "W", "Th", "F", "S"];
 
   const handleMonthChange =

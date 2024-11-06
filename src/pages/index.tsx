@@ -68,7 +68,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 
 const Home: NextPage<any> = () => {
-  const [filters, setFilters] = useState<FiltersState>({
+  const initialFilters: FiltersState = {
     days: 0,
     flexDays: 1,
     startDistance: 20,
@@ -79,7 +79,10 @@ const Home: NextPage<any> = () => {
     startDate: new Date(Date.now()),
     endDate: new Date(Date.now()),
     dateOverlap: 0,
-  });
+  };
+  const [defaultFilters, setDefaultFilters] =
+    useState<FiltersState>(initialFilters);
+  const [filters, setFilters] = useState<FiltersState>(initialFilters);
   const [sort, setSort] = useState<string>("any");
   const [debouncedFilters, setDebouncedFilters] = useState(filters);
   const [otherUser, setOtherUser] = useState<PublicUser | null>(null);
@@ -511,6 +514,7 @@ const Home: NextPage<any> = () => {
                     sort={sort}
                     setFilters={setFilters}
                     filters={filters}
+                    defaultFilters={defaultFilters}
                     sidebarType={sidebarType}
                     role={user.role}
                     map={mapState}
