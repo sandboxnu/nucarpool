@@ -163,8 +163,8 @@ export const calculateScore = <T extends CommonUser>(
     ) {
       return undefined;
     }
-    const currentStart = currentUser.coopStartDate;
-    const currentEnd = currentUser.coopEndDate;
+    const currentStart = inputs.startDate;
+    const currentEnd = inputs.endDate;
     const userStart = user.coopStartDate;
     const userEnd = user.coopEndDate;
     let dateScore = 1;
