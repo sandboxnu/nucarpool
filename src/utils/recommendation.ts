@@ -94,6 +94,7 @@ export const calculateScore = <T extends CommonUser>(
       (currentUser.role === "RIDER" &&
         (user.role === "RIDER" || user.seatAvail === 0)) ||
       (currentUser.role === "DRIVER" && user.role === "DRIVER") ||
+      user.role === "VIEWER" ||
       (currentUser.carpoolId && currentUser.carpoolId === user.carpoolId)
     ) {
       return undefined;
