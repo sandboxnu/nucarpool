@@ -205,12 +205,12 @@ const Filters = ({
         toggleOpen={() => setDaysMatchOpen(!daysMatchOpen)}
       >
         <div className="mt-3">
-          <div className="text-md flex gap-2 font-semibold">
+          <div className="text-md flex justify-between gap-2 font-semibold">
             <button
               className={`rounded-full px-4 py-2  ${
                 filters.days === 0
                   ? "border-2 border-black bg-northeastern-red text-white"
-                  : "bg-gray-300"
+                  : "border-2 border-gray-300 bg-white text-black"
               }`}
               onClick={() =>
                 setFilters((prev) => ({
@@ -225,7 +225,7 @@ const Filters = ({
               className={`rounded-full px-4 py-2 ${
                 filters.days === 1
                   ? "border-2 border-black bg-northeastern-red text-white"
-                  : "bg-gray-300"
+                  : "border-2 border-gray-300 bg-white text-black"
               }`}
               onClick={() =>
                 setFilters((prev) => ({
@@ -240,7 +240,7 @@ const Filters = ({
               className={`rounded-full px-4 py-2 ${
                 filters.days === 2
                   ? "border-2 border-black bg-northeastern-red text-white"
-                  : "bg-gray-300"
+                  : "border-2 border-gray-300 bg-white text-black"
               }`}
               onClick={() =>
                 setFilters((prev) => ({
@@ -371,12 +371,12 @@ const Filters = ({
         toggleOpen={() => setTermDatesOpen(!termDatesOpen)}
       >
         <div className="mt-3">
-          <div className="mb-4 flex gap-1 text-sm font-semibold">
+          <div className="text-md mb-4 flex justify-between  gap-1  font-semibold">
             <button
-              className={`rounded-full px-4 py-2 ${
+              className={`rounded-full border-2 px-4 py-2 ${
                 filters.dateOverlap === 0
-                  ? "border border-black bg-northeastern-red text-white"
-                  : "bg-gray-300"
+                  ? " border-black bg-northeastern-red text-white"
+                  : "border-gray-300 bg-white  text-black"
               }`}
               onClick={() =>
                 setFilters((prev) => ({
@@ -385,13 +385,13 @@ const Filters = ({
                 }))
               }
             >
-              Any dates
+              Any
             </button>
             <button
-              className={`rounded-full px-4 py-2 ${
+              className={`rounded-full border-2 px-4 py-2 ${
                 filters.dateOverlap === 1
-                  ? "border border-black bg-northeastern-red text-white"
-                  : "bg-gray-300"
+                  ? " border-black bg-northeastern-red text-white"
+                  : "border-gray-300 bg-white  text-black"
               }`}
               onClick={() =>
                 setFilters((prev) => ({
@@ -403,10 +403,10 @@ const Filters = ({
               Partial overlap
             </button>
             <button
-              className={`rounded-full px-4 py-2 ${
+              className={`rounded-full border-2 px-4 py-2 ${
                 filters.dateOverlap === 2
-                  ? "border border-black bg-northeastern-red text-white"
-                  : "bg-gray-300"
+                  ? " border-black bg-northeastern-red text-white"
+                  : "border-gray-300 bg-white  text-black"
               }`}
               onClick={() =>
                 setFilters((prev) => ({
