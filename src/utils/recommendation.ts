@@ -171,9 +171,10 @@ export const calculateScore = <T extends CommonUser>(
     let partialOverlap = false;
     let fullOverlap = false;
     if (currentStart && currentEnd && userStart && userEnd) {
-      partialOverlap =
-        (currentStart <= userStart && currentEnd >= userStart) ||
-        (currentEnd >= userEnd && currentStart <= userEnd);
+      partialOverlap = !(
+        (userStart < currentStart && userEnd < currentStart) ||
+        (userEnd > currentEnd && userStart > currentEnd)
+      );
       fullOverlap = userStart <= currentStart && userEnd >= currentEnd;
       if (inputs.dateOverlap !== 0) {
         if (inputs.dateOverlap === 1 && !partialOverlap) {
