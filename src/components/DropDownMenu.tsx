@@ -3,45 +3,21 @@ import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import Spinner from "./Spinner";
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useState } from "react";
 import { AiOutlineUser } from "react-icons/ai";
 import { useRouter } from "next/router";
-import { trpc } from "../utils/trpc";
+import useProfileImage from "../utils/useProfileImage";
 
 const DropDownMenu = () => {
   const { data: session } = useSession();
   const router = useRouter();
-  const [profileImageUrl, setProfileImageUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [imageLoadError, setImageLoadError] = useState(false);
+
+  const { profileImageUrl, imageLoadError } = useProfileImage();
 
   const logout = () => {
     signOut();
   };
-
-  const {
-    data: presignedData,
-    error: presignedError,
-    refetch,
-  } = trpc.user.getPresignedDownloadUrl.useQuery({ userId: undefined });
-
-  useEffect(() => {
-    if (presignedData?.url) {
-      setProfileImageUrl(presignedData.url);
-    } else {
-      setProfileImageUrl("");
-    }
-  }, [presignedData]);
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      refetch();
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [refetch]);
-
-  useEffect(() => {
-    setImageLoadError(false);
-  }, [profileImageUrl]);
 
   const handleProfileClick = async () => {
     setIsLoading(true);
@@ -64,7 +40,6 @@ const DropDownMenu = () => {
               alt="Profile Image"
               width={50}
               height={50}
-              onError={() => setImageLoadError(true)}
             />
           ) : (
             <AiOutlineUser className="h-12 w-12 rounded-full bg-gray-400" />

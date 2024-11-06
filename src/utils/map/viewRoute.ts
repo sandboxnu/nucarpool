@@ -4,7 +4,7 @@ import { trpc } from "../trpc";
 import { SetStateAction, useEffect } from "react";
 import { toast } from "react-toastify";
 import polyline from "@mapbox/polyline";
-import { LineString } from "geojson";
+import { GeoJSON, LineString } from "geojson";
 import { StaticImageData } from "next/image";
 import DriverStart from "../../../public/driver-start.png";
 import RiderStart from "../../../public/rider-start.png";
@@ -60,14 +60,12 @@ interface ViewRouteProps {
 export const viewRoute = (props: ViewRouteProps) => {
   clearMarkers();
   clearDirections(props.map);
-  console.log(props.userCoord);
   const redCircle = createMarkerEl(DriverStart);
   const selfStartPopup = createPopup("My Start");
   const selfEndPopup = createPopup("My Dest.");
   const orangeStart = createMarkerEl(RiderStart);
   const redStart = createMarkerEl(redCircle);
-
-  let startPoiLng, startPoiLat, endPoiLng, endPoiLat;
+  let minLng, minLat, maxLng, maxLat;
 
   if (props.otherUser !== undefined) {
     const otherRole =
@@ -96,14 +94,24 @@ export const viewRoute = (props: ViewRouteProps) => {
     otherUserStartMarker.togglePopup();
     previousMarkers.push(otherUserStartMarker);
     previousMarkers.push(otherUserEndPopup);
-
-    startPoiLng = props.otherUser.startPOICoordLng;
-    startPoiLat = props.otherUser.startPOICoordLat;
-    endPoiLng = props.otherUser.companyCoordLng;
-    endPoiLat = props.otherUser.companyCoordLat;
+    minLng = Math.min(
+      props.otherUser.startPOICoordLng,
+      props.otherUser.companyCoordLng
+    );
+    minLat = Math.min(
+      props.otherUser.startPOICoordLat,
+      props.otherUser.companyCoordLat
+    );
+    maxLng = Math.max(
+      props.otherUser.startPOICoordLng,
+      props.otherUser.companyCoordLng
+    );
+    maxLat = Math.max(
+      props.otherUser.startPOICoordLat,
+      props.otherUser.companyCoordLat
+    );
   }
   if (props.userCoord !== undefined) {
-    console.log("adding popups");
     selfStartPopup
       .setLngLat([props.userCoord.startLng, props.userCoord.startLat])
       .addTo(props.map);
@@ -113,33 +121,36 @@ export const viewRoute = (props: ViewRouteProps) => {
       .addTo(props.map);
     previousMarkers.push(selfStartPopup);
     previousMarkers.push(selfEndPopup);
-
-    startPoiLng = props.userCoord.startLng;
-    startPoiLat = props.userCoord.startLat;
-    endPoiLng = props.userCoord.endLng;
-    endPoiLat = props.userCoord.endLat;
+    minLng =
+      minLng !== undefined
+        ? Math.min(minLng, props.userCoord.startLng, props.userCoord.endLng)
+        : Math.min(props.userCoord.startLng, props.userCoord.endLng);
+    minLat =
+      minLat !== undefined
+        ? Math.min(minLat, props.userCoord.startLat, props.userCoord.endLat)
+        : Math.min(props.userCoord.startLat, props.userCoord.endLat);
+    maxLng =
+      maxLng !== undefined
+        ? Math.max(maxLng, props.userCoord.startLng, props.userCoord.endLng)
+        : Math.max(props.userCoord.startLng, props.userCoord.endLng);
+    maxLat =
+      maxLat !== undefined
+        ? Math.max(maxLat, props.userCoord.startLat, props.userCoord.endLat)
+        : Math.max(props.userCoord.startLat, props.userCoord.endLat);
   }
   if (
-    !startPoiLat ||
-    !startPoiLat ||
-    !endPoiLat ||
-    !endPoiLat ||
-    !startPoiLng ||
-    !endPoiLng
+    minLng === undefined ||
+    minLat === undefined ||
+    maxLng === undefined ||
+    maxLat === undefined
   ) {
     return;
   }
 
   props.map.fitBounds(
     [
-      [
-        Math.min(startPoiLng, endPoiLng) - 0.0075,
-        Math.min(startPoiLat, endPoiLat) - 0.0075,
-      ],
-      [
-        Math.max(startPoiLng, endPoiLng) + 0.0075,
-        Math.max(startPoiLat, endPoiLat) + 0.0075,
-      ],
+      [minLng - 0.0075, minLat - 0.0075],
+      [maxLng + 0.0075, maxLat + 0.0075],
     ],
     { padding: 20 }
   );
@@ -170,37 +181,50 @@ export function useGetDirections({
         ]);
 
         // Create a GeoJSON LineString feature
-        const lineStringFeature: LineString = {
-          coordinates: geoJsonCoordinates,
-          type: "LineString",
+        const lineStringFeature: GeoJSON.Feature<
+          GeoJSON.LineString,
+          GeoJSON.GeoJsonProperties
+        > = {
+          type: "Feature",
+          geometry: {
+            type: "LineString",
+            coordinates: geoJsonCoordinates,
+          },
+          properties: {},
         };
 
-        let beforeLayerId = "";
+        if (map.getLayer("route")) {
+          const source = map.getSource("route") as mapboxgl.GeoJSONSource;
+          source.setData(lineStringFeature);
+        } else {
+          let beforeLayerId = "";
 
-        if (map.getLayer("riders")) {
-          beforeLayerId = "riders";
-        } else if (map.getLayer("drivers")) {
-          beforeLayerId = "drivers";
+          if (map.getLayer("riders")) {
+            beforeLayerId = "riders";
+          } else if (map.getLayer("drivers")) {
+            beforeLayerId = "drivers";
+          }
+
+          map.addLayer(
+            {
+              id: "route",
+              type: "line",
+              source: {
+                type: "geojson",
+                data: lineStringFeature,
+              },
+              layout: {
+                "line-join": "round",
+                "line-cap": "round",
+              },
+              paint: {
+                "line-color": "#61666b",
+                "line-width": 6,
+              },
+            },
+            beforeLayerId
+          );
         }
-        map.addLayer(
-          {
-            id: "route",
-            type: "line",
-            source: {
-              type: "geojson",
-              data: lineStringFeature,
-            },
-            layout: {
-              "line-join": "round",
-              "line-cap": "round",
-            },
-            paint: {
-              "line-color": "#61666b",
-              "line-width": 6,
-            },
-          },
-          beforeLayerId
-        );
       },
       onError: (error) => {
         toast.error(`Something went wrong: ${error}`);
@@ -211,8 +235,8 @@ export function useGetDirections({
   );
   useEffect(() => {
     // ensures that we don't run on page load
-    if (points.length !== 0) {
+    if (points.length !== 0 && map !== undefined) {
       query.refetch();
     }
-  }, [points]);
+  }, [points, map, query]);
 }
