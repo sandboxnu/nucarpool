@@ -270,9 +270,18 @@ const Filters = ({
                     icon={<StaticDayBox day={day} isSelected={false} />}
                   />
                 ))}
+                {filters.days === 1 ? (
+                  <p
+                    className="w-full px-4 pt-2 text-xs"
+                    style={{ color: "#BCA7A7" }}
+                  >
+                    (?) Exact days only shows users with the exact selected
+                    carpool days.
+                  </p>
+                ) : null}
               </div>
               {filters.days === 2 && (
-                <div className="mt-4 flex w-full flex-col justify-center">
+                <div className="mt-2 flex w-full flex-col justify-center">
                   <label className="mb-2 self-center">
                     Minimum shared carpool days
                   </label>
@@ -296,8 +305,15 @@ const Filters = ({
                         }));
                       }
                     }}
-                    className="flex h-10 w-16 self-center rounded-full border border-gray-400 p-2 text-center focus:border-transparent focus:ring-2 focus:ring-northeastern-red "
+                    className="flex h-10 w-14 self-center rounded-full  border-2 border-gray-300 p-2 text-center focus:border-transparent focus:ring-2 focus:ring-northeastern-red "
                   />
+                  <p
+                    className="w-full px-4 pt-2 text-xs"
+                    style={{ color: "#BCA7A7" }}
+                  >
+                    (?) Flex days shows any users sharing at least this number
+                    of carpool days.
+                  </p>
                 </div>
               )}
             </>
@@ -376,7 +392,7 @@ const Filters = ({
               className={`rounded-full border-2 px-4 py-2 ${
                 filters.dateOverlap === 0
                   ? " border-black bg-northeastern-red text-white"
-                  : "border-gray-300 bg-white  text-black"
+                  : "border-gray-300 bg-white text-black"
               }`}
               onClick={() =>
                 setFilters((prev) => ({
@@ -391,7 +407,7 @@ const Filters = ({
               className={`rounded-full border-2 px-4 py-2 ${
                 filters.dateOverlap === 1
                   ? " border-black bg-northeastern-red text-white"
-                  : "border-gray-300 bg-white  text-black"
+                  : "border-gray-300 bg-white text-black"
               }`}
               onClick={() =>
                 setFilters((prev) => ({
@@ -418,6 +434,23 @@ const Filters = ({
               Full overlap
             </button>
           </div>
+          {filters.dateOverlap === 1 ? (
+            <p
+              className="w-full px-4 pb-2 text-xs"
+              style={{ color: "#BCA7A7" }}
+            >
+              (?) Partial overlap shows all users who are carpooling at some
+              point between the selected dates.
+            </p>
+          ) : filters.dateOverlap === 2 ? (
+            <p
+              className="w-full px-4 pb-2 text-xs"
+              style={{ color: "#BCA7A7" }}
+            >
+              (?) Full overlap shows all users who are carpooling the entire
+              range of the selected dates.
+            </p>
+          ) : null}
           <div className="flex w-full gap-4">
             <div className="flex min-w-0 flex-1 flex-col">
               <label className="mb-2 block font-semibold">Start Date</label>
