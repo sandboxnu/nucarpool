@@ -336,11 +336,7 @@ const Home: NextPage<any> = () => {
   const enhancedReceivedUsers = requests.received.map(
     (request: { fromUser: any }) => extendPublicUser(request.fromUser!)
   );
-  const enhancedRecs = _.differenceBy(
-    recommendations,
-    enhancedSentUsers,
-    "id"
-  ).map(extendPublicUser);
+  const enhancedRecs = recommendations.map(extendPublicUser);
   const enhancedFavs = favorites.map(extendPublicUser);
   useEffect(() => {
     if (user && user.role !== "VIEWER") {

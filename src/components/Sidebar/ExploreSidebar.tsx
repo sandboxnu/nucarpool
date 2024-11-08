@@ -46,7 +46,6 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
 
   const activeFilters = getActiveFilters();
   const filtersActive = Object.values(activeFilters).some((value) => value);
-
   const sortOptions = [
     { value: "any", label: "Recommended" },
     { value: "distance", label: "Distance" },
