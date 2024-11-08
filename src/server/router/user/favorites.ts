@@ -3,6 +3,7 @@ import { z } from "zod";
 import { router, protectedRouter } from "../createRouter";
 import _ from "lodash";
 import { convertToPublic } from "../../../utils/publicUser";
+import { Status } from "@prisma/client";
 
 export const favoritesRouter = router({
   me: protectedRouter.query(async ({ ctx }) => {
@@ -24,7 +25,10 @@ export const favoritesRouter = router({
     }
     const userRole = user.role;
     const filteredFavorites = user.favorites.filter(
-      (favorite) => favorite.role !== userRole
+      (favorite) =>
+        favorite.role !== userRole &&
+        favorite.role !== "VIEWER" &&
+        favorite.status !== Status.INACTIVE
     );
     return filteredFavorites.map(convertToPublic);
   }),

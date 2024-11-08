@@ -32,6 +32,8 @@ export type FiltersState = {
   startDate: Date;
   endDate: Date;
   dateOverlap: number;
+  favorites: boolean;
+  messaged: boolean;
 };
 
 export type MapUser = {

@@ -8,6 +8,8 @@ import { GeoJSON, LineString } from "geojson";
 import { StaticImageData } from "next/image";
 import DriverStart from "../../../public/driver-start.png";
 import RiderStart from "../../../public/rider-start.png";
+import DriverEnd from "../../../public/driver-dest.png";
+import RiderEnd from "../../../public/rider-dest.png";
 
 const previousMarkers: (mapboxgl.Marker | mapboxgl.Popup)[] = [];
 export const clearMarkers = () => {

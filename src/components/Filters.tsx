@@ -51,6 +51,9 @@ const Filters = ({
   const [distanceOpen, setDistanceOpen] = useState(
     activeFilters.startDistance || activeFilters.endDistance
   );
+  const [checkedOpen, setCheckedOpen] = useState(
+    activeFilters.favorites || activeFilters.messaged
+  );
   const [daysMatchOpen, setDaysMatchOpen] = useState(activeFilters.days);
   const [startTimeOpen, setStartTimeOpen] = useState(
     activeFilters.startTime || activeFilters.endTime
@@ -275,8 +278,8 @@ const Filters = ({
                     className="w-full px-4 pt-2 text-xs"
                     style={{ color: "#BCA7A7" }}
                   >
-                    (?) Exact days only shows users with the exact selected
-                    carpool days.
+                    (?) Exact days only shows users carpooling during the
+                    selected carpool days.
                   </p>
                 ) : null}
               </div>
@@ -289,7 +292,11 @@ const Filters = ({
                     type="number"
                     min="1"
                     max={selectedDaysCount}
-                    value={filters.flexDays}
+                    value={
+                      filters.flexDays > selectedDaysCount
+                        ? selectedDaysCount
+                        : filters.flexDays
+                    }
                     onChange={(e) => {
                       const newFlexDays = Math.max(
                         1,
@@ -474,6 +481,52 @@ const Filters = ({
                 onChange={handleMonthChange("endDate")}
               />
             </div>
+          </div>
+        </div>
+      </FilterSection>
+      <FilterSection
+        title="Favorites + Connections"
+        isOpen={checkedOpen}
+        toggleOpen={() => setCheckedOpen(!checkedOpen)}
+      >
+        <div className="mt-3 ">
+          <div className="flex items-center">
+            <Checkbox
+              checked={filters.favorites}
+              onChange={(event) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  favorites: event.target.checked,
+                }))
+              }
+              sx={{
+                color: "#C1C1C1",
+                "&.Mui-checked": {
+                  color: "#c8102e",
+                },
+              }}
+            />
+            <label className=" text-black">Only show favorites</label>
+          </div>
+          <div className="flex items-center ">
+            <Checkbox
+              sx={{
+                color: "#C1C1C1",
+                "&.Mui-checked": {
+                  color: "#c8102e",
+                },
+              }}
+              checked={!filters.messaged}
+              onChange={(event) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  messaged: !event.target.checked,
+                }))
+              }
+            />
+            <label className="text-gray-black">
+              Hide users I have messaged
+            </label>
           </div>
         </div>
       </FilterSection>

@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { router, protectedRouter } from "../createRouter";
+import { protectedRouter, router } from "../createRouter";
 import _ from "lodash";
 import { convertToPublic } from "../../../utils/publicUser";
 import { Status } from "@prisma/client";
@@ -23,6 +23,8 @@ export const recommendationsRouter = router({
           startDate: z.date(),
           endDate: z.date(),
           dateOverlap: z.number(), // 0 any, 1 partial, 2 full
+          favorites: z.boolean(), // if true, only show users user has favorited
+          messaged: z.boolean(), // if false, hide users user has messaged
         }),
       })
     )
@@ -32,6 +34,11 @@ export const recommendationsRouter = router({
         where: {
           id: id,
         },
+        include: {
+          favorites: input.filters.favorites,
+          sentRequests: !input.filters.messaged,
+          receivedRequests: !input.filters.messaged,
+        },
       });
       if (!currentUser) {
         throw new TRPCError({
@@ -39,24 +46,40 @@ export const recommendationsRouter = router({
           message: `No user with id ${id}.`,
         });
       }
+      const { favorites, sentRequests, receivedRequests, ...calcUser } =
+        currentUser;
 
+      let userQuery: { id: any; isOnboarded: boolean; status: Status } = {
+        id: { not: id },
+        isOnboarded: true,
+        status: Status.ACTIVE,
+      };
+
+      // Hide users user has messaged
+      if (!input.filters.messaged) {
+        userQuery.id["notIn"] = [
+          ...sentRequests.map((r) => r.toUserId),
+          ...receivedRequests.map((r) => r.fromUserId),
+        ];
+      }
+
+      // Favorites filter
+      if (input.filters.favorites) {
+        userQuery.id["in"] = favorites.map((f) => f.id);
+      }
+
+      // Construct Query with Filters
       const users = await ctx.prisma.user.findMany({
-        where: {
-          id: {
-            not: id, // doesn't include the current user
-          },
-          isOnboarded: true, // only include user that have finished onboarding
-          status: Status.ACTIVE, // only include active users
-        },
+        where: userQuery,
       });
       const recs = _.compact(
-        users.map(calculateScore(currentUser, input.filters, input.sort))
+        users.map(calculateScore(calcUser, input.filters, input.sort))
       );
       recs.sort((a, b) => a.score - b.score);
       const sortedUsers = recs.map((rec) =>
         users.find((user) => user.id === rec.id)
       );
-      const finalUsers = sortedUsers.slice(0, 20);
+      const finalUsers = sortedUsers.slice(0, 50);
 
       return Promise.all(finalUsers.map((user) => convertToPublic(user!)));
     }),

@@ -13,9 +13,6 @@ interface RequestSidebarProps {
 
 const RequestSidebar = (props: RequestSidebarProps) => {
   const [curOption, setCurOption] = useState<"received" | "sent">("received");
-  const [selectedUser, setSelectedUser] = useState<EnhancedPublicUser | null>(
-    null
-  );
 
   const handleCardClick = (userId: string) => {
     props.onUserSelect(userId);

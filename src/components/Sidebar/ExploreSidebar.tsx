@@ -42,6 +42,8 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
         props.defaultFilters.startDistance !== props.filters.startDistance,
       endDistance:
         props.defaultFilters.endDistance !== props.filters.endDistance,
+      favorites: props.defaultFilters.favorites !== props.filters.favorites,
+      messaged: props.defaultFilters.messaged !== props.filters.messaged,
     };
   };
 
@@ -77,6 +79,7 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
             }
             onClick={() => {
               setCurOption("favorites");
+              setFiltersOpen(false);
             }}
           >
             Favorites
