@@ -23,7 +23,7 @@ const FilterSection = ({
   toggleOpen,
   children,
 }: FilterSectionProps) => (
-  <div className="flex flex-shrink flex-col border-b border-gray-200 px-4 py-4">
+  <div className="flex flex-shrink flex-col border-b border-gray-200 px-3 py-4">
     <div
       className="flex cursor-pointer items-center justify-between"
       onClick={toggleOpen}
@@ -106,7 +106,7 @@ const Filters = ({
     .filter((day) => day === "1").length;
 
   return (
-    <div className="relative  mr-1 h-full select-none overflow-y-auto bg-white pb-20 pr-1 scrollbar-thin  scrollbar-track-stone-100 scrollbar-thumb-northeastern-red scrollbar-track-rounded-full scrollbar-thumb-rounded-full">
+    <div className="relative  mx-1 h-full select-none overflow-y-auto bg-white px-1 pb-20 scrollbar-thin  scrollbar-track-stone-100 scrollbar-thumb-northeastern-red scrollbar-track-rounded-full scrollbar-thumb-rounded-full">
       <div className="sticky top-0 z-10 border-b border-gray-200 bg-white px-4 pb-5 pt-2">
         <div className="flex items-center justify-between">
           <h2 className="mx-auto text-xl font-semibold">Filters</h2>
