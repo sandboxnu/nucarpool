@@ -104,24 +104,26 @@ const renderUserCard = (
 
 export const SidebarContent = (props: SidebarContentProps) => {
   return (
-    <div className="-mr-.5 h-full overflow-auto pb-32  scrollbar scrollbar-track-stone-100 scrollbar-thumb-busy-red scrollbar-track-rounded-full scrollbar-thumb-rounded-full">
-      {props.userCardList.length === 0 ||
-      (props.disabled && props.subType !== "favorites") ? (
-        <div className="m-4 text-center text-lg font-light">
-          {emptyMessage(props.subType, props.disabled)}
-        </div>
-      ) : (
-        props.userCardList.map((otherUser: EnhancedPublicUser) =>
-          renderUserCard(
-            props.subType,
-            otherUser,
-            props.onViewRouteClick,
-            props.onCardClick,
-            props.selectedUser,
-            props.onViewRequest
+    <div className="relative h-full px-3.5">
+      <div className="relative h-full overflow-auto pb-32  scrollbar scrollbar-track-stone-100 scrollbar-thumb-busy-red scrollbar-track-rounded-full scrollbar-thumb-rounded-full">
+        {props.userCardList.length === 0 ||
+        (props.disabled && props.subType !== "favorites") ? (
+          <div className="m-4 text-center text-lg font-light">
+            {emptyMessage(props.subType, props.disabled)}
+          </div>
+        ) : (
+          props.userCardList.map((otherUser: EnhancedPublicUser) =>
+            renderUserCard(
+              props.subType,
+              otherUser,
+              props.onViewRouteClick,
+              props.onCardClick,
+              props.selectedUser,
+              props.onViewRequest
+            )
           )
-        )
-      )}
+        )}
+      </div>
     </div>
   );
 };

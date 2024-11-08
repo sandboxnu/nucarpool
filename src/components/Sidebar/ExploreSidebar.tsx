@@ -5,12 +5,9 @@ import {
   PublicUser,
   User,
 } from "../../utils/types";
-import _ from "lodash";
 import { SidebarContent } from "./SidebarContent";
-import { clearMarkers } from "../../utils/map/viewRoute";
 import Filters from "../Filters";
 import { FaFilter } from "react-icons/fa6";
-import { mockSession } from "next-auth/client/__tests__/helpers/mocks";
 import CustomSelect from "./CustomSelect";
 
 interface ExploreSidebarProps {
@@ -56,8 +53,8 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
     { value: "time", label: "Time" },
   ];
   return (
-    <div className="z-10 flex h-full flex-shrink-0 flex-col bg-white px-5 text-left">
-      <div className="flex-row py-3">
+    <div className="z-10 flex h-full flex-shrink-0 flex-col bg-white text-left">
+      <div className="flex-row px-5 py-3">
         <div className="flex justify-center gap-3">
           <button
             className={
@@ -107,7 +104,7 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
         )}
       </div>
 
-      <div className="relative h-full">
+      <div className="relative h-full w-full ">
         {filtersOpen ? (
           <Filters
             setFilters={props.setFilters}
