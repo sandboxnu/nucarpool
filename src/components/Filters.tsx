@@ -23,15 +23,17 @@ const FilterSection = ({
   toggleOpen,
   children,
 }: FilterSectionProps) => (
-  <div className="flex flex-shrink flex-col border-b border-gray-200 px-3 py-4">
-    <div
-      className="flex cursor-pointer items-center justify-between"
-      onClick={toggleOpen}
-    >
-      <h3 className="text-lg font-semibold">{title}</h3>
-      {isOpen ? <FaMinus /> : <FaPlus />}
+  <div className="px-3 ">
+    <div className="flex flex-shrink flex-col border-b border-gray-200 py-4">
+      <div
+        className="flex cursor-pointer items-center justify-between"
+        onClick={toggleOpen}
+      >
+        <h3 className="text-lg font-semibold">{title}</h3>
+        {isOpen ? <FaMinus /> : <FaPlus />}
+      </div>
+      {isOpen && <div className="mt-3">{children}</div>}
     </div>
-    {isOpen && <div className="mt-3">{children}</div>}
   </div>
 );
 
@@ -40,6 +42,7 @@ interface FiltersProps {
   setFilters: React.Dispatch<React.SetStateAction<FiltersState>>;
   filters: FiltersState;
   activeFilters: { [key: string]: boolean };
+  resetFilters: () => void;
 }
 
 const Filters = ({
@@ -47,6 +50,7 @@ const Filters = ({
   filters,
   setFilters,
   activeFilters,
+  resetFilters: externalResetFilters,
 }: FiltersProps) => {
   const [distanceOpen, setDistanceOpen] = useState(
     activeFilters.startDistance || activeFilters.endDistance
@@ -60,7 +64,14 @@ const Filters = ({
   );
   const [termDatesOpen, setTermDatesOpen] = useState(activeFilters.dateOverlap);
   const daysOfWeek = ["Su", "M", "Tu", "W", "Th", "F", "S"];
-
+  const resetFilters = () => {
+    externalResetFilters();
+    setDistanceOpen(false);
+    setCheckedOpen(false);
+    setDaysMatchOpen(false);
+    setStartTimeOpen(false);
+    setTermDatesOpen(false);
+  };
   const handleMonthChange =
     (field: keyof FiltersState) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,12 +117,20 @@ const Filters = ({
     .filter((day) => day === "1").length;
 
   return (
-    <div className="relative  mx-1 h-full select-none overflow-y-auto bg-white px-1 pb-20 scrollbar-thin  scrollbar-track-stone-100 scrollbar-thumb-northeastern-red scrollbar-track-rounded-full scrollbar-thumb-rounded-full">
+    <div className="relative mx-1 h-full select-none overflow-y-auto bg-white px-1 pb-20 scrollbar-thin  scrollbar-track-stone-100 scrollbar-thumb-northeastern-red scrollbar-track-rounded-full scrollbar-thumb-rounded-full">
       <div className="sticky top-0 z-10 border-b border-gray-200 bg-white px-4 pb-5 pt-2">
-        <div className="flex items-center justify-between">
-          <h2 className="mx-auto text-xl font-semibold">Filters</h2>
-          <button className="self-center pt-1 text-black" onClick={onClose}>
-            <FaTimes size={20} />
+        <div className="flex w-full  items-center justify-between">
+          <button
+            className="flex-1 self-end bg-transparent text-start font-semibold text-northeastern-red hover:text-busy-red"
+            onClick={resetFilters}
+          >
+            Reset All
+          </button>
+          <h2 className="flex-1 self-end text-center text-xl font-semibold">
+            Filters
+          </h2>
+          <button className="flex-1  pt-1 " onClick={onClose}>
+            <FaTimes size={20} className="justify-self-end" />
           </button>
         </div>
       </div>
@@ -486,12 +505,12 @@ const Filters = ({
         </div>
       </FilterSection>
       <FilterSection
-        title="Favorites + Connections"
+        title="Favorites + Requests"
         isOpen={checkedOpen}
         toggleOpen={() => setCheckedOpen(!checkedOpen)}
       >
         <div className="mt-3 ">
-          <div className="flex items-center">
+          <label className="flex cursor-pointer items-center">
             <Checkbox
               checked={filters.favorites}
               onChange={(event) =>
@@ -507,28 +526,30 @@ const Filters = ({
                 },
               }}
             />
-            <label className=" text-black">Only show favorites</label>
-          </div>
-          <div className="flex items-center ">
+            <span className="text-gray-black">Only show favorites</span>
+          </label>
+
+          <label className="flex cursor-pointer items-center">
             <Checkbox
+              checked={filters.messaged}
+              onChange={(event) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  messaged: event.target.checked,
+                }))
+              }
               sx={{
                 color: "#C1C1C1",
                 "&.Mui-checked": {
                   color: "#c8102e",
                 },
               }}
-              checked={!filters.messaged}
-              onChange={(event) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  messaged: !event.target.checked,
-                }))
-              }
+              inputProps={{ "aria-label": "Include users I have messaged" }}
             />
-            <label className="text-gray-black">
-              Hide users I have messaged
-            </label>
-          </div>
+            <span className="text-gray-black">
+              Include users I have messaged
+            </span>
+          </label>
         </div>
       </FilterSection>
     </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import {
   EnhancedPublicUser,
   FiltersState,
@@ -9,6 +9,7 @@ import { SidebarContent } from "./SidebarContent";
 import Filters from "../Filters";
 import { FaFilter } from "react-icons/fa6";
 import CustomSelect from "./CustomSelect";
+import { UserContext } from "../../utils/userContext";
 
 interface ExploreSidebarProps {
   recs: EnhancedPublicUser[];
@@ -24,6 +25,7 @@ interface ExploreSidebarProps {
 }
 
 const ExploreSidebar = (props: ExploreSidebarProps) => {
+  const user = useContext(UserContext);
   const [curOption, setCurOption] = useState<"recommendations" | "favorites">(
     "recommendations"
   );
@@ -43,9 +45,20 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
       messaged: props.defaultFilters.messaged !== props.filters.messaged,
     };
   };
-
+  const resetFilters = () => {
+    if (!user) {
+      return;
+    }
+    props.setFilters({
+      ...props.defaultFilters,
+      startDate: user.coopStartDate || props.filters.startDate,
+      endDate: user.coopEndDate || props.filters.endDate,
+      daysWorking: user.daysWorking,
+    });
+  };
   const activeFilters = getActiveFilters();
   const filtersActive = Object.values(activeFilters).some((value) => value);
+
   const sortOptions = [
     { value: "any", label: "Recommended" },
     { value: "distance", label: "Distance" },
@@ -110,6 +123,7 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
             activeFilters={activeFilters}
             filters={props.filters}
             onClose={() => setFiltersOpen(false)}
+            resetFilters={() => resetFilters()}
           />
         ) : (
           <SidebarContent

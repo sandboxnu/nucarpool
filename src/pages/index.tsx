@@ -81,7 +81,7 @@ const Home: NextPage<any> = () => {
     endDate: new Date(Date.now()),
     dateOverlap: 0,
     favorites: false,
-    messaged: true,
+    messaged: false,
   };
   const [tempOtherUser, setTempOtherUser] = useState<PublicUser | null>(null);
   const [tempOtherUserMarkerActive, setTempOtherUserMarkerActive] =
