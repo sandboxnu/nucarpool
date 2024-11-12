@@ -331,6 +331,7 @@ const Profile: NextPage = () => {
       await utils.user.me.refetch();
       await utils.user.recommendations.me.invalidate();
       await utils.mapbox.geoJsonUserList.invalidate();
+      await utils.user.messages.getUnreadMessageCount.refetch();
       router.push("/").then(() => {
         setIsLoading(false);
       });

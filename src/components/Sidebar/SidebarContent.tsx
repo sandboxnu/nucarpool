@@ -34,8 +34,9 @@ const emptyMessages = {
     "You are currently in Viewer mode, to get recommendations select Driver or Rider in profile.",
   favorites: `You have no users currently favorited.
   Click the star icon on the upper-right side of a user's card to add them to your favorites!`,
-  sent: "You have no current outgoing requests. Sent requests to other users through the recommendations dashbaord!",
+  sent: "You have no current outgoing requests. Send requests to other users through the recommendations sidebar!",
   received: "You have no current incoming requests. Hold tight!",
+  all: "You have no incoming or outgoing requests. Send a request or hold tight!",
 };
 
 const emptyMessage = (card: string, disabled: boolean): string => {
@@ -50,6 +51,8 @@ const emptyMessage = (card: string, disabled: boolean): string => {
       return disabled ? emptyMessages.disabledReq : emptyMessages.sent;
     case "received":
       return disabled ? emptyMessages.disabledReq : emptyMessages.received;
+    case "all":
+      return disabled ? emptyMessages.disabledReq : emptyMessages.all;
     default:
       return "";
   }
