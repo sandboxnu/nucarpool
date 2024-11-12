@@ -13,16 +13,13 @@ interface RequestSidebarProps {
 
 const RequestSidebar = (props: RequestSidebarProps) => {
   const [curOption, setCurOption] = useState<"received" | "sent">("received");
-  const [selectedUser, setSelectedUser] = useState<EnhancedPublicUser | null>(
-    null
-  );
 
   const handleCardClick = (userId: string) => {
     props.onUserSelect(userId);
   };
   return (
-    <div className="z-10 flex h-full flex-shrink-0 flex-col bg-white px-5 text-left">
-      <div className="flex-row py-3">
+    <div className="z-10 flex h-full flex-shrink-0 flex-col bg-white text-left">
+      <div className="flex-row px-5 py-3">
         <div className="flex justify-center gap-3">
           <button
             className={
@@ -53,15 +50,17 @@ const RequestSidebar = (props: RequestSidebarProps) => {
           </button>
         </div>
       </div>
-      <SidebarContent
-        userCardList={curOption === "received" ? props.received : props.sent}
-        subType={curOption}
-        disabled={props.disabled}
-        onViewRouteClick={props.viewRoute}
-        onCardClick={handleCardClick}
-        selectedUser={props.selectedUser}
-        onViewRequest={props.onUserSelect}
-      />
+      <div className="relative h-full w-full ">
+        <SidebarContent
+          userCardList={curOption === "received" ? props.received : props.sent}
+          subType={curOption}
+          disabled={props.disabled}
+          onViewRouteClick={props.viewRoute}
+          onCardClick={handleCardClick}
+          selectedUser={props.selectedUser}
+          onViewRequest={props.onUserSelect}
+        />
+      </div>
     </div>
   );
 };

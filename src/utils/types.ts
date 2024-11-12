@@ -21,6 +21,20 @@ export type ProfileFormInputs = {
   companyAddress: string;
   status: "active" | "inactive";
 };
+export type FiltersState = {
+  days: number;
+  flexDays: number;
+  startDistance: number;
+  endDistance: number;
+  daysWorking: string;
+  startTime: number;
+  endTime: number;
+  startDate: Date;
+  endDate: Date;
+  dateOverlap: number;
+  favorites: boolean;
+  messaged: boolean;
+};
 
 export type MapUser = {
   id: string;

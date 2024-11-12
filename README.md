@@ -17,6 +17,8 @@ This is a web app for Northeastern University's students to assists them in find
 NEXTAUTH_SECRET=
 NEXTAUTH_URL=
 
+#MixPanel (use any value for local development)
+NEXT_PUBLIC_MIXPANEL_PROJECT_TOKEN=
 # Mapbox
 
 NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=

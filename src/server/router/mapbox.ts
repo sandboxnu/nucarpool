@@ -1,13 +1,13 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { router, protectedRouter } from "./createRouter";
+import { protectedRouter, router } from "./createRouter";
 import { Feature, FeatureCollection } from "geojson";
 import { serverEnv } from "../../utils/env/server";
 import { Role, Status } from "@prisma/client";
 import { DirectionsResponse } from "../../utils/types";
 import { roundCoord } from "../../utils/publicUser";
 import _ from "lodash";
-import { calculateScore, distanceBasedRecs } from "../../utils/recommendation";
+import { calculateScore } from "../../utils/recommendation";
 
 // router for interacting with the Mapbox API
 export const mapboxRouter = router({
@@ -40,93 +40,103 @@ export const mapboxRouter = router({
     }),
 
   //queries all other users and locations besides current user
-  geoJsonUserList: protectedRouter.query(async ({ ctx }) => {
-    const id = ctx.session.user?.id;
-    const currentUser = await ctx.prisma.user.findUnique({
-      where: {
-        id: id,
-      },
-    });
-
-    if (!currentUser) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: `No user with id ${id}.`,
+  geoJsonUserList: protectedRouter
+    .input(
+      z.object({
+        days: z.number(), /// 0 for any, 1 for exact
+        daysWorking: z.string(),
+        flexDays: z.number(),
+        startDistance: z.number(), // max 20, greater = any
+        endDistance: z.number(),
+        startTime: z.number(), // max = 4 hours, greater = any
+        endTime: z.number(),
+        startDate: z.date(),
+        endDate: z.date(),
+        dateOverlap: z.number(), // 0 any, 1 partial, 2 full
+        favorites: z.boolean(), // if true, only show users user has favorited
+        messaged: z.boolean(), // if false, hide users user has messaged
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const id = ctx.session.user?.id;
+      const currentUser = await ctx.prisma.user.findUnique({
+        where: {
+          id: id,
+        },
+        include: {
+          favorites: input.favorites,
+          sentRequests: !input.messaged,
+          receivedRequests: !input.messaged,
+        },
       });
-    }
 
-    // Now returns all drivers and riders if user is in viewer mode
-    const oppRole =
-      currentUser?.role === Role.DRIVER ? Role.RIDER : Role.DRIVER;
-    const isViewer = currentUser?.role === Role.VIEWER;
-    const viewCheck = isViewer ? Role.RIDER : oppRole;
-    const users = await ctx.prisma.user.findMany({
-      where: {
-        id: {
-          not: id, // doesn't include the current user
-        },
-        isOnboarded: true, // only include user that have finished onboarding
-        status: Status.ACTIVE, // only include active users
-        OR: [{ role: oppRole }, { role: viewCheck }],
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        status: true,
-        seatAvail: true,
-        companyName: true,
-        daysWorking: true,
-        preferredName: true,
-        companyAddress: true,
-        companyCoordLat: true,
-        companyCoordLng: true,
-        startPOICoordLng: true,
-        startPOICoordLat: true,
-        startPOILocation: true,
-        coopEndDate: true,
-        coopStartDate: true,
-        startTime: true,
-        endTime: true,
-        startCoordLat: true,
-        startCoordLng: true,
-        carpoolId: true,
-      },
-    });
+      if (!currentUser) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `No user with id ${id}.`,
+        });
+      }
 
-    const distances = _.compact(users.map(distanceBasedRecs(currentUser)));
-    distances.sort((a, b) => a.score - b.score);
-    const sortedUsers = _.compact(
-      distances.map((rec) => users.find((user) => user.id === rec.id))
-    );
-    const finalUsers = isViewer ? sortedUsers : sortedUsers.slice(0, 50);
+      const { favorites, sentRequests, receivedRequests, ...calcUser } =
+        currentUser;
 
-    // creates points for each user with coordinates at company location
-    const features: Feature[] = finalUsers.map((u) => {
-      const feat = {
-        type: "Feature" as "Feature",
-        geometry: {
-          type: "Point" as "Point",
-          coordinates: [
-            roundCoord(u.companyCoordLng),
-            roundCoord(u.companyCoordLat),
-          ],
-        },
-        properties: {
-          ...u,
-        },
+      let userQuery: { id: any; isOnboarded: boolean; status: Status } = {
+        id: { not: id },
+        isOnboarded: true,
+        status: Status.ACTIVE,
       };
-      return feat;
-    });
 
-    const featureCollection: FeatureCollection = {
-      type: "FeatureCollection" as "FeatureCollection",
-      features,
-    };
+      // Hide users user has messaged
+      if (!input.messaged) {
+        userQuery.id["notIn"] = [
+          ...sentRequests.map((r) => r.toUserId),
+          ...receivedRequests.map((r) => r.fromUserId),
+        ];
+      }
 
-    return featureCollection;
-  }),
+      // Favorites filter
+      if (input.favorites) {
+        userQuery.id["in"] = favorites.map((f) => f.id);
+      }
+
+      // Construct Query with Filters
+      const users = await ctx.prisma.user.findMany({
+        where: userQuery,
+      });
+      const filtered = _.compact(
+        users.map(calculateScore(calcUser, input, "distance"))
+      );
+      filtered.sort((a, b) => a.score - b.score);
+      const sortedUsers = _.compact(
+        filtered.map((rec) => users.find((user) => user.id === rec.id))
+      );
+      const finalUsers =
+        calcUser.role === Role.VIEWER ? sortedUsers : sortedUsers.slice(0, 150);
+
+      // creates points for each user with coordinates at company location
+      const features: Feature[] = finalUsers.map((u) => {
+        return {
+          type: "Feature" as "Feature",
+          geometry: {
+            type: "Point" as "Point",
+            coordinates: [
+              roundCoord(u.companyCoordLng),
+              roundCoord(u.companyCoordLat),
+            ],
+          },
+          properties: {
+            ...u,
+          },
+        };
+      });
+
+      const featureCollection: FeatureCollection = {
+        type: "FeatureCollection" as "FeatureCollection",
+        features,
+      };
+
+      return featureCollection;
+    }),
 
   getDirections: protectedRouter
     .input(

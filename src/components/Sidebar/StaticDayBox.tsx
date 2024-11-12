@@ -1,6 +1,6 @@
 import React from "react";
 
-const DayBox = ({
+const StaticDayBox = ({
   day,
   isSelected,
 }: {
@@ -8,7 +8,7 @@ const DayBox = ({
   isSelected: boolean;
 }): React.ReactElement => {
   const baseClasses =
-    "flex md:h-14 md:w-14 lg:h-16 lg:w-16 sm:h-10 sm:w-10 items-center justify-center rounded-full ml-2 border border-black lg:text-2xl md:text-lg";
+    "flex h-10 w-10  items-center justify-center rounded-full m-1 border border-black text-xl";
 
   const selectedClasses = isSelected
     ? "bg-northeastern-red text-white"
@@ -16,5 +16,4 @@ const DayBox = ({
 
   return <div className={`${baseClasses} ${selectedClasses}`}>{day}</div>;
 };
-
-export default DayBox;
+export default StaticDayBox;
