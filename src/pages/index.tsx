@@ -121,7 +121,7 @@ const Home: NextPage<any> = () => {
     refetchOnMount: true,
   });
   const requestsQuery = trpc.user.requests.me.useQuery(undefined, {
-    refetchOnMount: true,
+    refetchOnMount: "always",
   });
   const { data: requests = { sent: [], received: [] } } = requestsQuery;
   const utils = trpc.useContext();

@@ -12,6 +12,18 @@ export const messageRouter = router({
       });
     }
 
+    const user = await ctx.prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+
+    if (!user) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User not found",
+      });
+    }
+
     return ctx.prisma.message.count({
       where: {
         isRead: false,
@@ -21,43 +33,25 @@ export const messageRouter = router({
         conversation: {
           request: {
             some: {
-              OR: [{ fromUserId: userId }, { toUserId: userId }],
+              OR: [
+                {
+                  fromUserId: userId,
+                  toUser: {
+                    role: { not: user.role },
+                    AND: { role: { not: "VIEWER" } },
+                  },
+                },
+                {
+                  toUserId: userId,
+                  fromUser: {
+                    role: { not: user.role },
+                    AND: { role: { not: "VIEWER" } },
+                  },
+                },
+              ],
             },
           },
         },
-      },
-    });
-  }),
-
-  getRequests: protectedRouter.query(async ({ ctx }) => {
-    const userId = ctx.session.user?.id;
-    if (!userId) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "User not authenticated",
-      });
-    }
-
-    return ctx.prisma.request.findMany({
-      where: {
-        OR: [{ fromUserId: userId }, { toUserId: userId }],
-      },
-      include: {
-        fromUser: true,
-        toUser: true,
-        conversation: {
-          include: {
-            messages: {
-              orderBy: {
-                dateCreated: "desc",
-              },
-            },
-            request: true,
-          },
-        },
-      },
-      orderBy: {
-        id: "desc",
       },
     });
   }),

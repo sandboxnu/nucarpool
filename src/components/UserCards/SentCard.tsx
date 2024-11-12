@@ -1,5 +1,10 @@
 import { useContext, useState } from "react";
-import { ButtonInfo, EnhancedPublicUser, PublicUser } from "../../utils/types";
+import {
+  ButtonInfo,
+  EnhancedPublicUser,
+  Message,
+  PublicUser,
+} from "../../utils/types";
 import { UserContext } from "../../utils/userContext";
 import { UserCard } from "./UserCard";
 import SentRequestModal from "../Modals/SentRequestModal";
@@ -12,36 +17,21 @@ interface SentCardProps {
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
   onClick: () => void;
   selectedUser: EnhancedPublicUser | null;
+  isUnread: boolean;
+  latestMessage?: Message;
 }
 
 export const SentCard = (props: SentCardProps): JSX.Element => {
   const user = useContext(UserContext);
   const [showModal, setShowModal] = useState(false);
 
-  const handleManageSent = () => {
-    setShowModal(true);
-  };
-  const latestMessage =
-    props.otherUser.outgoingRequest && user
-      ? getLatestMessageForRequest(props.otherUser.outgoingRequest, user.id)
-      : null;
-
-  let isUnread = latestMessage ? !latestMessage.isRead : false;
-  if (user?.id === latestMessage?.userId) {
-    isUnread = false;
-  }
-  const connectButtonInfo: ButtonInfo = {
-    text: "Manage",
-    onPress: () => handleManageSent(),
-    color: "bg-northeastern-red",
-  };
   return (
     <>
       <div onClick={props.onClick} className="cursor-pointer">
         <UserCard
           otherUser={props.otherUser}
-          message={latestMessage?.content}
-          isUnread={isUnread}
+          message={props.latestMessage?.content}
+          isUnread={props.isUnread}
           classname={
             props.selectedUser?.id === props.otherUser.id
               ? "border-l-northeastern-red drop-shadow-lg"
