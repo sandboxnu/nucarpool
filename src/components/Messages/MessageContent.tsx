@@ -55,8 +55,6 @@ const MessageContent = ({ selectedUser }: MessageContentProps) => {
   const onSuccess = useCallback(() => {
     utils.user.messages.getUnreadMessageCount.invalidate();
     utils.user.requests.me.invalidate();
-
-    console.log("invalidated :)");
   }, [utils.user.messages.getUnreadMessageCount, utils.user.requests.me]);
 
   const onError = useCallback((error: any) => {
