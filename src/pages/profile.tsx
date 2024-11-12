@@ -36,12 +36,9 @@ import { CarpoolAddress, CarpoolFeature } from "../utils/types";
 import { EntryLabel } from "../components/EntryLabel";
 import ControlledAddressCombobox from "../components/Profile/ControlledAddressCombobox";
 import { getSession, useSession } from "next-auth/react";
-import { createPortal } from "react-dom";
 import { ComplianceModal } from "../components/CompliancePortal";
 import ProfilePicture from "../components/Profile/ProfilePicture";
 import Spinner from "../components/Spinner";
-import { getPresignedImageUrl } from "../utils/uploadToS3";
-import { userInfo } from "node:os";
 import { trackProfileCompletion } from "../utils/mixpanel";
 
 // Inputs to the onboarding form.
@@ -62,10 +59,6 @@ export type OnboardingFormInputs = {
   coopEndDate: Date | null;
   timeDiffers: boolean;
   bio: string;
-};
-
-const dateErrorMap: z.ZodErrorMap = (issue, ctx) => {
-  return { message: "Invalid time" };
 };
 
 const custom = z.ZodIssueCode.custom;
