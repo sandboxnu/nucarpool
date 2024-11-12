@@ -150,14 +150,12 @@ export const SidebarContent = (props: SidebarContentProps) => {
 
   const sortedUserCards = props.userCardList
     .map((otherUser) => {
-      const latestMessage = otherUser.incomingRequest
-        ? getLatestMessageForRequest(otherUser.incomingRequest, user.id)
-        : null;
       const request = otherUser.incomingRequest || otherUser.outgoingRequest;
 
       if (!request) {
         return { otherUser, isUnread: false, latestActivityDate: new Date(0) };
       }
+      const latestMessage = getLatestMessageForRequest(request, user.id);
 
       const { isUnread, latestActivityDate } = getCardSortingData(
         user.id,
@@ -168,9 +166,6 @@ export const SidebarContent = (props: SidebarContentProps) => {
       return { otherUser, isUnread, latestActivityDate, latestMessage };
     })
     .sort((a, b) => {
-      // Sort by unread
-      if (a.isUnread !== b.isUnread) return a.isUnread ? -1 : 1;
-      // Sort by date
       return b.latestActivityDate.getTime() - a.latestActivityDate.getTime();
     });
   return (

@@ -1,6 +1,4 @@
-import { Message, Request, Conversation, EnhancedPublicUser } from "./types";
-import { undefined } from "zod";
-import { User } from "@prisma/client";
+import { Message, Request } from "./types";
 
 export const getLatestMessageForRequest = (
   request: Request,

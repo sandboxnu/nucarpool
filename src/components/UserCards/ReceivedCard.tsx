@@ -1,9 +1,4 @@
-import {
-  ButtonInfo,
-  EnhancedPublicUser,
-  PublicUser,
-  User,
-} from "../../utils/types";
+import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
 import { UserCard } from "./UserCard";
 import { useContext, useState } from "react";
 import { UserContext } from "../../utils/userContext";
