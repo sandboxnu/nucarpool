@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
 import { SidebarContent } from "./SidebarContent";
-import { clearMarkers } from "../../utils/map/viewRoute";
+import CustomSelect from "./CustomSelect";
 interface RequestSidebarProps {
   received: EnhancedPublicUser[];
   sent: EnhancedPublicUser[];
@@ -10,57 +10,50 @@ interface RequestSidebarProps {
   onUserSelect: (userId: string) => void;
   selectedUser: EnhancedPublicUser | null;
 }
-
+interface Option<T> {
+  value: T;
+  label: string;
+}
 const RequestSidebar = (props: RequestSidebarProps) => {
-  const [curOption, setCurOption] = useState<"received" | "sent">("received");
-
+  const [curOption, setCurOption] = useState<"received" | "sent" | "all">(
+    "all"
+  );
+  const options: Option<"received" | "sent" | "all">[] = [
+    { value: "all", label: "All" },
+    { value: "received", label: "Received" },
+    { value: "sent", label: "Sent" },
+  ];
   const handleCardClick = (userId: string) => {
     props.onUserSelect(userId);
   };
   return (
     <div className="z-10 flex h-full flex-shrink-0 flex-col bg-white text-left">
-      <div className="flex-row px-5 py-3">
-        <div className="flex justify-center gap-3">
-          <button
-            className={
-              curOption === "received"
-                ? "rounded-xl bg-northeastern-red p-2 text-xl font-semibold text-white"
-                : "rounded-xl p-2 text-xl font-semibold text-black"
-            }
-            onClick={() => {
-              setCurOption("received");
-              // don't see a reason for clearing markers
-              //clearMarkers();
-            }}
-          >
-            Received
-          </button>
-          <button
-            className={
-              curOption === "sent"
-                ? "rounded-xl bg-northeastern-red p-2 text-xl font-semibold text-white"
-                : "rounded-xl p-2 text-xl font-semibold text-black"
-            }
-            onClick={() => {
-              setCurOption("sent");
-              //clearMarkers();
-            }}
-          >
-            Sent
-          </button>
+      <div className="flex-row px-7 py-3 pt-5">
+        <div className="flex items-center justify-between">
+          <div className="text-2xl  font-bold">Requests</div>
+          <CustomSelect
+            className="!w-1/3"
+            value={curOption}
+            onChange={setCurOption}
+            options={options}
+          />
         </div>
       </div>
-      <div className="relative h-full w-full ">
-        <SidebarContent
-          userCardList={curOption === "received" ? props.received : props.sent}
-          subType={curOption}
-          disabled={props.disabled}
-          onViewRouteClick={props.viewRoute}
-          onCardClick={handleCardClick}
-          selectedUser={props.selectedUser}
-          onViewRequest={props.onUserSelect}
-        />
-      </div>
+      <SidebarContent
+        userCardList={
+          curOption === "all"
+            ? [...props.received, ...props.sent]
+            : curOption === "sent"
+            ? props.sent
+            : props.received
+        }
+        subType={curOption}
+        disabled={props.disabled}
+        onViewRouteClick={props.viewRoute}
+        onCardClick={handleCardClick}
+        selectedUser={props.selectedUser}
+        onViewRequest={props.onUserSelect}
+      />
     </div>
   );
 };

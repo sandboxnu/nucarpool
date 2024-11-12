@@ -1,9 +1,19 @@
-import React from "react";
-import { EnhancedPublicUser, PublicUser, User } from "../../utils/types";
+import React, { useContext } from "react";
+import {
+  EnhancedPublicUser,
+  Message,
+  PublicUser,
+  User,
+} from "../../utils/types";
 import Spinner from "../Spinner";
 import { ConnectCard } from "../UserCards/ConnectCard";
 import { ReceivedCard } from "../UserCards/ReceivedCard";
 import { SentCard } from "../UserCards/SentCard";
+import {
+  getCardSortingData,
+  getLatestMessageForRequest,
+} from "../../utils/latestMessage";
+import { UserContext } from "../../utils/userContext";
 
 interface SidebarContentProps {
   subType: string;
@@ -51,7 +61,9 @@ const renderUserCard = (
   onViewRouteClick: (user: User, otherUser: PublicUser) => void,
   onCardClick: (userId: string) => void,
   selectedUser: EnhancedPublicUser | null,
-  onViewRequest: (userId: string) => void
+  onViewRequest: (userId: string) => void,
+  isUnread: boolean,
+  latestMessage: Message | undefined
 ): JSX.Element => {
   const handleClick = () => onCardClick(otherUser.id);
   switch (subType) {
@@ -82,6 +94,8 @@ const renderUserCard = (
             onViewRouteClick={onViewRouteClick}
             onClick={handleClick}
             selectedUser={selectedUser}
+            isUnread={isUnread}
+            latestMessage={latestMessage}
           />
         );
       }
@@ -94,6 +108,34 @@ const renderUserCard = (
             onViewRouteClick={onViewRouteClick}
             onClick={handleClick}
             selectedUser={selectedUser}
+            isUnread={isUnread}
+            latestMessage={latestMessage}
+          />
+        );
+      }
+    case "all":
+      if (otherUser.incomingRequest) {
+        return (
+          <ReceivedCard
+            key={otherUser.id}
+            otherUser={otherUser}
+            onViewRouteClick={onViewRouteClick}
+            onClick={handleClick}
+            selectedUser={selectedUser}
+            isUnread={isUnread}
+            latestMessage={latestMessage}
+          />
+        );
+      } else if (otherUser.outgoingRequest) {
+        return (
+          <SentCard
+            key={otherUser.id}
+            otherUser={otherUser}
+            onViewRouteClick={onViewRouteClick}
+            onClick={handleClick}
+            selectedUser={selectedUser}
+            isUnread={isUnread}
+            latestMessage={latestMessage}
           />
         );
       }
@@ -103,6 +145,34 @@ const renderUserCard = (
 };
 
 export const SidebarContent = (props: SidebarContentProps) => {
+  const user = useContext(UserContext);
+  if (!user) return null;
+
+  const sortedUserCards = props.userCardList
+    .map((otherUser) => {
+      const latestMessage = otherUser.incomingRequest
+        ? getLatestMessageForRequest(otherUser.incomingRequest, user.id)
+        : null;
+      const request = otherUser.incomingRequest || otherUser.outgoingRequest;
+
+      if (!request) {
+        return { otherUser, isUnread: false, latestActivityDate: new Date(0) };
+      }
+
+      const { isUnread, latestActivityDate } = getCardSortingData(
+        user.id,
+        request,
+        latestMessage
+      );
+
+      return { otherUser, isUnread, latestActivityDate, latestMessage };
+    })
+    .sort((a, b) => {
+      // Sort by unread
+      if (a.isUnread !== b.isUnread) return a.isUnread ? -1 : 1;
+      // Sort by date
+      return b.latestActivityDate.getTime() - a.latestActivityDate.getTime();
+    });
   return (
     <div className="relative h-full px-3.5">
       <div className="relative h-full overflow-auto pb-32  scrollbar scrollbar-track-stone-100 scrollbar-thumb-busy-red scrollbar-track-rounded-full scrollbar-thumb-rounded-full">
@@ -112,14 +182,16 @@ export const SidebarContent = (props: SidebarContentProps) => {
             {emptyMessage(props.subType, props.disabled)}
           </div>
         ) : (
-          props.userCardList.map((otherUser: EnhancedPublicUser) =>
+          sortedUserCards.map(({ otherUser, isUnread, latestMessage }) =>
             renderUserCard(
               props.subType,
               otherUser,
               props.onViewRouteClick,
               props.onCardClick,
               props.selectedUser,
-              props.onViewRequest
+              props.onViewRequest,
+              isUnread,
+              !latestMessage ? undefined : latestMessage
             )
           )
         )}

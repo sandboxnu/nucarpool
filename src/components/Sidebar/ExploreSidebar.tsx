@@ -101,6 +101,8 @@ const ExploreSidebar = (props: ExploreSidebarProps) => {
               value={props.sort}
               onChange={props.setSort}
               options={sortOptions}
+              title={"Sort by"}
+              className="!w-1/2"
             />
             <button
               className={`rounded-full p-3 ${
