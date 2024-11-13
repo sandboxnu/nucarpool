@@ -150,7 +150,7 @@ const ProfilePicture = (props: ProfilePictureProps) => {
           <div className="h-40 w-40 overflow-hidden rounded-full">
             <Image
               src={previewUrl}
-              alt="Profile Picture"
+              alt="Index Picture"
               width={160}
               height={160}
               objectFit="cover"
@@ -166,7 +166,7 @@ const ProfilePicture = (props: ProfilePictureProps) => {
             htmlFor="fileInput"
             className="text-md ml-10 inline-block cursor-pointer rounded-full bg-northeastern-red px-4 py-2  text-white hover:bg-red-700"
           >
-            Upload Profile Picture
+            Upload Index Picture
           </label>
           <input
             id="fileInput"

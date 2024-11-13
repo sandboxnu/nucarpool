@@ -7,15 +7,15 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import FormControlLabel from "@mui/material/FormControlLabel";
 
-import Header from "../components/Header";
+import Header from "../../components/Header";
 import { z } from "zod";
-import { trpc } from "../utils/trpc";
+import { trpc } from "../../utils/trpc";
 import { Role, Status } from "@prisma/client";
-import { TextField } from "../components/TextField";
-import Radio from "../components/Radio";
-import useSearch from "../utils/search";
+import { TextField } from "../../components/TextField";
+import Radio from "../../components/Radio";
+import useSearch from "../../utils/search";
 import Checkbox from "@mui/material/Checkbox";
-import DayBox from "../components/Profile/DayBox";
+import DayBox from "../../components/Profile/DayBox";
 import {
   BottomProfileSection,
   CompleteProfileButton,
@@ -30,16 +30,19 @@ import {
   Note,
   ErrorDisplay,
   ProfileHeaderNoMB,
-} from "../styles/profile";
-import ControlledTimePicker from "../components/Profile/ControlledTimePicker";
-import { CarpoolAddress, CarpoolFeature } from "../utils/types";
-import { EntryLabel } from "../components/EntryLabel";
-import ControlledAddressCombobox from "../components/Profile/ControlledAddressCombobox";
+} from "../../styles/profile";
+import ControlledTimePicker from "../../components/Profile/ControlledTimePicker";
+import { CarpoolAddress, CarpoolFeature } from "../../utils/types";
+import { EntryLabel } from "../../components/EntryLabel";
+import ControlledAddressCombobox from "../../components/Profile/ControlledAddressCombobox";
 import { getSession, useSession } from "next-auth/react";
-import { ComplianceModal } from "../components/CompliancePortal";
-import ProfilePicture from "../components/Profile/ProfilePicture";
-import Spinner from "../components/Spinner";
-import { trackProfileCompletion } from "../utils/mixpanel";
+import { createPortal } from "react-dom";
+import { ComplianceModal } from "../../components/CompliancePortal";
+import ProfilePicture from "../../components/Profile/ProfilePicture";
+import Spinner from "../../components/Spinner";
+import { getPresignedImageUrl } from "../../utils/uploadToS3";
+import { userInfo } from "node:os";
+import { trackProfileCompletion } from "../../utils/mixpanel";
 
 // Inputs to the onboarding form.
 export type OnboardingFormInputs = {
@@ -59,6 +62,10 @@ export type OnboardingFormInputs = {
   coopEndDate: Date | null;
   timeDiffers: boolean;
   bio: string;
+};
+
+const dateErrorMap: z.ZodErrorMap = (issue, ctx) => {
+  return { message: "Invalid time" };
 };
 
 const custom = z.ZodIssueCode.custom;
@@ -162,7 +169,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     props: {},
   };
 }
-const Profile: NextPage = () => {
+const Index: NextPage = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const utils = trpc.useContext();
@@ -796,4 +803,4 @@ const Profile: NextPage = () => {
   );
 };
 
-export default Profile;
+export default Index;
