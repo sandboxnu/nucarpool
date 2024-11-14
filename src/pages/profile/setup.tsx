@@ -12,19 +12,14 @@ import {
   onboardSchema,
   profileDefaultValues,
 } from "../../utils/profile/zodSchema";
-import { useUploadFile } from "../../utils/profile/useUploadFile";
-import useSearch from "../../utils/search";
-import ControlledAddressCombobox from "../../components/Profile/ControlledAddressCombobox";
-import ProfilePicture from "../../components/Profile/ProfilePicture";
-import Spinner from "../../components/Spinner";
-import { trackProfileCompletion } from "../../utils/mixpanel";
 
-import { Logo } from "../../components/Header";
+import Spinner from "../../components/Spinner";
 import InitialStep from "../../components/Setup/InitialStep";
 import { FaArrowRight } from "react-icons/fa";
 import StepTwo from "../../components/Setup/StepTwo";
 import ProgressBar from "../../components/Setup/ProgressBar";
 import StepThree from "../../components/Setup/StepThree";
+import { SetupContainer } from "../../components/Setup/SetupContainer";
 
 const Setup: NextPage = () => {
   const router = useRouter();
@@ -106,7 +101,7 @@ const Setup: NextPage = () => {
   };
   console.log(step);
   return (
-    <div className="relative flex h-full w-full flex-col items-center">
+    <div className="relative flex h-full w-full flex-col items-center justify-start">
       {/* Background layer for step 0 */}
       <div
         className={`absolute inset-0 bg-setup-gradient transition-opacity duration-1000 ease-in-out ${
@@ -140,7 +135,13 @@ const Setup: NextPage = () => {
         CarpoolNU
       </h1>
       {step > 1 && <ProgressBar step={step - 2} />}
-      <div className="absolute inset-0 flex flex-col items-center  justify-center">
+      <SetupContainer
+        className={` ${
+          step < 2
+            ? "rounded-2xl bg-white px-16 py-20 drop-shadow-[0_15px_8px_rgba(0,0,0,0.35)]"
+            : ""
+        }`}
+      >
         {(step === 0 || step == 1) && (
           <InitialStep
             handleNextStep={handleNextStep}
@@ -168,23 +169,23 @@ const Setup: NextPage = () => {
             setValue={setValue}
           />
         )}
-        {step > 0 && (
-          <button
-            className="mt-10 rounded-full bg-white drop-shadow-[0_15px_4px_rgba(0,0,0,0.35)]"
-            onClick={handleNextStep}
-          >
-            <div className="flex flex-row items-center  px-4 py-2 font-montserrat text-2xl font-bold ">
-              Continue
-              <FaArrowRight color="black" className="ml-2" />
-            </div>
-          </button>
-        )}
-        {isLoading && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
-            <Spinner />
+      </SetupContainer>
+      {step > 0 && (
+        <button
+          className="mt-10 rounded-full bg-white drop-shadow-[0_15px_4px_rgba(0,0,0,0.35)]"
+          onClick={handleNextStep}
+        >
+          <div className="flex flex-row items-center px-4 py-2 font-montserrat text-2xl font-bold ">
+            Continue
+            <FaArrowRight color="black" className="ml-2" />
           </div>
-        )}
-      </div>
+        </button>
+      )}
+      {isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+          <Spinner />
+        </div>
+      )}
     </div>
   );
 };

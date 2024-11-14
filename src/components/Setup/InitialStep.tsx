@@ -23,7 +23,7 @@ const InitialStep = ({
   watch,
 }: InitialStepProps) => {
   return (
-    <div className="flex flex-col items-center rounded-2xl bg-white px-16 py-20 drop-shadow-[0_15px_8px_rgba(0,0,0,0.35)]">
+    <div className="flex flex-col items-center">
       <h2 className="mb-4 text-center font-montserrat text-6xl font-bold">
         Welcome to{" "}
       </h2>
@@ -33,7 +33,7 @@ const InitialStep = ({
       {step === 0 && (
         <button
           onClick={handleNextStep}
-          className="mt-10 rounded-md border border-black bg-northeastern-red px-4 py-2 font-montserrat text-white transition hover:bg-red-700"
+          className="mt-20 rounded-lg border border-black bg-northeastern-red px-8 py-2 font-montserrat text-2xl text-white transition hover:bg-red-700"
         >
           Get Started
         </button>
