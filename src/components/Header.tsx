@@ -17,7 +17,7 @@ const HeaderDiv = styled.div`
   width: 100%;
 `;
 
-const Logo = styled.h1`
+export const Logo = styled.h1`
   font-family: "Lato", sans-serif;
   height: 111px;
   font-style: normal;

@@ -4,7 +4,7 @@ import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 import { ReactNode, useEffect, useState } from "react";
 import { Control, Controller } from "react-hook-form";
-import { OnboardingFormInputs } from "../../pages/profile";
+import { OnboardingFormInputs } from "../../utils/types";
 interface ControlledTimePickerRHFProps {
   control: Control<OnboardingFormInputs>;
   name: "startTime" | "endTime";

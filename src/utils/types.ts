@@ -11,16 +11,25 @@ export type PoiData = {
   coordLng: number;
   coordLat: number;
 };
-
-export type ProfileFormInputs = {
-  firstName: string;
-  lastName: string;
-  rdStatus: "rider" | "driver";
-  seatsAvailability: number;
+export type OnboardingFormInputs = {
+  role: Role;
+  status: Status;
+  seatAvail: number;
   companyName: string;
+  profilePicture: string;
   companyAddress: string;
-  status: "active" | "inactive";
+  startAddress: string;
+  preferredName: string;
+  pronouns: string;
+  daysWorking: boolean[];
+  startTime: Date | null;
+  endTime: Date | null;
+  coopStartDate: Date | null;
+  coopEndDate: Date | null;
+  timeDiffers: boolean;
+  bio: string;
 };
+
 export type FiltersState = {
   days: number;
   flexDays: number;

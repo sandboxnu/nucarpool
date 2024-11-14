@@ -1,8 +1,11 @@
 import { Combobox, Transition } from "@headlessui/react";
 import { Control, Controller, FieldError } from "react-hook-form";
-import { OnboardingFormInputs } from "../../pages/profile";
 import { Fragment, SetStateAction } from "react";
-import { CarpoolFeature, CarpoolAddress } from "../../utils/types";
+import {
+  CarpoolFeature,
+  CarpoolAddress,
+  OnboardingFormInputs,
+} from "../../utils/types";
 
 interface ControlledAddressComboboxProps {
   control: Control<OnboardingFormInputs>;

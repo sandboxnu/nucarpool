@@ -494,7 +494,7 @@ const Filters = ({
               <label className="mb-2 block font-semibold">End Date</label>
               <TextField
                 type="month"
-                inputClassName="h-14 text-mdd"
+                inputClassName="h-14 text-md"
                 isDisabled={filters.dateOverlap === 0}
                 id="coopEndDate"
                 value={formatDateToMonth(filters.endDate)}

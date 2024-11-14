@@ -32,7 +32,11 @@ import {
   ProfileHeaderNoMB,
 } from "../../styles/profile";
 import ControlledTimePicker from "../../components/Profile/ControlledTimePicker";
-import { CarpoolAddress, CarpoolFeature } from "../../utils/types";
+import {
+  CarpoolAddress,
+  CarpoolFeature,
+  OnboardingFormInputs,
+} from "../../utils/types";
 import { EntryLabel } from "../../components/EntryLabel";
 import ControlledAddressCombobox from "../../components/Profile/ControlledAddressCombobox";
 import { getSession, useSession } from "next-auth/react";
@@ -43,28 +47,15 @@ import Spinner from "../../components/Spinner";
 import { getPresignedImageUrl } from "../../utils/uploadToS3";
 import { userInfo } from "node:os";
 import { trackProfileCompletion } from "../../utils/mixpanel";
-import { onboardSchema } from "../../utils/profile/zodSchema";
+import {
+  onboardSchema,
+  profileDefaultValues,
+} from "../../utils/profile/zodSchema";
 import { useUploadFile } from "../../utils/profile/useUploadFile";
+import { formatDateToMonth, handleMonthChange } from "../../utils/dateUtils";
+import { useAddressSelection } from "../../utils/useAddressSelection";
 
 // Inputs to the onboarding form.
-export type OnboardingFormInputs = {
-  role: Role;
-  status: Status;
-  seatAvail: number;
-  companyName: string;
-  profilePicture: string;
-  companyAddress: string;
-  startAddress: string;
-  preferredName: string;
-  pronouns: string;
-  daysWorking: boolean[];
-  startTime: Date | null;
-  endTime: Date | null;
-  coopStartDate: Date | null;
-  coopEndDate: Date | null;
-  timeDiffers: boolean;
-  bio: string;
-};
 
 const daysOfWeek = ["Su", "M", "Tu", "W", "Th", "F", "S"];
 
@@ -107,70 +98,25 @@ const Index: NextPage = () => {
     control,
   } = useForm<OnboardingFormInputs>({
     mode: "onSubmit",
-    defaultValues: {
-      role: Role.RIDER,
-      status: Status.ACTIVE,
-      seatAvail: 0,
-      companyName: "",
-      profilePicture: "",
-      companyAddress: "",
-      startAddress: "",
-      preferredName: "",
-      pronouns: "",
-      daysWorking: [false, false, false, false, false, false, false],
-      startTime: undefined,
-      endTime: undefined,
-      timeDiffers: false,
-      coopStartDate: null,
-      coopEndDate: null,
-      bio: "",
-    },
+    defaultValues: profileDefaultValues,
     resolver: zodResolver(onboardSchema),
   });
   const role = watch("role");
   const isViewer = role === "VIEWER";
-  const handleMonthChange = (field: any) => (event: any) => {
-    const [year, month] = event.target.value.split("-").map(Number);
-    const lastDay = new Date(year, month, 0);
-    setValue(field, lastDay);
-  };
-  const formatDateToMonth = (date: Date | null) => {
-    if (!date) {
-      return undefined;
-    }
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    return `${year}-${month}`;
-  };
-  const [companyAddressSuggestions, setCompanyAddressSuggestions] = useState<
-    CarpoolFeature[]
-  >([]);
-  const [startAddressSuggestions, setStartAddressSuggestions] = useState<
-    CarpoolFeature[]
-  >([]);
 
-  const [companyAddressSelected, setCompanyAddressSelected] =
-    useState<CarpoolAddress>({
-      place_name: "",
-      center: [0, 0],
-    });
-  const [startAddressSelected, setStartAddressSelected] =
-    useState<CarpoolAddress>({
-      place_name: "",
-      center: [0, 0],
-    });
+  const {
+    selectedAddress: startAddressSelected,
+    setSelectedAddress: setStartAddressSelected,
+    updateAddress: updateStartingAddress,
+    suggestions: startAddressSuggestions,
+  } = useAddressSelection();
 
-  const [companyAddress, setCompanyAddress] = useState("");
-  const updateCompanyAddress = useMemo(
-    () => debounce(setCompanyAddress, 250),
-    []
-  );
-
-  const [startingAddress, setStartingAddress] = useState("");
-  const updateStartingAddress = useMemo(
-    () => debounce(setStartingAddress, 250),
-    []
-  );
+  const {
+    selectedAddress: companyAddressSelected,
+    setSelectedAddress: setCompanyAddressSelected,
+    updateAddress: updateCompanyAddress,
+    suggestions: companyAddressSuggestions,
+  } = useAddressSelection();
 
   useEffect(() => {
     if (!user) return;
@@ -202,18 +148,6 @@ const Index: NextPage = () => {
       bio: user.bio,
     });
   }, [user]);
-
-  useSearch({
-    value: companyAddress,
-    type: "address%2Cpostcode",
-    setFunc: setCompanyAddressSuggestions,
-  });
-
-  useSearch({
-    value: startingAddress,
-    type: "address%2Cpostcode",
-    setFunc: setStartAddressSuggestions,
-  });
 
   const editUserMutation = trpc.user.edit.useMutation({
     onSuccess: async () => {
@@ -404,7 +338,6 @@ const Index: NextPage = () => {
                     <ErrorDisplay>{errors.startAddress.message}</ErrorDisplay>
                   )}
                 </MiddleProfileSection>
-                {/* Role field  */}
                 <BottomProfileSection>
                   <EntryLabel
                     required={!isViewer}
@@ -524,7 +457,6 @@ const Index: NextPage = () => {
                       flexible, coordinate directly with potential riders or
                       drivers to inform them.
                     </Note>
-                    <div className="flex flex-col space-y-2"></div>
                   </CommutingScheduleSection>
                 </BottomProfileSection>
               </ProfileColumn>
@@ -549,7 +481,7 @@ const Index: NextPage = () => {
                       isDisabled={isViewer}
                       id="coopStartDate"
                       error={errors.coopStartDate}
-                      onChange={handleMonthChange("coopStartDate")}
+                      onChange={handleMonthChange("coopStartDate", setValue)}
                       defaultValue={
                         formatDateToMonth(watch("coopStartDate")) || undefined
                       }
@@ -567,7 +499,7 @@ const Index: NextPage = () => {
                       isDisabled={isViewer}
                       id="coopEndDate"
                       error={errors.coopEndDate}
-                      onChange={handleMonthChange("coopEndDate")}
+                      onChange={handleMonthChange("coopEndDate", setValue)}
                       defaultValue={
                         formatDateToMonth(watch("coopEndDate")) || undefined
                       }

@@ -83,3 +83,21 @@ export const onboardSchema = z
       }
     }
   });
+export const profileDefaultValues = {
+  role: Role.RIDER,
+  status: Status.ACTIVE,
+  seatAvail: 0,
+  companyName: "",
+  profilePicture: "",
+  companyAddress: "",
+  startAddress: "",
+  preferredName: "",
+  pronouns: "",
+  daysWorking: [false, false, false, false, false, false, false],
+  startTime: undefined,
+  endTime: undefined,
+  timeDiffers: false,
+  coopStartDate: null,
+  coopEndDate: null,
+  bio: "",
+};
