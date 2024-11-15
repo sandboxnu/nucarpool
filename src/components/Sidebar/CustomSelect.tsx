@@ -3,28 +3,38 @@ import { FaChevronDown } from "react-icons/fa";
 import React, { Fragment } from "react";
 import { FaCheck } from "react-icons/fa6";
 
-interface Option {
-  value: string;
+interface Option<T> {
+  value: T;
   label: string;
 }
 
-interface CustomSelectProps {
-  value: string;
-  onChange: (value: string) => void;
-  options: Option[];
+interface CustomSelectProps<T> {
+  value: T;
+  onChange: React.Dispatch<React.SetStateAction<T>>;
+  options: Option<T>[];
+  title?: string;
+  className?: string;
 }
 
-const CustomSelect: React.FC<CustomSelectProps> = ({
+const CustomSelect = <T extends string>({
   value,
   onChange,
   options,
-}) => {
+  title,
+  className,
+}: CustomSelectProps<T>) => {
   return (
-    <div className="relative z-20 w-1/2">
+    <div className={"relative z-20 w-full " + className}>
       <Listbox value={value} onChange={onChange}>
         <div className="relative ">
           <Listbox.Button className="relative w-full cursor-default rounded-lg border border-black bg-white py-2 pl-3 pr-8 text-left focus:outline-none ">
-            <span className="block truncate">Sort By</span>
+            {title ? (
+              <span className="block truncate">{title}</span>
+            ) : (
+              <span className="block truncate font-semibold">
+                {options.find((opt) => value === opt.value)?.label}
+              </span>
+            )}
             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
               <FaChevronDown className="h-4 w-4" aria-hidden="true" />
             </span>

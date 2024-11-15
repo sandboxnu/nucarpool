@@ -1,5 +1,4 @@
-import { Message, Request, Conversation } from "./types";
-import { undefined } from "zod";
+import { Message, Request } from "./types";
 
 export const getLatestMessageForRequest = (
   request: Request,
@@ -26,4 +25,18 @@ export const getLatestMessageForRequest = (
   );
 
   return allMessages[0];
+};
+export const getCardSortingData = (
+  userId: string,
+  request: Request,
+  latestMessage: Message | null
+) => {
+  const isUnread = latestMessage
+    ? !latestMessage.isRead && userId !== latestMessage.userId
+    : false;
+  const latestActivityDate = latestMessage
+    ? latestMessage.dateCreated
+    : request.dateCreated;
+
+  return { isUnread, latestActivityDate };
 };

@@ -1,10 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { router, protectedRouter } from "../createRouter";
-import _ from "lodash";
-import { Request, User } from "@prisma/client";
+import { protectedRouter, router } from "../createRouter";
+
 import { convertToPublic } from "../../../utils/publicUser";
-import { PublicUser, ResolvedRequest } from "../../../utils/types";
 
 // use this router to manage invitations
 export const requestsRouter = router({
@@ -86,8 +84,13 @@ export const requestsRouter = router({
         toUser: convertToPublic(user),
       };
     });
-
-    return { sent, received };
+    const sentGoodRole = sent.filter(
+      (req) => req.toUser.role !== user.role && req.toUser.role !== "VIEWER"
+    );
+    const recGoodRole = received.filter(
+      (req) => req.fromUser.role !== user.role && req.fromUser.role !== "VIEWER"
+    );
+    return { sent: sentGoodRole, received: recGoodRole };
   }),
 
   create: protectedRouter
@@ -199,12 +202,11 @@ export const requestsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const user = await ctx.prisma.request.update({
+      return await ctx.prisma.request.update({
         where: { id: input.invitationId },
         data: {
           message: input.message,
         },
       });
-      return user;
     }),
 });

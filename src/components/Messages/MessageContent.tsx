@@ -54,7 +54,8 @@ const MessageContent = ({ selectedUser }: MessageContentProps) => {
 
   const onSuccess = useCallback(() => {
     utils.user.messages.getUnreadMessageCount.invalidate();
-  }, [utils.user.messages.getUnreadMessageCount]);
+    utils.user.requests.me.invalidate();
+  }, [utils.user.messages.getUnreadMessageCount, utils.user.requests.me]);
 
   const onError = useCallback((error: any) => {
     console.error("Failed to mark messages as read:", error);
@@ -86,7 +87,7 @@ const MessageContent = ({ selectedUser }: MessageContentProps) => {
         prevUnreadMessageIdsRef.current = unreadMessageIds;
       }
     }
-  }, [user, allMessages]);
+  }, [user, allMessages, markMessagesAsRead]);
 
   // Group messages by date
   const messagesByDate = [];

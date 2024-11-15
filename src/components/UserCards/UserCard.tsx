@@ -103,13 +103,21 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
 
         {/* Profile picture goes here */}
         <div className="flex">
-          <div className="text-lg">
+          <div className="flex flex-row space-x-3 text-lg">
             {user.role === "VIEWER" ? (
               <p className="font-semibold">{`${props.otherUser.role.charAt(
                 0
               )}${props.otherUser.role.slice(1).toLowerCase()}`}</p>
             ) : (
-              <p className="font-semibold">{props.otherUser.preferredName}</p>
+              <>
+                <p className="font-semibold">{props.otherUser.preferredName}</p>
+                {props.isUnread && (
+                  <div className="flex items-center">
+                    <span className="mr-2 h-2 w-2 rounded-full bg-blue-300"></span>
+                    <p className="text-sm italic ">New!</p>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
