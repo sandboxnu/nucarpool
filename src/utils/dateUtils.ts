@@ -10,7 +10,7 @@ const handleMonthChange =
   (event: React.ChangeEvent<HTMLInputElement>): void => {
     const [year, month] = event.target.value.split("-").map(Number);
     const lastDay = new Date(year, month, 0);
-    setValue(field, lastDay);
+    setValue(field, lastDay, { shouldValidate: true });
   };
 
 const formatDateToMonth = (date: Date | null): string | undefined => {

@@ -5,7 +5,7 @@ import { Role } from "@prisma/client";
 import { EntryLabel } from "../EntryLabel";
 import { TextField } from "../TextField";
 
-import { Note } from "../../styles/profile";
+import { ErrorDisplay, Note } from "../../styles/profile";
 import FormRadioButton from "./FormRadioButton";
 interface InitialStepProps {
   handleNextStep: () => void;
@@ -73,22 +73,6 @@ const InitialStep = ({
               {...register("role")}
             />
           </div>
-
-          {watch("role") === Role.DRIVER && (
-            <div className="mt-4 flex flex-1 flex-col">
-              <EntryLabel error={errors.seatAvail} label="Seat availability" />
-              <TextField
-                inputClassName="py-2 px-4 text-lg !appearance-none !bg-red !font-montserrat"
-                label="Seat Availability"
-                id="seatAvail"
-                error={errors.seatAvail}
-                type="number"
-                min="0"
-                {...register("seatAvail", { valueAsNumber: true })}
-              />
-            </div>
-          )}
-
           <p className="pt-4 font-montserrat text-lg">
             {watch("role") === Role.DRIVER && (
               <span>Looking for Carpoolers to join you.</span>
@@ -100,6 +84,30 @@ const InitialStep = ({
               <span> View the map and change your role later!</span>
             )}
           </p>
+          {watch("role") === Role.DRIVER && (
+            <div className="mt-2 flex flex-1 items-center justify-center gap-4">
+              <div className="flex flex-col">
+                <div className="flex items-center justify-center">
+                  <span className="mr-3 font-montserrat text-lg font-semibold">
+                    Seat Availability
+                  </span>
+                  <TextField
+                    className="!w-1/5"
+                    label="Seat Availability"
+                    id="seatAvail"
+                    type="number"
+                    min="0"
+                    {...register("seatAvail", { valueAsNumber: true })}
+                  />
+                </div>
+                {errors.seatAvail && (
+                  <span className="mt-1 text-center text-xs text-northeastern-red">
+                    {errors.seatAvail.message}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

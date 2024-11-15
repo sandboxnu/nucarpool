@@ -1,141 +1,184 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useState,
+  useCallback,
+  ReactNode,
+  ReactDOM,
+  useEffect,
+} from "react";
 import Image from "next/image";
-import Cropper from "cropperjs";
-import "cropperjs/dist/cropper.css";
+import Cropper, { Point } from "react-easy-crop";
 import { AiOutlineUser } from "react-icons/ai";
-import { trpc } from "../../utils/trpc";
-
+import getCroppedImg from "../../utils/cropImage";
+import useProfileImage from "../../utils/useProfileImage";
+import { createPortal } from "react-dom";
 interface ProfilePictureProps {
   onFileSelected: (file: File | null) => void;
 }
-
-const ProfilePicture = (props: ProfilePictureProps) => {
-  const [previewUrl, setPreviewUrl] = useState<string>("");
+const ProfilePicture = ({ onFileSelected }: ProfilePictureProps) => {
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [croppedImageUrl, setCroppedImageUrl] = useState<string>("");
-  const [imageLoadError, setImageLoadError] = useState<boolean>(false);
-  const imageElement = useRef<HTMLImageElement>(null);
-  const [cropper, setCropper] = useState<Cropper | null>(null);
-  const [showModal, setShowModal] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [minZoom, setMinZoom] = useState(1);
 
-  // fetch the profile picture URL
-  const {
-    data: profilePictureData,
-    isLoading,
-    error,
-  } = trpc.user.getPresignedDownloadUrl.useQuery({ userId: undefined });
+  const [croppedArea, setCroppedArea] = useState();
 
-  // Update previewUrl when profilePictureData is available
-  useEffect(() => {
-    if (profilePictureData?.url) {
-      setPreviewUrl(profilePictureData.url);
-    }
-  }, [profilePictureData]);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
-  // Reset imageLoadError when the image URLs change
-  useEffect(() => {
-    setImageLoadError(false);
-  }, [croppedImageUrl, previewUrl]);
+  const { profileImageUrl, imageLoadError } = useProfileImage();
 
-  // Initialize the cropper when previewUrl changes
-  useEffect(() => {
-    let cropperInstance: Cropper | null = null;
-    if (imageElement.current && previewUrl && showModal) {
-      cropperInstance = new Cropper(imageElement.current, {
-        aspectRatio: 1,
-        scalable: true,
-        cropBoxResizable: true,
-      });
-      setCropper(cropperInstance);
-    }
-    return () => {
-      cropperInstance?.destroy();
-      setCropper(null);
-    };
-  }, [previewUrl, showModal]);
+  const onCropComplete = useCallback(
+    (croppedAreaPercentage: any, croppedAreaPixels: any) => {
+      setCroppedArea(croppedAreaPercentage);
+      setCroppedAreaPixels(croppedAreaPixels);
+    },
+    []
+  );
 
-  const modalContentRef = useRef<HTMLDivElement>(null);
+  const handleCancel = () => {
+    setImageSrc("");
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setMinZoom(1);
+    setCroppedArea(undefined);
+    setCroppedAreaPixels(null);
+    setShowModal(false);
+  };
 
-  // use effect for modal click
-  useEffect(() => {
-    if (showModal) {
-      const handleClickOutside = (event: MouseEvent) => {
-        if (
-          modalContentRef.current &&
-          !modalContentRef.current.contains(event.target as Node)
-        ) {
-          setShowModal(false);
-        }
-      };
-      document.addEventListener("mousedown", handleClickOutside);
-
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    }
-  }, [showModal]);
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newFile = event.target.files?.[0];
-    if (newFile) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
-        setShowModal(true);
-      };
-      reader.readAsDataURL(newFile);
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const imageDataUrl = await readFile(file);
+      setImageSrc(imageDataUrl as string);
+      setShowModal(true);
     } else {
-      props.onFileSelected(null);
+      onFileSelected(null);
     }
   };
 
-  const handleCropClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    handleCrop();
-  };
-
-  const handleCrop = () => {
-    const canvas = cropper?.getCroppedCanvas();
-    if (canvas) {
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const croppedUrl = URL.createObjectURL(blob);
-          setCroppedImageUrl(croppedUrl);
-          setShowModal(false);
-          const file = new File([blob], "cropped-image.jpeg", {
-            type: "image/jpeg",
-          });
-          props.onFileSelected(file);
-        }
-      }, "image/jpeg");
+  const handleCrop = async () => {
+    if (!imageSrc || !croppedAreaPixels) return;
+    try {
+      const { file, url } = await getCroppedImg(imageSrc, croppedAreaPixels);
+      setCroppedImageUrl(url);
+      onFileSelected(file);
+      setShowModal(false);
+    } catch (error) {
+      console.error(error);
     }
   };
+
+  const readFile = (file: File): Promise<string | ArrayBuffer | null> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.addEventListener("load", () => resolve(reader.result));
+      reader.readAsDataURL(file);
+    });
+  };
+  const onMediaLoaded = useCallback(
+    (mediaSize: { naturalWidth: number; naturalHeight: number }) => {
+      const { naturalWidth, naturalHeight } = mediaSize;
+      const cropWidth = 300;
+      const cropHeight = 300;
+
+      // Calculate minZoom to ensure the entire image fits into area but doesn't extend outside of it
+      const widthRatio = cropWidth / naturalWidth;
+      const heightRatio = cropHeight / naturalHeight;
+
+      let newMinZoom = Math.min(widthRatio, heightRatio);
+      if (widthRatio < 1 || heightRatio < 1) {
+        // automatically scales to fit
+        newMinZoom = 1;
+      }
+      setMinZoom(newMinZoom);
+      setZoom(newMinZoom);
+
+      setCrop({ x: 0, y: 0 }); // ReCenter
+    },
+    []
+  );
+  const onCropChange = useCallback(
+    (newCrop: Point) => {
+      const boundedCrop = { x: newCrop.x, y: newCrop.y };
+      const cropWidth = 300;
+      const cropHeight = 300;
+      const midWidth = cropWidth / 2;
+      const midHeight = cropHeight / 2;
+      const zoomIncrease = (zoom - minZoom) / minZoom;
+
+      let maxHorizontalMovement = zoomIncrease * midWidth + midWidth;
+      let maxVerticalMovement = zoomIncrease * midHeight + midHeight;
+
+      boundedCrop.x = Math.min(
+        Math.max(boundedCrop.x, -maxHorizontalMovement),
+        maxHorizontalMovement
+      );
+
+      boundedCrop.y = Math.min(
+        Math.max(boundedCrop.y, -maxVerticalMovement),
+        maxVerticalMovement
+      );
+
+      setCrop(boundedCrop);
+    },
+    [zoom, minZoom]
+  );
+  interface ModalOverlayProps {
+    children: ReactNode;
+  }
 
   return (
     <div>
-      {previewUrl && showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div
-            ref={modalContentRef}
-            className="relative mx-auto inline-block rounded bg-white text-center"
-          >
-            <img
-              ref={imageElement}
-              src={previewUrl}
-              alt="Crop this image"
-              style={{ display: "block", maxWidth: "50vw", maxHeight: "50vh" }}
-            />
-            <button
-              onClick={handleCropClick}
-              className="w-full rounded-b bg-northeastern-red p-2 text-white hover:bg-red-700"
-            >
-              Crop Image
-            </button>
-          </div>
-        </div>
-      )}
+      {showModal &&
+        imageSrc &&
+        createPortal(
+          <div className="fixed inset-0 z-50 flex items-center justify-center  backdrop-blur-sm ">
+            <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border-8 border-gray-400 bg-white  ">
+              <div className="relative h-96 w-full">
+                <Cropper
+                  image={imageSrc}
+                  minZoom={minZoom}
+                  maxZoom={10}
+                  crop={crop}
+                  zoom={zoom}
+                  aspect={1}
+                  showGrid={false}
+                  onCropComplete={onCropComplete}
+                  onZoomChange={setZoom}
+                  onMediaLoaded={onMediaLoaded}
+                  cropSize={{ width: 300, height: 300 }}
+                  cropShape="round"
+                  restrictPosition={false}
+                  objectFit="contain"
+                  onCropChange={onCropChange}
+                />
+              </div>
+              <div className="flex w-full items-stretch justify-between p-4">
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="mr-2 rounded-lg bg-gray-300 px-8 py-2 font-montserrat text-lg text-black"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCrop}
+                  className="rounded-lg bg-northeastern-red px-8 py-2 font-montserrat text-lg text-white hover:bg-red-700"
+                >
+                  Crop Image
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
 
       <div className="mt-2 flex items-center">
-        {croppedImageUrl && !imageLoadError ? (
+        {croppedImageUrl ? (
           <div className="h-40 w-40 overflow-hidden rounded-full">
             <Image
               src={croppedImageUrl}
@@ -143,18 +186,16 @@ const ProfilePicture = (props: ProfilePictureProps) => {
               width={160}
               height={160}
               objectFit="cover"
-              onError={() => setImageLoadError(true)}
             />
           </div>
-        ) : previewUrl && !imageLoadError ? (
+        ) : profileImageUrl && !imageLoadError ? (
           <div className="h-40 w-40 overflow-hidden rounded-full">
             <Image
-              src={previewUrl}
-              alt="Index Picture"
+              src={profileImageUrl}
+              alt="Profile Picture"
               width={160}
               height={160}
               objectFit="cover"
-              onError={() => setImageLoadError(true)}
             />
           </div>
         ) : (
@@ -164,9 +205,9 @@ const ProfilePicture = (props: ProfilePictureProps) => {
         <div className="ml-4">
           <label
             htmlFor="fileInput"
-            className="text-md ml-10 inline-block cursor-pointer rounded-full bg-northeastern-red px-4 py-2  text-white hover:bg-red-700"
+            className="text-md ml-10 inline-block cursor-pointer rounded-full bg-northeastern-red px-4 py-2 text-white hover:bg-red-700"
           >
-            Upload Index Picture
+            Upload Profile Picture
           </label>
           <input
             id="fileInput"

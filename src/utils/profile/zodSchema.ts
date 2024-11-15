@@ -18,7 +18,6 @@ export const onboardSchema = z
     endTime: z.date().nullable().optional(),
     coopStartDate: z.date().nullable().optional(),
     coopEndDate: z.date().nullable().optional(),
-    timeDiffers: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.role !== Role.VIEWER) {
@@ -48,39 +47,36 @@ export const onboardSchema = z
           path: ["companyName"],
           message: "Cannot be empty",
         });
-      if (data.companyAddress?.length === 0)
+      if (!data.companyAddress || data.companyAddress?.length === 0)
         ctx.addIssue({
           code: custom,
           path: ["companyAddress"],
           message: "Cannot be empty",
         });
-      if (data.startAddress?.length === 0)
+      if (!data.startAddress || data.startAddress?.length === 0)
         ctx.addIssue({
           code: custom,
           path: ["startAddress"],
           message: "Cannot be empty",
         });
-      if (!data.daysWorking?.some(Boolean))
+      if (!data.daysWorking || !data.daysWorking?.some(Boolean))
         ctx.addIssue({
           code: custom,
           path: ["daysWorking"],
           message: "Select at least one day",
         });
-
-      if (!data.timeDiffers) {
-        if (!data.startTime)
-          ctx.addIssue({
-            code: custom,
-            path: ["startTime"],
-            message: "Start time must be provided",
-          });
-        if (!data.endTime)
-          ctx.addIssue({
-            code: custom,
-            path: ["endTime"],
-            message: "End time must be provided",
-          });
-      }
+      if (!data.startTime)
+        ctx.addIssue({
+          code: custom,
+          path: ["startTime"],
+          message: "Cannot be empty",
+        });
+      if (!data.endTime)
+        ctx.addIssue({
+          code: custom,
+          path: ["endTime"],
+          message: "Cannot be empty",
+        });
     }
   });
 export const profileDefaultValues = {

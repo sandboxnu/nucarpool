@@ -144,7 +144,6 @@ const Index: NextPage = () => {
       endTime: user.endTime,
       coopStartDate: user.coopStartDate!,
       coopEndDate: user.coopEndDate!,
-      timeDiffers: false,
       bio: user.bio,
     });
   }, [user]);

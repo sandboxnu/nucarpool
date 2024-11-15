@@ -62,7 +62,7 @@ const StepTwo = ({ register, errors, watch, user, control }: StepTwoProps) => {
 
   return (
     <div className="flex flex-col  items-center justify-center bg-white">
-      <div className="mb-8 flex flex-row text-center font-montserrat text-3xl font-bold">
+      <div className="mb-8 text-center font-montserrat text-3xl font-bold">
         <span>Where are you&nbsp;</span>
         <span className="text-northeastern-red">carpooling?</span>
       </div>

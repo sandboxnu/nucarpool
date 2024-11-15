@@ -120,6 +120,7 @@ export const Note = styled.p<{}>`
 export const ErrorDisplay = styled.span<{}>`
   font-family: "Montserrat";
   font-style: normal;
+  max-width: 100%;
   font-weight: 400;
   font-size: 16px;
   line-height: 19px;

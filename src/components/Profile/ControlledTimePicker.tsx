@@ -3,14 +3,17 @@ import dayjs, { Dayjs } from "dayjs";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 import { ReactNode, useEffect, useState } from "react";
-import { Control, Controller } from "react-hook-form";
+import { Control, Controller, FieldError } from "react-hook-form";
 import { OnboardingFormInputs } from "../../utils/types";
+import { ErrorDisplay } from "../../styles/profile";
+import * as React from "react";
 interface ControlledTimePickerRHFProps {
   control: Control<OnboardingFormInputs>;
   name: "startTime" | "endTime";
   placeholder?: string;
   value?: Date;
   isDisabled?: boolean;
+  error?: FieldError;
 }
 const ControlledTimePickerRHF = (props: ControlledTimePickerRHFProps) => {
   const [displayedTime, setDisplayedTime] = useState<Dayjs | undefined>(
@@ -51,7 +54,7 @@ const ControlledTimePickerRHF = (props: ControlledTimePickerRHFProps) => {
         return (
           <div className={"flex flex-col"}>
             <TimePicker
-              className="form-input w-full rounded-lg"
+              className="form-input w-full rounded-lg border border-black font-montserrat text-xl"
               format="h:mm A"
               suffixIcon={customSuffixIcon()}
               ref={ref}
@@ -73,6 +76,7 @@ const ControlledTimePickerRHF = (props: ControlledTimePickerRHFProps) => {
                 }
               }}
             />
+            {props.error && <ErrorDisplay>{props.error.message}</ErrorDisplay>}
           </div>
         );
       }}

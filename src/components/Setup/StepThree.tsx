@@ -16,6 +16,7 @@ import { EntryLabel } from "../EntryLabel";
 import ControlledTimePicker from "../Profile/ControlledTimePicker";
 import { TextField } from "../TextField";
 import { formatDateToMonth, handleMonthChange } from "../../utils/dateUtils";
+import StaticDayBox from "../Sidebar/StaticDayBox";
 
 interface StepThreeProps {
   errors: FieldErrors<OnboardingFormInputs>;
@@ -34,15 +35,26 @@ const StepThree = ({
   const daysOfWeek = ["Su", "M", "Tu", "W", "Th", "F", "S"];
 
   return (
-    <div className="flex flex-col items-center justify-center bg-white px-4">
+    <div className="flex flex-col   items-center justify-center bg-white">
       <div className="mb-8 text-center font-montserrat text-3xl font-bold">
         <span>When are you&nbsp;</span>
         <span className="text-northeastern-red">carpooling?</span>
       </div>
 
-      <div className="flex w-1/2 flex-col items-start space-y-8 ">
+      <div className="flex flex-col items-start space-y-4 ">
         <div className="flex flex-col space-y-2">
-          <EntryLabel required={false} label="Days of the Week" />
+          <EntryLabel
+            required={true}
+            error={
+              errors.daysWorking
+                ? {
+                    type: "custom",
+                    message: "Please select at least one day.",
+                  }
+                : undefined
+            }
+            label="Days of the Week"
+          />
           <div className="flex flex-row items-center ">
             {daysOfWeek.map((day, index) => (
               <Controller
@@ -56,8 +68,20 @@ const StepThree = ({
                     disabled={false}
                     checked={value}
                     onChange={onChange}
-                    checkedIcon={<DayBox day={day} isSelected={true} />}
-                    icon={<DayBox day={day} isSelected={false} />}
+                    checkedIcon={
+                      <StaticDayBox
+                        className={"!h-12 !w-12"}
+                        day={day}
+                        isSelected={true}
+                      />
+                    }
+                    icon={
+                      <StaticDayBox
+                        className={"!h-12 !w-12"}
+                        day={day}
+                        isSelected={false}
+                      />
+                    }
                   />
                 )}
               />
@@ -70,7 +94,7 @@ const StepThree = ({
 
         {/* Time Section */}
         <div className="flex flex-col space-y-2">
-          <div className="flex flex-col gap-x-16 gap-y-4 md:flex-row">
+          <div className="flex flex-row gap-x-16 gap-y-4">
             <div className="flex flex-col ">
               <EntryLabel
                 required={true}
@@ -81,6 +105,7 @@ const StepThree = ({
                 isDisabled={false}
                 control={control}
                 name="startTime"
+                error={errors.startTime}
                 value={user?.startTime || undefined}
               />
             </div>
@@ -93,6 +118,7 @@ const StepThree = ({
               <ControlledTimePicker
                 isDisabled={false}
                 control={control}
+                error={errors.endTime}
                 name="endTime"
                 value={user?.endTime || undefined}
               />
@@ -107,7 +133,7 @@ const StepThree = ({
 
         {/* Date Section */}
         <div className="flex flex-col space-y-2">
-          <div className="flex flex-col gap-4 md:flex-row">
+          <div className="flex  flex-row gap-4">
             <div className="flex flex-col">
               <EntryLabel
                 required={true}
@@ -117,6 +143,7 @@ const StepThree = ({
               <TextField
                 type="month"
                 isDisabled={false}
+                inputClassName="!py-2 !px-1"
                 id="coopStartDate"
                 error={errors.coopStartDate}
                 onChange={handleMonthChange("coopStartDate", setValue)}
@@ -134,6 +161,7 @@ const StepThree = ({
               <TextField
                 type="month"
                 isDisabled={false}
+                inputClassName="!p-2"
                 id="coopEndDate"
                 error={errors.coopEndDate}
                 onChange={handleMonthChange("coopEndDate", setValue)}
