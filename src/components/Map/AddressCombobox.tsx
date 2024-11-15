@@ -1,8 +1,8 @@
 import { Combobox, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { CarpoolFeature, CarpoolAddress } from "../../utils/types";
 
-interface ControlledAddressComboboxProps {
+interface AddressComboboxProps {
   name: "startAddress" | "companyAddress";
   className: string;
   addressSelected: CarpoolAddress;
@@ -13,7 +13,7 @@ interface ControlledAddressComboboxProps {
   placeholder: string;
 }
 
-const ControlledAddressCombobox = ({
+const AddressCombobox = ({
   name,
   className,
   addressSelected,
@@ -22,7 +22,7 @@ const ControlledAddressCombobox = ({
   addressSuggestions,
   placeholder,
   error,
-}: ControlledAddressComboboxProps) => {
+}: AddressComboboxProps) => {
   return (
     <div className={className}>
       <Combobox
@@ -73,4 +73,4 @@ const ControlledAddressCombobox = ({
   );
 };
 
-export default ControlledAddressCombobox;
+export default AddressCombobox;

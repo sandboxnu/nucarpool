@@ -1,16 +1,12 @@
-import { OnboardingFormInputs } from "../../utils/types";
+import { CarpoolAddress, OnboardingFormInputs } from "../../utils/types";
 import {
   UseFormWatch,
   FieldErrors,
   UseFormRegister,
   Control,
 } from "react-hook-form";
-import {
-  ErrorDisplay,
-  MiddleProfileSection,
-  Note,
-  ProfileHeader,
-} from "../../styles/profile";
+import { ErrorDisplay, Note } from "../../styles/profile";
+
 import { EntryLabel } from "../EntryLabel";
 import ControlledAddressCombobox from "../Profile/ControlledAddressCombobox";
 import { TextField } from "../TextField";
@@ -24,8 +20,18 @@ interface StepTwoProps {
   watch: UseFormWatch<OnboardingFormInputs>;
   control: Control<OnboardingFormInputs>;
   user?: User;
+  onAddressChange: (addresses: {
+    startAddressSelected: CarpoolAddress | null;
+    companyAddressSelected: CarpoolAddress | null;
+  }) => void;
 }
-const StepTwo = ({ register, errors, watch, user, control }: StepTwoProps) => {
+const StepTwo = ({
+  register,
+  errors,
+  user,
+  control,
+  onAddressChange,
+}: StepTwoProps) => {
   const [hasInitialized, setHasInitialized] = useState(false);
 
   const {
@@ -59,9 +65,19 @@ const StepTwo = ({ register, errors, watch, user, control }: StepTwoProps) => {
     setStartAddressSelected,
     setCompanyAddressSelected,
   ]);
-
+  useEffect(() => {
+    if (
+      startAddressSelected?.place_name !== "" &&
+      companyAddressSelected?.place_name !== ""
+    ) {
+      onAddressChange({
+        startAddressSelected,
+        companyAddressSelected,
+      });
+    }
+  }, [startAddressSelected, companyAddressSelected, onAddressChange]);
   return (
-    <div className="flex flex-col  items-center justify-center bg-white">
+    <div className="flex flex-col items-center  justify-center bg-white px-4">
       <div className="mb-8 text-center font-montserrat text-3xl font-bold">
         <span>Where are you&nbsp;</span>
         <span className="text-northeastern-red">carpooling?</span>
@@ -71,8 +87,9 @@ const StepTwo = ({ register, errors, watch, user, control }: StepTwoProps) => {
         <EntryLabel
           required={true}
           error={errors.startAddress}
-          label="Home Address"
+          label="Start Address"
         />
+
         <ControlledAddressCombobox
           isDisabled={false}
           control={control}
@@ -114,10 +131,6 @@ const StepTwo = ({ register, errors, watch, user, control }: StepTwoProps) => {
           error={errors.companyAddress}
           label="Workplace Address"
         />
-        <Note>
-          Note: Select the autocomplete results, even if you typed the address
-          out
-        </Note>
         <ControlledAddressCombobox
           isDisabled={false}
           control={control}

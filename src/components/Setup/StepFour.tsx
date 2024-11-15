@@ -1,55 +1,27 @@
 import { OnboardingFormInputs } from "../../utils/types";
-import {
-  UseFormWatch,
-  FieldErrors,
-  UseFormRegister,
-  Control,
-  Controller,
-  UseFormSetValue,
-} from "react-hook-form";
-
-import { User } from "@prisma/client";
-import Checkbox from "@mui/material/Checkbox";
-import DayBox from "../Profile/DayBox";
-import { ErrorDisplay, LightEntryLabel, Note } from "../../styles/profile";
+import { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
+import { Note } from "../../styles/profile";
 import { EntryLabel } from "../EntryLabel";
-import ControlledTimePicker from "../Profile/ControlledTimePicker";
 import { TextField } from "../TextField";
-import { formatDateToMonth, handleMonthChange } from "../../utils/dateUtils";
-import StaticDayBox from "../Sidebar/StaticDayBox";
 import ProfilePicture from "../Profile/ProfilePicture";
-import { useState } from "react";
-import { useUploadFile } from "../../utils/profile/useUploadFile";
 
 interface StepFourProps {
   errors: FieldErrors<OnboardingFormInputs>;
-  watch: UseFormWatch<OnboardingFormInputs>;
-  control: Control<OnboardingFormInputs>;
   setValue: UseFormSetValue<OnboardingFormInputs>;
-  user?: User;
   register: UseFormRegister<OnboardingFormInputs>;
+  onFileSelect: (file: File | null) => void;
 }
-const StepFour = ({
-  errors,
-  register,
-  watch,
-  user,
-  control,
-  setValue,
-}: StepFourProps) => {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
-  const { uploadFile, error } = useUploadFile(selectedFile);
+const StepFour = ({ errors, register, onFileSelect }: StepFourProps) => {
   return (
-    <div className="flex flex-col  items-center justify-center bg-white">
-      <div className="mb-8 text-center font-montserrat text-3xl font-bold">
+    <div className="flex flex-col items-center  justify-center bg-white px-4">
+      <div className="mb-4 text-center font-montserrat text-3xl font-bold">
         <span>Who is&nbsp;</span>
         <span className="text-northeastern-red">carpooling?</span>
       </div>
       {/* Pfp Section*/}
 
-      <div className=" mb-10 w-full ">
-        <ProfilePicture onFileSelected={setSelectedFile} />
+      <div className=" mb-2 w-full ">
+        <ProfilePicture onFileSelected={onFileSelect} />
       </div>
 
       {/* About Me*/}

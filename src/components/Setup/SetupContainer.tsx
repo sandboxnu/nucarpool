@@ -8,7 +8,7 @@ export const SetupContainer = ({
   className?: string;
 }) => {
   return (
-    <div className={`h-[500px] w-[600px] bg-white p-4 ${className}`}>
+    <div className={`z-50 h-[500px] w-[600px] bg-white p-4 ${className}`}>
       {children}
     </div>
   );

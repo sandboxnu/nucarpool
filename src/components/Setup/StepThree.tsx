@@ -2,7 +2,6 @@ import { OnboardingFormInputs } from "../../utils/types";
 import {
   UseFormWatch,
   FieldErrors,
-  UseFormRegister,
   Control,
   Controller,
   UseFormSetValue,
@@ -10,7 +9,6 @@ import {
 
 import { User } from "@prisma/client";
 import Checkbox from "@mui/material/Checkbox";
-import DayBox from "../Profile/DayBox";
 import { ErrorDisplay, Note } from "../../styles/profile";
 import { EntryLabel } from "../EntryLabel";
 import ControlledTimePicker from "../Profile/ControlledTimePicker";
@@ -35,14 +33,14 @@ const StepThree = ({
   const daysOfWeek = ["Su", "M", "Tu", "W", "Th", "F", "S"];
 
   return (
-    <div className="flex flex-col   items-center justify-center bg-white">
+    <div className="flex flex-col items-center  justify-center bg-white px-4">
       <div className="mb-8 text-center font-montserrat text-3xl font-bold">
         <span>When are you&nbsp;</span>
         <span className="text-northeastern-red">carpooling?</span>
       </div>
 
-      <div className="flex flex-col items-start space-y-4 ">
-        <div className="flex flex-col space-y-2">
+      <div className="flex flex-col items-start space-y-2 ">
+        <div className="flex flex-col ">
           <EntryLabel
             required={true}
             error={
@@ -92,89 +90,95 @@ const StepThree = ({
           )}
         </div>
 
-        {/* Time Section */}
-        <div className="flex flex-col space-y-2">
-          <div className="flex flex-row gap-x-16 gap-y-4">
-            <div className="flex flex-col ">
-              <EntryLabel
-                required={true}
-                error={errors.startTime}
-                label="Start Time"
-              />
-              <ControlledTimePicker
-                isDisabled={false}
-                control={control}
-                name="startTime"
-                error={errors.startTime}
-                value={user?.startTime || undefined}
-              />
-            </div>
-            <div className="flex flex-col ">
-              <EntryLabel
-                required={true}
-                error={errors.endTime}
-                label="End Time"
-              />
-              <ControlledTimePicker
-                isDisabled={false}
-                control={control}
-                error={errors.endTime}
-                name="endTime"
-                value={user?.endTime || undefined}
-              />
-            </div>
+        <div className="grid grid-cols-2 gap-x-16 ">
+          {/* Start Time */}
+          <div className="flex flex-col">
+            <EntryLabel
+              required={true}
+              error={errors.startTime}
+              label="Start Time"
+            />
+            <ControlledTimePicker
+              isDisabled={false}
+              control={control}
+              name="startTime"
+              error={errors.startTime}
+              value={user?.startTime || undefined}
+            />
           </div>
-          <Note className="py-2">
-            Please input the start and end times of your work, rather than your
-            departure times. If your work hours are flexible, coordinate
-            directly with potential riders or drivers.
-          </Note>
-        </div>
 
-        {/* Date Section */}
-        <div className="flex flex-col space-y-2">
-          <div className="flex  flex-row gap-4">
-            <div className="flex flex-col">
-              <EntryLabel
-                required={true}
-                error={errors.coopStartDate}
-                label="Start Date"
-              />
-              <TextField
-                type="month"
-                isDisabled={false}
-                inputClassName="!py-2 !px-1"
-                id="coopStartDate"
-                error={errors.coopStartDate}
-                onChange={handleMonthChange("coopStartDate", setValue)}
-                defaultValue={
-                  formatDateToMonth(watch("coopStartDate")) || undefined
-                }
-              />
-            </div>
-            <div className="flex flex-col">
-              <EntryLabel
-                required={true}
-                error={errors.coopEndDate}
-                label="End Date"
-              />
-              <TextField
-                type="month"
-                isDisabled={false}
-                inputClassName="!p-2"
-                id="coopEndDate"
-                error={errors.coopEndDate}
-                onChange={handleMonthChange("coopEndDate", setValue)}
-                defaultValue={
-                  formatDateToMonth(watch("coopEndDate")) || undefined
-                }
-              />
-            </div>
+          {/* End Time */}
+          <div className="flex flex-col">
+            <EntryLabel
+              required={true}
+              error={errors.endTime}
+              label="End Time"
+            />
+            <ControlledTimePicker
+              isDisabled={false}
+              control={control}
+              name="endTime"
+              error={errors.endTime}
+              value={user?.endTime || undefined}
+            />
           </div>
-          <Note className="py-2">
-            Please indicate the start and the end dates of your co-op. If you
-            don&apos;t know exact dates, you can use approximate dates.
-          </Note>
+
+          {/* Note for Time Section */}
+          <div className="col-span-2">
+            <Note className="py-2">
+              Please input the start and end times of your work, rather than
+              your departure times. If your work hours are flexible, coordinate
+              directly with potential riders or drivers.
+            </Note>
+          </div>
+
+          {/* Start Date */}
+          <div className="flex flex-col">
+            <EntryLabel
+              required={true}
+              error={errors.coopStartDate}
+              label="Start Date"
+            />
+            <TextField
+              type="month"
+              isDisabled={false}
+              inputClassName="!py-2 "
+              id="coopStartDate"
+              error={errors.coopStartDate}
+              onChange={handleMonthChange("coopStartDate", setValue)}
+              defaultValue={
+                formatDateToMonth(watch("coopStartDate")) || undefined
+              }
+            />
+          </div>
+
+          {/* End Date */}
+          <div className="flex flex-col">
+            <EntryLabel
+              required={true}
+              error={errors.coopEndDate}
+              label="End Date"
+            />
+            <TextField
+              type="month"
+              isDisabled={false}
+              inputClassName="!py-2 "
+              id="coopEndDate"
+              error={errors.coopEndDate}
+              onChange={handleMonthChange("coopEndDate", setValue)}
+              defaultValue={
+                formatDateToMonth(watch("coopEndDate")) || undefined
+              }
+            />
+          </div>
+
+          {/* Note for Date Section */}
+          <div className="col-span-2">
+            <Note className="py-2">
+              Please indicate the start and the end dates of your co-op. If you
+              don&apos;t know exact dates, you can use approximate dates.
+            </Note>
+          </div>
         </div>
       </div>
     </div>

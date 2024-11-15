@@ -19,7 +19,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     }
     return {
       redirect: {
-        destination: "/profile",
+        destination: "/profile/setup",
         permanent: false,
       },
     };

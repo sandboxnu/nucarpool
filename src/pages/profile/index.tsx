@@ -1,19 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import _, { debounce } from "lodash";
-import { GetServerSideProps, GetServerSidePropsContext, NextPage } from "next";
+import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import FormControlLabel from "@mui/material/FormControlLabel";
-
 import Header from "../../components/Header";
-import { z } from "zod";
 import { trpc } from "../../utils/trpc";
 import { Role, Status } from "@prisma/client";
 import { TextField } from "../../components/TextField";
 import Radio from "../../components/Radio";
-import useSearch from "../../utils/search";
 import Checkbox from "@mui/material/Checkbox";
 import DayBox from "../../components/Profile/DayBox";
 import {
@@ -32,20 +28,13 @@ import {
   ProfileHeaderNoMB,
 } from "../../styles/profile";
 import ControlledTimePicker from "../../components/Profile/ControlledTimePicker";
-import {
-  CarpoolAddress,
-  CarpoolFeature,
-  OnboardingFormInputs,
-} from "../../utils/types";
+import { OnboardingFormInputs } from "../../utils/types";
 import { EntryLabel } from "../../components/EntryLabel";
 import ControlledAddressCombobox from "../../components/Profile/ControlledAddressCombobox";
 import { getSession, useSession } from "next-auth/react";
-import { createPortal } from "react-dom";
 import { ComplianceModal } from "../../components/CompliancePortal";
 import ProfilePicture from "../../components/Profile/ProfilePicture";
 import Spinner from "../../components/Spinner";
-import { getPresignedImageUrl } from "../../utils/uploadToS3";
-import { userInfo } from "node:os";
 import { trackProfileCompletion } from "../../utils/mixpanel";
 import {
   onboardSchema,
@@ -223,7 +212,7 @@ const Index: NextPage = () => {
     trackProfileCompletion(userInfo.role, userInfo.status);
   };
 
-  if (isLoading) {
+  if (isLoading || !user) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-white ">
         <Spinner />
