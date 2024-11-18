@@ -62,16 +62,10 @@ interface NoGroupInfoProps {
   onClose: () => void;
 }
 
-const NoGroupInfo = ({ role, onClose }: NoGroupInfoProps) => {
-  const utils = trpc.useContext();
+const NoGroupInfo = ({ role }: NoGroupInfoProps) => {
   const { data: user } = trpc.user.me.useQuery();
   const [groupMessage, setGroupMessage] = useState(user?.groupMessage ?? "");
-  const { mutate: updateUserMessage } = trpc.user.groups.updateUserMessage.useMutation({
-    onSuccess: () => {
-      // Invalidate and refetch the user.me query
-      utils.user.me.invalidate();
-    },
-  });
+  const { mutate: updateUserMessage } = trpc.user.groups.updateUserMessage.useMutation();
 
   useEffect(() => {
     if (user?.groupMessage) {
@@ -94,22 +88,20 @@ const NoGroupInfo = ({ role, onClose }: NoGroupInfoProps) => {
       ) : (
         <>
           {role === "DRIVER" && (
-            <div className="mx-20 flex flex-col py-1 mb-8">
+            <div className="mx-20 flex flex-col py-1">
               <div className="my-1 text-xs italic text-slate-400">
-                Below, share any information that you would like riders joining you your Carpool to know. You can indicate when you generally like to be leaving your place, what your preferred method of communication is, what your preference is to split gas and what your Carpool vibe will be like.
+                Save a message to share with your future riders!
               </div>
-              <div className="flex flex-row gap-2">
+              <div className="flex flex-row divide-y-2 overflow-auto">
                 <textarea
-                  className="form-input min-h-[50px] flex-grow resize-none rounded-md py-2 shadow-sm"
+                  className="form-input h-10 min-h-[50px] flex-grow resize-none rounded-md py-2 shadow-sm"
+                  maxLength={140}
                   value={groupMessage}
                   onChange={(e) => setGroupMessage(e.target.value)}
                 />
                 <button
-                  className="w-[150px] rounded-md bg-red-700 py-2 text-white h-full"
-                  onClick={async () => {
-                    await handleMessageSubmit();
-                    toast.success('Group message successfully saved!');
-                  }}
+                  className="ml-8 h-full w-[150px] rounded-md bg-red-700 text-white"
+                  onClick={handleMessageSubmit}
                 >
                   Submit
                 </button>
