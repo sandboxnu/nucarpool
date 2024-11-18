@@ -26,6 +26,7 @@ const MessageHeader = ({
     onClose("");
   };
   const { profileImageUrl, imageLoadError } = useProfileImage(selectedUser.id);
+
   return (
     <div className="flex items-center justify-between border-b bg-white p-8">
       <div className="flex items-center">
