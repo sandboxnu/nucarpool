@@ -108,12 +108,12 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
           <Image
             src={profileImageUrl}
             alt={`${props.otherUser.preferredName}'s Profile Image`}
-            width={48}
-            height={48}
-            className="h-12 w-12  rounded-full object-cover"
+            width={56}
+            height={56}
+            className="h-14 w-14  rounded-full object-cover"
           />
         ) : (
-          <AiOutlineUser className="h-12 w-12  rounded-full bg-gray-200" />
+          <AiOutlineUser className="h-14 w-14  rounded-full bg-gray-200" />
         )}
 
         {/* Name and Pronouns */}
