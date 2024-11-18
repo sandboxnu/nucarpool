@@ -59,13 +59,56 @@ interface NoGroupInfoProps {
 }
 
 const NoGroupInfo = ({ role }: NoGroupInfoProps) => {
-  const text =
-    role === Role.VIEWER
-      ? "You are in Viewer mode, switch to Rider or Driver to join a group"
-      : "You are not currently part of a carpool group";
+  const { data: user } = trpc.user.me.useQuery();
+  const [groupMessage, setGroupMessage] = useState(user?.groupMessage ?? "");
+  const { mutate: updateUserMessage } = trpc.user.groups.updateUserMessage.useMutation();
+
+  useEffect(() => {
+    if (user?.groupMessage) {
+      setGroupMessage(user.groupMessage);
+    }
+  }, [user]);
+
+  const handleMessageSubmit = async () => {
+    if (user?.id && role === "DRIVER") {
+      await updateUserMessage({ message: groupMessage });
+    }
+  };
+
   return (
-    <div className="flex flex-grow items-center justify-center text-xl font-light">
-      {text}
+    <div className="flex flex-col">
+      {role === Role.VIEWER ? (
+        <div className="flex flex-grow items-center justify-center text-xl font-light">
+          You are in Viewer mode, switch to Rider or Driver to join a group
+        </div>
+      ) : (
+        <>
+          {role === "DRIVER" && (
+            <div className="mx-20 flex flex-col py-1">
+              <div className="my-1 text-xs italic text-slate-400">
+                Save a message to share with your future riders!
+              </div>
+              <div className="flex flex-row divide-y-2 overflow-auto">
+                <textarea
+                  className="form-input h-10 min-h-[50px] flex-grow resize-none rounded-md py-2 shadow-sm"
+                  maxLength={140}
+                  value={groupMessage}
+                  onChange={(e) => setGroupMessage(e.target.value)}
+                />
+                <button
+                  className="ml-8 h-full w-[150px] rounded-md bg-red-700 text-white"
+                  onClick={handleMessageSubmit}
+                >
+                  Submit
+                </button>
+              </div>
+            </div>
+          )}
+          <div className="flex flex-grow items-center justify-center text-xl font-light">
+            You are not currently part of a carpool group
+          </div>
+        </>
+      )}
     </div>
   );
 };
