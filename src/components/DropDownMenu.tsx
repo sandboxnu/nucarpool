@@ -33,16 +33,17 @@ const DropDownMenu = () => {
         </div>
       )}
       <Menu>
-        <Menu.Button className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full">
+        <Menu.Button className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full">
           {profileImageUrl && !imageLoadError ? (
             <Image
               src={profileImageUrl}
               alt="Profile Image"
-              width={50}
-              height={50}
+              width={56}
+              height={56}
+              className="h-14 w-14 rounded-full object-cover"
             />
           ) : (
-            <AiOutlineUser className="h-12 w-12 rounded-full bg-gray-400" />
+            <AiOutlineUser className="h-14 w-14 rounded-full bg-gray-400" />
           )}
         </Menu.Button>
 

@@ -63,7 +63,7 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
 
     useEffect(() => {
       setIsActive(currentlySelected === value);
-    });
+    }, [currentlySelected, value]);
 
     const input = (
       <input

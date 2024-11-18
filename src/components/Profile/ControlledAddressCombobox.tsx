@@ -1,8 +1,11 @@
 import { Combobox, Transition } from "@headlessui/react";
 import { Control, Controller, FieldError } from "react-hook-form";
-import { OnboardingFormInputs } from "../../pages/profile";
 import { Fragment, SetStateAction } from "react";
-import { CarpoolFeature, CarpoolAddress } from "../../utils/types";
+import {
+  CarpoolFeature,
+  CarpoolAddress,
+  OnboardingFormInputs,
+} from "../../utils/types";
 
 interface ControlledAddressComboboxProps {
   control: Control<OnboardingFormInputs>;
@@ -22,7 +25,7 @@ const ControlledAddressCombobox = (props: ControlledAddressComboboxProps) => {
       control={props.control}
       render={({ field: { ref, ...fieldProps } }) => (
         <Combobox
-          className={`relative w-full`}
+          className={`relative  w-full`}
           as="div"
           value={props.addressSelected}
           onChange={(val: CarpoolFeature) => {
@@ -68,7 +71,7 @@ const ControlledAddressCombobox = (props: ControlledAddressComboboxProps) => {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Combobox.Options className="absolute z-10 w-full rounded-md bg-white text-base shadow-lg focus:outline-none ">
+            <Combobox.Options className="absolute w-full rounded-md bg-white text-base shadow-lg focus:outline-none ">
               {props.addressSuggestions.length === 0 ? (
                 <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
                   Nothing found.
@@ -78,7 +81,7 @@ const ControlledAddressCombobox = (props: ControlledAddressComboboxProps) => {
                   <Combobox.Option
                     key={feat.id}
                     className={({ active }) =>
-                      `cursor-default select-none border-black p-3 ${
+                      `] cursor-default select-none border-black p-3 ${
                         active ? "bg-blue-400 text-white" : "text-gray-900"
                       }`
                     }

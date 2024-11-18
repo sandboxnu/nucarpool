@@ -1,14 +1,9 @@
-import React, { ReactNode, useContext, useEffect, useState } from "react";
+import React, { ReactNode, useState } from "react";
 import { FaMinus, FaPlus } from "react-icons/fa6";
 import { FaTimes } from "react-icons/fa";
-import { Controller } from "react-hook-form";
 import Checkbox from "@mui/material/Checkbox";
-import DayBox from "./Profile/DayBox";
-import { User } from "@prisma/client";
-import { EnhancedPublicUser, FiltersState } from "../utils/types";
-import { UserContext } from "../utils/userContext";
+import { FiltersState } from "../utils/types";
 import { TextField } from "./TextField";
-import { setValue } from "rc-field-form/es/utils/valueUtil";
 import StaticDayBox from "./Sidebar/StaticDayBox";
 
 interface FilterSectionProps {
@@ -117,7 +112,7 @@ const Filters = ({
     .filter((day) => day === "1").length;
 
   return (
-    <div className="relative mx-1 h-full select-none overflow-y-auto bg-white px-1 pb-20 scrollbar-thin  scrollbar-track-stone-100 scrollbar-thumb-northeastern-red scrollbar-track-rounded-full scrollbar-thumb-rounded-full">
+    <div className="relative mx-1 h-full select-none overflow-y-auto bg-white px-1 pb-20 scrollbar-thin  scrollbar-track-stone-100 scrollbar-thumb-busy-red scrollbar-track-rounded-full scrollbar-thumb-rounded-full">
       <div className="sticky top-0 z-10 border-b border-gray-200 bg-white px-4 pb-5 pt-2">
         <div className="flex w-full  items-center justify-between">
           <button
@@ -230,7 +225,7 @@ const Filters = ({
         <div className="mt-3">
           <div className="text-md flex justify-between gap-2 font-semibold">
             <button
-              className={`rounded-full px-4 py-2  ${
+              className={`grow rounded-full px-4 py-2  ${
                 filters.days === 0
                   ? "border-2 border-black bg-northeastern-red text-white"
                   : "border-2 border-gray-300 bg-white text-black"
@@ -245,7 +240,7 @@ const Filters = ({
               Any days
             </button>
             <button
-              className={`rounded-full px-4 py-2 ${
+              className={`grow rounded-full px-4 py-2 ${
                 filters.days === 1
                   ? "border-2 border-black bg-northeastern-red text-white"
                   : "border-2 border-gray-300 bg-white text-black"
@@ -260,7 +255,7 @@ const Filters = ({
               Exact days
             </button>
             <button
-              className={`rounded-full px-4 py-2 ${
+              className={`grow rounded-full px-4 py-2 ${
                 filters.days === 2
                   ? "border-2 border-black bg-northeastern-red text-white"
                   : "border-2 border-gray-300 bg-white text-black"
@@ -278,36 +273,33 @@ const Filters = ({
 
           {filters.days === 1 || filters.days === 2 ? (
             <>
-              <div className="mt-4 flex flex-wrap items-start">
-                {daysOfWeek.map((day, index) => (
-                  <Checkbox
-                    key={day + index.toString()}
-                    sx={{ padding: 0 }}
-                    checked={
-                      filters.daysWorking.split(",").map((d) => d === "1")[
-                        index
-                      ]
-                    }
-                    onChange={() => toggleDaySelection(index)}
-                    checkedIcon={<StaticDayBox day={day} isSelected={true} />}
-                    icon={<StaticDayBox day={day} isSelected={false} />}
-                  />
-                ))}
+              <div className="mx-4 flex flex-col  gap-2">
+                <div className="mt-4 flex justify-between ">
+                  {daysOfWeek.map((day, index) => (
+                    <Checkbox
+                      key={day + index.toString()}
+                      sx={{ padding: 0 }}
+                      checked={
+                        filters.daysWorking.split(",").map((d) => d === "1")[
+                          index
+                        ]
+                      }
+                      onChange={() => toggleDaySelection(index)}
+                      checkedIcon={<StaticDayBox day={day} isSelected={true} />}
+                      icon={<StaticDayBox day={day} isSelected={false} />}
+                    />
+                  ))}
+                </div>
                 {filters.days === 1 ? (
-                  <p
-                    className="w-full px-4 pt-2 text-xs"
-                    style={{ color: "#BCA7A7" }}
-                  >
+                  <p className="w-full text-xs" style={{ color: "#BCA7A7" }}>
                     (?) Exact days only shows users carpooling during the
                     selected carpool days.
                   </p>
                 ) : null}
               </div>
               {filters.days === 2 && (
-                <div className="mt-2 flex w-full flex-col justify-center">
-                  <label className="mb-2 self-center">
-                    Minimum shared carpool days
-                  </label>
+                <div className="mx-4 mt-2 flex flex-col items-center justify-center">
+                  <label className="mb-2 ">Minimum shared carpool days</label>
                   <input
                     type="number"
                     min="1"
@@ -332,10 +324,10 @@ const Filters = ({
                         }));
                       }
                     }}
-                    className="flex h-10 w-14 self-center rounded-full  border-2 border-gray-300 p-2 text-center focus:border-transparent focus:ring-2 focus:ring-northeastern-red "
+                    className="flex h-10 w-14  rounded-full  border-2 border-gray-300 p-2 text-center focus:border-transparent focus:ring-2 focus:ring-northeastern-red "
                   />
                   <p
-                    className="w-full px-4 pt-2 text-xs"
+                    className="w-full  pt-2 text-xs"
                     style={{ color: "#BCA7A7" }}
                   >
                     (?) Flex days shows any users sharing at least this number
@@ -414,9 +406,9 @@ const Filters = ({
         toggleOpen={() => setTermDatesOpen(!termDatesOpen)}
       >
         <div className="mt-3">
-          <div className="text-md mb-4 flex justify-between  gap-1  font-semibold">
+          <div className="text-md mb-4 flex justify-between gap-2 font-semibold">
             <button
-              className={`rounded-full border-2 px-4 py-2 ${
+              className={`grow rounded-full border-2 px-4 py-2 ${
                 filters.dateOverlap === 0
                   ? " border-black bg-northeastern-red text-white"
                   : "border-gray-300 bg-white text-black"
@@ -494,7 +486,7 @@ const Filters = ({
               <label className="mb-2 block font-semibold">End Date</label>
               <TextField
                 type="month"
-                inputClassName="h-14 text-mdd"
+                inputClassName="h-14 text-md"
                 isDisabled={filters.dateOverlap === 0}
                 id="coopEndDate"
                 value={formatDateToMonth(filters.endDate)}

@@ -5,7 +5,7 @@ import timezone from "dayjs/plugin/timezone";
 import { ButtonInfo, EnhancedPublicUser, PublicUser } from "../../utils/types";
 import { trpc } from "../../utils/trpc";
 import { toast } from "react-toastify";
-import { useContext } from "react";
+import React, { useContext } from "react";
 import { UserContext } from "../../utils/userContext";
 import Spinner from "../Spinner";
 import { classNames } from "../../utils/classNames";
@@ -14,6 +14,8 @@ import StartIcon from "../../../public/start.png";
 import EndIcon from "../../../public/end.png";
 import Image from "next/image";
 import { trackViewRoute } from "../../utils/mixpanel";
+import useProfileImage from "../../utils/useProfileImage";
+import { AiOutlineUser } from "react-icons/ai";
 
 interface UserCardProps {
   otherUser: EnhancedPublicUser;
@@ -27,9 +29,7 @@ interface UserCardProps {
 const getButtonClassName = (button: ButtonInfo): string => {
   const bColor = button.color;
   return classNames(
-    `${bColor} w-1/2 hover:${
-      bColor === "bg-northeastern.red"
-    } rounded-md p-1 my-1 text-center text-white`
+    `${bColor} w-1/2 hover:bg-red-700 rounded-md p-1 my-1 text-center text-white`
   );
 };
 
@@ -43,6 +43,10 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       trpcUtils.user.favorites.me.invalidate();
     },
   });
+  const { profileImageUrl, imageLoadError } = useProfileImage(
+    props.otherUser.id
+  );
+
   const user = useContext(UserContext);
   const handleFavorite = (favoriteId: string, add: boolean) => {
     if (user) {
@@ -75,7 +79,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         <div
           key={i}
           className={
-            "flex h-7 w-7 items-center justify-center rounded-full border border-black text-sm" +
+            "flex h-8 w-8 items-center justify-center rounded-full border border-black text-sm" +
             backgroundColor +
             textColor
           }
@@ -84,7 +88,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         </div>
       );
     }
-    return <div className="flex gap-2">{boxes}</div>;
+    return <div className="flex w-11/12 justify-between">{boxes}</div>;
   };
 
   if (!user) {
@@ -93,41 +97,60 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
   return (
     <div
       className={classNames(
-        "align-center m-3.5 flex flex-col gap-2 rounded-xl bg-stone-100 px-6 py-4 text-left shadow-md",
-        "border-l-[13px] border-l-busy-red",
+        "align-center m-3.5 flex flex-col gap-2 rounded-xl bg-stone-100 px-4 py-4 text-left shadow-md",
+        "border-l-[13px] border-l-busy-red font-montserrat ",
         props.classname
       )}
     >
-      <div className="flex justify-between">
-        {/* top row - Username*/}
+      <div className={"mb-1 flex flex-row items-center gap-1"}>
+        {/* Profile Image */}
+        {profileImageUrl && !imageLoadError ? (
+          <Image
+            src={profileImageUrl}
+            alt={`${props.otherUser.preferredName}'s Profile Image`}
+            width={48}
+            height={48}
+            className="h-12 w-12  rounded-full object-cover"
+          />
+        ) : (
+          <AiOutlineUser className="h-14 w-14  rounded-full bg-gray-200" />
+        )}
 
-        {/* Profile picture goes here */}
-        <div className="flex">
-          <div className="flex flex-row space-x-3 text-lg">
+        {/* Name and Pronouns */}
+        <div className="flex flex-col items-start pl-4">
+          <div className="text-lg font-semibold ">
             {user.role === "VIEWER" ? (
-              <p className="font-semibold">{`${props.otherUser.role.charAt(
-                0
-              )}${props.otherUser.role.slice(1).toLowerCase()}`}</p>
+              <p>{`${props.otherUser.role.charAt(0)}${props.otherUser.role
+                .slice(1)
+                .toLowerCase()}`}</p>
             ) : (
-              <>
-                <p className="font-semibold">{props.otherUser.preferredName}</p>
-                {props.isUnread && (
-                  <div className="flex items-center">
-                    <span className="mr-2 h-2 w-2 rounded-full bg-blue-300"></span>
-                    <p className="text-sm italic ">New!</p>
-                  </div>
-                )}
-              </>
+              <p>{props.otherUser.preferredName}</p>
+            )}
+          </div>
+          <div className="flex flex-row items-start gap-4">
+            <p className="font-montserrat text-sm italic">
+              {props.otherUser.pronouns}
+            </p>
+
+            {props.isUnread && (
+              <div className="flex items-center">
+                <span className="mr-1 h-2 w-2 rounded-full bg-blue-300"></span>
+                <p className="text-sm italic ">New!</p>
+              </div>
             )}
           </div>
         </div>
-        <Rating
-          name=""
-          size="large"
-          onChange={(_, value) => handleFavorite(props.otherUser.id, !!value)}
-          value={props.otherUser.isFavorited ? 1 : 0}
-          max={1}
-        />
+
+        {/* Rating */}
+        <div className="ml-auto">
+          <Rating
+            name=""
+            size="large"
+            onChange={(_, value) => handleFavorite(props.otherUser.id, !!value)}
+            value={props.otherUser.isFavorited ? 1 : 0}
+            max={1}
+          />
+        </div>
       </div>
       {/* second row - Start location*/}
 
@@ -168,7 +191,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       {/* Fifth row - Start and end times */}
 
       <div className="m-0 flex w-full justify-between align-middle">
-        <div className="flex text-sm font-normal">
+        <div className="flex text-sm ">
           <p className="pr-1">Start:</p>
           <p className="font-semibold">
             {dayjs.tz(props.otherUser.startTime, "UTC").format("h:mm")} am
@@ -183,7 +206,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       {/* Sixth row - coop Start and end dates */}
       {props.otherUser.coopStartDate && props.otherUser.coopEndDate && (
         <div className="m-0 flex w-full justify-between align-middle">
-          <div className="flex text-sm font-normal">
+          <div className="flex text-sm ">
             <p className="pr-1">From:</p>
             <p className="font-semibold">
               {dayjs(props.otherUser.coopStartDate).format("MMMM")}

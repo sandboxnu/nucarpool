@@ -2,10 +2,8 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import type { GetServerSidePropsContext, NextPage } from "next";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import Feature from "geojson";
 import { RiFocus3Line } from "react-icons/ri";
 import { ToastProvider } from "react-toast-notifications";
-import addClusters from "../utils/map/addClusters";
 import addMapEvents from "../utils/map/addMapEvents";
 import Head from "next/head";
 import { trpc } from "../utils/trpc";
@@ -57,7 +55,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   if (!session.user.isOnboarded) {
     return {
       redirect: {
-        destination: "/profile",
+        destination: "/profile/setup",
         permanent: false,
       },
     };
@@ -259,7 +257,6 @@ const Home: NextPage<any> = () => {
         );
       }
       if (shouldRemoveMarker && tempOtherUser) {
-        console.log("removing marker");
         updateCompanyLocation(
           mapState,
           tempOtherUser.companyCoordLng,
@@ -273,7 +270,6 @@ const Home: NextPage<any> = () => {
         setTempOtherUser(null);
       }
       if (!isOtherUserInGeoList && selectedUserId === clickedUser.id) {
-        console.log("adding temp marker");
         updateCompanyLocation(
           mapState,
           clickedUser.companyCoordLng,
@@ -413,7 +409,6 @@ const Home: NextPage<any> = () => {
         );
       }
       if (otherUser) {
-        console.log("viewing route");
         onViewRouteClick(user, otherUser);
       }
     }
@@ -430,8 +425,8 @@ const Home: NextPage<any> = () => {
     setSelectedUserId(null);
   }, [sidebarType]);
 
+  // initial route rendering
   useEffect(() => {
-    // useEffect for initial route rendering
     if (
       user &&
       !otherUser &&
@@ -583,7 +578,7 @@ const Home: NextPage<any> = () => {
               }}
             />
             <div className="flex h-[91.5%] overflow-hidden">
-              <div className="w-96">
+              <div className="w-[25rem]  ">
                 {mapState && (
                   <SidebarPage
                     setSort={setSort}
