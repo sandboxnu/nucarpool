@@ -12,8 +12,9 @@ const gmailEmailSchema = z
   .email()
   .refine(
     (email) =>
-      process.env.NEXT_PUBLIC_ENV === "staging" &&
-      email.toLowerCase().endsWith("@gmail.com"),
+      (process.env.NEXT_PUBLIC_ENV === "staging" &&
+        email.toLowerCase().endsWith("@gmail.com")) ||
+      process.env.NEXT_PUBLIC_ENV !== "staging",
     {
       message:
         "Only gmail.com email addresses are accepted in the staging environment",
