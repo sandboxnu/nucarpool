@@ -73,9 +73,8 @@ const Header = (props: HeaderProps) => {
     setSidebar: Dispatch<SetStateAction<HeaderOptions>>;
     disabled: boolean;
   }) => {
-    // @ts-ignore
     return (
-      <div className="pr-12">
+      <div className="pr-8">
         <button
           onClick={() => {
             setSidebar("explore");

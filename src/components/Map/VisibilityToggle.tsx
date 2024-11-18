@@ -12,7 +12,6 @@ const VisibilityToggle = ({ map, style }: VisibilityToggleProps) => {
   useEffect(() => {
     if (!map) return;
 
-    // Function to update layer visibility
     const updateVisibility = () => {
       const layerIds = ["riders", "drivers"];
 
@@ -33,13 +32,11 @@ const VisibilityToggle = ({ map, style }: VisibilityToggleProps) => {
       });
     };
 
-    // Ensure style is loaded before setting layout properties
+    // check style loaded
     if (map.isStyleLoaded()) {
-      console.log(map.isStyleLoaded());
       updateVisibility();
     } else {
       map.on("style.load", updateVisibility);
-      // Clean up the event listener
       return () => {
         map.off("style.load", updateVisibility);
       };

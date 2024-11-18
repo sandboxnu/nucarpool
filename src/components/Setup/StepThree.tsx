@@ -103,7 +103,7 @@ const StepThree = ({
               control={control}
               name="startTime"
               error={errors.startTime}
-              value={user?.startTime || undefined}
+              value={watch("startTime") || user?.startTime || undefined}
             />
           </div>
 
@@ -119,7 +119,7 @@ const StepThree = ({
               control={control}
               name="endTime"
               error={errors.endTime}
-              value={user?.endTime || undefined}
+              value={watch("endTime") || user?.endTime || undefined}
             />
           </div>
 

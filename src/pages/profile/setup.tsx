@@ -24,6 +24,11 @@ import { Role } from "@prisma/client";
 import { trackProfileCompletion } from "../../utils/mixpanel";
 import { useUploadFile } from "../../utils/profile/useUploadFile";
 import { ComplianceModal } from "../../components/CompliancePortal";
+import { useAddressSelection } from "../../utils/useAddressSelection";
+import {
+  updateUser,
+  useEditUserMutation,
+} from "../../utils/profile/updateUser";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getSession(context);
@@ -31,14 +36,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     return {
       redirect: {
         destination: "/sign-in",
-        permanent: false,
-      },
-    };
-  }
-  if (session.user.isOnboarded) {
-    return {
-      redirect: {
-        destination: "/profile",
         permanent: false,
       },
     };
@@ -56,26 +53,33 @@ const Setup: NextPage = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const { uploadFile } = useUploadFile(selectedFile);
   const { data: session } = useSession();
-  const utils = trpc.useContext();
   const { data: user } = trpc.user.me.useQuery(undefined, {
     refetchOnMount: true,
   });
-  const [addressData, setAddressData] = useState<{
-    startAddressSelected: CarpoolAddress | null;
-    companyAddressSelected: CarpoolAddress | null;
-  }>({
-    startAddressSelected: null,
-    companyAddressSelected: null,
-  });
-  const handleAddressChange = useCallback(
-    (addresses: {
-      startAddressSelected: CarpoolAddress | null;
-      companyAddressSelected: CarpoolAddress | null;
-    }) => {
-      setAddressData(addresses);
-    },
-    [setAddressData]
+  const editUserMutation = useEditUserMutation(router, () =>
+    setIsLoading(false)
   );
+  const startAddressHook = useAddressSelection();
+  const companyAddressHook = useAddressSelection();
+
+  const { setSelectedAddress: setStartAddressSelected } = startAddressHook;
+  const { setSelectedAddress: setCompanyAddressSelected } = companyAddressHook;
+
+  useEffect(() => {
+    if (user?.startAddress && user.startAddress !== "") {
+      setStartAddressSelected({
+        place_name: user.startAddress,
+        center: [user.startCoordLng, user.startCoordLat],
+      });
+    }
+    if (user?.companyAddress && user.companyAddress !== "") {
+      setCompanyAddressSelected({
+        place_name: user.companyAddress,
+        center: [user.companyCoordLng, user.companyCoordLat],
+      });
+    }
+  }, [user, setStartAddressSelected, setCompanyAddressSelected]);
+
   const {
     register,
     setValue,
@@ -114,29 +118,15 @@ const Setup: NextPage = () => {
       setInitialLoad(false);
     }
   }, [initialLoad, reset, user]);
-  const editUserMutation = trpc.user.edit.useMutation({
-    onSuccess: async () => {
-      await utils.user.me.refetch();
-      await utils.user.recommendations.me.invalidate();
-      await utils.mapbox.geoJsonUserList.invalidate();
-      router.push("/").then(() => {
-        setIsLoading(false);
-      });
-    },
-    onError: (error) => {
-      toast.error(`Something went wrong: ${error.message}`);
-      setIsLoading(false);
-    },
-  });
+
   const onSubmit = async (values: OnboardingFormInputs) => {
     setIsLoading(true);
-
     const userInfo = {
       ...values,
-      companyCoordLng: addressData.companyAddressSelected?.center[0] || 0,
-      companyCoordLat: addressData.companyAddressSelected?.center[1] || 0,
-      startCoordLng: addressData.startAddressSelected?.center[0] || 0,
-      startCoordLat: addressData.startAddressSelected?.center[1] || 0,
+      companyCoordLng: companyAddressHook.selectedAddress.center[0],
+      companyCoordLat: companyAddressHook.selectedAddress.center[1],
+      startCoordLng: startAddressHook.selectedAddress.center[0],
+      startCoordLat: startAddressHook.selectedAddress.center[1],
       seatAvail: values.role === "RIDER" ? 0 : values.seatAvail,
     };
     if (selectedFile) {
@@ -146,40 +136,11 @@ const Setup: NextPage = () => {
         console.error("File upload failed:", error);
       }
     }
-    const daysWorkingParsed: string = userInfo.daysWorking
-      .map((val: boolean) => {
-        if (val) {
-          return "1";
-        } else {
-          return "0";
-        }
-      })
-      .join(",");
     const sessionName = session?.user?.name ?? "";
-
-    editUserMutation.mutate({
-      role: userInfo.role,
-      status: userInfo.status,
-      seatAvail: userInfo.seatAvail,
-      companyName: userInfo.companyName,
-      companyAddress: userInfo.companyAddress,
-      companyCoordLng: userInfo.companyCoordLng!,
-      companyCoordLat: userInfo.companyCoordLat!,
-      startAddress: userInfo.startAddress,
-      startCoordLng: userInfo.startCoordLng!,
-      startCoordLat: userInfo.startCoordLat!,
-      isOnboarded: true,
-      preferredName: userInfo.preferredName
-        ? userInfo.preferredName
-        : sessionName,
-      pronouns: userInfo.pronouns,
-      daysWorking: daysWorkingParsed,
-      startTime: userInfo.startTime?.toISOString(),
-      endTime: userInfo.endTime?.toISOString(),
-      bio: userInfo.bio,
-      coopStartDate: userInfo.coopStartDate!,
-      coopEndDate: userInfo.coopEndDate!,
-      licenseSigned: true,
+    await updateUser({
+      userInfo,
+      sessionName,
+      mutation: editUserMutation,
     });
     trackProfileCompletion(userInfo.role, userInfo.status);
   };
@@ -224,6 +185,17 @@ const Setup: NextPage = () => {
       </div>
     );
   }
+  const buttonBaseClass =
+    "absolute z-0 flex w-[200px] items-center justify-center rounded-full drop-shadow-[0_15px_4px_rgba(0,0,0,0.35)]";
+  const backButtonClass =
+    "absolute left-1/4 top-[calc(50%+250px+20px)] z-0 -translate-x-1/2 px-4 py-2 items-center justify-center font-montserrat font-semibold text-2xl text-stone-500 underline";
+  const continueButtonDefaultClass = "bg-white text-black";
+  const continueButtonFinalStepClass = "bg-northeastern-red text-white";
+  const continueButtonCenterClass =
+    "left-1/2 -translate-x-1/2 top-[calc(50%+250px+20px)]";
+  const continueButtonRightClass =
+    "left-3/4 -translate-x-1/2 top-[calc(50%+250px+20px)]";
+
   return (
     <div className="relative h-full w-full overflow-hidden ">
       {!user?.licenseSigned && <ComplianceModal />}
@@ -256,11 +228,11 @@ const Setup: NextPage = () => {
           <div className="relative z-0">
             <StepTwo
               control={control}
-              user={user}
               register={register}
               watch={watch}
               errors={errors}
-              onAddressChange={handleAddressChange}
+              startAddressHook={startAddressHook}
+              companyAddressHook={companyAddressHook}
             />
           </div>
         )}
@@ -284,26 +256,39 @@ const Setup: NextPage = () => {
       </SetupContainer>
 
       {step > 0 && (
-        <button
-          type="button"
-          className={`absolute  left-1/2 top-[calc(50%+250px+20px)] z-0 flex w-[200px] -translate-x-1/2 transform items-center justify-center rounded-full drop-shadow-[0_15px_4px_rgba(0,0,0,0.35)] ${
-            step === 4 || watch("role") === Role.VIEWER
-              ? "bg-northeastern-red text-white"
-              : "bg-white text-black"
-          }`}
-          onClick={handleNextStep}
-        >
-          <div className="z-0 flex items-center px-4 py-2 font-montserrat text-2xl font-bold">
-            {watch("role") === Role.VIEWER
-              ? "View Map"
-              : step === 4
-              ? "Complete"
-              : "Continue"}
-            {step !== 4 && watch("role") !== Role.VIEWER && (
-              <FaArrowRight className="ml-2 text-black" />
-            )}
-          </div>
-        </button>
+        <>
+          {step > 1 && (
+            <button
+              type="button"
+              className={backButtonClass}
+              onClick={() => setStep((prevStep) => Math.max(prevStep - 1, 0))}
+            >
+              Previous
+            </button>
+          )}
+          <button
+            type="button"
+            className={`${buttonBaseClass} ${
+              step === 1 ? continueButtonCenterClass : continueButtonRightClass
+            } ${
+              step === 4 || watch("role") === Role.VIEWER
+                ? continueButtonFinalStepClass
+                : continueButtonDefaultClass
+            }`}
+            onClick={handleNextStep}
+          >
+            <div className="z-0 flex items-center px-4 py-2 font-montserrat text-2xl font-bold">
+              {watch("role") === Role.VIEWER
+                ? "View Map"
+                : step === 4
+                ? "Complete"
+                : "Continue"}
+              {step !== 4 && watch("role") !== Role.VIEWER && (
+                <FaArrowRight className="ml-2 text-black" />
+              )}
+            </div>
+          </button>
+        </>
       )}
     </div>
   );

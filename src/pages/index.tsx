@@ -257,7 +257,6 @@ const Home: NextPage<any> = () => {
         );
       }
       if (shouldRemoveMarker && tempOtherUser) {
-        console.log("removing marker");
         updateCompanyLocation(
           mapState,
           tempOtherUser.companyCoordLng,
@@ -271,7 +270,6 @@ const Home: NextPage<any> = () => {
         setTempOtherUser(null);
       }
       if (!isOtherUserInGeoList && selectedUserId === clickedUser.id) {
-        console.log("adding temp marker");
         updateCompanyLocation(
           mapState,
           clickedUser.companyCoordLng,
@@ -411,7 +409,6 @@ const Home: NextPage<any> = () => {
         );
       }
       if (otherUser) {
-        console.log("viewing route");
         onViewRouteClick(user, otherUser);
       }
     }
@@ -428,8 +425,8 @@ const Home: NextPage<any> = () => {
     setSelectedUserId(null);
   }, [sidebarType]);
 
+  // initial route rendering
   useEffect(() => {
-    // useEffect for initial route rendering
     if (
       user &&
       !otherUser &&

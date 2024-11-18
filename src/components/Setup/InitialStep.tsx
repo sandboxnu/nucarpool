@@ -23,7 +23,7 @@ const InitialStep = ({
   watch,
 }: InitialStepProps) => {
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex select-none flex-col items-center">
       <h2 className="mb-4 text-center font-montserrat text-6xl font-bold">
         Welcome to{" "}
       </h2>

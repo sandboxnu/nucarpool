@@ -43,6 +43,10 @@ import {
 import { useUploadFile } from "../../utils/profile/useUploadFile";
 import { formatDateToMonth, handleMonthChange } from "../../utils/dateUtils";
 import { useAddressSelection } from "../../utils/useAddressSelection";
+import {
+  updateUser,
+  useEditUserMutation,
+} from "../../utils/profile/updateUser";
 
 // Inputs to the onboarding form.
 
@@ -68,6 +72,9 @@ const Index: NextPage = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const utils = trpc.useContext();
+  const editUserMutation = useEditUserMutation(router, () =>
+    setIsLoading(false)
+  );
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -137,21 +144,6 @@ const Index: NextPage = () => {
     });
   }, [user]);
 
-  const editUserMutation = trpc.user.edit.useMutation({
-    onSuccess: async () => {
-      await utils.user.me.refetch();
-      await utils.user.recommendations.me.invalidate();
-      await utils.mapbox.geoJsonUserList.invalidate();
-      router.push("/").then(() => {
-        setIsLoading(false);
-      });
-    },
-    onError: (error) => {
-      toast.error(`Something went wrong: ${error.message}`);
-      setIsLoading(false);
-    },
-  });
-
   const onSubmit = async (values: OnboardingFormInputs) => {
     setIsLoading(true);
     const coord: number[] = companyAddressSelected.center;
@@ -165,16 +157,6 @@ const Index: NextPage = () => {
       seatAvail: values.role === Role.RIDER ? 0 : values.seatAvail,
     };
 
-    const daysWorkingParsed: string = userInfo.daysWorking
-      .map((val: boolean) => {
-        if (val) {
-          return "1";
-        } else {
-          return "0";
-        }
-      })
-      .join(",");
-
     const sessionName = session?.user?.name ?? "";
     if (selectedFile) {
       try {
@@ -183,32 +165,11 @@ const Index: NextPage = () => {
         console.error("File upload failed:", error);
       }
     }
-    editUserMutation.mutate({
-      role: userInfo.role,
-      status: userInfo.status,
-      seatAvail: userInfo.seatAvail,
-      companyName: userInfo.companyName,
-      companyAddress: userInfo.companyAddress,
-      companyCoordLng: userInfo.companyCoordLng!,
-      companyCoordLat: userInfo.companyCoordLat!,
-      startAddress: userInfo.startAddress,
-      startCoordLng: userInfo.startCoordLng!,
-      startCoordLat: userInfo.startCoordLat!,
-      isOnboarded: true,
-      preferredName: userInfo.preferredName
-        ? userInfo.preferredName
-        : sessionName,
-      pronouns: userInfo.pronouns,
-      daysWorking: daysWorkingParsed,
-      startTime: userInfo.startTime?.toISOString(),
-      endTime: userInfo.endTime?.toISOString(),
-      bio: userInfo.bio,
-      coopStartDate: userInfo.coopStartDate!,
-      coopEndDate: userInfo.coopEndDate!,
-      licenseSigned: true,
+    await updateUser({
+      userInfo,
+      sessionName,
+      mutation: editUserMutation,
     });
-
-    // Track profile completion
     trackProfileCompletion(userInfo.role, userInfo.status);
   };
 
@@ -422,7 +383,9 @@ const Index: NextPage = () => {
                           isDisabled={isViewer}
                           control={control}
                           name={"startTime"}
-                          value={user?.startTime ? user.startTime : undefined}
+                          value={
+                            watch("startTime") || user?.startTime || undefined
+                          }
                         />
                       </div>
                       <div className="flex flex-1 flex-col gap-2">
@@ -435,7 +398,7 @@ const Index: NextPage = () => {
                           isDisabled={isViewer}
                           control={control}
                           name={"endTime"}
-                          value={user?.endTime ? user.endTime : undefined}
+                          value={watch("endTime") || user?.endTime || undefined}
                         />
                       </div>
                     </div>

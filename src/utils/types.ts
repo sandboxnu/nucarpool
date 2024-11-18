@@ -26,10 +26,29 @@ export type OnboardingFormInputs = {
   endTime: Date | null;
   coopStartDate: Date | null;
   coopEndDate: Date | null;
-  timeDiffers: boolean;
   bio: string;
 };
-
+export type UserInfo = {
+  role: Role;
+  status: Status;
+  seatAvail: number;
+  companyName: string;
+  profilePicture: string;
+  startAddress: string;
+  preferredName: string;
+  pronouns: string;
+  startTime: Date | null;
+  endTime: Date | null;
+  coopStartDate: Date | null;
+  coopEndDate: Date | null;
+  bio: string;
+  companyCoordLng: number;
+  companyCoordLat: number;
+  startCoordLng: number;
+  startCoordLat: number;
+  companyAddress: string;
+  daysWorking: boolean[];
+};
 export type FiltersState = {
   days: number;
   flexDays: number;

@@ -12,70 +12,22 @@ import ControlledAddressCombobox from "../Profile/ControlledAddressCombobox";
 import { TextField } from "../TextField";
 import { useAddressSelection } from "../../utils/useAddressSelection";
 import { User } from "@prisma/client";
-import { useEffect, useState } from "react";
 
 interface StepTwoProps {
   register: UseFormRegister<OnboardingFormInputs>;
   errors: FieldErrors<OnboardingFormInputs>;
   watch: UseFormWatch<OnboardingFormInputs>;
   control: Control<OnboardingFormInputs>;
-  user?: User;
-  onAddressChange: (addresses: {
-    startAddressSelected: CarpoolAddress | null;
-    companyAddressSelected: CarpoolAddress | null;
-  }) => void;
+  startAddressHook: ReturnType<typeof useAddressSelection>;
+  companyAddressHook: ReturnType<typeof useAddressSelection>;
 }
 const StepTwo = ({
   register,
   errors,
-  user,
   control,
-  onAddressChange,
+  startAddressHook,
+  companyAddressHook,
 }: StepTwoProps) => {
-  const [hasInitialized, setHasInitialized] = useState(false);
-
-  const {
-    selectedAddress: startAddressSelected,
-    setSelectedAddress: setStartAddressSelected,
-    updateAddress: updateStartingAddress,
-    suggestions: startAddressSuggestions,
-  } = useAddressSelection();
-
-  const {
-    selectedAddress: companyAddressSelected,
-    setSelectedAddress: setCompanyAddressSelected,
-    updateAddress: updateCompanyAddress,
-    suggestions: companyAddressSuggestions,
-  } = useAddressSelection();
-  useEffect(() => {
-    if (user && !hasInitialized) {
-      setStartAddressSelected({
-        place_name: user.startAddress,
-        center: [user.startCoordLng, user.startCoordLat],
-      });
-      setCompanyAddressSelected({
-        place_name: user.companyAddress,
-        center: [user.companyCoordLng, user.companyCoordLat],
-      });
-      setHasInitialized(true);
-    }
-  }, [
-    user,
-    hasInitialized,
-    setStartAddressSelected,
-    setCompanyAddressSelected,
-  ]);
-  useEffect(() => {
-    if (
-      startAddressSelected?.place_name !== "" &&
-      companyAddressSelected?.place_name !== ""
-    ) {
-      onAddressChange({
-        startAddressSelected,
-        companyAddressSelected,
-      });
-    }
-  }, [startAddressSelected, companyAddressSelected, onAddressChange]);
   return (
     <div className="flex flex-col items-center  justify-center bg-white px-4">
       <div className="mb-8 text-center font-montserrat text-3xl font-bold">
@@ -94,11 +46,11 @@ const StepTwo = ({
           isDisabled={false}
           control={control}
           name="startAddress"
-          addressSelected={startAddressSelected}
-          addressSetter={setStartAddressSelected}
-          addressSuggestions={startAddressSuggestions}
+          addressSelected={startAddressHook.selectedAddress}
+          addressSetter={startAddressHook.setSelectedAddress}
+          addressSuggestions={startAddressHook.suggestions}
           error={errors.startAddress}
-          addressUpdater={updateStartingAddress}
+          addressUpdater={startAddressHook.updateAddress}
         />
         <Note className="pt-2">
           Note: Your address will only be used to find users close to you. It
@@ -135,11 +87,11 @@ const StepTwo = ({
           isDisabled={false}
           control={control}
           name="companyAddress"
-          addressSelected={companyAddressSelected}
-          addressSetter={setCompanyAddressSelected}
-          addressSuggestions={companyAddressSuggestions}
+          addressSelected={companyAddressHook.selectedAddress}
+          addressSetter={companyAddressHook.setSelectedAddress}
+          addressSuggestions={companyAddressHook.suggestions}
           error={errors.companyAddress}
-          addressUpdater={updateCompanyAddress}
+          addressUpdater={companyAddressHook.updateAddress}
         />
         {errors.companyAddress && (
           <ErrorDisplay>{errors.companyAddress.message}</ErrorDisplay>
