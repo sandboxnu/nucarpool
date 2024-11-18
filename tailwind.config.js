@@ -36,13 +36,18 @@ module.exports = {
         },
       },
       animation: {
-        gradientShift: "gradientShift 5s ease-in-out infinite",
+        "gradient-shift-5s": "gradientShift 5s ease-in-out infinite",
+        "gradient-shift-10s": "gradientShift 10s ease-in-out infinite",
+        "gradient-shift-15s": "gradientShift 15s ease-in-out infinite",
+        "gradient-shift-20s": "gradientShift 20s ease-in-out infinite",
       },
       fontFamily: {
         montserrat: ["Montserrat", "sans-serif"],
         lato: ["Lato", "sans-serif"],
       },
       backgroundImage: {
+        "50-red-50-white":
+          "linear-gradient(to right, #C8102E 50%, #FFFFFF 50%)",
         floaty:
           "radial-gradient(ellipse 100% 80% at -10% 110% , #C8102E, #FFA9A9, transparent)," +
           "radial-gradient(ellipse 70% 100% at 110% -10% , #C8102E, #FFA9A9, white )",

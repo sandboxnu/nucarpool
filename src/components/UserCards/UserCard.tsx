@@ -79,7 +79,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         <div
           key={i}
           className={
-            "flex h-7 w-7 items-center justify-center rounded-full border border-black text-sm" +
+            "flex h-8 w-8 items-center justify-center rounded-full border border-black text-sm" +
             backgroundColor +
             textColor
           }
@@ -88,7 +88,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         </div>
       );
     }
-    return <div className="flex gap-2">{boxes}</div>;
+    return <div className="flex w-11/12 justify-between">{boxes}</div>;
   };
 
   if (!user) {
@@ -97,12 +97,12 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
   return (
     <div
       className={classNames(
-        "align-center m-3.5 flex flex-col gap-2 rounded-xl bg-stone-100 px-6 py-4 text-left shadow-md",
-        "border-l-[13px] border-l-busy-red font-montserrat",
+        "align-center m-3.5 flex flex-col gap-2 rounded-xl bg-stone-100 px-4 py-4 text-left shadow-md",
+        "border-l-[13px] border-l-busy-red font-montserrat ",
         props.classname
       )}
     >
-      <div className="flex flex-row items-center gap-4">
+      <div className={"mb-1 flex flex-row items-center gap-1"}>
         {/* Profile Image */}
         {profileImageUrl && !imageLoadError ? (
           <Image
@@ -110,34 +110,35 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
             alt={`${props.otherUser.preferredName}'s Profile Image`}
             width={48}
             height={48}
-            className="h-12 w-12 rounded-full object-cover"
+            className="h-12 w-12  rounded-full object-cover"
           />
         ) : (
-          <AiOutlineUser className="h-14 w-14 rounded-full bg-gray-200" />
+          <AiOutlineUser className="h-14 w-14  rounded-full bg-gray-200" />
         )}
 
         {/* Name and Pronouns */}
-        <div className="flex flex-col">
-          <div className="font-montserrat text-xl font-bold">
+        <div className="flex flex-col items-start pl-4">
+          <div className="text-lg font-semibold ">
             {user.role === "VIEWER" ? (
               <p>{`${props.otherUser.role.charAt(0)}${props.otherUser.role
                 .slice(1)
                 .toLowerCase()}`}</p>
             ) : (
-              <>
-                <p className="font-semibold">{props.otherUser.preferredName}</p>
-                {props.isUnread && (
-                  <div className="flex items-center">
-                    <span className="mr-2 h-2 w-2 rounded-full bg-blue-300"></span>
-                    <p className="text-sm italic ">New!</p>
-                  </div>
-                )}
-              </>
+              <p>{props.otherUser.preferredName}</p>
             )}
           </div>
-          <p className="font-montserrat text-sm italic">
-            {props.otherUser.pronouns}
-          </p>
+          <div className="flex flex-row items-start gap-4">
+            <p className="font-montserrat text-sm italic">
+              {props.otherUser.pronouns}
+            </p>
+
+            {props.isUnread && (
+              <div className="flex items-center">
+                <span className="mr-1 h-2 w-2 rounded-full bg-blue-300"></span>
+                <p className="text-sm italic ">New!</p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Rating */}

@@ -47,6 +47,19 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 const Setup: NextPage = () => {
   const router = useRouter();
+  const [backgroundOption, setBackgroundOption] = useState<string>("10s");
+  const [progressBarClass, setProgressBarClass] = useState<
+    "default" | "defined"
+  >("default");
+  const handleBackgroundChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setBackgroundOption(e.target.value);
+    console.log(`Background changed to: ${e.target.value}`);
+  };
+
+  const toggleProgressBar = () => {
+    setProgressBarClass((prev) => (prev === "default" ? "defined" : "default"));
+    console.log("Progress bar toggled");
+  };
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(0);
   const [initialLoad, setInitialLoad] = useState(true);
@@ -185,27 +198,63 @@ const Setup: NextPage = () => {
       </div>
     );
   }
-  const buttonBaseClass =
-    "absolute z-0 flex w-[200px] items-center justify-center rounded-full drop-shadow-[0_15px_4px_rgba(0,0,0,0.35)]";
+  const continueBaseClass =
+    "absolute left-1/2 -translate-x-1/2 top-[calc(50%+250px+20px)] z-0 flex w-[200px] items-center justify-center rounded-full drop-shadow-[0_15px_4px_rgba(0,0,0,0.35)]";
   const backButtonClass =
-    "absolute left-1/4 top-[calc(50%+250px+20px)] z-0 -translate-x-1/2 px-4 py-2 items-center justify-center font-montserrat font-semibold text-2xl text-stone-500 underline";
-  const continueButtonDefaultClass = "bg-white text-black";
+    "absolute left-1/2 top-[calc(50%+250px+75px)] z-0 -translate-x-1/2 px-4 py-2 items-center justify-center font-montserrat text-lg text-black underline";
+  const continueButtonDefaultClass = "bg-white text-black ";
   const continueButtonFinalStepClass = "bg-northeastern-red text-white";
-  const continueButtonCenterClass =
-    "left-1/2 -translate-x-1/2 top-[calc(50%+250px+20px)]";
-  const continueButtonRightClass =
-    "left-3/4 -translate-x-1/2 top-[calc(50%+250px+20px)]";
 
   return (
     <div className="relative h-full w-full overflow-hidden ">
+      <div className="absolute left-4 top-[80px] z-50 flex flex-col space-y-2">
+        <button
+          onClick={toggleProgressBar}
+          className="rounded bg-northeastern-red p-2 text-white "
+        >
+          Toggle Progress Bar Style
+        </button>
+        <div className="flex items-center">
+          <label
+            htmlFor="background-select"
+            className="mr-2 text-sm font-semibold"
+          >
+            Change Background:
+          </label>
+          <select
+            id="background-select"
+            value={backgroundOption}
+            onChange={handleBackgroundChange}
+            className="rounded border border-gray-300 px-10 py-2"
+          >
+            <option value="static">Static</option>
+            <option value="5s">5s</option>
+            <option value="10s">10s (default)</option>
+            <option value="15s">15s</option>
+            <option value="20s">20s</option>
+          </select>
+        </div>
+      </div>
       {!user?.licenseSigned && <ComplianceModal />}
-      <div className="absolute inset-0  animate-gradientShift bg-floaty"></div>
+      <div
+        className={`absolute inset-0 bg-floaty ${
+          backgroundOption === "5s"
+            ? "animate-gradient-shift-5s"
+            : backgroundOption === "10s"
+            ? "animate-gradient-shift-10s"
+            : backgroundOption === "15s"
+            ? "animate-gradient-shift-15s"
+            : backgroundOption === "20s"
+            ? "animate-gradient-shift-20s"
+            : ""
+        }`}
+      />
       <h1 className="absolute z-10 w-full justify-start p-4 font-lato text-5xl font-bold text-northeastern-red transition-opacity duration-1000">
         CarpoolNU
       </h1>
       {step > 1 && (
         <div className="absolute left-1/2 top-[calc(50%-250px-60px)] -translate-x-1/2 transform">
-          <ProgressBar step={step - 2} />
+          <ProgressBar step={step - 2} option={progressBarClass} />
         </div>
       )}
       <SetupContainer
@@ -268,9 +317,7 @@ const Setup: NextPage = () => {
           )}
           <button
             type="button"
-            className={`${buttonBaseClass} ${
-              step === 1 ? continueButtonCenterClass : continueButtonRightClass
-            } ${
+            className={`${continueBaseClass}  ${
               step === 4 || watch("role") === Role.VIEWER
                 ? continueButtonFinalStepClass
                 : continueButtonDefaultClass

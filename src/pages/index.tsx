@@ -578,7 +578,7 @@ const Home: NextPage<any> = () => {
               }}
             />
             <div className="flex h-[91.5%] overflow-hidden">
-              <div className="w-96">
+              <div className="w-[25rem]  ">
                 {mapState && (
                   <SidebarPage
                     setSort={setSort}
