@@ -61,14 +61,16 @@ export const groupsRouter = router({
           message: "Driver does not have space available in their car",
         });
       }
+      
       const group = await ctx.prisma.carpoolGroup.create({
         data: {
           users: {
             connect: { id: input.driverId },
           },
-          message: "",
+          message: driver.groupMessage || "",
         },
       });
+      
       const nGroup = await ctx.prisma.carpoolGroup.update({
         where: { id: group.id },
         data: {
@@ -206,5 +208,20 @@ export const groupsRouter = router({
         },
       });
       return updatedGroup;
+    }),
+  updateUserMessage: protectedRouter
+    .input(
+      z.object({
+        message: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const updatedUser = await ctx.prisma.user.update({
+        where: { id: ctx.session.user?.id },
+        data: {
+          groupMessage: input.message,
+        },
+      });
+      return updatedUser;
     }),
 });

@@ -163,6 +163,7 @@ model User {
   Message            Message[]
   dateCreated        DateTime      @default(now())
   dateModified       DateTime      @default(now()) @updatedAt
+  groupMessage       String        @default("") @map("group_message")
 
   @@index([carpoolId])
   @@map(name: "user")
