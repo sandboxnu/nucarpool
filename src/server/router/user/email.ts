@@ -12,7 +12,7 @@ const gmailEmailSchema = z
   .email()
   .refine(
     (email) =>
-      process.env.NEXT_PUBLIC_ENV === "staging" ||
+      process.env.NEXT_PUBLIC_ENV === "staging" &&
       email.toLowerCase().endsWith("@gmail.com"),
     {
       message:
