@@ -97,12 +97,12 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
   return (
     <div
       className={classNames(
-        "align-center m-3.5 flex flex-col gap-2 rounded-xl bg-stone-100 px-4 py-4 text-left shadow-md",
+        "align-center relative m-3.5 flex flex-col gap-2 rounded-xl bg-stone-100 px-4 py-4 text-left shadow-md",
         "border-l-[13px] border-l-busy-red font-montserrat ",
         props.classname
       )}
     >
-      <div className={"mb-1 flex flex-row items-center gap-1"}>
+      <div className={"-ml-2 mb-1 flex flex-row items-center"}>
         {/* Profile Image */}
         {profileImageUrl && !imageLoadError ? (
           <Image
@@ -113,11 +113,11 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
             className="h-14 w-14  rounded-full object-cover"
           />
         ) : (
-          <AiOutlineUser className="h-14 w-14  rounded-full bg-gray-200" />
+          <AiOutlineUser className="h-12 w-12  rounded-full bg-gray-200" />
         )}
 
         {/* Name and Pronouns */}
-        <div className="flex flex-col items-start pl-4">
+        <div className="flex flex-col items-start pl-3.5">
           <div className="text-lg font-semibold ">
             {user.role === "VIEWER" ? (
               <p>{`${props.otherUser.role.charAt(0)}${props.otherUser.role
@@ -128,7 +128,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
             )}
           </div>
           <div className="flex flex-row items-start gap-4">
-            <p className="font-montserrat text-sm italic">
+            <p className="font-montserrat text-sm  italic">
               {props.otherUser.pronouns}
             </p>
 
