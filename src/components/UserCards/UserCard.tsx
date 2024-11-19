@@ -129,7 +129,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
           </div>
           <div className="flex flex-row items-start gap-4">
             <p className="font-montserrat text-sm  italic">
-              {props.otherUser.pronouns}
+              ({props.otherUser.pronouns})
             </p>
 
             {props.isUnread && (

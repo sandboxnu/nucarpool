@@ -14,6 +14,7 @@ interface StepFourProps {
   errors: FieldErrors<OnboardingFormInputs>;
   setValue: UseFormSetValue<OnboardingFormInputs>;
   register: UseFormRegister<OnboardingFormInputs>;
+  watch: UseFormWatch<OnboardingFormInputs>;
   onFileSelect: (file: File | null) => void;
 }
 const StepFour = ({
@@ -21,6 +22,7 @@ const StepFour = ({
   register,
   onFileSelect,
   setValue,
+  watch,
 }: StepFourProps) => {
   return (
     <div className="flex flex-col items-center  justify-center bg-white px-4">
@@ -61,6 +63,7 @@ const StepFour = ({
             error={errors.pronouns}
             isDisabled={false}
             type="text"
+            defaultValue={watch("pronouns") ? `(${watch("pronouns")})` : ""}
             onChange={(e: any) => {
               const input = e.target;
               const cursorPosition = input.selectionStart || 0;

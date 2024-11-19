@@ -244,6 +244,7 @@ const Setup: NextPage = () => {
         {step === 4 && (
           <StepFour
             setValue={setValue}
+            watch={watch}
             onFileSelect={setSelectedFile}
             errors={errors}
             register={register}

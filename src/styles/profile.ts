@@ -109,7 +109,7 @@ export const ProfileHeaderNoMB = styled(ProfileHeader)`
 `;
 
 export const Note = styled.p<{}>`
-  font-family: "Montserrat";
+  font-family: "Montserrat", sans-serif;
   font-style: normal;
   font-weight: 300;
   font-size: 0.75rem;
@@ -118,7 +118,7 @@ export const Note = styled.p<{}>`
 `;
 
 export const ErrorDisplay = styled.span<{}>`
-  font-family: "Montserrat";
+  font-family: "Montserrat", sans-serif;
   font-style: normal;
   max-width: 100%;
   font-weight: 400;
@@ -130,7 +130,7 @@ export const ErrorDisplay = styled.span<{}>`
 export const LightEntryLabel = styled.label<{
   error?: boolean;
 }>`
-  font-family: "Montserrat";
+  font-family: "Montserrat", sans-serif;
   font-style: normal;
   font-weight: 400;
   line-height: 24.38px;

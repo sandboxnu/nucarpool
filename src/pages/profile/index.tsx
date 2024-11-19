@@ -419,7 +419,7 @@ const Index: NextPage = () => {
                     <span className="text-northeastern-red">*</span>
                   )}
                 </ProfileHeader>
-                <div className="flex w-full gap-4">
+                <div className="flex w-2/3 gap-8 lg:w-full">
                   <div className="flex flex-1 flex-col">
                     <EntryLabel
                       required={!isViewer}
@@ -535,9 +535,36 @@ const Index: NextPage = () => {
                           id="pronouns"
                           inputClassName={`h-12`}
                           error={errors.pronouns}
+                          charLimit={20}
                           isDisabled={isViewer}
+                          defaultValue={
+                            watch("pronouns") ? `(${watch("pronouns")})` : ""
+                          }
                           type="text"
-                          {...register("pronouns")}
+                          onChange={(e: any) => {
+                            const input = e.target;
+                            const cursorPosition = input.selectionStart || 0;
+                            const sanitizedValue = input.value.replace(
+                              /[()]/g,
+                              ""
+                            );
+                            const displayValue = sanitizedValue
+                              ? `(${sanitizedValue})`
+                              : "";
+                            setValue("pronouns", sanitizedValue, {
+                              shouldValidate: true,
+                            });
+                            input.value = displayValue;
+                            // Reset cursor
+                            const adjustedCursor = Math.min(
+                              cursorPosition + 1,
+                              displayValue.length - 1
+                            );
+                            input.setSelectionRange(
+                              adjustedCursor,
+                              adjustedCursor
+                            );
+                          }}
                         />
                       </div>
                     </div>
