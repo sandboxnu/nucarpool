@@ -118,7 +118,7 @@ model Message {
 // Represents a group of users
 model CarpoolGroup {
   id          String   @id @default(cuid()) // primary key
-  message     String
+  message     String   @db.Text
   users       User[]
   dateCreated DateTime @default(now())
 
@@ -170,7 +170,7 @@ model User {
   Message            Message[]
   dateCreated        DateTime      @default(now())
   dateModified       DateTime      @default(now()) @updatedAt
-  groupMessage       String        @default("") @map("group_message")
+  groupMessage       String?       @map("group_message") @db.Text
 
   @@index([carpoolId])
   @@map(name: "user")
