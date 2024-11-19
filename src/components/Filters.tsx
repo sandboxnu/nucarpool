@@ -110,6 +110,22 @@ const Filters = ({
   const selectedDaysCount = filters.daysWorking
     .split(",")
     .filter((day) => day === "1").length;
+  const getMonthInputClassName = (date: Date, dateOverlap: number) => {
+    return `${
+      date.toLocaleString("default", { month: "long" }).length > 7 &&
+      dateOverlap !== 0
+        ? "px-[4px]"
+        : "px-4"
+    }`;
+  };
+  const startMonthInputClassName = `h-14 text-md ${getMonthInputClassName(
+    filters.startDate,
+    filters.dateOverlap
+  )}`;
+  const endMonthInputClassName = `h-14 text-md ${getMonthInputClassName(
+    filters.endDate,
+    filters.dateOverlap
+  )}`;
 
   return (
     <div className="relative mx-1 h-full select-none overflow-y-auto bg-white px-1 pb-20 scrollbar-thin  scrollbar-track-stone-100 scrollbar-thumb-busy-red scrollbar-track-rounded-full scrollbar-thumb-rounded-full">
@@ -475,7 +491,7 @@ const Filters = ({
               <label className="mb-2 block font-semibold">Start Date</label>
               <TextField
                 type="month"
-                inputClassName="h-14 text-md"
+                inputClassName={`${startMonthInputClassName}`}
                 isDisabled={filters.dateOverlap === 0}
                 id="coopStartDate"
                 value={formatDateToMonth(filters.startDate)}
@@ -486,7 +502,7 @@ const Filters = ({
               <label className="mb-2 block font-semibold">End Date</label>
               <TextField
                 type="month"
-                inputClassName="h-14 text-md"
+                inputClassName={`${endMonthInputClassName}`}
                 isDisabled={filters.dateOverlap === 0}
                 id="coopEndDate"
                 value={formatDateToMonth(filters.endDate)}

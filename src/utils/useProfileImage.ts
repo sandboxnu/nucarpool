@@ -27,7 +27,6 @@ const useProfileImage = (userId?: string) => {
       setImageLoadError(true);
       setProfileImageUrl(null);
     }
-    console.log(presignedData);
   }, [presignedData, presignedError]);
 
   useEffect(() => {

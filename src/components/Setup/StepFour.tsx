@@ -1,5 +1,10 @@
 import { OnboardingFormInputs } from "../../utils/types";
-import { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
+import {
+  FieldErrors,
+  UseFormRegister,
+  UseFormSetValue,
+  UseFormWatch,
+} from "react-hook-form";
 import { Note } from "../../styles/profile";
 import { EntryLabel } from "../EntryLabel";
 import { TextField } from "../TextField";
@@ -11,7 +16,12 @@ interface StepFourProps {
   register: UseFormRegister<OnboardingFormInputs>;
   onFileSelect: (file: File | null) => void;
 }
-const StepFour = ({ errors, register, onFileSelect }: StepFourProps) => {
+const StepFour = ({
+  errors,
+  register,
+  onFileSelect,
+  setValue,
+}: StepFourProps) => {
   return (
     <div className="flex flex-col items-center  justify-center bg-white px-4">
       <div className="mb-4 text-center font-montserrat text-3xl font-bold">
@@ -46,11 +56,25 @@ const StepFour = ({ errors, register, onFileSelect }: StepFourProps) => {
           <EntryLabel error={errors.pronouns} label="Prounouns" />
           <TextField
             id="pronouns"
+            charLimit={20}
             inputClassName={`h-12`}
             error={errors.pronouns}
             isDisabled={false}
             type="text"
-            {...register("pronouns")}
+            onChange={(e: any) => {
+              const input = e.target;
+              const cursorPosition = input.selectionStart || 0;
+              const sanitizedValue = input.value.replace(/[()]/g, "");
+              const displayValue = sanitizedValue ? `(${sanitizedValue})` : "";
+              setValue("pronouns", sanitizedValue, { shouldValidate: true });
+              input.value = displayValue;
+              // Reset cursor
+              const adjustedCursor = Math.min(
+                cursorPosition + 1,
+                displayValue.length - 1
+              );
+              input.setSelectionRange(adjustedCursor, adjustedCursor);
+            }}
           />
         </div>
       </div>

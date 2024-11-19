@@ -39,8 +39,8 @@ const StepThree = ({
         <span className="text-northeastern-red">carpooling?</span>
       </div>
 
-      <div className="flex flex-col items-start space-y-2 ">
-        <div className="flex flex-col ">
+      <div className="flex flex-col items-start space-y-4 ">
+        <div className="flex flex-col space-y-2 ">
           <EntryLabel
             required={true}
             error={
@@ -90,41 +90,43 @@ const StepThree = ({
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-x-16 ">
-          {/* Start Time */}
-          <div className="flex flex-col">
-            <EntryLabel
-              required={true}
-              error={errors.startTime}
-              label="Start Time"
-            />
-            <ControlledTimePicker
-              isDisabled={false}
-              control={control}
-              name="startTime"
-              error={errors.startTime}
-              value={watch("startTime") || user?.startTime || undefined}
-            />
-          </div>
+        <div className="flex w-full  flex-col ">
+          <div className="flex w-3/4 gap-8">
+            {/* Start Time */}
+            <div className="flex flex-1  flex-col ">
+              <EntryLabel
+                required={true}
+                error={errors.startTime}
+                label="Start Time"
+              />
+              <ControlledTimePicker
+                isDisabled={false}
+                control={control}
+                name="startTime"
+                error={errors.startTime}
+                value={watch("startTime") || user?.startTime || undefined}
+              />
+            </div>
 
-          {/* End Time */}
-          <div className="flex flex-col">
-            <EntryLabel
-              required={true}
-              error={errors.endTime}
-              label="End Time"
-            />
-            <ControlledTimePicker
-              isDisabled={false}
-              control={control}
-              name="endTime"
-              error={errors.endTime}
-              value={watch("endTime") || user?.endTime || undefined}
-            />
+            {/* End Time */}
+            <div className="flex flex-1 flex-col ">
+              <EntryLabel
+                required={true}
+                error={errors.endTime}
+                label="End Time"
+              />
+              <ControlledTimePicker
+                isDisabled={false}
+                control={control}
+                name="endTime"
+                error={errors.endTime}
+                value={watch("endTime") || user?.endTime || undefined}
+              />
+            </div>
           </div>
 
           {/* Note for Time Section */}
-          <div className="col-span-2">
+          <div className="w-full">
             <Note className="py-2">
               Please input the start and end times of your work, rather than
               your departure times. If your work hours are flexible, coordinate
@@ -132,48 +134,53 @@ const StepThree = ({
             </Note>
           </div>
 
-          {/* Start Date */}
-          <div className="flex flex-col">
-            <EntryLabel
-              required={true}
-              error={errors.coopStartDate}
-              label="Start Date"
-            />
-            <TextField
-              type="month"
-              isDisabled={false}
-              inputClassName="!py-2 "
-              id="coopStartDate"
-              error={errors.coopStartDate}
-              onChange={handleMonthChange("coopStartDate", setValue)}
-              defaultValue={
-                formatDateToMonth(watch("coopStartDate")) || undefined
-              }
-            />
-          </div>
+          <div
+            className={`flex w-3/4 ${
+              !errors.startTime && !errors.endTime && "pt-4"
+            } gap-8`}
+          >
+            {/* Start Date */}
+            <div className="flex flex-1  flex-col  ">
+              <EntryLabel
+                required={true}
+                error={errors.coopStartDate}
+                label="Start Date"
+              />
+              <TextField
+                type="month"
+                isDisabled={false}
+                inputClassName={" !px-0 !pr-0 !pl-2"}
+                id="coopStartDate"
+                error={errors.coopStartDate}
+                onChange={handleMonthChange("coopStartDate", setValue)}
+                defaultValue={
+                  formatDateToMonth(watch("coopStartDate")) || undefined
+                }
+              />
+            </div>
 
-          {/* End Date */}
-          <div className="flex flex-col">
-            <EntryLabel
-              required={true}
-              error={errors.coopEndDate}
-              label="End Date"
-            />
-            <TextField
-              type="month"
-              isDisabled={false}
-              inputClassName="!py-2 "
-              id="coopEndDate"
-              error={errors.coopEndDate}
-              onChange={handleMonthChange("coopEndDate", setValue)}
-              defaultValue={
-                formatDateToMonth(watch("coopEndDate")) || undefined
-              }
-            />
+            {/* End Date */}
+            <div className="flex flex-1 flex-grow-0 flex-col ">
+              <EntryLabel
+                required={true}
+                error={errors.coopEndDate}
+                label="End Date"
+              />
+              <TextField
+                type="month"
+                isDisabled={false}
+                inputClassName={"!pr-0 !pl-2"}
+                id="coopEndDate"
+                error={errors.coopEndDate}
+                onChange={handleMonthChange("coopEndDate", setValue)}
+                defaultValue={
+                  formatDateToMonth(watch("coopEndDate")) || undefined
+                }
+              />
+            </div>
           </div>
-
           {/* Note for Date Section */}
-          <div className="col-span-2">
+          <div className="w-full">
             <Note className="py-2">
               Please indicate the start and the end dates of your co-op. If you
               don&apos;t know exact dates, you can use approximate dates.

@@ -1,22 +1,15 @@
-import { CarpoolAddress, OnboardingFormInputs } from "../../utils/types";
-import {
-  UseFormWatch,
-  FieldErrors,
-  UseFormRegister,
-  Control,
-} from "react-hook-form";
+import { OnboardingFormInputs } from "../../utils/types";
+import { FieldErrors, UseFormRegister, Control } from "react-hook-form";
 import { ErrorDisplay, Note } from "../../styles/profile";
 
 import { EntryLabel } from "../EntryLabel";
 import ControlledAddressCombobox from "../Profile/ControlledAddressCombobox";
 import { TextField } from "../TextField";
 import { useAddressSelection } from "../../utils/useAddressSelection";
-import { User } from "@prisma/client";
 
 interface StepTwoProps {
   register: UseFormRegister<OnboardingFormInputs>;
   errors: FieldErrors<OnboardingFormInputs>;
-  watch: UseFormWatch<OnboardingFormInputs>;
   control: Control<OnboardingFormInputs>;
   startAddressHook: ReturnType<typeof useAddressSelection>;
   companyAddressHook: ReturnType<typeof useAddressSelection>;
@@ -78,24 +71,30 @@ const StepTwo = ({
         />
 
         {/* Workplace Address */}
-        <EntryLabel
-          required={true}
-          error={errors.companyAddress}
-          label="Workplace Address"
-        />
-        <ControlledAddressCombobox
-          isDisabled={false}
-          control={control}
-          name="companyAddress"
-          addressSelected={companyAddressHook.selectedAddress}
-          addressSetter={companyAddressHook.setSelectedAddress}
-          addressSuggestions={companyAddressHook.suggestions}
-          error={errors.companyAddress}
-          addressUpdater={companyAddressHook.updateAddress}
-        />
-        {errors.companyAddress && (
-          <ErrorDisplay>{errors.companyAddress.message}</ErrorDisplay>
-        )}
+        <div
+          className={`${
+            !errors.companyName && !errors.companyAddress && "pt-4"
+          }`}
+        >
+          <EntryLabel
+            required={true}
+            error={errors.companyAddress}
+            label="Workplace Address"
+          />
+          <ControlledAddressCombobox
+            isDisabled={false}
+            control={control}
+            name="companyAddress"
+            addressSelected={companyAddressHook.selectedAddress}
+            addressSetter={companyAddressHook.setSelectedAddress}
+            addressSuggestions={companyAddressHook.suggestions}
+            error={errors.companyAddress}
+            addressUpdater={companyAddressHook.updateAddress}
+          />
+          {errors.companyAddress && (
+            <ErrorDisplay>{errors.companyAddress.message}</ErrorDisplay>
+          )}
+        </div>
       </div>
     </div>
   );
