@@ -62,10 +62,16 @@ interface NoGroupInfoProps {
   onClose: () => void;
 }
 
-const NoGroupInfo = ({ role }: NoGroupInfoProps) => {
+const NoGroupInfo = ({ role, onClose }: NoGroupInfoProps) => {
+  const utils = trpc.useContext();
   const { data: user } = trpc.user.me.useQuery();
   const [groupMessage, setGroupMessage] = useState(user?.groupMessage ?? "");
-  const { mutate: updateUserMessage } = trpc.user.groups.updateUserMessage.useMutation();
+  const { mutate: updateUserMessage } = trpc.user.groups.updateUserMessage.useMutation({
+    onSuccess: () => {
+      // Invalidate and refetch the user.me query
+      utils.user.me.invalidate();
+    },
+  });
 
   useEffect(() => {
     if (user?.groupMessage) {
@@ -88,20 +94,22 @@ const NoGroupInfo = ({ role }: NoGroupInfoProps) => {
       ) : (
         <>
           {role === "DRIVER" && (
-            <div className="mx-20 flex flex-col py-1">
+            <div className="mx-20 flex flex-col py-1 mb-8">
               <div className="my-1 text-xs italic text-slate-400">
-                Save a message to share with your future riders!
+                Below, share any information that you'd like riders joining you your Carpool to know. You can indicate when you generally like to be leaving your place, what your preferred method of communication is, what your preference is to split gas and what your Carpool vibe will be like.
               </div>
-              <div className="flex flex-row divide-y-2 overflow-auto">
+              <div className="flex flex-row gap-2">
                 <textarea
-                  className="form-input h-10 min-h-[50px] flex-grow resize-none rounded-md py-2 shadow-sm"
-                  maxLength={140}
+                  className="form-input min-h-[50px] flex-grow resize-none rounded-md py-2 shadow-sm"
                   value={groupMessage}
                   onChange={(e) => setGroupMessage(e.target.value)}
                 />
                 <button
-                  className="ml-8 h-full w-[150px] rounded-md bg-red-700 text-white"
-                  onClick={handleMessageSubmit}
+                  className="w-[150px] rounded-md bg-red-700 py-2 text-white h-full"
+                  onClick={async () => {
+                    await handleMessageSubmit();
+                    onClose();
+                  }}
                 >
                   Submit
                 </button>
