@@ -1,11 +1,13 @@
 import { OnboardingFormInputs } from "../../utils/types";
-import { UseFormWatch, FieldErrors, UseFormRegister } from "react-hook-form";
-import Radio from "../../components/Radio";
+import {
+  UseFormWatch,
+  FieldErrors,
+  UseFormRegister,
+  UseFormSetValue,
+} from "react-hook-form";
 import { Role } from "@prisma/client";
-import { EntryLabel } from "../EntryLabel";
 import { TextField } from "../TextField";
 
-import { ErrorDisplay, Note } from "../../styles/profile";
 import FormRadioButton from "./FormRadioButton";
 interface InitialStepProps {
   handleNextStep: () => void;
@@ -96,13 +98,14 @@ const InitialStep = ({
                     label="Seat Availability"
                     id="seatAvail"
                     type="number"
-                    min="0"
+                    min="1"
+                    defaultValue={1}
                     {...register("seatAvail", { valueAsNumber: true })}
                   />
                 </div>
                 {errors.seatAvail && (
-                  <span className="mt-1 text-center text-xs text-northeastern-red">
-                    {errors.seatAvail.message}
+                  <span className="mt-1 text-center  text-northeastern-red">
+                    Enter a number between 1 and 6
                   </span>
                 )}
               </div>

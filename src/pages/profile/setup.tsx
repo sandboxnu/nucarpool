@@ -85,6 +85,7 @@ const Setup: NextPage = () => {
     register,
     setValue,
     formState: { errors },
+    setError,
     watch,
     handleSubmit,
     reset,
@@ -119,6 +120,16 @@ const Setup: NextPage = () => {
       setInitialLoad(false);
     }
   }, [initialLoad, reset, user]);
+  const role = watch("role");
+
+  useEffect(() => {
+    const seatAvail = watch("seatAvail");
+    if (role === Role.DRIVER && seatAvail <= 0) {
+      setValue("seatAvail", 1);
+    } else if (role !== Role.DRIVER) {
+      setValue("seatAvail", 0);
+    }
+  }, [setValue, watch, role]);
 
   const onSubmit = async (values: OnboardingFormInputs) => {
     setIsLoading(true);
@@ -147,10 +158,17 @@ const Setup: NextPage = () => {
   };
 
   const handleNextStep = async () => {
-    const role = watch("role");
+    const seatAvail = watch("seatAvail");
     if (step === 1) {
       if (role === Role.VIEWER) {
         await handleSubmit(onSubmit)();
+        return;
+      }
+      if (role === Role.DRIVER && (!seatAvail || seatAvail <= 0)) {
+        setError("seatAvail", {
+          type: "manual",
+          message: "Seat availability must be > 0",
+        });
         return;
       }
       const isValid = await trigger(["seatAvail"]);
