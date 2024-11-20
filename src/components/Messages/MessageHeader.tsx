@@ -26,6 +26,7 @@ const MessageHeader = ({
     onClose("");
   };
   const { profileImageUrl, imageLoadError } = useProfileImage(selectedUser.id);
+
   return (
     <div className="flex items-center justify-between border-b bg-white p-8">
       <div className="flex items-center">
@@ -41,7 +42,7 @@ const MessageHeader = ({
           <AiOutlineUser className="h-20 w-20 rounded-full bg-gray-200" />
         )}
 
-        <span className="pl-10 pr-10 font-medium sm:text-lg md:text-xl lg:text-2xl ">
+        <span className="pl-10 pr-10 font-montserrat font-semibold sm:text-lg md:text-xl lg:text-2xl ">
           {selectedUser.preferredName}
         </span>
       </div>

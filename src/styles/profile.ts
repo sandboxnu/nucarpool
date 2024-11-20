@@ -54,7 +54,6 @@ export const MiddleProfileSection = styled(ProfileColumn)`
 export const BottomProfileSection = styled(ProfileColumn)`
   width: 100%;
   flex: 1 1 auto;
-  margin-bottom: 24px;
 `;
 
 export const TopProfileSection = styled(ProfileColumn)`
@@ -71,8 +70,8 @@ export const PersonalInfoSection = styled(ProfileColumn)`
   flex: 1 1 auto;
   gap: 4px;
   @media (min-width: 834px) {
-    padding-top: 0px;
-    padding-bottom: 0px;
+    padding-top: 0;
+    padding-bottom: 0;
   }
   padding-top: 12px;
   padding-bottom: 12px;
@@ -81,11 +80,7 @@ export const PersonalInfoSection = styled(ProfileColumn)`
 export const CommutingScheduleSection = styled(ProfileColumn)`
   width: 100%;
   flex: 1 1 auto;
-  @media (min-width: 834px) {
-    gap: 0px;
-  }
   gap: 6px;
-  padding-bottom: 1rem;
 `;
 
 export const ProfileHeader = styled.h1`
@@ -109,7 +104,7 @@ export const ProfileHeaderNoMB = styled(ProfileHeader)`
 `;
 
 export const Note = styled.p<{}>`
-  font-family: "Montserrat";
+  font-family: "Montserrat", sans-serif;
   font-style: normal;
   font-weight: 300;
   font-size: 0.75rem;
@@ -118,8 +113,9 @@ export const Note = styled.p<{}>`
 `;
 
 export const ErrorDisplay = styled.span<{}>`
-  font-family: "Montserrat";
+  font-family: "Montserrat", sans-serif;
   font-style: normal;
+  max-width: 100%;
   font-weight: 400;
   font-size: 16px;
   line-height: 19px;
@@ -129,7 +125,7 @@ export const ErrorDisplay = styled.span<{}>`
 export const LightEntryLabel = styled.label<{
   error?: boolean;
 }>`
-  font-family: "Montserrat";
+  font-family: "Montserrat", sans-serif;
   font-style: normal;
   font-weight: 400;
   line-height: 24.38px;

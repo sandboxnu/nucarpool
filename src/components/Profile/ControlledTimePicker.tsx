@@ -1,35 +1,28 @@
-import { TimePicker } from "antd";
+import { TimePicker, ConfigProvider } from "antd";
 import dayjs, { Dayjs } from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+dayjs.extend(customParseFormat);
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
-import { ReactNode, useEffect, useState } from "react";
-import { Control, Controller } from "react-hook-form";
-import { OnboardingFormInputs } from "../../pages/profile";
-interface ControlledTimePickerRHFProps {
+import { forwardRef, ReactNode, useEffect, useState } from "react";
+import { Control, Controller, FieldError } from "react-hook-form";
+import { OnboardingFormInputs } from "../../utils/types";
+import { ErrorDisplay } from "../../styles/profile";
+import * as React from "react";
+interface ControlledTimePickerProps {
   control: Control<OnboardingFormInputs>;
   name: "startTime" | "endTime";
   placeholder?: string;
   value?: Date;
   isDisabled?: boolean;
+  error?: FieldError;
 }
-const ControlledTimePickerRHF = (props: ControlledTimePickerRHFProps) => {
-  const [displayedTime, setDisplayedTime] = useState<Dayjs | undefined>(
-    props.value ? dayjs.utc(props.value) : undefined
-  );
-
+const ControlledTimePicker = (props: ControlledTimePickerProps) => {
   useEffect(() => {
     if (props.value) {
       dayjs.utc(props.value);
     }
   }, [props.value]);
-
-  const convertInputDateToUTC = (inputDate: Date): Date => {
-    const inputHours = inputDate.getHours();
-    const result = dayjs.utc(
-      `2022-02-02 ${inputHours}:${inputDate.getMinutes()}`
-    );
-    return result.toDate();
-  };
 
   const customSuffixIcon = (): ReactNode => {
     return (
@@ -38,6 +31,16 @@ const ControlledTimePickerRHF = (props: ControlledTimePickerRHFProps) => {
       </div>
     );
   };
+  const TimePickerWrapper = forwardRef<
+    HTMLDivElement,
+    React.ComponentProps<typeof TimePicker>
+  >((props, ref) => (
+    <div ref={ref}>
+      <TimePicker {...props} />
+    </div>
+  ));
+  TimePickerWrapper.displayName = "TimePickerWrapper";
+
   return (
     <Controller
       name={props.name}
@@ -49,34 +52,48 @@ const ControlledTimePickerRHF = (props: ControlledTimePickerRHFProps) => {
         }
 
         return (
-          <div className={"flex flex-col"}>
-            <TimePicker
-              className="form-input w-full rounded-lg"
-              format="h:mm A"
-              suffixIcon={customSuffixIcon()}
-              ref={ref}
-              status={fieldState.error ? "error" : undefined}
-              placeholder={props.placeholder}
-              showNow={false}
-              disabled={props.isDisabled}
-              minuteStep={15}
-              use12Hours={true}
-              value={displayedTime}
-              onSelect={(date) => {
-                if (!date.isUTC()) {
-                  const utcDate = convertInputDateToUTC(date.toDate());
-                  setDisplayedTime(date);
-                  fieldProps.onChange(utcDate);
-                } else {
-                  setDisplayedTime(dayjs.utc(date));
-                  fieldProps.onChange(date.toDate());
-                }
-              }}
-            />
-          </div>
+          <ConfigProvider
+            theme={{
+              components: {
+                DatePicker: {
+                  fontWeightStrong: 500,
+                  controlItemBgActive: "#FFA9A9",
+                  cellHoverBg: "#FFE6E6",
+                },
+              },
+              token: {
+                fontFamily: "Montserrat",
+                fontSize: 16,
+                colorPrimary: "#C8102E",
+              },
+            }}
+          >
+            <div className={"flex flex-col "}>
+              <TimePickerWrapper
+                ref={ref}
+                needConfirm={false}
+                className="form-input w-full  rounded-lg border border-black "
+                format="h:mm A"
+                suffixIcon={customSuffixIcon()}
+                status={fieldState.error ? "error" : undefined}
+                placeholder={props.placeholder}
+                showNow={false}
+                disabled={props.isDisabled}
+                minuteStep={15}
+                use12Hours={true}
+                value={fieldProps.value ? dayjs(fieldProps.value) : null}
+                onChange={(date) => {
+                  fieldProps.onChange(date ? date.toDate() : null);
+                }}
+              />
+              {props.error && (
+                <ErrorDisplay>{props.error.message}</ErrorDisplay>
+              )}
+            </div>
+          </ConfigProvider>
         );
       }}
     />
   );
 };
-export default ControlledTimePickerRHF;
+export default ControlledTimePicker;

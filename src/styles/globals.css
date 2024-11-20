@@ -16,3 +16,20 @@
 .custom-marker-popup .mapboxgl-popup-tip {
   border: 0px;
 }
+
+.ant-picker-input > input {
+  font-family: "Montserrat", sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 16px !important;
+}
+
+input[type="month"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
+}
+.placeholder:empty:before {
+  content: "Type a message...";
+  color: gray;
+  opacity: 0.6;
+  pointer-events: none;
+}

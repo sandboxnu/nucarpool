@@ -18,6 +18,7 @@ export const ReceivedCard = (props: ReceivedCardProps): JSX.Element => {
   const user = useContext(UserContext);
   const [showModal, setShowModal] = useState(false);
 
+
   return (
     <>
       <div onClick={props.onClick} className="cursor-pointer">

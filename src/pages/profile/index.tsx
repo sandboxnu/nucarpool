@@ -1,21 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import _, { debounce } from "lodash";
-import { GetServerSideProps, GetServerSidePropsContext, NextPage } from "next";
+import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import FormControlLabel from "@mui/material/FormControlLabel";
-
-import Header from "../components/Header";
-import { z } from "zod";
-import { trpc } from "../utils/trpc";
+import Header from "../../components/Header";
+import { trpc } from "../../utils/trpc";
 import { Role, Status } from "@prisma/client";
-import { TextField } from "../components/TextField";
-import Radio from "../components/Radio";
-import useSearch from "../utils/search";
+import { TextField } from "../../components/TextField";
+import Radio from "../../components/Radio";
 import Checkbox from "@mui/material/Checkbox";
-import DayBox from "../components/Profile/DayBox";
+import DayBox from "../../components/Profile/DayBox";
 import {
   BottomProfileSection,
   CompleteProfileButton,
@@ -30,119 +26,29 @@ import {
   Note,
   ErrorDisplay,
   ProfileHeaderNoMB,
-} from "../styles/profile";
-import ControlledTimePicker from "../components/Profile/ControlledTimePicker";
-import { CarpoolAddress, CarpoolFeature } from "../utils/types";
-import { EntryLabel } from "../components/EntryLabel";
-import ControlledAddressCombobox from "../components/Profile/ControlledAddressCombobox";
+} from "../../styles/profile";
+import ControlledTimePicker from "../../components/Profile/ControlledTimePicker";
+import { OnboardingFormInputs } from "../../utils/types";
+import { EntryLabel } from "../../components/EntryLabel";
+import ControlledAddressCombobox from "../../components/Profile/ControlledAddressCombobox";
 import { getSession, useSession } from "next-auth/react";
-import { ComplianceModal } from "../components/CompliancePortal";
-import ProfilePicture from "../components/Profile/ProfilePicture";
-import Spinner from "../components/Spinner";
-import { trackProfileCompletion } from "../utils/mixpanel";
+import { ComplianceModal } from "../../components/CompliancePortal";
+import ProfilePicture from "../../components/Profile/ProfilePicture";
+import Spinner from "../../components/Spinner";
+import { trackProfileCompletion } from "../../utils/mixpanel";
+import {
+  onboardSchema,
+  profileDefaultValues,
+} from "../../utils/profile/zodSchema";
+import { useUploadFile } from "../../utils/profile/useUploadFile";
+import { formatDateToMonth, handleMonthChange } from "../../utils/dateUtils";
+import { useAddressSelection } from "../../utils/useAddressSelection";
+import {
+  updateUser,
+  useEditUserMutation,
+} from "../../utils/profile/updateUser";
 
 // Inputs to the onboarding form.
-export type OnboardingFormInputs = {
-  role: Role;
-  status: Status;
-  seatAvail: number;
-  companyName: string;
-  profilePicture: string;
-  companyAddress: string;
-  startAddress: string;
-  preferredName: string;
-  pronouns: string;
-  daysWorking: boolean[];
-  startTime: Date | null;
-  endTime: Date | null;
-  coopStartDate: Date | null;
-  coopEndDate: Date | null;
-  timeDiffers: boolean;
-  bio: string;
-};
-
-const custom = z.ZodIssueCode.custom;
-const onboardSchema = z
-  .object({
-    role: z.nativeEnum(Role),
-    status: z.nativeEnum(Status),
-    seatAvail: z.number().int().nonnegative().max(6).optional(),
-    companyName: z.string().optional(),
-    companyAddress: z.string().optional(),
-    startAddress: z.string().optional(),
-    preferredName: z.string().optional(),
-    pronouns: z.string().optional(),
-    daysWorking: z.array(z.boolean()).optional(),
-    bio: z.string().optional(),
-    startTime: z.date().nullable().optional(),
-    endTime: z.date().nullable().optional(),
-    coopStartDate: z.date().nullable().optional(),
-    coopEndDate: z.date().nullable().optional(),
-    timeDiffers: z.boolean().optional(),
-  })
-  .superRefine((data, ctx) => {
-    if (data.role !== Role.VIEWER) {
-      if (!data.coopEndDate) {
-        ctx.addIssue({
-          code: custom,
-          path: ["coopEndDate"],
-          message: "Cannot be empty",
-        });
-      }
-      if (!data.coopStartDate) {
-        ctx.addIssue({
-          code: custom,
-          path: ["coopStartDate"],
-          message: "Cannot be empty",
-        });
-      }
-      if (!data.seatAvail && data.seatAvail !== 0)
-        ctx.addIssue({
-          code: custom,
-          path: ["seatAvail"],
-          message: "Cannot be empty",
-        });
-      if (data.companyName?.length === 0)
-        ctx.addIssue({
-          code: custom,
-          path: ["companyName"],
-          message: "Cannot be empty",
-        });
-      if (data.companyAddress?.length === 0)
-        ctx.addIssue({
-          code: custom,
-          path: ["companyAddress"],
-          message: "Cannot be empty",
-        });
-      if (data.startAddress?.length === 0)
-        ctx.addIssue({
-          code: custom,
-          path: ["startAddress"],
-          message: "Cannot be empty",
-        });
-      if (!data.daysWorking?.some(Boolean))
-        ctx.addIssue({
-          code: custom,
-          path: ["daysWorking"],
-          message: "Select at least one day",
-        });
-
-      if (!data.timeDiffers) {
-        if (!data.startTime)
-          ctx.addIssue({
-            code: custom,
-            path: ["startTime"],
-            message: "Start time must be provided",
-          });
-        if (!data.endTime)
-          ctx.addIssue({
-            code: custom,
-            path: ["endTime"],
-            message: "End time must be provided",
-          });
-      }
-    }
-  });
 
 const daysOfWeek = ["Su", "M", "Tu", "W", "Th", "F", "S"];
 
@@ -157,44 +63,28 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       },
     };
   }
+  if (!session?.user.isOnboarded) {
+    return {
+      redirect: {
+        destination: "/profile/setup",
+        permanent: false,
+      },
+    };
+  }
 
   return {
     props: {},
   };
 }
-const Profile: NextPage = () => {
+const Index: NextPage = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const utils = trpc.useContext();
+  const editUserMutation = useEditUserMutation(router, () =>
+    setIsLoading(false)
+  );
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const useUploadFile = (selectedFile: File | null) => {
-    const { data: presignedData, error } = trpc.user.getPresignedUrl.useQuery(
-      {
-        contentType: selectedFile?.type || "",
-      },
-      { enabled: !!selectedFile }
-    );
-    const uploadFile = async () => {
-      if (presignedData?.url && selectedFile) {
-        const url = presignedData.url;
 
-        const response = await fetch(url, {
-          method: "PUT",
-          headers: {
-            "Content-Type": selectedFile.type,
-          },
-          body: selectedFile,
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to upload file: ${response.statusText}`);
-        }
-      }
-    };
-
-    return { uploadFile, error };
-  };
   const { uploadFile, error } = useUploadFile(selectedFile);
 
   const { data: session } = useSession();
@@ -211,70 +101,25 @@ const Profile: NextPage = () => {
     control,
   } = useForm<OnboardingFormInputs>({
     mode: "onSubmit",
-    defaultValues: {
-      role: Role.RIDER,
-      status: Status.ACTIVE,
-      seatAvail: 0,
-      companyName: "",
-      profilePicture: "",
-      companyAddress: "",
-      startAddress: "",
-      preferredName: "",
-      pronouns: "",
-      daysWorking: [false, false, false, false, false, false, false],
-      startTime: undefined,
-      endTime: undefined,
-      timeDiffers: false,
-      coopStartDate: null,
-      coopEndDate: null,
-      bio: "",
-    },
+    defaultValues: profileDefaultValues,
     resolver: zodResolver(onboardSchema),
   });
   const role = watch("role");
   const isViewer = role === "VIEWER";
-  const handleMonthChange = (field: any) => (event: any) => {
-    const [year, month] = event.target.value.split("-").map(Number);
-    const lastDay = new Date(year, month, 0);
-    setValue(field, lastDay);
-  };
-  const formatDateToMonth = (date: Date | null) => {
-    if (!date) {
-      return undefined;
-    }
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    return `${year}-${month}`;
-  };
-  const [companyAddressSuggestions, setCompanyAddressSuggestions] = useState<
-    CarpoolFeature[]
-  >([]);
-  const [startAddressSuggestions, setStartAddressSuggestions] = useState<
-    CarpoolFeature[]
-  >([]);
 
-  const [companyAddressSelected, setCompanyAddressSelected] =
-    useState<CarpoolAddress>({
-      place_name: "",
-      center: [0, 0],
-    });
-  const [startAddressSelected, setStartAddressSelected] =
-    useState<CarpoolAddress>({
-      place_name: "",
-      center: [0, 0],
-    });
+  const {
+    selectedAddress: startAddressSelected,
+    setSelectedAddress: setStartAddressSelected,
+    updateAddress: updateStartingAddress,
+    suggestions: startAddressSuggestions,
+  } = useAddressSelection();
 
-  const [companyAddress, setCompanyAddress] = useState("");
-  const updateCompanyAddress = useMemo(
-    () => debounce(setCompanyAddress, 250),
-    []
-  );
-
-  const [startingAddress, setStartingAddress] = useState("");
-  const updateStartingAddress = useMemo(
-    () => debounce(setStartingAddress, 250),
-    []
-  );
+  const {
+    selectedAddress: companyAddressSelected,
+    setSelectedAddress: setCompanyAddressSelected,
+    updateAddress: updateCompanyAddress,
+    suggestions: companyAddressSuggestions,
+  } = useAddressSelection();
 
   useEffect(() => {
     if (!user) return;
@@ -302,38 +147,9 @@ const Profile: NextPage = () => {
       endTime: user.endTime,
       coopStartDate: user.coopStartDate!,
       coopEndDate: user.coopEndDate!,
-      timeDiffers: false,
       bio: user.bio,
     });
   }, [user]);
-
-  useSearch({
-    value: companyAddress,
-    type: "address%2Cpostcode",
-    setFunc: setCompanyAddressSuggestions,
-  });
-
-  useSearch({
-    value: startingAddress,
-    type: "address%2Cpostcode",
-    setFunc: setStartAddressSuggestions,
-  });
-
-  const editUserMutation = trpc.user.edit.useMutation({
-    onSuccess: async () => {
-      await utils.user.me.refetch();
-      await utils.user.recommendations.me.invalidate();
-      await utils.mapbox.geoJsonUserList.invalidate();
-      await utils.user.messages.getUnreadMessageCount.refetch();
-      router.push("/").then(() => {
-        setIsLoading(false);
-      });
-    },
-    onError: (error) => {
-      toast.error(`Something went wrong: ${error.message}`);
-      setIsLoading(false);
-    },
-  });
 
   const onSubmit = async (values: OnboardingFormInputs) => {
     setIsLoading(true);
@@ -348,16 +164,6 @@ const Profile: NextPage = () => {
       seatAvail: values.role === Role.RIDER ? 0 : values.seatAvail,
     };
 
-    const daysWorkingParsed: string = userInfo.daysWorking
-      .map((val: boolean) => {
-        if (val) {
-          return "1";
-        } else {
-          return "0";
-        }
-      })
-      .join(",");
-
     const sessionName = session?.user?.name ?? "";
     if (selectedFile) {
       try {
@@ -366,36 +172,15 @@ const Profile: NextPage = () => {
         console.error("File upload failed:", error);
       }
     }
-    editUserMutation.mutate({
-      role: userInfo.role,
-      status: userInfo.status,
-      seatAvail: userInfo.seatAvail,
-      companyName: userInfo.companyName,
-      companyAddress: userInfo.companyAddress,
-      companyCoordLng: userInfo.companyCoordLng!,
-      companyCoordLat: userInfo.companyCoordLat!,
-      startAddress: userInfo.startAddress,
-      startCoordLng: userInfo.startCoordLng!,
-      startCoordLat: userInfo.startCoordLat!,
-      isOnboarded: true,
-      preferredName: userInfo.preferredName
-        ? userInfo.preferredName
-        : sessionName,
-      pronouns: userInfo.pronouns,
-      daysWorking: daysWorkingParsed,
-      startTime: userInfo.startTime?.toISOString(),
-      endTime: userInfo.endTime?.toISOString(),
-      bio: userInfo.bio,
-      coopStartDate: userInfo.coopStartDate!,
-      coopEndDate: userInfo.coopEndDate!,
-      licenseSigned: true,
+    await updateUser({
+      userInfo,
+      sessionName,
+      mutation: editUserMutation,
     });
-
-    // Track profile completion
     trackProfileCompletion(userInfo.role, userInfo.status);
   };
 
-  if (isLoading) {
+  if (isLoading || !user) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-white ">
         <Spinner />
@@ -409,7 +194,7 @@ const Profile: NextPage = () => {
         <Header />
         <ProfileContainer onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col items-center justify-center md:w-10/12">
-            <div className="flex flex-col items-center justify-center gap-8 md:gap-12 lg:flex-row lg:items-start">
+            <div className="flex flex-col items-center justify-center gap-8  lg:flex-row lg:items-start">
               <ProfileColumn>
                 <TopProfileSection>
                   <ProfileHeaderNoMB>
@@ -509,7 +294,6 @@ const Profile: NextPage = () => {
                     <ErrorDisplay>{errors.startAddress.message}</ErrorDisplay>
                   )}
                 </MiddleProfileSection>
-                {/* Role field  */}
                 <BottomProfileSection>
                   <EntryLabel
                     required={!isViewer}
@@ -629,19 +413,13 @@ const Profile: NextPage = () => {
                       flexible, coordinate directly with potential riders or
                       drivers to inform them.
                     </Note>
-                    <div className="flex flex-col space-y-2"></div>
                   </CommutingScheduleSection>
                 </BottomProfileSection>
               </ProfileColumn>
 
               <ProfileColumn>
-                <ProfileHeader>
-                  Co-op Term Dates{" "}
-                  {!isViewer && (
-                    <span className="text-northeastern-red">*</span>
-                  )}
-                </ProfileHeader>
-                <div className="flex w-full gap-4">
+                <ProfileHeader>Co-op Term Dates </ProfileHeader>
+                <div className="flex w-2/3 gap-8 lg:w-full">
                   <div className="flex flex-1 flex-col">
                     <EntryLabel
                       required={!isViewer}
@@ -654,7 +432,7 @@ const Profile: NextPage = () => {
                       isDisabled={isViewer}
                       id="coopStartDate"
                       error={errors.coopStartDate}
-                      onChange={handleMonthChange("coopStartDate")}
+                      onChange={handleMonthChange("coopStartDate", setValue)}
                       defaultValue={
                         formatDateToMonth(watch("coopStartDate")) || undefined
                       }
@@ -672,7 +450,7 @@ const Profile: NextPage = () => {
                       isDisabled={isViewer}
                       id="coopEndDate"
                       error={errors.coopEndDate}
-                      onChange={handleMonthChange("coopEndDate")}
+                      onChange={handleMonthChange("coopEndDate", setValue)}
                       defaultValue={
                         formatDateToMonth(watch("coopEndDate")) || undefined
                       }
@@ -757,9 +535,36 @@ const Profile: NextPage = () => {
                           id="pronouns"
                           inputClassName={`h-12`}
                           error={errors.pronouns}
+                          charLimit={20}
                           isDisabled={isViewer}
+                          defaultValue={
+                            watch("pronouns") ? `(${watch("pronouns")})` : ""
+                          }
                           type="text"
-                          {...register("pronouns")}
+                          onChange={(e: any) => {
+                            const input = e.target;
+                            const cursorPosition = input.selectionStart || 0;
+                            const sanitizedValue = input.value.replace(
+                              /[()]/g,
+                              ""
+                            );
+                            const displayValue = sanitizedValue
+                              ? `(${sanitizedValue})`
+                              : "";
+                            setValue("pronouns", sanitizedValue, {
+                              shouldValidate: true,
+                            });
+                            input.value = displayValue;
+                            // Reset cursor
+                            const adjustedCursor = Math.min(
+                              cursorPosition + 1,
+                              displayValue.length - 1
+                            );
+                            input.setSelectionRange(
+                              adjustedCursor,
+                              adjustedCursor
+                            );
+                          }}
                         />
                       </div>
                     </div>
@@ -796,4 +601,4 @@ const Profile: NextPage = () => {
   );
 };
 
-export default Profile;
+export default Index;

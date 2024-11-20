@@ -119,7 +119,6 @@ const MessagePanel = ({
   };
   useEffect(() => {
     if (user && selectedUser && activeTab === "map") {
-      console.log("Calling onViewRouteClick", { user, selectedUser });
       onViewRouteClick(user, selectedUser);
     }
   }, [user, selectedUser, activeTab, onViewRouteClick]);

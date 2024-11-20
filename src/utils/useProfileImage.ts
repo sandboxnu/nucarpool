@@ -14,12 +14,16 @@ const useProfileImage = (userId?: string) => {
     { userId },
     { enabled: !profileImageUrl }
   );
-
+  useEffect(() => {
+    setProfileImageUrl(null);
+    setImageLoadError(false);
+    setHasRefetched(false);
+  }, [userId]);
   const fetchImageUrl = useCallback(() => {
-    if (presignedData?.url) {
+    if (presignedData?.url && !presignedError) {
       setProfileImageUrl(presignedData.url);
       setImageLoadError(false);
-    } else if (!presignedData && presignedError) {
+    } else {
       setImageLoadError(true);
       setProfileImageUrl(null);
     }

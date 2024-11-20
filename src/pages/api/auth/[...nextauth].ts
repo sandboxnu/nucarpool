@@ -6,11 +6,12 @@ import { serverEnv } from "../../../utils/env/server";
 import AzureADProvider from "next-auth/providers/azure-ad";
 import GoogleProvider from "next-auth/providers/google";
 import { Adapter } from "next-auth/adapters";
+import { Prisma } from "@prisma/client";
 
 const CustomPrismaAdapter = (p: typeof prisma): Adapter => {
   return {
     ...PrismaAdapter(p),
-    createUser: async (data) => {
+    createUser: async (data: Prisma.UserCreateInput) => {
       const user = await p.user.create({
         data: {
           ...data,
