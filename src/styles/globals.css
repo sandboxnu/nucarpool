@@ -27,3 +27,9 @@ input[type="month"]::-webkit-calendar-picker-indicator {
   opacity: 0;
   cursor: pointer;
 }
+.placeholder:empty:before {
+  content: "Type a message...";
+  color: gray;
+  opacity: 0.6;
+  pointer-events: none;
+}

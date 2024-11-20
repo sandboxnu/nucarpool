@@ -32,8 +32,7 @@ const SendBar = ({ onSendMessage }: SendBarProps) => {
       <div className="mx-10 flex items-center overflow-hidden rounded-lg border bg-gray-100">
         <div
           contentEditable="true"
-          className="w-full flex-1 resize-none border-0 bg-gray-100 p-2 text-lg focus:outline-none"
-          placeholder="Type a message..."
+          className="placeholder w-full flex-1 resize-none border-0 bg-gray-100 p-2 text-lg focus:outline-none"
           ref={messageInputRef}
           style={{
             minHeight: "20px",

@@ -86,7 +86,7 @@
     "@types/mixpanel-browser": "^2.50.1",
     "@types/node": "18.0.0",
     "@types/random-seed": "^0.3.3",
-    "@types/react": "18.0.14",
+    "@types/react": "18.3.12",
     "@types/react-dom": "18.0.5",
     "autoprefixer": "^10.4.7",
     "eslint": "8.18.0",
