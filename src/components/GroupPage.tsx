@@ -174,6 +174,8 @@ const GroupInfo = ({
         </div>
       ) : (
         <div className="mx-16 flex flex-col py-1">
+          <div className="text-center">Carpool Information from Driver</div>
+          <br/>
           <p className="flex-1 justify-center rounded-md border px-3 py-2 text-center text-sm shadow-sm">
             {groupMessage != ""
               ? groupMessage
