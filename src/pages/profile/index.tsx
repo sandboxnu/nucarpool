@@ -63,6 +63,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       },
     };
   }
+  if (!session?.user.isOnboarded) {
+    return {
+      redirect: {
+        destination: "/profile/setup",
+        permanent: false,
+      },
+    };
+  }
 
   return {
     props: {},
@@ -71,7 +79,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 const Index: NextPage = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const utils = trpc.useContext();
   const editUserMutation = useEditUserMutation(router, () =>
     setIsLoading(false)
   );
@@ -187,7 +194,7 @@ const Index: NextPage = () => {
         <Header />
         <ProfileContainer onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col items-center justify-center md:w-10/12">
-            <div className="flex flex-col items-center justify-center gap-8 md:gap-12 lg:flex-row lg:items-start">
+            <div className="flex flex-col items-center justify-center gap-8  lg:flex-row lg:items-start">
               <ProfileColumn>
                 <TopProfileSection>
                   <ProfileHeaderNoMB>
@@ -383,9 +390,7 @@ const Index: NextPage = () => {
                           isDisabled={isViewer}
                           control={control}
                           name={"startTime"}
-                          value={
-                            watch("startTime") || user?.startTime || undefined
-                          }
+                          value={user?.startTime ? user.startTime : undefined}
                         />
                       </div>
                       <div className="flex flex-1 flex-col gap-2">
@@ -398,7 +403,7 @@ const Index: NextPage = () => {
                           isDisabled={isViewer}
                           control={control}
                           name={"endTime"}
-                          value={watch("endTime") || user?.endTime || undefined}
+                          value={user?.endTime ? user.endTime : undefined}
                         />
                       </div>
                     </div>
@@ -413,12 +418,7 @@ const Index: NextPage = () => {
               </ProfileColumn>
 
               <ProfileColumn>
-                <ProfileHeader>
-                  Co-op Term Dates{" "}
-                  {!isViewer && (
-                    <span className="text-northeastern-red">*</span>
-                  )}
-                </ProfileHeader>
+                <ProfileHeader>Co-op Term Dates </ProfileHeader>
                 <div className="flex w-2/3 gap-8 lg:w-full">
                   <div className="flex flex-1 flex-col">
                     <EntryLabel

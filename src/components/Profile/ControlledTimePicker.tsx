@@ -9,7 +9,7 @@ import { Control, Controller, FieldError } from "react-hook-form";
 import { OnboardingFormInputs } from "../../utils/types";
 import { ErrorDisplay } from "../../styles/profile";
 import * as React from "react";
-interface ControlledTimePickerRHFProps {
+interface ControlledTimePickerProps {
   control: Control<OnboardingFormInputs>;
   name: "startTime" | "endTime";
   placeholder?: string;
@@ -17,7 +17,7 @@ interface ControlledTimePickerRHFProps {
   isDisabled?: boolean;
   error?: FieldError;
 }
-const ControlledTimePickerRHF = (props: ControlledTimePickerRHFProps) => {
+const ControlledTimePicker = (props: ControlledTimePickerProps) => {
   useEffect(() => {
     if (props.value) {
       dayjs.utc(props.value);
@@ -96,4 +96,4 @@ const ControlledTimePickerRHF = (props: ControlledTimePickerRHFProps) => {
     />
   );
 };
-export default ControlledTimePickerRHF;
+export default ControlledTimePicker;

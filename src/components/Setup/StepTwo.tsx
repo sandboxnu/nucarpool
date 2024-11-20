@@ -44,6 +44,7 @@ const StepTwo = ({
           addressSuggestions={startAddressHook.suggestions}
           error={errors.startAddress}
           addressUpdater={startAddressHook.updateAddress}
+          className={"z-10"}
         />
         <Note className="pt-2">
           Note: Your address will only be used to find users close to you. It

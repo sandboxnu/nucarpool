@@ -54,7 +54,6 @@ export const MiddleProfileSection = styled(ProfileColumn)`
 export const BottomProfileSection = styled(ProfileColumn)`
   width: 100%;
   flex: 1 1 auto;
-  margin-bottom: 24px;
 `;
 
 export const TopProfileSection = styled(ProfileColumn)`
@@ -71,8 +70,8 @@ export const PersonalInfoSection = styled(ProfileColumn)`
   flex: 1 1 auto;
   gap: 4px;
   @media (min-width: 834px) {
-    padding-top: 0px;
-    padding-bottom: 0px;
+    padding-top: 0;
+    padding-bottom: 0;
   }
   padding-top: 12px;
   padding-bottom: 12px;
@@ -81,11 +80,7 @@ export const PersonalInfoSection = styled(ProfileColumn)`
 export const CommutingScheduleSection = styled(ProfileColumn)`
   width: 100%;
   flex: 1 1 auto;
-  @media (min-width: 834px) {
-    gap: 0px;
-  }
   gap: 6px;
-  padding-bottom: 1rem;
 `;
 
 export const ProfileHeader = styled.h1`

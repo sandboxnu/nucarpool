@@ -31,15 +31,20 @@ const StepThree = ({
   setValue,
 }: StepThreeProps) => {
   const daysOfWeek = ["Su", "M", "Tu", "W", "Th", "F", "S"];
-
   return (
-    <div className="flex flex-col items-center  justify-center bg-white px-4">
+    <div className="flex flex-col items-center  justify-center bg-white px-4 ">
       <div className="mb-8 text-center font-montserrat text-3xl font-bold">
         <span>When are you&nbsp;</span>
         <span className="text-northeastern-red">carpooling?</span>
       </div>
-
-      <div className="flex flex-col items-start space-y-4 ">
+      <div
+        className={`flex flex-col items-start  ${
+          (errors.startTime || errors.endTime) &&
+          (errors.coopStartDate || errors.coopEndDate)
+            ? "space-y-0"
+            : "space-y-4"
+        } `}
+      >
         <div className="flex flex-col space-y-2 ">
           <EntryLabel
             required={true}
@@ -136,7 +141,9 @@ const StepThree = ({
 
           <div
             className={`flex w-3/4 ${
-              !errors.startTime && !errors.endTime && "pt-4"
+              !errors.startTime && !errors.endTime
+                ? "pt-4"
+                : errors.daysWorking && "!-mt-2"
             } gap-8`}
           >
             {/* Start Date */}

@@ -10,11 +10,11 @@ interface EntryLabelProps {
 const StyledLabel = styled.label<{
   error?: boolean;
 }>`
-  font-family: "Montserrat";
+  font-family: "Montserrat", sans-serif;
   font-style: normal;
   font-weight: 700;
   font-size: 20px;
-  line-height: 24.38px;
+  line-height: 24px;
   display: flex;
   align-items: center;
   color: ${(props) => (props.error ? "#B12424" : "#000000")};
@@ -24,7 +24,6 @@ const StyledLabel = styled.label<{
     padding-bottom: 0.4rem;
     font-size: 20px;
   }
-  font-size: 16px;
 `;
 
 export const EntryLabel = (props: EntryLabelProps) => {

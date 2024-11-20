@@ -16,6 +16,7 @@ interface ControlledAddressComboboxProps {
   addressSuggestions: CarpoolFeature[];
   error?: FieldError;
   isDisabled: boolean;
+  className?: string;
 }
 
 const ControlledAddressCombobox = (props: ControlledAddressComboboxProps) => {
@@ -25,7 +26,7 @@ const ControlledAddressCombobox = (props: ControlledAddressComboboxProps) => {
       control={props.control}
       render={({ field: { ref, ...fieldProps } }) => (
         <Combobox
-          className={`relative  w-full`}
+          className={`relative  w-full ${props.className}`}
           as="div"
           value={props.addressSelected}
           onChange={(val: CarpoolFeature) => {

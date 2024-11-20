@@ -40,6 +40,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       },
     };
   }
+  if (session?.user.isOnboarded) {
+    return {
+      redirect: {
+        destination: "/profile",
+        permanent: false,
+      },
+    };
+  }
 
   return {
     props: {},
