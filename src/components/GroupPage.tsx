@@ -93,7 +93,7 @@ const NoGroupInfo = ({ role, onClose }: NoGroupInfoProps) => {
           {role === "DRIVER" && (
             <div className="mx-20 flex flex-col py-1 mb-8">
               <div className="my-1 text-xs italic text-slate-400">
-                Below, share any information that you'd like riders joining you your Carpool to know. You can indicate when you generally like to be leaving your place, what your preferred method of communication is, what your preference is to split gas and what your Carpool vibe will be like.
+                Below, share any information that you would like riders joining you your Carpool to know. You can indicate when you generally like to be leaving your place, what your preferred method of communication is, what your preference is to split gas and what your Carpool vibe will be like.
               </div>
               <div className="flex flex-row gap-2">
                 <textarea
