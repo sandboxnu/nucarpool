@@ -55,10 +55,10 @@ export const groupsRouter = router({
         where: { id: input.driverId },
       });
 
-      if (driver?.seatAvail === 0) {
+      if (!driver) {
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Driver does not have space available in their car",
+          code: "NOT_FOUND",
+          message: "Driver not found",
         });
       }
       
