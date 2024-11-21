@@ -7,6 +7,7 @@ import {
   SendTemplatedEmailCommand,
   SendTemplatedEmailCommandInput,
 } from "@aws-sdk/client-ses";
+<<<<<<< HEAD
 const gmailEmailSchema = z
   .string()
   .email()
@@ -20,6 +21,12 @@ const gmailEmailSchema = z
         "Only gmail.com email addresses are accepted in the staging environment",
     }
   );
+=======
+const gmailEmailSchema = z.string().email().refine((email) =>        
+  (process.env.NEXT_PUBLIC_ENV === "staging" && email.toLowerCase().endsWith("@gmail.com")) 
+|| process.env.NEXT_PUBLIC_ENV !== "staging",    
+{message:"Only gmail.com email addresses are accepted in the staging environment",});
+>>>>>>> dabc6dd8c629a5d422a4f4a5504edc518a65be5a
 
 export const emailsRouter = router({
   sendRequestNotification: protectedRouter
