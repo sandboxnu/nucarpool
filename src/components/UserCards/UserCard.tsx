@@ -236,10 +236,11 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         <div className="flex flex-row justify-between gap-2">
           <button
             disabled={user.status === "INACTIVE" && user.role !== "VIEWER"}
-            onClick={() =>
+            onClick={() => {
               props.onViewRouteClick &&
-              props.onViewRouteClick(user, props.otherUser)
-            }
+                props.onViewRouteClick(user, props.otherUser);
+              trackViewRoute();
+            }}
             className="my-1 w-1/2 rounded-md border border-black p-1 text-center hover:bg-stone-200 disabled:hover:bg-transparent"
           >
             View Route

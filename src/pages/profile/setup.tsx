@@ -21,7 +21,11 @@ import StepThree from "../../components/Setup/StepThree";
 import { SetupContainer } from "../../components/Setup/SetupContainer";
 import StepFour from "../../components/Setup/StepFour";
 import { Role } from "@prisma/client";
-import { trackProfileCompletion } from "../../utils/mixpanel";
+import {
+  trackFTUECompletion,
+  trackFTUEStep,
+  trackProfileCompletion,
+} from "../../utils/mixpanel";
 import { useUploadFile } from "../../utils/profile/useUploadFile";
 import { ComplianceModal } from "../../components/CompliancePortal";
 import { useAddressSelection } from "../../utils/useAddressSelection";
@@ -162,7 +166,7 @@ const Setup: NextPage = () => {
       sessionName,
       mutation: editUserMutation,
     });
-    trackProfileCompletion(userInfo.role, userInfo.status);
+    trackFTUECompletion(userInfo.role);
   };
 
   const handleNextStep = async () => {
@@ -203,6 +207,7 @@ const Setup: NextPage = () => {
       await handleSubmit(onSubmit)();
       return;
     }
+    trackFTUEStep(step);
     setStep((prevStep) => prevStep + 1);
   };
   if (isLoading || !user) {
