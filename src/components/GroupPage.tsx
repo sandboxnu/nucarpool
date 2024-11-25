@@ -5,6 +5,9 @@ import { trpc } from "../utils/trpc";
 import { UserContext } from "../utils/userContext";
 import { Role, User } from "@prisma/client";
 import Spinner from "./Spinner";
+import { toast } from "react-toastify";
+import { TRPCClientError } from "@trpc/client";
+import { useToasts } from "react-toast-notifications";
 
 interface GroupPageProps {
   onClose: () => void;
@@ -105,7 +108,7 @@ const NoGroupInfo = ({ role, onClose }: NoGroupInfoProps) => {
                   className="w-[150px] rounded-md bg-red-700 py-2 text-white h-full"
                   onClick={async () => {
                     await handleMessageSubmit();
-                    onClose();
+                    toast.success('Group message successfully saved!');
                   }}
                 >
                   Submit
@@ -139,14 +142,23 @@ const GroupInfo = ({
       utils.user.groups.me.invalidate();
     },
   });
+  const { mutate: updateUserMessage } = trpc.user.groups.updateUserMessage.useMutation({
+    onSuccess: () => {
+      // Invalidate and refetch the user.me query
+      utils.user.me.invalidate();
+    },
+  });
 
   useEffect(() => {
-    setGroupMessage(group?.message ?? "");
+    if (group?.message !== undefined) {
+      setGroupMessage(group.message);
+    }
   }, [group]);
 
   const handleMessageSubmit = async () => {
     if (group?.id && curUser?.role === "DRIVER") {
       await updateMessage({ groupId: group.id, message: groupMessage });
+      await updateUserMessage({ message: groupMessage });
     }
   };
 
@@ -166,7 +178,10 @@ const GroupInfo = ({
             />
             <button
               className="ml-8 h-full w-[150px] rounded-md bg-red-700 text-white"
-              onClick={handleMessageSubmit}
+              onClick={async () => {
+                await handleMessageSubmit();
+                toast.success('Group message successfully saved!');
+              }}
             >
               Submit
             </button>
