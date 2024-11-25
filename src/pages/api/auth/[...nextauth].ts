@@ -32,6 +32,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = user.id;
         session.user.isOnboarded = user.isOnboarded;
+        session.user.permission = user.permission;
       }
       return session;
     },
