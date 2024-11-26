@@ -15,7 +15,7 @@ import {
   generatePresignedUrl,
   getPresignedImageUrl,
 } from "../../utils/uploadToS3";
-import { adminRouter } from "./user/admin";
+import { adminDataRouter } from "./user/admin";
 const getPresignedDownloadUrlInput = z.object({
   userId: z.string().optional(),
 });
@@ -156,5 +156,5 @@ export const userRouter = router({
   requests: requestsRouter,
   groups: groupsRouter,
   emails: emailsRouter,
-  admin: adminRouter,
+  admin: adminDataRouter,
 });

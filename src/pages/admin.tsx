@@ -6,6 +6,7 @@ import { useState } from "react";
 import UserManagement from "../components/Admin/UserManagement";
 import Spinner from "../components/Spinner";
 import { Permission } from "@prisma/client";
+import AdminData from "../components/Admin/AdminData";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getSession(context);
@@ -47,13 +48,15 @@ const Admin: NextPage<AdminProps> = ({ userPermission }) => {
       {!userPermission ? (
         <Spinner />
       ) : (
-        <div className="flex h-full  flex-row">
+        <div className="flex h-[91.5%]  flex-row">
           <div className="z-0 min-w-[150px] max-w-[250px] flex-[1] border-r-4 border-busy-red   bg-stone-100">
             <AdminSidebar option={option} setOption={setOption} />
           </div>
           <div className="flex-[3]">
-            {option === "management" && (
+            {option === "management" ? (
               <UserManagement permission={userPermission} />
+            ) : (
+              <AdminData />
             )}
           </div>
         </div>

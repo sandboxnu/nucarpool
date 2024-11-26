@@ -1,11 +1,24 @@
-import { Role } from "@prisma/client";
+import { Permission, Role } from "@prisma/client";
 import { Status } from "@prisma/client";
 import { Feature } from "geojson";
 import type { AppRouter } from "../server/router";
 import { inferRouterOutputs } from "@trpc/server";
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
-
+export type TempUser = {
+  id: string;
+  email: string;
+  permission: Permission;
+  isOnboarded: boolean;
+  dateCreated: Date;
+};
+export type TempGroup = {
+  id: string;
+  dateCreated: Date;
+  _count: {
+    users: number;
+  };
+};
 export type PoiData = {
   location: string;
   coordLng: number;

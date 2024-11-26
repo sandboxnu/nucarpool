@@ -1,17 +1,11 @@
-import { protectedRouter, router } from "../createRouter";
+import { adminRouter, router } from "../createRouter";
 import { z } from "zod";
-import { Permission } from "@prisma/client";
-
+import { Permission, Status } from "@prisma/client";
+import { Role } from "@prisma/client";
 // Router for admin dashboard queries, only Managers can edit roles
 // User must be Manager or Admin to view user data
-export const adminRouter = router({
-  getAllUsers: protectedRouter.query(async ({ ctx, input }) => {
-    const permission = ctx.session.user?.permission;
-    console.log(ctx.session);
-    if (permission === "USER") {
-      throw new Error("Unauthorized access.");
-    }
-
+export const adminDataRouter = router({
+  getAllUsers: adminRouter.query(async ({ ctx, input }) => {
     return ctx.prisma.user.findMany({
       where: {
         email: {
@@ -22,10 +16,45 @@ export const adminRouter = router({
         id: true,
         email: true,
         permission: true,
+        isOnboarded: true,
+        dateCreated: true,
       },
     });
   }),
-  updateUserPermission: protectedRouter
+  getCarpoolGroups: adminRouter.query(async ({ ctx, input }) => {
+    return ctx.prisma.carpoolGroup.findMany({
+      where: {
+        AND: [
+          {
+            users: {
+              some: {
+                role: Role.DRIVER,
+                status: Status.ACTIVE,
+              },
+            },
+          },
+          {
+            users: {
+              some: {
+                role: Role.RIDER,
+                status: Status.ACTIVE,
+              },
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        dateCreated: true,
+        _count: {
+          select: {
+            users: true,
+          },
+        },
+      },
+    });
+  }),
+  updateUserPermission: adminRouter
     .input(
       z.object({
         userId: z.string(),
