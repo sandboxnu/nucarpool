@@ -8,7 +8,7 @@ export const adminRouter = router({
   getAllUsers: protectedRouter.query(async ({ ctx, input }) => {
     const permission = ctx.session.user?.permission;
     console.log(ctx.session);
-    if (permission !== "MANAGER") {
+    if (permission === "USER") {
       throw new Error("Unauthorized access.");
     }
 

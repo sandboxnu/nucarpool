@@ -4,14 +4,17 @@ import React, { useEffect, useState } from "react";
 import Spinner from "../Spinner";
 import { toast } from "react-toastify";
 import { ConfigProvider, Select } from "antd";
+import { Note } from "../../styles/profile";
 
 type TempUser = {
   id: string;
   email: string;
   permission: Permission;
 };
-
-const UserManagement = () => {
+type UserManagementProps = {
+  permission: Permission;
+};
+const UserManagement = ({ permission }: UserManagementProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedUser, setSelectedUser] = React.useState<TempUser | null>(null);
   const [selectedPermission, setSelectedPermission] =
@@ -84,6 +87,17 @@ const UserManagement = () => {
             <h1 className="text-center font-montserrat text-3xl font-bold text-black">
               Permissions Management
             </h1>
+            {permission !== "MANAGER" && (
+              <div className="items-center gap-1 text-center">
+                <Note>
+                  Admins can view user permissions but cannot modify them.
+                </Note>
+                <Note>
+                  To change your permission, contact a MANAGER from the
+                  dropdown.
+                </Note>
+              </div>
+            )}
             <div className="flex flex-row items-center justify-center gap-8">
               <ConfigProvider
                 theme={{
@@ -97,7 +111,11 @@ const UserManagement = () => {
                 <Select
                   showSearch
                   style={{ width: "180px" }}
-                  placeholder="Select a User"
+                  placeholder={
+                    permission === "MANAGER"
+                      ? "Select a User"
+                      : "View User List"
+                  }
                   onChange={handleUserChange}
                   popupMatchSelectWidth={false}
                   placement={"bottomRight"}
@@ -111,6 +129,7 @@ const UserManagement = () => {
                 <Select
                   placeholder="Change Permission"
                   value={selectedPermission}
+                  disabled={permission !== "MANAGER"}
                   onChange={(value: Permission) => {
                     setSelectedPermission(value);
                   }}
@@ -124,12 +143,14 @@ const UserManagement = () => {
                 />
               </ConfigProvider>
             </div>
-            <button
-              className="text-bold w-full justify-center rounded-2xl bg-northeastern-red py-2 font-lato text-white hover:bg-busy-red "
-              onClick={updatePermission}
-            >
-              Update Permission
-            </button>
+            {permission === "MANAGER" && (
+              <button
+                className="text-bold w-full justify-center rounded-2xl bg-northeastern-red py-2 font-lato text-white hover:bg-busy-red "
+                onClick={updatePermission}
+              >
+                Update Permission
+              </button>
+            )}
           </div>
         </div>
       )}

@@ -140,25 +140,24 @@ const Header = (props: HeaderProps) => {
         <div className="flex items-center">
           <button
             onClick={handleAdminClick}
-            className="rounded-xl p-4 text-xl font-medium text-white"
+            className="rounded-xl pr-10 text-xl font-medium text-white"
           >
             Home
           </button>
+          <DropDownMenu />
         </div>
       ) : (
-        props.data && (
-          <div className="flex items-center">
-            {renderSidebarOptions(props.data)}
-            <DropDownMenu />
-            <>
-              {displayGroup &&
-                createPortal(
-                  <GroupPage onClose={() => setDisplayGroup(false)} />,
-                  document.body
-                )}
-            </>
-          </div>
-        )
+        <div className="flex items-center">
+          {props.data && renderSidebarOptions(props.data)}
+          <DropDownMenu />
+          <>
+            {displayGroup &&
+              createPortal(
+                <GroupPage onClose={() => setDisplayGroup(false)} />,
+                document.body
+              )}
+          </>
+        </div>
       )}
     </HeaderDiv>
   );

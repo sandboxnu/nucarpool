@@ -4,6 +4,8 @@ import Header from "../components/Header";
 import AdminSidebar from "../components/Admin/AdminSidebar";
 import { useState } from "react";
 import UserManagement from "../components/Admin/UserManagement";
+import Spinner from "../components/Spinner";
+import { Permission } from "@prisma/client";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getSession(context);
@@ -17,26 +19,45 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         },
       };
     }
+  } else {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
   }
 
   return {
-    props: {},
+    props: {
+      userPermission: session.user.permission,
+    },
   };
 }
 
-const Admin: NextPage = () => {
+interface AdminProps {
+  userPermission: Permission;
+}
+
+const Admin: NextPage<AdminProps> = ({ userPermission }) => {
   const [option, setOption] = useState<string>("management");
   return (
     <div className="relative h-full w-full overflow-hidden  ">
       <Header admin={true} />
-      <div className="flex h-full  flex-row">
-        <div className="z-0 min-w-[150px] max-w-[250px] flex-[1] border-r-4 border-busy-red   bg-stone-100">
-          <AdminSidebar option={option} setOption={setOption} />
+      {!userPermission ? (
+        <Spinner />
+      ) : (
+        <div className="flex h-full  flex-row">
+          <div className="z-0 min-w-[150px] max-w-[250px] flex-[1] border-r-4 border-busy-red   bg-stone-100">
+            <AdminSidebar option={option} setOption={setOption} />
+          </div>
+          <div className="flex-[3]">
+            {option === "management" && (
+              <UserManagement permission={userPermission} />
+            )}
+          </div>
         </div>
-        <div className="flex-[3]">
-          {option === "management" && <UserManagement />}
-        </div>
-      </div>
+      )}
     </div>
   );
 };
