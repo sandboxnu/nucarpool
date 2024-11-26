@@ -1,4 +1,5 @@
 import { DefaultSession } from "next-auth";
+import { Permission } from "@prisma/client";
 
 declare module "next-auth" {
   /**
@@ -8,10 +9,12 @@ declare module "next-auth" {
     user?: {
       id?: string;
       isOnboarded: boolean;
+      permission: Permission;
     } & DefaultSession["user"];
   }
 
-  interface User {
-    isOnboarded: boolean & DefaultUser;
+  interface User extends DefaultUser {
+    isOnboarded: boolean;
+    permission: Permission;
   }
 }
