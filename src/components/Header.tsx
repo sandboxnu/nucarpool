@@ -39,6 +39,7 @@ interface HeaderProps {
     setSidebar: Dispatch<SetStateAction<HeaderOptions>>;
     disabled: boolean;
   };
+  admin?: boolean;
 }
 
 export type HeaderOptions = "explore" | "requests";
@@ -70,7 +71,11 @@ const Header = (props: HeaderProps) => {
     }
   };
   const handleAdminClick = () => {
-    router.push("/admin");
+    if (!props.admin) {
+      router.push("/admin");
+    } else {
+      router.push("/");
+    }
   };
   const renderSidebarOptions = ({
     sidebarValue,
@@ -131,18 +136,29 @@ const Header = (props: HeaderProps) => {
   return (
     <HeaderDiv>
       <Logo>CarpoolNU</Logo>
-      {props.data && (
+      {props.admin ? (
         <div className="flex items-center">
-          {renderSidebarOptions(props.data)}
-          <DropDownMenu />
-          <>
-            {displayGroup &&
-              createPortal(
-                <GroupPage onClose={() => setDisplayGroup(false)} />,
-                document.body
-              )}
-          </>
+          <button
+            onClick={handleAdminClick}
+            className="rounded-xl p-4 text-xl font-medium text-white"
+          >
+            Home
+          </button>
         </div>
+      ) : (
+        props.data && (
+          <div className="flex items-center">
+            {renderSidebarOptions(props.data)}
+            <DropDownMenu />
+            <>
+              {displayGroup &&
+                createPortal(
+                  <GroupPage onClose={() => setDisplayGroup(false)} />,
+                  document.body
+                )}
+            </>
+          </div>
+        )
       )}
     </HeaderDiv>
   );

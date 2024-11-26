@@ -112,7 +112,6 @@ const UserManagement = () => {
                   placeholder="Change Permission"
                   value={selectedPermission}
                   onChange={(value: Permission) => {
-                    console.log(value);
                     setSelectedPermission(value);
                   }}
                   popupMatchSelectWidth={false}
