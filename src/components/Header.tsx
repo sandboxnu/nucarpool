@@ -4,6 +4,8 @@ import DropDownMenu from "./DropDownMenu";
 import { createPortal } from "react-dom";
 import { GroupPage } from "./GroupPage";
 import { trpc } from "../utils/trpc";
+import { UserContext } from "../utils/userContext";
+import { useRouter } from "next/router";
 
 const HeaderDiv = styled.div`
   display: flex;
@@ -15,6 +17,7 @@ const HeaderDiv = styled.div`
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.25);
   height: 8.5%;
   width: 100%;
+  z-index: 10;
 `;
 
 export const Logo = styled.h1`
@@ -36,6 +39,7 @@ interface HeaderProps {
     setSidebar: Dispatch<SetStateAction<HeaderOptions>>;
     disabled: boolean;
   };
+  admin?: boolean;
 }
 
 export type HeaderOptions = "explore" | "requests";
@@ -43,6 +47,8 @@ export type HeaderOptions = "explore" | "requests";
 const Header = (props: HeaderProps) => {
   const { data: unreadMessagesCount } =
     trpc.user.messages.getUnreadMessageCount.useQuery();
+  const user = useContext(UserContext);
+  const router = useRouter();
 
   const [displayGroup, setDisplayGroup] = useState<boolean>(false);
   const renderClassName = (sidebarValue: string, sidebarText: string) => {
@@ -62,6 +68,13 @@ const Header = (props: HeaderProps) => {
       return "underline underline-offset-8 rounded-xl p-4 font-medium text-xl text-white";
     } else {
       return "rounded-xl p-4 font-medium text-xl text-white";
+    }
+  };
+  const handleAdminClick = () => {
+    if (!props.admin) {
+      router.push("/admin");
+    } else {
+      router.push("/");
     }
   };
   const renderSidebarOptions = ({
@@ -107,6 +120,15 @@ const Header = (props: HeaderProps) => {
         >
           My Group
         </button>
+        {user?.permission !== "USER" && (
+          <button
+            onClick={handleAdminClick}
+            disabled={disabled}
+            className={renderClassName(sidebarValue, "filler")}
+          >
+            Admin
+          </button>
+        )}
       </div>
     );
   };
@@ -114,18 +136,29 @@ const Header = (props: HeaderProps) => {
   return (
     <HeaderDiv>
       <Logo>CarpoolNU</Logo>
-      {props.data && (
+      {props.admin ? (
         <div className="flex items-center">
-          {renderSidebarOptions(props.data)}
-          <DropDownMenu />
-          <>
-            {displayGroup &&
-              createPortal(
-                <GroupPage onClose={() => setDisplayGroup(false)} />,
-                document.body
-              )}
-          </>
+          <button
+            onClick={handleAdminClick}
+            className="rounded-xl p-4 text-xl font-medium text-white"
+          >
+            Home
+          </button>
         </div>
+      ) : (
+        props.data && (
+          <div className="flex items-center">
+            {renderSidebarOptions(props.data)}
+            <DropDownMenu />
+            <>
+              {displayGroup &&
+                createPortal(
+                  <GroupPage onClose={() => setDisplayGroup(false)} />,
+                  document.body
+                )}
+            </>
+          </div>
+        )
       )}
     </HeaderDiv>
   );

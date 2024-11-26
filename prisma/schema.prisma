@@ -22,6 +22,12 @@ enum Role {
   VIEWER
 }
 
+enum Permission {
+  USER
+  ADMIN
+  MANAGER
+}
+
 // Represents a Status.
 enum Status {
   ACTIVE
@@ -132,6 +138,7 @@ model User {
   accounts           Account[] // can have multiple accounts
   sessions           Session[] // can have multiple settings
   role               Role          @default(VIEWER)
+  permission         Permission    @default(USER)
   status             Status        @default(ACTIVE)
   seatAvail          Int           @default(0) @map("seat_avail")
   companyName        String        @default("") @map("company_name")
