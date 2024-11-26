@@ -27,7 +27,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 const Admin: NextPage = () => {
   const [option, setOption] = useState<string>("management");
   return (
-    <div className="relative h-full max-h-screen w-full ">
+    <div className="relative h-full w-full overflow-hidden  ">
       <Header admin={true} />
       <div className="flex h-full  flex-row">
         <div className="z-0 min-w-[150px] max-w-[250px] flex-[1] border-r-4 border-busy-red   bg-stone-100">
