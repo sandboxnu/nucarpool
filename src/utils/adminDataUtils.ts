@@ -1,4 +1,4 @@
-import { addWeeks } from "date-fns";
+import { addWeeks, startOfWeek } from "date-fns";
 
 interface ItemWithDate {
   dateCreated: Date;
@@ -9,7 +9,7 @@ export const filterItemsByDate = (
   endTimestamp: number
 ) => {
   return items.filter((item) => {
-    const itemTimestamp = item.dateCreated.getTime();
+    const itemTimestamp = startOfWeek(item.dateCreated).getTime();
     return itemTimestamp >= startTimestamp && itemTimestamp <= endTimestamp;
   });
 };
