@@ -5,12 +5,8 @@ import Spinner from "../Spinner";
 import { toast } from "react-toastify";
 import { ConfigProvider, Select } from "antd";
 import { Note } from "../../styles/profile";
+import { TempUser } from "../../utils/types";
 
-type TempUser = {
-  id: string;
-  email: string;
-  permission: Permission;
-};
 type UserManagementProps = {
   permission: Permission;
 };

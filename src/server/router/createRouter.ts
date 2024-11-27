@@ -22,5 +22,21 @@ const isProtected = middleware(({ ctx, next }) => {
     },
   });
 });
+const isAdmin = middleware(({ ctx, next }) => {
+  if (!ctx.session || !ctx.session.user) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  if (ctx.session.user.permission === "USER") {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  return next({
+    ctx: {
+      ...ctx,
+      session: ctx.session,
+    },
+  });
+});
 
 export const protectedRouter = procedure.use(isProtected);
+export const adminRouter = procedure.use(isAdmin);
