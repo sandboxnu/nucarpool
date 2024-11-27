@@ -1,5 +1,5 @@
 import { TimePicker, ConfigProvider } from "antd";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
 import utc from "dayjs/plugin/utc";
@@ -46,11 +46,9 @@ const ControlledTimePicker = (props: ControlledTimePickerProps) => {
       name={props.name}
       control={props.control}
       render={({ field: { ref, ...fieldProps }, fieldState }) => {
-        // Log the error state to the console
         if (fieldState.error) {
           console.log("Error in TimePicker:", fieldState.error);
         }
-
         return (
           <ConfigProvider
             theme={{
