@@ -28,11 +28,15 @@ interface BarChartOnboardingProps {
 }
 
 function BarChartUserCounts({ users }: BarChartOnboardingProps) {
-  const totalCount = users.length;
-  const countOnboarded = users.filter((user) => user.isOnboarded).length;
+  const activeUsers = users.filter((user) => user.status === "ACTIVE");
+  const totalCount = activeUsers.length;
+  const inactiveCount = users.length - totalCount;
+  const countOnboarded = activeUsers.filter((user) => user.isOnboarded).length;
   const countNotOnboarded = totalCount - countOnboarded;
-  const driverCount = users.filter((user) => user.role === "DRIVER").length;
-  const riderCount = users.filter((user) => user.role === "RIDER").length;
+  const driverCount = activeUsers.filter(
+    (user) => user.role === "DRIVER"
+  ).length;
+  const riderCount = activeUsers.filter((user) => user.role === "RIDER").length;
 
   const viewerCount = totalCount - (driverCount + riderCount);
   const dataPoints = [
@@ -42,6 +46,7 @@ function BarChartUserCounts({ users }: BarChartOnboardingProps) {
     driverCount,
     riderCount,
     viewerCount,
+    inactiveCount,
   ];
   const barColors = [
     "#000000",
@@ -50,6 +55,7 @@ function BarChartUserCounts({ users }: BarChartOnboardingProps) {
     "#C8102E",
     "#DA7D25",
     "#2454DD",
+    "#808080",
   ];
   const labels = [
     "Total",
@@ -58,6 +64,7 @@ function BarChartUserCounts({ users }: BarChartOnboardingProps) {
     "Driver",
     "Rider",
     "Viewer",
+    "Inactive",
   ];
 
   const barData: ChartData<"bar"> = {
@@ -65,7 +72,7 @@ function BarChartUserCounts({ users }: BarChartOnboardingProps) {
 
     datasets: [
       {
-        label: "User Counts",
+        label: "Active User Counts",
         data: dataPoints,
         backgroundColor: barColors,
       },
@@ -120,8 +127,12 @@ function BarChartUserCounts({ users }: BarChartOnboardingProps) {
 
   return (
     <div className="h-full w-full ">
-      <div className="relative h-full">
+      <div className="relative flex h-full flex-col">
         <Bar data={barData} options={barOptions} />
+        <span className="w-full text-center font-lato text-sm text-gray-400">
+          All bars currently only include active users aside from
+          &quot;Inactive&quot;
+        </span>
       </div>
     </div>
   );

@@ -33,6 +33,7 @@ import {
   countCumulativeItemsPerWeek,
   filterItemsByDate,
 } from "../../utils/adminDataUtils";
+import _ from "lodash";
 
 interface LineChartCountProps {
   users: TempUser[];
@@ -43,7 +44,10 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
   const [sliderRange, setSliderRange] = useState<number[]>([0, 0]);
   const [minDate, setMinDate] = useState<number>(0);
   const [maxDate, setMaxDate] = useState<number>(0);
-
+  const activeUsers = users.filter(
+    (user: TempUser) => user.status === "ACTIVE"
+  );
+  const inactiveUsers = _.differenceBy(users, activeUsers);
   useEffect(() => {
     if (users && groups) {
       const allTimestamps = [
@@ -70,8 +74,13 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
   };
 
   // Filter based on slider range
-  const filteredUsers = filterItemsByDate(
-    users,
+  const filteredActiveUsers = filterItemsByDate(
+    activeUsers,
+    sliderRange[0],
+    sliderRange[1]
+  );
+  const filteredInactiveUsers = filterItemsByDate(
+    inactiveUsers,
     sliderRange[0],
     sliderRange[1]
   );
@@ -83,7 +92,7 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
 
   // Generate week labels
   const allDates = [
-    ...filteredUsers.map((user) => user.dateCreated),
+    ...users.map((user) => user.dateCreated),
     ...filteredGroups.map((group) => group.dateCreated),
   ];
 
@@ -104,17 +113,36 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
     }
   }
 
-  const userCounts = countCumulativeItemsPerWeek(filteredUsers, weekLabels);
+  const activeUserCount = countCumulativeItemsPerWeek(
+    filteredActiveUsers,
+    weekLabels
+  );
+  const inactiveUserCount = countCumulativeItemsPerWeek(
+    filteredInactiveUsers,
+    weekLabels
+  );
+
   const groupCounts = countCumulativeItemsPerWeek(filteredGroups, weekLabels);
   const lineData: ChartData<"line"> = {
     labels: weekLabels,
     datasets: [
       {
-        label: "Users",
-        data: userCounts,
+        label: "Active Users",
+        data: activeUserCount,
         fill: false,
         backgroundColor: "#C8102E",
         borderColor: "#C8102E",
+        tension: 0.1,
+        pointRadius: 10,
+        spanGaps: true,
+      },
+      {
+        label: "Inactive Users",
+        data: inactiveUserCount,
+        fill: false,
+        hidden: true,
+        backgroundColor: "#808080",
+        borderColor: "#808080",
         tension: 0.1,
         pointRadius: 10,
         spanGaps: true,
