@@ -15,7 +15,7 @@ import {
 } from "chart.js";
 import "chartjs-adapter-date-fns";
 import { format, startOfWeek, differenceInWeeks, addWeeks } from "date-fns";
-import { Slider } from "antd";
+import { Slider, ConfigProvider } from "antd";
 
 ChartJS.register(
   CategoryScale,
@@ -66,7 +66,7 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
     setSliderRange(value);
   };
 
-  // Filter items based on slider range
+  // Filter based on slider range
   const filteredUsers = filterItemsByDate(
     users,
     sliderRange[0],
@@ -142,7 +142,7 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
         labels: {
           font: {
             family: "Montserrat",
-            size: 18,
+            size: 16,
             style: "normal",
             weight: "bold",
           },
@@ -239,16 +239,26 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
         <div>No data available for the selected date range.</div>
       )}
       <div className="w-full">
-        <Slider
-          range={{ draggableTrack: true }}
-          min={minDate}
-          max={maxDate}
-          value={sliderRange}
-          tooltip={{ formatter }}
-          onChange={onSliderChange}
-          step={24 * 60 * 60 * 1000}
-        />
-        <div className="flex justify-between">
+        <ConfigProvider
+          theme={{
+            token: {
+              fontFamily: "Montserrat",
+              fontSize: 16,
+              colorPrimary: "#C8102E",
+            },
+          }}
+        >
+          <Slider
+            range={{ draggableTrack: true }}
+            min={minDate}
+            max={maxDate}
+            value={sliderRange}
+            tooltip={{ formatter }}
+            onChange={onSliderChange}
+            step={24 * 60 * 60 * 1000}
+          />
+        </ConfigProvider>
+        <div className="flex justify-between font-montserrat">
           <span>{format(new Date(sliderRange[0]), "MMM dd, yyyy")}</span>
           <span>{format(new Date(sliderRange[1]), "MMM dd, yyyy")}</span>
         </div>

@@ -1,5 +1,5 @@
 import { TimePicker, ConfigProvider } from "antd";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
 import utc from "dayjs/plugin/utc";

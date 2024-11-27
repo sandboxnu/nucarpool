@@ -18,6 +18,7 @@ export const adminDataRouter = router({
         permission: true,
         isOnboarded: true,
         dateCreated: true,
+        role: true,
       },
     });
   }),

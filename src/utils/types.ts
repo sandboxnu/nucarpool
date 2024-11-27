@@ -11,6 +11,7 @@ export type TempUser = {
   permission: Permission;
   isOnboarded: boolean;
   dateCreated: Date;
+  role: Role;
 };
 export type TempGroup = {
   id: string;

@@ -27,22 +27,47 @@ interface BarChartOnboardingProps {
   users: TempUser[];
 }
 
-function BarChartOnboarding({ users }: BarChartOnboardingProps) {
+function BarChartUserCounts({ users }: BarChartOnboardingProps) {
+  const totalCount = users.length;
   const countOnboarded = users.filter((user) => user.isOnboarded).length;
-  const countNotOnboarded = users.length - countOnboarded;
+  const countNotOnboarded = totalCount - countOnboarded;
+  const driverCount = users.filter((user) => user.role === "DRIVER").length;
+  const riderCount = users.filter((user) => user.role === "RIDER").length;
+
+  const viewerCount = totalCount - (driverCount + riderCount);
+  const dataPoints = [
+    totalCount,
+    countOnboarded,
+    countNotOnboarded,
+    driverCount,
+    riderCount,
+    viewerCount,
+  ];
+  const barColors = [
+    "#000000",
+    "#FFA9A9",
+    "#808080",
+    "#C8102E",
+    "#DA7D25",
+    "#2454DD",
+  ];
+  const labels = [
+    "Total",
+    "Onboarded",
+    "Not Onboarded",
+    "Driver",
+    "Rider",
+    "Viewer",
+  ];
 
   const barData: ChartData<"bar"> = {
-    labels: ["Users"],
+    labels,
+
     datasets: [
       {
-        label: "Onboarded",
-        data: [countOnboarded],
-        backgroundColor: "#C8102E",
-      },
-      {
-        label: "Not Onboarded",
-        data: [countNotOnboarded],
-        backgroundColor: "#D3D3D3",
+        label: "User Counts",
+        data: dataPoints,
+        backgroundColor: barColors,
       },
     ],
   };
@@ -52,19 +77,11 @@ function BarChartOnboarding({ users }: BarChartOnboardingProps) {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: "top",
-        labels: {
-          font: {
-            family: "Montserrat",
-            size: 16,
-            style: "normal",
-            weight: "bold",
-          },
-        },
+        display: false,
       },
       title: {
         display: true,
-        text: "User Onboarding Status",
+        text: "User Counts",
         font: {
           family: "Montserrat",
           size: 18,
@@ -110,4 +127,4 @@ function BarChartOnboarding({ users }: BarChartOnboardingProps) {
   );
 }
 
-export default BarChartOnboarding;
+export default BarChartUserCounts;
