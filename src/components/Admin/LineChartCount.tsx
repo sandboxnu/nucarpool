@@ -57,7 +57,10 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
 
         setMinDate(minTimestamp);
         setMaxDate(maxTimestamp);
-        setSliderRange([minTimestamp, maxTimestamp]);
+        setSliderRange([
+          startOfWeek(minTimestamp).getTime(),
+          startOfWeek(maxTimestamp).getTime(),
+        ]);
       }
     }
   }, [users, groups]);
@@ -87,12 +90,10 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
   let weekLabels: Date[] = [];
   if (allDates.length > 0) {
     const minWeekDate = startOfWeek(
-      new Date(Math.min(...allDates.map((date) => date.getTime()))),
-      { weekStartsOn: 1 }
+      new Date(Math.min(...allDates.map((date) => date.getTime())))
     );
     const maxWeekDate = startOfWeek(
-      new Date(Math.max(...allDates.map((date) => date.getTime()))),
-      { weekStartsOn: 1 }
+      new Date(Math.max(...allDates.map((date) => date.getTime())))
     );
 
     const weeksDifference = differenceInWeeks(maxWeekDate, minWeekDate) + 1;
@@ -105,7 +106,6 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
 
   const userCounts = countCumulativeItemsPerWeek(filteredUsers, weekLabels);
   const groupCounts = countCumulativeItemsPerWeek(filteredGroups, weekLabels);
-
   const lineData: ChartData<"line"> = {
     labels: weekLabels,
     datasets: [
@@ -150,7 +150,7 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
       },
       title: {
         display: true,
-        text: "Cumulative Users and Groups Over Time",
+        text: "Cumulative Users and Current Groups Over Time",
         font: {
           family: "Montserrat",
           size: 18,
@@ -250,17 +250,21 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
         >
           <Slider
             range={{ draggableTrack: true }}
-            min={minDate}
-            max={maxDate}
+            min={startOfWeek(minDate).getTime()}
+            max={startOfWeek(maxDate).getTime()}
             value={sliderRange}
             tooltip={{ formatter }}
             onChange={onSliderChange}
-            step={24 * 60 * 60 * 1000}
+            step={7 * 24 * 60 * 60 * 1000}
           />
         </ConfigProvider>
         <div className="flex justify-between font-montserrat">
-          <span>{format(new Date(sliderRange[0]), "MMM dd, yyyy")}</span>
-          <span>{format(new Date(sliderRange[1]), "MMM dd, yyyy")}</span>
+          <span>
+            {format(startOfWeek(new Date(sliderRange[0])), "MMM dd, yyyy")}
+          </span>
+          <span>
+            {format(startOfWeek(new Date(sliderRange[1])), "MMM dd, yyyy")}
+          </span>
         </div>
       </div>
     </div>
