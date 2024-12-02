@@ -179,7 +179,19 @@ const Index: NextPage = () => {
     });
     trackProfileCompletion(userInfo.role, userInfo.status);
   };
-
+  const handleRoleChange = (newRole: Role) => {
+    if (
+      user?.role === Role.DRIVER &&
+      user.carpoolId &&
+      newRole !== Role.DRIVER
+    ) {
+      toast.error(
+        "You are currently in a carpool group. To switch roles, please leave the group."
+      );
+    } else {
+      setValue("role", newRole, { shouldValidate: true });
+    }
+  };
   if (isLoading || !user) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-white ">
@@ -208,8 +220,10 @@ const Index: NextPage = () => {
                       role={Role.VIEWER}
                       value={Role.VIEWER}
                       currentlySelected={watch("role")}
-                      {...register("role")}
+                      onChange={() => handleRoleChange(Role.VIEWER)}
+                      checked={watch("role") === Role.VIEWER}
                     />
+
                     <Radio
                       label="Rider"
                       id="rider"
@@ -217,8 +231,10 @@ const Index: NextPage = () => {
                       role={Role.RIDER}
                       value={Role.RIDER}
                       currentlySelected={watch("role")}
-                      {...register("role")}
+                      onChange={() => handleRoleChange(Role.RIDER)}
+                      checked={watch("role") === Role.RIDER}
                     />
+
                     <Radio
                       label="Driver"
                       id="driver"
@@ -226,7 +242,8 @@ const Index: NextPage = () => {
                       role={Role.DRIVER}
                       value={Role.DRIVER}
                       currentlySelected={watch("role")}
-                      {...register("role")}
+                      onChange={() => handleRoleChange(Role.DRIVER)}
+                      checked={watch("role") === Role.DRIVER}
                     />
 
                     {watch("role") == Role.DRIVER && (
