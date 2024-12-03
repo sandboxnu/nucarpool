@@ -5,6 +5,9 @@ import { trpc } from "../utils/trpc";
 import { UserContext } from "../utils/userContext";
 import { Role, User } from "@prisma/client";
 import Spinner from "./Spinner";
+import { toast } from "react-toastify";
+import { TRPCClientError } from "@trpc/client";
+import { useToasts } from "react-toast-notifications";
 
 interface GroupPageProps {
   onClose: () => void;
@@ -48,7 +51,7 @@ const GroupBody = ({
   onClose: () => void;
 }) => {
   return !curUser?.carpoolId ? (
-    <NoGroupInfo role={curUser.role} />
+    <NoGroupInfo role={curUser.role} onClose={onClose} />
   ) : (
     <GroupInfo curUser={curUser} onClose={onClose} />
   );
@@ -56,16 +59,68 @@ const GroupBody = ({
 
 interface NoGroupInfoProps {
   role: Role;
+  onClose: () => void;
 }
 
-const NoGroupInfo = ({ role }: NoGroupInfoProps) => {
-  const text =
-    role === Role.VIEWER
-      ? "You are in Viewer mode, switch to Rider or Driver to join a group"
-      : "You are not currently part of a carpool group";
+const NoGroupInfo = ({ role, onClose }: NoGroupInfoProps) => {
+  const utils = trpc.useContext();
+  const { data: user } = trpc.user.me.useQuery();
+  const [groupMessage, setGroupMessage] = useState(user?.groupMessage ?? "");
+  const { mutate: updateUserMessage } = trpc.user.groups.updateUserMessage.useMutation({
+    onSuccess: () => {
+      // Invalidate and refetch the user.me query
+      utils.user.me.invalidate();
+    },
+  });
+
+  useEffect(() => {
+    if (user?.groupMessage) {
+      setGroupMessage(user.groupMessage);
+    }
+  }, [user]);
+
+  const handleMessageSubmit = async () => {
+    if (user?.id && role === "DRIVER") {
+      await updateUserMessage({ message: groupMessage });
+    }
+  };
+
   return (
-    <div className="flex flex-grow items-center justify-center text-xl font-light">
-      {text}
+    <div className="flex flex-col">
+      {role === Role.VIEWER ? (
+        <div className="flex flex-grow items-center justify-center text-xl font-light">
+          You are in Viewer mode, switch to Rider or Driver to join a group
+        </div>
+      ) : (
+        <>
+          {role === "DRIVER" && (
+            <div className="mx-20 flex flex-col py-1 mb-8">
+              <div className="my-1 text-xs italic text-slate-400">
+                Below, share any information that you would like riders joining you your Carpool to know. You can indicate when you generally like to be leaving your place, what your preferred method of communication is, what your preference is to split gas and what your Carpool vibe will be like.
+              </div>
+              <div className="flex flex-row gap-2">
+                <textarea
+                  className="form-input min-h-[50px] flex-grow resize-none rounded-md py-2 shadow-sm"
+                  value={groupMessage}
+                  onChange={(e) => setGroupMessage(e.target.value)}
+                />
+                <button
+                  className="w-[150px] rounded-md bg-red-700 py-2 text-white h-full"
+                  onClick={async () => {
+                    await handleMessageSubmit();
+                    toast.success('Group message successfully saved!');
+                  }}
+                >
+                  Submit
+                </button>
+              </div>
+            </div>
+          )}
+          <div className="flex flex-grow items-center justify-center text-xl font-light">
+            You are not currently part of a carpool group
+          </div>
+        </>
+      )}
     </div>
   );
 };
@@ -77,19 +132,33 @@ const GroupInfo = ({
   curUser: User;
   onClose: () => void;
 }) => {
+  const utils = trpc.useContext();
   const { data: group } = trpc.user.groups.me.useQuery();
   const users = group?.users ?? [];
   const [groupMessage, setGroupMessage] = useState(group?.message ?? "");
-  const { mutate: updateMessage } =
-    trpc.user.groups.updateMessage.useMutation();
+  const { mutate: updateMessage } = trpc.user.groups.updateMessage.useMutation({
+    onSuccess: () => {
+      // Invalidate and refetch the groups.me query
+      utils.user.groups.me.invalidate();
+    },
+  });
+  const { mutate: updateUserMessage } = trpc.user.groups.updateUserMessage.useMutation({
+    onSuccess: () => {
+      // Invalidate and refetch the user.me query
+      utils.user.me.invalidate();
+    },
+  });
 
   useEffect(() => {
-    setGroupMessage(group?.message ?? "");
+    if (group?.message !== undefined) {
+      setGroupMessage(group.message);
+    }
   }, [group]);
 
   const handleMessageSubmit = async () => {
     if (group?.id && curUser?.role === "DRIVER") {
       await updateMessage({ groupId: group.id, message: groupMessage });
+      await updateUserMessage({ message: groupMessage });
     }
   };
 
@@ -109,7 +178,10 @@ const GroupInfo = ({
             />
             <button
               className="ml-8 h-full w-[150px] rounded-md bg-red-700 text-white"
-              onClick={handleMessageSubmit}
+              onClick={async () => {
+                await handleMessageSubmit();
+                toast.success('Group message successfully saved!');
+              }}
             >
               Submit
             </button>
@@ -117,6 +189,8 @@ const GroupInfo = ({
         </div>
       ) : (
         <div className="mx-16 flex flex-col py-1">
+          <div className="text-center">Carpool Information from Driver</div>
+          <br/>
           <p className="flex-1 justify-center rounded-md border px-3 py-2 text-center text-sm shadow-sm">
             {groupMessage != ""
               ? groupMessage

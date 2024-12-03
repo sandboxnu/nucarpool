@@ -55,20 +55,22 @@ export const groupsRouter = router({
         where: { id: input.driverId },
       });
 
-      if (driver?.seatAvail === 0) {
+      if (!driver) {
         throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Driver does not have space available in their car",
+          code: "NOT_FOUND",
+          message: "Driver not found",
         });
       }
+      
       const group = await ctx.prisma.carpoolGroup.create({
         data: {
           users: {
             connect: { id: input.driverId },
           },
-          message: "",
+          message: driver.groupMessage || "",
         },
       });
+      
       const nGroup = await ctx.prisma.carpoolGroup.update({
         where: { id: group.id },
         data: {
@@ -206,5 +208,20 @@ export const groupsRouter = router({
         },
       });
       return updatedGroup;
+    }),
+  updateUserMessage: protectedRouter
+    .input(
+      z.object({
+        message: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const updatedUser = await ctx.prisma.user.update({
+        where: { id: ctx.session.user?.id },
+        data: {
+          groupMessage: input.message,
+        },
+      });
+      return updatedUser;
     }),
 });
