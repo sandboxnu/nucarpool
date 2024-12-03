@@ -165,15 +165,15 @@ const Profile2: NextPage = () => {
   return (
     <div className="relative h-full w-full overflow-hidden">
       <Header />
-      <div className="grid h-[91.5%] grid-cols-3">
+      <div className="grid h-[91.5%] grid-cols-[250px_repeat(2,1fr)] lg:grid-cols-[350px_repeat(2,1fr)]">
         {/* Sidebar */}
-        <div className="lg:w[350px] col-start-1 col-end-2 w-[250px] border-r-4 border-busy-red bg-stone-100">
+        <div className="col-start-1 col-end-2 w-[250px] border-r-4 border-busy-red bg-stone-100 lg:w-[350px]">
           <ProfileSidebar option={option} setOption={setOption} />
         </div>
 
         {/* Main Section */}
-        <div className="col-start-2 col-end-3 flex items-start justify-center">
-          <div className="max-w-[800px]  md:-translate-x-[125px] lg:-translate-x-[175px]">
+        <div className="col-start-2 col-end-4 flex shrink items-start justify-center overflow-hidden">
+          <div className="overflow-hidden lg:max-w-[800px] lg:-translate-x-[175px]  lg:overflow-visible">
             <UserSection
               watch={watch}
               onFileSelect={setSelectedFile}
