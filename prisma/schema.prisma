@@ -118,7 +118,7 @@ model Message {
 // Represents a group of users
 model CarpoolGroup {
   id          String   @id @default(cuid()) // primary key
-  message     String   @db.Text
+  message     String
   users       User[]
   dateCreated DateTime @default(now())
 
