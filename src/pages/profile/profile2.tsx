@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { FieldErrors, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
@@ -36,6 +36,8 @@ import {
 import ProfileSidebar from "../../components/Profile/ProfileSidebar";
 import UserSection from "../../components/Profile/UserSection";
 import Header from "../../components/Header";
+import CarpoolSection from "../../components/Profile/CarpoolSection";
+import AccountSection from "../../components/Profile/AccountSection";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getSession(context);
@@ -63,8 +65,10 @@ const Profile2: NextPage = () => {
   const { data: user } = trpc.user.me.useQuery(undefined, {
     refetchOnMount: true,
   });
-  const editUserMutation = useEditUserMutation(router, () =>
-    setIsLoading(false)
+  const editUserMutation = useEditUserMutation(
+    router,
+    () => setIsLoading(false),
+    false
   );
   const startAddressHook = useAddressSelection();
   const companyAddressHook = useAddressSelection();
@@ -91,12 +95,10 @@ const Profile2: NextPage = () => {
     register,
     setValue,
     formState: { errors },
-    setError,
     watch,
     handleSubmit,
     reset,
     control,
-    trigger,
   } = useForm<OnboardingFormInputs>({
     mode: "onChange",
     defaultValues: profileDefaultValues,
@@ -155,13 +157,53 @@ const Profile2: NextPage = () => {
       }
     }
     const sessionName = session?.user?.name ?? "";
-    await updateUser({
-      userInfo,
-      sessionName,
-      mutation: editUserMutation,
-    });
-    trackFTUECompletion(userInfo.role);
+    try {
+      await updateUser({
+        userInfo,
+        sessionName,
+        mutation: editUserMutation,
+      });
+      trackProfileCompletion(userInfo.role, userInfo.status);
+      toast.success("User profile updated successfully!");
+    } catch (error) {
+      toast.error("Failed to update user profile. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
+  const onError = (errors: FieldErrors<OnboardingFormInputs>) => {
+    const firstErrorKey = Object.keys(errors)[0];
+
+    if (firstErrorKey) {
+      if (
+        ["preferredName", "pronouns", "role", "bio", "seatAvail"].includes(
+          firstErrorKey
+        )
+      ) {
+        setOption("user");
+      } else if (
+        [
+          "startAddress",
+          "companyAddress",
+          "startTime",
+          "endTime",
+          "daysWorking",
+        ].includes(firstErrorKey)
+      ) {
+        setOption("carpool");
+      } else {
+        setOption("account");
+      }
+    }
+    toast.error("One or more fields are invalid, please fix and try again.");
+  };
+  if (isLoading || !user) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white ">
+        <Spinner />
+      </div>
+    );
+  }
   return (
     <div className="relative h-full w-full overflow-hidden">
       <Header />
@@ -173,14 +215,39 @@ const Profile2: NextPage = () => {
 
         {/* Main Section */}
         <div className="col-start-2 col-end-4 flex shrink items-start justify-center overflow-hidden">
-          <div className="overflow-hidden lg:max-w-[800px] lg:-translate-x-[175px]  lg:overflow-visible">
-            <UserSection
-              watch={watch}
-              onFileSelect={setSelectedFile}
-              errors={errors}
-              register={register}
-              setValue={setValue}
-            />
+          <div className="overflow-hidden  lg:-translate-x-[175px]  lg:overflow-visible">
+            {option === "user" ? (
+              <UserSection
+                watch={watch}
+                onFileSelect={setSelectedFile}
+                errors={errors}
+                register={register}
+                onSubmit={handleSubmit(onSubmit, onError)}
+                setValue={setValue}
+              />
+            ) : option === "carpool" ? (
+              <CarpoolSection
+                watch={watch}
+                onFileSelect={setSelectedFile}
+                errors={errors}
+                register={register}
+                setValue={setValue}
+                onSubmit={handleSubmit(onSubmit, onError)}
+                startAddressHook={startAddressHook}
+                companyAddressHook={companyAddressHook}
+                control={control}
+              />
+            ) : option === "account" ? (
+              <AccountSection
+                control={control}
+                watch={watch}
+                onSubmit={handleSubmit(onSubmit, onError)}
+                errors={errors}
+                setValue={setValue}
+              />
+            ) : (
+              <></>
+            )}
           </div>
         </div>
       </div>

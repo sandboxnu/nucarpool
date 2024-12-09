@@ -40,6 +40,7 @@ interface HeaderProps {
     disabled: boolean;
   };
   admin?: boolean;
+  signIn?: boolean;
 }
 
 export type HeaderOptions = "explore" | "requests";
@@ -144,12 +145,12 @@ const Header = (props: HeaderProps) => {
           >
             Home
           </button>
-          <DropDownMenu />
+          {!props.signIn && <DropDownMenu />}
         </div>
       ) : (
         <div className="flex items-center">
           {props.data && renderSidebarOptions(props.data)}
-          <DropDownMenu />
+          {!props.signIn && <DropDownMenu />}
           <>
             {displayGroup &&
               createPortal(

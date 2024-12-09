@@ -1,50 +1,42 @@
-import {
-  LightEntryLabel,
-  Note,
-  PersonalInfoSection,
-  ProfileColumn,
-  ProfileHeader,
-  ProfileHeaderNoMB,
-  TopProfileSection,
-} from "../../styles/profile";
+import { Note, ProfileHeader } from "../../styles/profile";
 import Radio from "../Radio";
-import { Role, Status } from "@prisma/client";
+import { Role } from "@prisma/client";
 import { EntryLabel } from "../EntryLabel";
 import { TextField } from "../TextField";
 import {
-  Controller,
   FieldErrors,
+  UseFormHandleSubmit,
   UseFormRegister,
   UseFormSetValue,
   UseFormWatch,
 } from "react-hook-form";
 import { OnboardingFormInputs } from "../../utils/types";
-import styled from "styled-components";
 import ProfilePicture from "./ProfilePicture";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 interface UserSectionProps {
   register: UseFormRegister<OnboardingFormInputs>;
   errors: FieldErrors<OnboardingFormInputs>;
   setValue: UseFormSetValue<OnboardingFormInputs>;
   watch: UseFormWatch<OnboardingFormInputs>;
+  onSubmit: ReturnType<UseFormHandleSubmit<OnboardingFormInputs>>;
+
   onFileSelect: (file: File | null) => void;
 }
 const UserSection = ({
   errors,
   watch,
   register,
+  onSubmit,
   setValue,
   onFileSelect,
 }: UserSectionProps) => {
   const isViewer = watch("role") === Role.VIEWER;
   return (
-    <div className="relative flex h-full w-full flex-col justify-start p-20">
-      <ProfileHeader>User Profile</ProfileHeader>
-      <ProfileHeaderNoMB>
+    <div className="relative my-20 flex h-full  flex-col  justify-start">
+      <ProfileHeader className={"!text-4xl"}>User Profile</ProfileHeader>
+      <div className="flex font-montserrat text-2xl font-bold">
         I am a... <span className="text-northeastern-red">*</span>
-      </ProfileHeaderNoMB>
-      <div className="flex h-20 items-end space-x-4">
+      </div>
+      <div className="flex h-20 w-[700px] max-w-full grow items-end gap-8 ">
         <Radio
           label="Viewer"
           id="viewer"
@@ -78,22 +70,24 @@ const UserSection = ({
             <EntryLabel
               required={true}
               error={errors.seatAvail}
-              label="Seat availability"
-            />
-            <TextField
-              inputClassName="py-[14px] h-14 text-lg"
-              className="w-full self-end"
               label="Seat Availability"
-              id="seatAvail"
-              error={errors.seatAvail}
-              type="number"
-              min="0"
-              {...register("seatAvail", { valueAsNumber: true })}
             />
+            <div className="flex flex-col gap-1">
+              <TextField
+                inputClassName="py-[14px] h-14 text-lg "
+                className="w-full self-end"
+                label="Seat Availability"
+                id="seatAvail"
+                error={errors.seatAvail}
+                type="number"
+                min="0"
+                {...register("seatAvail", { valueAsNumber: true })}
+              />
+            </div>
           </div>
         )}
       </div>
-      <Note>
+      <Note className="my-2">
         {watch("role") === Role.DRIVER && (
           <span>Looking for Carpoolers to join you.</span>
         )}
@@ -107,16 +101,19 @@ const UserSection = ({
           </span>
         )}
       </Note>
-      <ProfileHeader>Personal Info</ProfileHeader>
-      <div className=" w-full ">
+      <EntryLabel label="Personal Info" className="mb-4 mt-6 !text-2xl" />
+      <div className=" mb-12 ml-10 w-full ">
         <ProfilePicture onFileSelected={onFileSelect} />
       </div>
 
       <div className="flex w-full flex-row  space-x-6">
         <div className="flex w-3/5 flex-col">
-          <LightEntryLabel error={!!errors.preferredName}>
-            Preferred Name
-          </LightEntryLabel>
+          <EntryLabel
+            error={errors.preferredName}
+            label="Preferred Name"
+            className={"!text-lg"}
+          />
+
           <TextField
             id="preferredName"
             error={errors.preferredName}
@@ -129,7 +126,11 @@ const UserSection = ({
 
         {/* Pronouns field  */}
         <div className="w-2/6 flex-1">
-          <LightEntryLabel error={!!errors.pronouns}>Pronouns</LightEntryLabel>
+          <EntryLabel
+            error={errors.pronouns}
+            label="Pronouns"
+            className={"!text-lg"}
+          />
           <TextField
             id="pronouns"
             inputClassName={`h-12`}
@@ -160,7 +161,11 @@ const UserSection = ({
 
       {/* Bio field */}
       <div className="w-full py-4">
-        <EntryLabel error={errors.bio} label="About Me" />
+        <EntryLabel
+          error={errors.bio}
+          label="About Me"
+          className={"!text-lg"}
+        />
         <textarea
           className={`form-input w-full resize-none rounded-md
                        ${
@@ -175,6 +180,15 @@ const UserSection = ({
         <Note>
           This intro will be shared with people you choose to connect with.
         </Note>
+      </div>
+      <div className="mt-8 font-montserrat">
+        <button
+          type="button"
+          className="w-full rounded-lg bg-northeastern-red py-3 text-lg text-white hover:bg-red-700 "
+          onClick={onSubmit}
+        >
+          Save Changes
+        </button>
       </div>
     </div>
   );

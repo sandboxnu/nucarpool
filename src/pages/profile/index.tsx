@@ -48,8 +48,6 @@ import {
   useEditUserMutation,
 } from "../../utils/profile/updateUser";
 
-// Inputs to the onboarding form.
-
 const daysOfWeek = ["Su", "M", "Tu", "W", "Th", "F", "S"];
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
