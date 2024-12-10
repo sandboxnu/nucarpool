@@ -6,6 +6,7 @@ import { GroupPage } from "./GroupPage";
 import { trpc } from "../utils/trpc";
 import { UserContext } from "../utils/userContext";
 import { useRouter } from "next/router";
+import Spinner from "./Spinner";
 
 const HeaderDiv = styled.div`
   display: flex;
@@ -47,6 +48,7 @@ interface HeaderProps {
 export type HeaderOptions = "explore" | "requests";
 
 const Header = (props: HeaderProps) => {
+  const [isLoading, setIsLoading] = useState(false);
   const { data: unreadMessagesCount } =
     trpc.user.messages.getUnreadMessageCount.useQuery();
   const user = useContext(UserContext);
@@ -72,15 +74,17 @@ const Header = (props: HeaderProps) => {
       return "rounded-xl p-4 font-medium text-xl text-white";
     }
   };
-  const handleAdminClick = () => {
+  const handleAdminClick = async () => {
+    setIsLoading(true);
     if (!props.admin) {
-      router.push("/admin");
+      await router.push("/admin").then(() => setIsLoading(false));
     } else {
-      router.push("/");
+      await router.push("/").then(() => setIsLoading(false));
     }
   };
-  const handleMapClick = () => {
-    router.push("/");
+  const handleMapClick = async () => {
+    setIsLoading(true);
+    await router.push("/").then(() => setIsLoading(false));
   };
   const renderSidebarOptions = ({
     sidebarValue,
@@ -91,6 +95,13 @@ const Header = (props: HeaderProps) => {
     setSidebar: Dispatch<SetStateAction<HeaderOptions>>;
     disabled: boolean;
   }) => {
+    if (isLoading) {
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white ">
+          <Spinner />
+        </div>
+      );
+    }
     return (
       <div className="pr-8">
         <button
