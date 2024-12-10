@@ -62,16 +62,17 @@ interface NoGroupInfoProps {
   onClose: () => void;
 }
 
-const NoGroupInfo = ({ role, onClose }: NoGroupInfoProps) => {
+const NoGroupInfo = ({ role }: NoGroupInfoProps) => {
   const utils = trpc.useContext();
   const { data: user } = trpc.user.me.useQuery();
   const [groupMessage, setGroupMessage] = useState(user?.groupMessage ?? "");
-  const { mutate: updateUserMessage } = trpc.user.groups.updateUserMessage.useMutation({
-    onSuccess: () => {
-      // Invalidate and refetch the user.me query
-      utils.user.me.invalidate();
-    },
-  });
+  const { mutate: updateUserMessage } =
+    trpc.user.groups.updateUserMessage.useMutation({
+      onSuccess: () => {
+        // Invalidate and refetch the user.me query
+        utils.user.me.invalidate();
+      },
+    });
 
   useEffect(() => {
     if (user?.groupMessage) {
@@ -94,9 +95,13 @@ const NoGroupInfo = ({ role, onClose }: NoGroupInfoProps) => {
       ) : (
         <>
           {role === "DRIVER" && (
-            <div className="mx-20 flex flex-col py-1 mb-8">
+            <div className="mx-20 mb-8 flex flex-col py-1">
               <div className="my-1 text-xs italic text-slate-400">
-                Below, share any information that you would like riders joining you your Carpool to know. You can indicate when you generally like to be leaving your place, what your preferred method of communication is, what your preference is to split gas and what your Carpool vibe will be like.
+                Below, share any information that you would like riders joining
+                you your Carpool to know. You can indicate when you generally
+                like to be leaving your place, what your preferred method of
+                communication is, what your preference is to split gas and what
+                your Carpool vibe will be like.
               </div>
               <div className="flex flex-row gap-2">
                 <textarea
@@ -105,10 +110,10 @@ const NoGroupInfo = ({ role, onClose }: NoGroupInfoProps) => {
                   onChange={(e) => setGroupMessage(e.target.value)}
                 />
                 <button
-                  className="w-[150px] rounded-md bg-red-700 py-2 text-white h-full"
+                  className="h-full w-[150px] rounded-md bg-red-700 py-2 text-white"
                   onClick={async () => {
                     await handleMessageSubmit();
-                    toast.success('Group message successfully saved!');
+                    toast.success("Group message successfully saved!");
                   }}
                 >
                   Submit
@@ -142,12 +147,13 @@ const GroupInfo = ({
       utils.user.groups.me.invalidate();
     },
   });
-  const { mutate: updateUserMessage } = trpc.user.groups.updateUserMessage.useMutation({
-    onSuccess: () => {
-      // Invalidate and refetch the user.me query
-      utils.user.me.invalidate();
-    },
-  });
+  const { mutate: updateUserMessage } =
+    trpc.user.groups.updateUserMessage.useMutation({
+      onSuccess: () => {
+        // Invalidate and refetch the user.me query
+        utils.user.me.invalidate();
+      },
+    });
 
   useEffect(() => {
     if (group?.message !== undefined) {
@@ -180,7 +186,7 @@ const GroupInfo = ({
               className="ml-8 h-full w-[150px] rounded-md bg-red-700 text-white"
               onClick={async () => {
                 await handleMessageSubmit();
-                toast.success('Group message successfully saved!');
+                toast.success("Group message successfully saved!");
               }}
             >
               Submit
@@ -190,7 +196,7 @@ const GroupInfo = ({
       ) : (
         <div className="mx-16 flex flex-col py-1">
           <div className="text-center">Carpool Information from Driver</div>
-          <br/>
+          <br />
           <p className="flex-1 justify-center rounded-md border px-3 py-2 text-center text-sm shadow-sm">
             {groupMessage != ""
               ? groupMessage

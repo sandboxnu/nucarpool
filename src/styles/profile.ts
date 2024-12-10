@@ -1,42 +1,5 @@
 import styled from "styled-components";
 
-/**
- * Media queries are min-width 1440, 834, and 420.
- */
-
-export const CompleteProfileButton = styled.button`
-  background: #c8102e;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 10px;
-  font-family: "Montserrat", sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 20px;
-  text-align: center;
-  color: #ffffff;
-  padding: 5px 7px 5px 7px;
-  width: 100%;
-  align-self: flex-end;
-  @media (min-width: 834px) {
-    justify-self: flex-end;
-    margin: 1rem 0 1rem 0;
-  }
-`;
-
-export const ProfileContainer = styled.form`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  flex: 1 1 auto;
-  width: 100%;
-  padding: 1.25rem;
-
-  @media (min-width: 834px) {
-    flex-direction: row;
-  }
-`;
-
 export const ProfileColumn = styled.div`
   display: flex;
   flex-direction: column;
@@ -46,17 +9,17 @@ export const ProfileColumn = styled.div`
   gap: 6px;
 `;
 
-export const MiddleProfileSection = styled(ProfileColumn)`
+styled(ProfileColumn)`
   width: 100%;
   flex: 1 1 auto;
 `;
 
-export const BottomProfileSection = styled(ProfileColumn)`
+styled(ProfileColumn)`
   width: 100%;
   flex: 1 1 auto;
 `;
 
-export const TopProfileSection = styled(ProfileColumn)`
+styled(ProfileColumn)`
   width: 100%;
   padding: 0 0 1rem 0;
   display: flex;
@@ -65,7 +28,7 @@ export const TopProfileSection = styled(ProfileColumn)`
   flex: 0 1 auto;
 `;
 
-export const PersonalInfoSection = styled(ProfileColumn)`
+styled(ProfileColumn)`
   width: 100%;
   flex: 1 1 auto;
   gap: 4px;
@@ -77,7 +40,7 @@ export const PersonalInfoSection = styled(ProfileColumn)`
   padding-bottom: 12px;
 `;
 
-export const CommutingScheduleSection = styled(ProfileColumn)`
+styled(ProfileColumn)`
   width: 100%;
   flex: 1 1 auto;
   gap: 6px;
@@ -99,7 +62,7 @@ export const ProfileHeader = styled.h1`
   font-size: 24px;
 `;
 
-export const ProfileHeaderNoMB = styled(ProfileHeader)`
+styled(ProfileHeader)`
   margin-bottom: 0;
 `;
 
@@ -120,19 +83,4 @@ export const ErrorDisplay = styled.span<{}>`
   font-size: 16px;
   line-height: 19px;
   color: #b12424;
-`;
-
-export const LightEntryLabel = styled.label<{
-  error?: boolean;
-}>`
-  font-family: "Montserrat", sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 24.38px;
-  display: flex;
-  align-items: center;
-  color: ${(props) => (props.error ? "#B12424" : "#000000")};
-  @media (min-width: 420px) {
-    font-size: 16px;
-  }
 `;

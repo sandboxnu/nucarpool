@@ -2,9 +2,10 @@ import { FieldError } from "react-hook-form";
 import styled from "styled-components";
 
 interface EntryLabelProps {
-  error?: FieldError;
+  error?: FieldError | (FieldError | undefined)[];
   label: string;
   required?: boolean;
+  className?: string;
 }
 
 const StyledLabel = styled.label<{
@@ -28,11 +29,11 @@ const StyledLabel = styled.label<{
 
 export const EntryLabel = (props: EntryLabelProps) => {
   return props.required ? (
-    <StyledLabel error={!!props.error}>
+    <StyledLabel error={!!props.error} className={props.className}>
       {props.label}
-      <span className="pl-1 text-northeastern-red">*</span>
+      <span className={"pl-1 text-northeastern-red "}>*</span>
     </StyledLabel>
   ) : (
-    <StyledLabel>{props.label}</StyledLabel>
+    <StyledLabel className={props.className}>{props.label} </StyledLabel>
   );
 };

@@ -25,7 +25,7 @@ export const mapboxRouter = router({
         autocomplete: z.literal(true),
       })
     )
-    .query(async ({ ctx, input }): Promise<FeatureCollection> => {
+    .query(async ({ input }): Promise<FeatureCollection> => {
       const endpoint = `https://api.mapbox.com/geocoding/v5/mapbox.places/${input.value}.json?access_token=${serverEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}&autocomplete=${input.autocomplete}&country=${input.country}&proximity=${input.proximity}&types=${input.types}`;
       const data = await fetch(endpoint)
         .then((response) => response.json())
@@ -144,7 +144,7 @@ export const mapboxRouter = router({
         points: z.array(z.tuple([z.number(), z.number()])), // Array of tuples containing longitude and latitude
       })
     )
-    .query(async ({ ctx, input }): Promise<DirectionsResponse> => {
+    .query(async ({ input }): Promise<DirectionsResponse> => {
       // Convert input to a string in the format required by the Mapbox API
       const coordinates = input.points
         .map(([lng, lat]) => `${lng},${lat}`)

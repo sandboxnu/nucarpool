@@ -299,14 +299,6 @@ export const generateUser = ({
   const [startHours, startMinutes] = startTime
     .split(":")
     .map((s) => _.toInteger(s));
-  const startDate = dayjs
-    .tz(`2022-11-01 ${startHours}:${startMinutes}00`, "UTC")
-    .toDate();
-
-  const [endHours, endMinutes] = endTime.split(":").map((s) => _.toInteger(s));
-  const endDate = dayjs
-    .tz(`2022-11-01 ${endHours}:${endMinutes}00`, "UTC")
-    .toDate();
 
   const updated_obj = {
     id: id,
