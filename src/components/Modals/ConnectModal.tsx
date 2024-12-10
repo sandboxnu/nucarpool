@@ -23,7 +23,7 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
     setIsOpen(false);
     props.onClose(action);
   };
-  const handleViewRequest = (e: React.MouseEvent) => {
+  const handleViewRequest = () => {
     props.onViewRequest(props.otherUser.id);
     props.onClose("connect");
   };

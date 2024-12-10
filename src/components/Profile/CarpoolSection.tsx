@@ -63,10 +63,7 @@ const CarpoolSection = ({
               key={day + index.toString()}
               name={`daysWorking.${index}`}
               control={control}
-              render={({
-                field: { onChange, value },
-                formState: { defaultValues },
-              }) => (
+              render={({ field: { onChange, value } }) => (
                 <Checkbox
                   key={day + index.toString()}
                   sx={{

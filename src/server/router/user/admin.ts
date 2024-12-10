@@ -5,7 +5,7 @@ import { Role } from "@prisma/client";
 // Router for admin dashboard queries, only Managers can edit roles
 // User must be Manager or Admin to view user data
 export const adminDataRouter = router({
-  getAllUsers: adminRouter.query(async ({ ctx, input }) => {
+  getAllUsers: adminRouter.query(async ({ ctx }) => {
     return ctx.prisma.user.findMany({
       where: {
         email: {
@@ -23,7 +23,7 @@ export const adminDataRouter = router({
       },
     });
   }),
-  getCarpoolGroups: adminRouter.query(async ({ ctx, input }) => {
+  getCarpoolGroups: adminRouter.query(async ({ ctx }) => {
     return ctx.prisma.carpoolGroup.findMany({
       where: {
         AND: [

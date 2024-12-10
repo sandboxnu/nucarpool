@@ -84,8 +84,7 @@ const Home: NextPage<any> = () => {
   const [tempOtherUser, setTempOtherUser] = useState<PublicUser | null>(null);
   const [tempOtherUserMarkerActive, setTempOtherUserMarkerActive] =
     useState(false);
-  const [defaultFilters, setDefaultFilters] =
-    useState<FiltersState>(initialFilters);
+  const [defaultFilters] = useState<FiltersState>(initialFilters);
   const [filters, setFilters] = useState<FiltersState>(initialFilters);
   const [sort, setSort] = useState<string>("any");
   const [debouncedFilters, setDebouncedFilters] = useState(filters);

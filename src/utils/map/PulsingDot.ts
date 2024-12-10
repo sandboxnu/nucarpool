@@ -18,8 +18,6 @@ export default class PulsingDot {
     this.map = map;
   }
 
-  onAdd() {}
-
   render() {
     const duration = 3000;
     const t = (performance.now() % duration) / duration;

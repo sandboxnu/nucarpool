@@ -14,7 +14,6 @@ interface AddressComboboxProps {
 }
 
 const AddressCombobox = ({
-  name,
   className,
   addressSelected,
   addressSetter,

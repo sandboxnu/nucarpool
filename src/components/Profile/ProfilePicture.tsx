@@ -120,9 +120,6 @@ const ProfilePicture = ({ onFileSelected }: ProfilePictureProps) => {
     },
     [zoom, minZoom]
   );
-  interface ModalOverlayProps {
-    children: ReactNode;
-  }
 
   return (
     <div>
