@@ -30,7 +30,7 @@ const AccountSection = ({
 }: AccountSectionProps) => {
   const isViewer = watch("role") === Role.VIEWER;
   return (
-    <div className="relative my-20 flex h-full w-[700px]  flex-col  justify-start">
+    <div className=" flex h-fit w-[700px]  flex-col  justify-start">
       <ProfileHeader className={"!text-4xl"}>Account Status</ProfileHeader>
       <span>
         Profile is currently{" "}
@@ -58,7 +58,6 @@ const AccountSection = ({
                       color="default"
                       sx={{
                         overflow: "visible",
-                        position: "fixed",
                         scale: 1.5,
                         "& .MuiSwitch-switchBase.Mui-checked": {
                           color: "white",
@@ -138,7 +137,7 @@ const AccountSection = ({
           Please indicate the start and the end dates of your co-op. If you
           don&apos;t know exact dates, you can use approximate dates.
         </Note>
-        <div className="mt-8 font-montserrat">
+        <div className="py-8 font-montserrat">
           <button
             type="button"
             className="w-full rounded-lg bg-northeastern-red py-3 text-lg text-white hover:bg-red-700 "

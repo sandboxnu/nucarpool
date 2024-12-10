@@ -5,8 +5,8 @@ import { TextField } from "../TextField";
 import {
   Control,
   Controller,
+  FieldError,
   FieldErrors,
-  useForm,
   UseFormHandleSubmit,
   UseFormRegister,
   UseFormSetValue,
@@ -44,16 +44,20 @@ const CarpoolSection = ({
   const daysOfWeek = ["Su", "M", "Tu", "W", "Th", "F", "S"];
 
   return (
-    <div className="relative my-20 flex h-full   flex-col  justify-start">
+    <div className="relative  flex h-full  flex-col  justify-start">
       <ProfileHeader className={"w-[700px] !text-4xl"}>
         Carpool Details
       </ProfileHeader>
 
-      <EntryLabel label="Commuting Schedule" className={"!text-2xl"} />
+      <EntryLabel
+        label="Commuting Schedule"
+        required={true}
+        error={errors.daysWorking as FieldError | (FieldError | undefined)[]}
+        className={"!text-2xl"}
+      />
 
-      {/* Days working field  */}
-      <div className="mb-2 aspect-[7/1] w-full max-w-[360px] md:my-4 lg:pl-20">
-        <div className="flex h-full w-full items-center justify-evenly ">
+      <div className="mb-2  w-full max-w-[360px] md:my-4 lg:pl-20">
+        <div className="flex  w-full items-center justify-evenly ">
           {daysOfWeek.map((day, index) => (
             <Controller
               key={day + index.toString()}
@@ -82,13 +86,11 @@ const CarpoolSection = ({
             />
           ))}
         </div>
-
-        {errors.daysWorking && (
-          <ErrorDisplay>{errors.daysWorking.message}</ErrorDisplay>
-        )}
       </div>
-      {/* Start/End Time Fields  */}
-      <div className="mt-4 flex w-full justify-between gap-6 pb-4 md:w-96">
+      {errors.daysWorking && (
+        <ErrorDisplay>{errors.daysWorking.message}</ErrorDisplay>
+      )}
+      <div className="relative mt-4 flex w-full justify-between gap-6 pb-4 md:w-96">
         <div className="flex flex-1 flex-col gap-2">
           <EntryLabel
             required={!isViewer}
@@ -122,7 +124,6 @@ const CarpoolSection = ({
         with potential riders or drivers to inform them.
       </Note>
       <EntryLabel label="Locations" className={"!text-2xl"} />
-      {/* Starting Location field  */}
       <EntryLabel
         required={!isViewer}
         error={errors.startAddress}
@@ -165,7 +166,6 @@ const CarpoolSection = ({
         type="text"
         {...register("companyName")}
       />
-      {/* Company Address field  */}
       <EntryLabel
         required={!isViewer}
         error={errors.companyAddress}
@@ -188,7 +188,7 @@ const CarpoolSection = ({
       {errors.companyAddress && (
         <ErrorDisplay>{errors.companyAddress.message}</ErrorDisplay>
       )}
-      <div className="mt-8 font-montserrat">
+      <div className="py-8 font-montserrat">
         <button
           type="button"
           className="w-full rounded-lg bg-northeastern-red py-3 text-lg text-white hover:bg-red-700 "

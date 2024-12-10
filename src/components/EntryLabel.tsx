@@ -2,7 +2,7 @@ import { FieldError } from "react-hook-form";
 import styled from "styled-components";
 
 interface EntryLabelProps {
-  error?: FieldError;
+  error?: FieldError | (FieldError | undefined)[];
   label: string;
   required?: boolean;
   className?: string;

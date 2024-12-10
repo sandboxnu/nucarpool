@@ -41,6 +41,7 @@ interface HeaderProps {
   };
   admin?: boolean;
   signIn?: boolean;
+  profile?: boolean;
 }
 
 export type HeaderOptions = "explore" | "requests";
@@ -77,6 +78,9 @@ const Header = (props: HeaderProps) => {
     } else {
       router.push("/");
     }
+  };
+  const handleMapClick = () => {
+    router.push("/");
   };
   const renderSidebarOptions = ({
     sidebarValue,
@@ -150,6 +154,24 @@ const Header = (props: HeaderProps) => {
       ) : (
         <div className="flex items-center">
           {props.data && renderSidebarOptions(props.data)}
+          {props.profile && (
+            <div className="flex">
+              <button
+                onClick={handleMapClick}
+                className="rounded-xl pr-10 text-xl font-medium text-white"
+              >
+                Map
+              </button>
+              {user?.permission !== "USER" && (
+                <button
+                  onClick={handleAdminClick}
+                  className="rounded-xl pr-10 text-xl font-medium text-white"
+                >
+                  Admin
+                </button>
+              )}
+            </div>
+          )}
           {!props.signIn && <DropDownMenu />}
           <>
             {displayGroup &&

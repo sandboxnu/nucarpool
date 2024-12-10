@@ -1,4 +1,4 @@
-import { Note, ProfileHeader } from "../../styles/profile";
+import { ErrorDisplay, Note, ProfileHeader } from "../../styles/profile";
 import Radio from "../Radio";
 import { Role } from "@prisma/client";
 import { EntryLabel } from "../EntryLabel";
@@ -31,12 +31,12 @@ const UserSection = ({
 }: UserSectionProps) => {
   const isViewer = watch("role") === Role.VIEWER;
   return (
-    <div className="relative my-20 flex h-full  flex-col  justify-start">
+    <div className="relative    flex h-full  flex-col  justify-start">
       <ProfileHeader className={"!text-4xl"}>User Profile</ProfileHeader>
-      <div className="flex font-montserrat text-2xl font-bold">
+      <div className="flex font-montserrat text-2xl  font-bold">
         I am a... <span className="text-northeastern-red">*</span>
       </div>
-      <div className="flex h-20 w-[700px] max-w-full grow items-end gap-8 ">
+      <div className="flex h-24 w-[700px] max-w-full  items-end gap-8 ">
         <Radio
           label="Viewer"
           id="viewer"
@@ -66,7 +66,7 @@ const UserSection = ({
         />
 
         {watch("role") == Role.DRIVER && (
-          <div className="flex flex-1 flex-col">
+          <div className="flex  flex-1 flex-col">
             <EntryLabel
               required={true}
               error={errors.seatAvail}
@@ -74,11 +74,10 @@ const UserSection = ({
             />
             <div className="flex flex-col gap-1">
               <TextField
-                inputClassName="py-[14px] h-14 text-lg "
+                inputClassName=" h-14 text-lg "
                 className="w-full self-end"
                 label="Seat Availability"
                 id="seatAvail"
-                error={errors.seatAvail}
                 type="number"
                 min="0"
                 {...register("seatAvail", { valueAsNumber: true })}
@@ -87,20 +86,25 @@ const UserSection = ({
           </div>
         )}
       </div>
-      <Note className="my-2">
-        {watch("role") === Role.DRIVER && (
-          <span>Looking for Carpoolers to join you.</span>
+      <div className="my-2 flex w-full justify-between">
+        <Note>
+          {watch("role") === Role.DRIVER && (
+            <p>Looking for Carpoolers to join you.</p>
+          )}
+          {watch("role") === Role.RIDER && (
+            <p>Looking for a Carpool to join.</p>
+          )}
+          {watch("role") === Role.VIEWER && (
+            <p>
+              As a viewer, you can see other riders and drivers on the map but
+              cannot request a ride.
+            </p>
+          )}
+        </Note>
+        {errors.seatAvail && watch("role") === Role.DRIVER && (
+          <ErrorDisplay>{errors.seatAvail.message}</ErrorDisplay>
         )}
-        {watch("role") === Role.RIDER && (
-          <span>Looking for a Carpool to join.</span>
-        )}
-        {watch("role") === Role.VIEWER && (
-          <span>
-            As a viewer, you can see other riders and drivers on the map but
-            cannot request a ride.
-          </span>
-        )}
-      </Note>
+      </div>
       <EntryLabel label="Personal Info" className="mb-4 mt-6 !text-2xl" />
       <div className=" mb-12 ml-10 w-full ">
         <ProfilePicture onFileSelected={onFileSelect} />
@@ -124,7 +128,6 @@ const UserSection = ({
           />
         </div>
 
-        {/* Pronouns field  */}
         <div className="w-2/6 flex-1">
           <EntryLabel
             error={errors.pronouns}
@@ -148,7 +151,6 @@ const UserSection = ({
                 shouldValidate: true,
               });
               input.value = displayValue;
-              // Reset cursor
               const adjustedCursor = Math.min(
                 cursorPosition + 1,
                 displayValue.length - 1
@@ -159,7 +161,6 @@ const UserSection = ({
         </div>
       </div>
 
-      {/* Bio field */}
       <div className="w-full py-4">
         <EntryLabel
           error={errors.bio}
@@ -181,7 +182,7 @@ const UserSection = ({
           This intro will be shared with people you choose to connect with.
         </Note>
       </div>
-      <div className="mt-8 font-montserrat">
+      <div className="py-8 font-montserrat">
         <button
           type="button"
           className="w-full rounded-lg bg-northeastern-red py-3 text-lg text-white hover:bg-red-700 "
