@@ -77,14 +77,17 @@ const Header = (props: HeaderProps) => {
   const handleAdminClick = async () => {
     setIsLoading(true);
     if (!props.admin) {
-      await router.push("/admin").then(() => setIsLoading(false));
+      await router.push("/admin");
+      setIsLoading(false);
     } else {
-      await router.push("/").then(() => setIsLoading(false));
+      await router.push("/");
+      setIsLoading(false);
     }
   };
   const handleMapClick = async () => {
     setIsLoading(true);
-    await router.push("/").then(() => setIsLoading(false));
+    await router.push("/");
+    setIsLoading(false);
   };
   const renderSidebarOptions = ({
     sidebarValue,
