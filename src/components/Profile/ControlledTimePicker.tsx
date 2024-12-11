@@ -46,9 +46,6 @@ const ControlledTimePicker = (props: ControlledTimePickerProps) => {
       name={props.name}
       control={props.control}
       render={({ field: { ref, ...fieldProps }, fieldState }) => {
-        if (fieldState.error) {
-          console.log("Error in TimePicker:", fieldState.error);
-        }
         return (
           <ConfigProvider
             theme={{

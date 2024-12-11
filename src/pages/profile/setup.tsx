@@ -153,6 +153,7 @@ const Setup: NextPage = () => {
       startCoordLat: startAddressHook.selectedAddress.center[1],
       seatAvail: values.role === "RIDER" ? 0 : values.seatAvail,
     };
+    console.log(userInfo);
     if (selectedFile) {
       try {
         await uploadFile();

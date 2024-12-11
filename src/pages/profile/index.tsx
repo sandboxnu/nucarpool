@@ -172,7 +172,7 @@ const Index: NextPage = () => {
   };
   const onError = (errors: FieldErrors<OnboardingFormInputs>) => {
     const firstErrorKey = Object.keys(errors)[0];
-
+    console.log(firstErrorKey);
     if (firstErrorKey) {
       if (
         ["preferredName", "pronouns", "role", "bio", "seatAvail"].includes(
@@ -184,6 +184,7 @@ const Index: NextPage = () => {
         [
           "startAddress",
           "companyAddress",
+          "companyName",
           "startTime",
           "endTime",
           "daysWorking",
