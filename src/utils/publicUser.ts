@@ -52,8 +52,6 @@ export const generatePoiData = async (
   longitude: number,
   latitude: number
 ): Promise<PoiData> => {
-  console.log(longitude + "\n" + latitude);
-
   const endpoint = [
     "https://api.mapbox.com/geocoding/v5/mapbox.places/",
     longitude,
@@ -62,11 +60,9 @@ export const generatePoiData = async (
     ".json?types=poi&access_token=",
     serverEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN,
   ].join("");
-  console.log(endpoint);
   const data = await fetch(endpoint)
     .then((response) => response.json())
     .catch((err) => {
-      console.log("throwing here?");
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Unexpected error. Please try again.",
