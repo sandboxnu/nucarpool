@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FieldErrors, useForm } from "react-hook-form";
+import { FieldErrors, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
@@ -28,6 +28,7 @@ import UserSection from "../../components/Profile/UserSection";
 import Header from "../../components/Header";
 import CarpoolSection from "../../components/Profile/CarpoolSection";
 import AccountSection from "../../components/Profile/AccountSection";
+import UnsavedModal from "../../components/Profile/UnsavedModal";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getSession(context);
@@ -58,6 +59,7 @@ const Index: NextPage = () => {
   const [option, setOption] = useState<"user" | "carpool" | "account">("user");
   const [isLoading, setIsLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const { uploadFile } = useUploadFile(selectedFile);
   const { data: session } = useSession();
@@ -137,6 +139,41 @@ const Index: NextPage = () => {
       setValue("seatAvail", 0);
     }
   }, [setValue, watch, role]);
+  const checkForChanges = async () => {
+    const formValues = watch();
+
+    const hasChanges =
+      formValues.role !== user?.role ||
+      formValues.seatAvail !== user?.seatAvail ||
+      formValues.status !== user?.status ||
+      formValues.companyName !== user?.companyName ||
+      formValues.companyAddress !== user?.companyAddress ||
+      formValues.startAddress !== user?.startAddress ||
+      formValues.preferredName !== user?.preferredName ||
+      formValues.pronouns !== user?.pronouns ||
+      formValues.daysWorking.some(
+        (day, index) => day !== (user?.daysWorking.split(",")[index] === "1")
+      ) ||
+      formValues.startTime?.getTime() !== user?.startTime?.getTime() ||
+      formValues.endTime?.getTime() !== user?.endTime?.getTime() ||
+      formValues.coopStartDate?.getDate() !== user?.coopStartDate?.getDate() ||
+      formValues.coopEndDate?.getDate() !== user?.coopEndDate?.getDate() ||
+      formValues.bio !== user?.bio;
+
+    if (hasChanges) {
+      setShowModal(true);
+    } else {
+      setIsLoading(true);
+      await router.push("/");
+      setIsLoading(false);
+    }
+  };
+  const onContinue = async () => {
+    setIsLoading(true);
+    await router.push("/");
+    setIsLoading(false);
+    setShowModal(false);
+  };
 
   const onSubmit = async (values: OnboardingFormInputs) => {
     setIsLoading(true);
@@ -170,9 +207,18 @@ const Index: NextPage = () => {
       setIsLoading(false);
     }
   };
+  const onSubmitWithContinue: SubmitHandler<OnboardingFormInputs> = async (
+    values
+  ) => {
+    await onSubmit(values);
+    await onContinue();
+  };
+  const handleSaveChanges = async () => {
+    setShowModal(false);
+    await handleSubmit(onSubmitWithContinue, onError)();
+  };
   const onError = (errors: FieldErrors<OnboardingFormInputs>) => {
     const firstErrorKey = Object.keys(errors)[0];
-    console.log(firstErrorKey);
     if (firstErrorKey) {
       if (
         ["preferredName", "pronouns", "role", "bio", "seatAvail"].includes(
@@ -200,18 +246,24 @@ const Index: NextPage = () => {
 
   if (isLoading || !user) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white ">
+      <div className="fixed inset-0 z-50  flex items-center justify-center bg-white ">
         <Spinner />
       </div>
     );
   }
   return (
     <div className="relative h-screen w-screen select-none ">
-      <div className="fixed left-0 right-0 top-0 z-0 h-full w-full  ">
-        <Header profile={true} />
-      </div>
+      {showModal && (
+        <UnsavedModal
+          onClose={() => setShowModal(false)}
+          onContinue={onContinue}
+          onSave={handleSaveChanges}
+        />
+      )}
 
-      <div className="relative top-[8.5%] grid  h-[91.5%] w-full grid-cols-[250px_repeat(2,1fr)] overflow-hidden lg:grid-cols-[350px_repeat(2,1fr)]">
+      <Header profile={true} checkChanges={checkForChanges} />
+
+      <div className="relative grid  h-[91.5%] w-full grid-cols-[250px_repeat(2,1fr)] overflow-hidden lg:grid-cols-[350px_repeat(2,1fr)]">
         {/* Sidebar */}
         <div className="sticky  top-0 col-start-1 col-end-2 h-full w-[250px]  border-r-4 border-busy-red bg-stone-100 lg:w-[350px]">
           <ProfileSidebar option={option} setOption={setOption} />
@@ -219,7 +271,7 @@ const Index: NextPage = () => {
 
         {/* Main Section */}
         <div className="col-start-2 col-end-4 flex h-full shrink items-start justify-center overflow-y-auto overflow-x-hidden ">
-          <div className="mt-16 lg:-translate-x-[175px]  ">
+          <div className="mt-10 lg:-translate-x-[175px]  ">
             {option === "user" ? (
               <UserSection
                 watch={watch}

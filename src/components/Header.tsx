@@ -43,6 +43,7 @@ interface HeaderProps {
   admin?: boolean;
   signIn?: boolean;
   profile?: boolean;
+  checkChanges?: () => void;
 }
 
 export type HeaderOptions = "explore" | "requests";
@@ -85,9 +86,9 @@ const Header = (props: HeaderProps) => {
     }
   };
   const handleMapClick = async () => {
-    setIsLoading(true);
-    await router.push("/");
-    setIsLoading(false);
+    if (props.checkChanges) {
+      props.checkChanges();
+    }
   };
   const renderSidebarOptions = ({
     sidebarValue,
@@ -106,7 +107,7 @@ const Header = (props: HeaderProps) => {
       );
     }
     return (
-      <div className="pr-8">
+      <div className="pr-8 ">
         <button
           onClick={() => {
             setSidebar("explore");

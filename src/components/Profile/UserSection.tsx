@@ -31,8 +31,8 @@ const UserSection = ({
 }: UserSectionProps) => {
   const isViewer = watch("role") === Role.VIEWER;
   return (
-    <div className="relative    flex h-full  flex-col  justify-start">
-      <ProfileHeader className={"!text-4xl"}>User Profile</ProfileHeader>
+    <div className="relative z-10   flex h-full  flex-col  justify-start">
+      <ProfileHeader className={"!text-4xl "}>User Profile</ProfileHeader>
       <div className="flex font-montserrat text-2xl  font-bold">
         I am a... <span className="text-northeastern-red">*</span>
       </div>
@@ -89,16 +89,16 @@ const UserSection = ({
       <div className="my-2 flex w-full justify-between">
         <Note>
           {watch("role") === Role.DRIVER && (
-            <p>Looking for Carpoolers to join you.</p>
+            <span>Looking for Carpoolers to join you.</span>
           )}
           {watch("role") === Role.RIDER && (
-            <p>Looking for a Carpool to join.</p>
+            <span>Looking for a Carpool to join.</span>
           )}
           {watch("role") === Role.VIEWER && (
-            <p>
+            <span>
               As a viewer, you can see other riders and drivers on the map but
               cannot request a ride.
-            </p>
+            </span>
           )}
         </Note>
         {errors.seatAvail && watch("role") === Role.DRIVER && (
