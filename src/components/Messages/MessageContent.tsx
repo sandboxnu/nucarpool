@@ -116,6 +116,14 @@ const MessageContent = ({ selectedUser }: MessageContentProps) => {
 
   const currentUserId = user?.id;
 
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [allMessages, scrollToBottom]);
+
   return (
     <div className="flex h-full flex-1 flex-col overflow-y-auto overflow-x-hidden bg-white p-4">
       {messagesByDate.map(({ date, messages }) => (
