@@ -6,8 +6,6 @@ import { UserContext } from "../utils/userContext";
 import { Role, User } from "@prisma/client";
 import Spinner from "./Spinner";
 import { toast } from "react-toastify";
-import { TRPCClientError } from "@trpc/client";
-import { useToasts } from "react-toast-notifications";
 
 interface GroupPageProps {
   onClose: () => void;
@@ -31,7 +29,7 @@ export const GroupPage = (props: GroupPageProps) => {
       <div className="fixed inset-0 backdrop-blur-sm" aria-hidden="true">
         <div className="fixed inset-0 flex items-center justify-center p-4">
           {/* dialog panel container  */}
-          <Dialog.Panel className="flex h-4/6 w-4/6 flex-col content-center justify-center gap-4 overflow-scroll rounded-md bg-white py-9 shadow-md">
+          <Dialog.Panel className="flex h-4/6 w-4/6 flex-col content-center justify-center gap-4 overflow-hidden  rounded-md bg-white py-9 shadow-md">
             <Dialog.Title className="text-center text-3xl font-bold">
               Group Page
             </Dialog.Title>
@@ -65,6 +63,7 @@ interface NoGroupInfoProps {
 const NoGroupInfo = ({ role }: NoGroupInfoProps) => {
   const utils = trpc.useContext();
   const { data: user } = trpc.user.me.useQuery();
+  const [preview, setPreview] = useState("");
   const [groupMessage, setGroupMessage] = useState(user?.groupMessage ?? "");
   const { mutate: updateUserMessage } =
     trpc.user.groups.updateUserMessage.useMutation({
@@ -77,17 +76,19 @@ const NoGroupInfo = ({ role }: NoGroupInfoProps) => {
   useEffect(() => {
     if (user?.groupMessage) {
       setGroupMessage(user.groupMessage);
+      setPreview(user.groupMessage);
     }
   }, [user]);
 
   const handleMessageSubmit = async () => {
     if (user?.id && role === "DRIVER") {
       await updateUserMessage({ message: groupMessage });
+      setPreview(groupMessage);
     }
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex  flex-col">
       {role === Role.VIEWER ? (
         <div className="flex flex-grow items-center justify-center text-xl font-light">
           You are in Viewer mode, switch to Rider or Driver to join a group
@@ -119,6 +120,17 @@ const NoGroupInfo = ({ role }: NoGroupInfoProps) => {
                   Submit
                 </button>
               </div>
+              <h3 className="mt-4 flex w-full text-center font-montserrat text-xl font-semibold">
+                Preview Message
+              </h3>
+              <div className="my-1 text-xs italic text-slate-400">
+                When you accept a request or a rider joins your group, they will
+                see the message displayed here! You can change your group
+                message at anytime.
+              </div>
+              <p className="mt-2 min-h-10 flex-1 justify-center rounded-md border px-3 py-2 text-center text-sm shadow-sm">
+                {preview}
+              </p>
             </div>
           )}
           <div className="flex flex-grow items-center justify-center text-xl font-light">
