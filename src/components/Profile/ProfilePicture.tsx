@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useCallback,
-  ReactNode,
-  ReactDOM,
-  useEffect,
-} from "react";
+import React, { useState, useCallback, ReactNode } from "react";
 import Image from "next/image";
 import Cropper, { Point } from "react-easy-crop";
 import { AiOutlineUser } from "react-icons/ai";
@@ -126,9 +120,6 @@ const ProfilePicture = ({ onFileSelected }: ProfilePictureProps) => {
     },
     [zoom, minZoom]
   );
-  interface ModalOverlayProps {
-    children: ReactNode;
-  }
 
   return (
     <div>
@@ -189,13 +180,12 @@ const ProfilePicture = ({ onFileSelected }: ProfilePictureProps) => {
             />
           </div>
         ) : profileImageUrl && !imageLoadError ? (
-          <div className="h-40 w-40 overflow-hidden rounded-full">
+          <div className="relative h-40 w-40 items-center justify-center overflow-hidden rounded-full">
             <Image
               src={profileImageUrl}
               alt="Profile Picture"
-              width={160}
-              height={160}
               objectFit="cover"
+              layout="fill"
             />
           </div>
         ) : (
@@ -205,7 +195,7 @@ const ProfilePicture = ({ onFileSelected }: ProfilePictureProps) => {
         <div className="ml-4">
           <label
             htmlFor="fileInput"
-            className="text-md ml-10 inline-block cursor-pointer rounded-full bg-northeastern-red px-4 py-2 text-white hover:bg-red-700"
+            className="border-1 ml-10 inline-block cursor-pointer rounded-lg border border-black bg-northeastern-red px-4 py-2 font-montserrat text-xl text-white hover:bg-red-700"
           >
             Upload Profile Picture
           </label>

@@ -52,7 +52,7 @@ export const GroupMembers = (props: GroupMembersProps) => {
     return <Spinner />;
   }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = () => {
     if (driver.carpoolId) {
       deleteGroup({ groupId: driver.carpoolId });
     } else {

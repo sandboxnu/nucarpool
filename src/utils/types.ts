@@ -152,12 +152,6 @@ export type ButtonInfo = {
   color: string;
 };
 
-export type ResolvedRequest = {
-  fromUser: PublicUser | null;
-  toUser: PublicUser | null;
-  id: string;
-};
-
 type Admin = {
   iso_3166_1_alpha3: string;
   iso_3166_1: string;

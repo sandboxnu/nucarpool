@@ -60,7 +60,6 @@ export const generatePoiData = async (
     ".json?types=poi&access_token=",
     serverEnv.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN,
   ].join("");
-
   const data = await fetch(endpoint)
     .then((response) => response.json())
     .catch((err) => {

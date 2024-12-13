@@ -26,7 +26,7 @@ const DropDownMenu = () => {
   };
 
   return (
-    <div className="z-30">
+    <div className=" z-30">
       {isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
           <Spinner />
@@ -57,10 +57,10 @@ const DropDownMenu = () => {
           leaveTo="transform opacity-0 scale-95"
         >
           {session?.user && (
-            <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-300 rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <Menu.Items className="absolute  right-0 mt-2 w-56 origin-top-right divide-y divide-gray-300 rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
               <Menu.Item
                 as="div"
-                className="flex flex-col items-center justify-center p-6"
+                className="flex flex-col  items-center justify-center p-6"
               >
                 <h1 className="text-lg font-bold">{session.user.name}</h1>
                 <p className="text-sm font-light text-gray-500">

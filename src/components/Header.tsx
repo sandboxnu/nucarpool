@@ -6,6 +6,7 @@ import { GroupPage } from "./GroupPage";
 import { trpc } from "../utils/trpc";
 import { UserContext } from "../utils/userContext";
 import { useRouter } from "next/router";
+import Spinner from "./Spinner";
 
 const HeaderDiv = styled.div`
   display: flex;
@@ -40,11 +41,15 @@ interface HeaderProps {
     disabled: boolean;
   };
   admin?: boolean;
+  signIn?: boolean;
+  profile?: boolean;
+  checkChanges?: () => void;
 }
 
 export type HeaderOptions = "explore" | "requests";
 
 const Header = (props: HeaderProps) => {
+  const [isLoading, setIsLoading] = useState(false);
   const { data: unreadMessagesCount } =
     trpc.user.messages.getUnreadMessageCount.useQuery();
   const user = useContext(UserContext);
@@ -70,11 +75,19 @@ const Header = (props: HeaderProps) => {
       return "rounded-xl p-4 font-medium text-xl text-white";
     }
   };
-  const handleAdminClick = () => {
+  const handleAdminClick = async () => {
+    setIsLoading(true);
     if (!props.admin) {
-      router.push("/admin");
+      await router.push("/admin");
+      setIsLoading(false);
     } else {
-      router.push("/");
+      await router.push("/");
+      setIsLoading(false);
+    }
+  };
+  const handleMapClick = async () => {
+    if (props.checkChanges) {
+      props.checkChanges();
     }
   };
   const renderSidebarOptions = ({
@@ -86,8 +99,15 @@ const Header = (props: HeaderProps) => {
     setSidebar: Dispatch<SetStateAction<HeaderOptions>>;
     disabled: boolean;
   }) => {
+    if (isLoading) {
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white ">
+          <Spinner />
+        </div>
+      );
+    }
     return (
-      <div className="pr-8">
+      <div className="pr-8 ">
         <button
           onClick={() => {
             setSidebar("explore");
@@ -144,12 +164,30 @@ const Header = (props: HeaderProps) => {
           >
             Home
           </button>
-          <DropDownMenu />
+          {!props.signIn && <DropDownMenu />}
         </div>
       ) : (
         <div className="flex items-center">
           {props.data && renderSidebarOptions(props.data)}
-          <DropDownMenu />
+          {props.profile && (
+            <div className="flex">
+              <button
+                onClick={handleMapClick}
+                className="rounded-xl pr-10 text-xl font-medium text-white"
+              >
+                Map
+              </button>
+              {user?.permission !== "USER" && (
+                <button
+                  onClick={handleAdminClick}
+                  className="rounded-xl pr-10 text-xl font-medium text-white"
+                >
+                  Admin
+                </button>
+              )}
+            </div>
+          )}
+          {!props.signIn && <DropDownMenu />}
           <>
             {displayGroup &&
               createPortal(

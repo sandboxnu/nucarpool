@@ -22,7 +22,7 @@ const MessageHeader = ({
   const hasIncomingRequest = !!selectedUser.incomingRequest;
   const hasOutgoingRequest = !!selectedUser.outgoingRequest;
 
-  const handleClose = (e: React.MouseEvent) => {
+  const handleClose = () => {
     onClose("");
   };
   const { profileImageUrl, imageLoadError } = useProfileImage(selectedUser.id);

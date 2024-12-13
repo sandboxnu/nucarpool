@@ -26,11 +26,11 @@ export const updateUser = async ({
     seatAvail: userInfo.seatAvail,
     companyName: userInfo.companyName,
     companyAddress: userInfo.companyAddress,
-    companyCoordLng: userInfo.companyCoordLng!,
-    companyCoordLat: userInfo.companyCoordLat!,
+    companyCoordLng: userInfo.companyCoordLng,
+    companyCoordLat: userInfo.companyCoordLat,
     startAddress: userInfo.startAddress,
-    startCoordLng: userInfo.startCoordLng!,
-    startCoordLat: userInfo.startCoordLat!,
+    startCoordLng: userInfo.startCoordLng,
+    startCoordLat: userInfo.startCoordLat,
     isOnboarded: true,
     preferredName: userInfo.preferredName || sessionName,
     pronouns: userInfo.pronouns,
@@ -45,7 +45,8 @@ export const updateUser = async ({
 };
 export const useEditUserMutation = (
   router: NextRouter,
-  onComplete: () => void
+  onComplete: () => void,
+  pushMap: boolean = true
 ) => {
   const utils = trpc.useContext();
 
@@ -54,9 +55,13 @@ export const useEditUserMutation = (
       await utils.user.me.refetch();
       await utils.user.recommendations.me.invalidate();
       await utils.mapbox.geoJsonUserList.invalidate();
-      router.push("/").then(() => {
+      if (pushMap) {
+        router.push("/").then(() => {
+          onComplete();
+        });
+      } else {
         onComplete();
-      });
+      }
     },
     onError: (error) => {
       toast.error(`Something went wrong: ${error.message}`);

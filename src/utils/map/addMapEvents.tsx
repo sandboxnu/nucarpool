@@ -39,7 +39,6 @@ const addMapEvents = (
   function handlePointClick(e: MapLayerMouseEvent) {
     if (!e.features) return;
     const layers = ["riders", "drivers"];
-    e;
     const pointFeatures = map.queryRenderedFeatures(e.point, { layers });
 
     if (pointFeatures.length === 0) return;

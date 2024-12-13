@@ -136,7 +136,7 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
       onClose();
       addToast(
         props.otherUser.preferredName +
-          "'s request to carpool with you has been accepted.",
+          "'s request to carpool with you has been accepted. If you're a driver, do make sure you add information on the group page for your riders!",
         { appearance: "success" }
       );
     }
