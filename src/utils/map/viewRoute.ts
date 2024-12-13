@@ -220,7 +220,7 @@ export function useGetDirections({
                 "line-cap": "round",
               },
               paint: {
-                "line-color": "#61666b",
+                "line-color": "#4a89f3 ",
                 "line-width": 6,
               },
             },
