@@ -27,11 +27,17 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
   const { profileImageUrl, imageLoadError } = useProfileImage(
     props.otherUser.id
   );
-  const onClose = (action: string) => {
+  const onClose = async (action: string) => {
+    if (action === "closeAfterSend") {
+      await utils.user.recommendations.me.invalidate();
+      await utils.user.requests.me.invalidate();
+    }
     setIsOpen(false);
     props.onClose(action);
   };
-  const handleViewRequest = () => {
+  const handleViewRequest = async () => {
+    await utils.user.recommendations.me.invalidate();
+    await utils.user.requests.me.invalidate();
     props.onViewRequest(props.otherUser.id);
     props.onClose("connect");
   };
@@ -42,8 +48,6 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
       toast.error(`Something went wrong: ${error.message}`);
     },
     async onSuccess() {
-      await utils.user.recommendations.me.invalidate();
-      await utils.user.requests.me.invalidate();
       setRequestSent(true);
     },
   });
@@ -150,7 +154,7 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
                     <div className="mb-2 text-lg font-bold">About:</div>
                     <div className="wrap text-base">{props.otherUser.bio}</div>
                   </div>
-                  <div className="flex flex-col gap-4 py-7 pl-12 md:w-1/2">
+                  <div className="flex flex-col gap-3 py-7 pl-12 md:w-1/2">
                     {/*start location*/}
                     <div className="flex  items-center">
                       <div className="flex w-8 items-center justify-center">
@@ -161,7 +165,7 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
                           alt="Start icon"
                         />
                       </div>
-                      <p className="ml-2  font-semibold">
+                      <p className="ml-1.5  font-semibold">
                         {props.otherUser.startPOILocation}
                       </p>
                     </div>
@@ -176,7 +180,7 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
                           alt="End icon"
                         />
                       </div>
-                      <p className="ml-2 font-semibold">
+                      <p className="ml-1.5 font-semibold">
                         {props.otherUser.companyName}
                       </p>
                     </div>
@@ -260,28 +264,30 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
                 </div>
               </>
             ) : (
-              <>
-                <Dialog.Title className="text-center text-2xl font-bold">
+              <div className="flex flex-col justify-center  ">
+                <Dialog.Title className="mb-8 text-center text-2xl font-bold">
                   Your request has been sent!
                 </Dialog.Title>
-                <div className="text-center">
+                <div className="mb-4 text-center">
                   Click below to view or continue exploring.
                 </div>
-                <div className="flex justify-center space-x-7">
-                  <button
-                    onClick={() => onClose("close")}
-                    className="w-full rounded-md border-2 border-red-700 bg-slate-50 p-1 text-red-700"
-                  >
-                    Close
-                  </button>
-                  <button
-                    onClick={handleViewRequest}
-                    className="w-full rounded-md border-2 border-red-700 bg-red-700 p-1 text-slate-50"
-                  >
-                    View Request
-                  </button>
+                <div className="flex w-full  justify-center space-x-7">
+                  <div className="flex w-full  gap-6 md:w-3/4">
+                    <button
+                      onClick={() => onClose("closeAfterSend")}
+                      className="w-full rounded-md border border-black p-1  hover:bg-stone-100 "
+                    >
+                      Close
+                    </button>
+                    <button
+                      className="w-full rounded-md  bg-northeastern-red p-1 text-slate-50 hover:bg-red-700"
+                      onClick={handleViewRequest}
+                    >
+                      View Request
+                    </button>
+                  </div>
                 </div>
-              </>
+              </div>
             )}
           </Dialog.Panel>
         </div>
