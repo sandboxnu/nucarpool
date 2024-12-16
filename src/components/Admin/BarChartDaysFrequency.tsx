@@ -29,52 +29,43 @@ interface BarChartOnboardingProps {
 
 function BarChartUserCounts({ users }: BarChartOnboardingProps) {
   const activeUsers = users.filter((user) => user.status === "ACTIVE");
-  const totalCount = activeUsers.length;
-  const inactiveCount = users.length - totalCount;
-  const countOnboarded = activeUsers.filter((user) => user.isOnboarded).length;
-  const countNotOnboarded = totalCount - countOnboarded;
-  const driverCount = activeUsers.filter(
-    (user) => user.role === "DRIVER"
-  ).length;
-  const riderCount = activeUsers.filter((user) => user.role === "RIDER").length;
 
-  const viewerCount = totalCount - (driverCount + riderCount);
-  const dataPoints = [
-    totalCount,
-    countOnboarded,
-    countNotOnboarded,
-    driverCount,
-    riderCount,
-    viewerCount,
-    inactiveCount,
-  ];
-  const barColors = [
-    "#000000",
-    "#FFA9A9",
-    "#808080",
-    "#C8102E",
-    "#DA7D25",
-    "#2454DD",
-    "#808080",
-  ];
-  const labels = [
-    "Total",
-    "Onboarded",
-    "Not Onboarded",
-    "Driver",
-    "Rider",
-    "Viewer",
-    "Inactive",
-  ];
+  const drivers = activeUsers.filter((user) => user.role === "DRIVER");
+
+  const riders = activeUsers.filter((user) => user.role === "RIDER");
+  const riderDayCount = [0, 0, 0, 0, 0, 0, 0];
+  const driverDayCount = [0, 0, 0, 0, 0, 0, 0];
+
+  riders.forEach((rider) => {
+    rider.daysWorking.split(",").forEach((day, index) => {
+      if (day === "1") {
+        riderDayCount[index] += 1;
+      }
+    });
+  });
+  drivers.forEach((driver) => {
+    driver.daysWorking.split(",").forEach((day, index) => {
+      if (day === "1") {
+        driverDayCount[index] += 1;
+      }
+    });
+  });
+
+  const labels = ["Su", "M", "Tu", "W", "Th", "F", "S"];
 
   const barData: ChartData<"bar"> = {
     labels,
 
     datasets: [
       {
-        label: "Active User Counts",
-        data: dataPoints,
-        backgroundColor: barColors,
+        label: "Riders",
+        data: riderDayCount,
+        backgroundColor: "#DA7D25",
+      },
+      {
+        label: "Drivers",
+        data: driverDayCount,
+        backgroundColor: "#C8102E",
       },
     ],
   };
@@ -84,11 +75,11 @@ function BarChartUserCounts({ users }: BarChartOnboardingProps) {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: false,
+        display: true,
       },
       title: {
         display: true,
-        text: "User Counts",
+        text: "Days Carpooling Frequency",
         font: {
           family: "Montserrat",
           size: 18,
@@ -100,6 +91,7 @@ function BarChartUserCounts({ users }: BarChartOnboardingProps) {
     },
     scales: {
       x: {
+        stacked: true,
         ticks: {
           font: {
             family: "Montserrat",
@@ -110,6 +102,7 @@ function BarChartUserCounts({ users }: BarChartOnboardingProps) {
         },
       },
       y: {
+        stacked: true,
         beginAtZero: true,
         title: {
           display: true,
@@ -126,8 +119,8 @@ function BarChartUserCounts({ users }: BarChartOnboardingProps) {
   };
 
   return (
-    <div className="relative h-full w-full ">
-      <div className="relative flex max-h-[500px]  flex-col">
+    <div className="relative  w-full ">
+      <div className="  flex h-[500px] flex-col">
         <Bar data={barData} options={barOptions} />
         <span className="w-full text-center font-lato text-sm text-gray-400">
           All bars currently only include active users aside from

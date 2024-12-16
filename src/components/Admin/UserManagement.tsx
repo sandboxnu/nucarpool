@@ -75,7 +75,7 @@ const UserManagement = ({ permission }: UserManagementProps) => {
     : [];
 
   return (
-    <div className="h-full w-full">
+    <div className="relative h-full w-full">
       {loading && <Spinner />}
       {!loading && users && (
         <div className="m-auto p-20 ">

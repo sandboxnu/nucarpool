@@ -13,6 +13,8 @@ export type TempUser = {
   dateCreated: Date;
   role: Role;
   status: Status;
+  carpoolId: string;
+  daysWorking: string;
 };
 export type TempGroup = {
   id: string;
@@ -20,6 +22,26 @@ export type TempGroup = {
   _count: {
     users: number;
   };
+};
+export type TempRequest = {
+  id: string;
+  dateCreated: Date;
+  fromUser: {
+    role: Role;
+  };
+};
+export type TempConversation = {
+  id: string;
+  dateCreated: Date;
+  _count: {
+    messages: number;
+  };
+};
+export type TempMessage = {
+  conversationId: string;
+  dateCreated: Date;
+  content: string;
+  User: PublicUser;
 };
 export type PoiData = {
   location: string;

@@ -28,7 +28,7 @@ ChartJS.register(
   Legend
 );
 
-import { TempUser, TempGroup } from "../../utils/types";
+import { TempUser, TempGroup, TempRequest } from "../../utils/types";
 import {
   countCumulativeItemsPerWeek,
   filterItemsByDate,
@@ -38,14 +38,22 @@ import _ from "lodash";
 interface LineChartCountProps {
   users: TempUser[];
   groups: TempGroup[];
+  requests: TempRequest[];
 }
 
-function LineChartCount({ users, groups }: LineChartCountProps) {
+function LineChartCount({ users, groups, requests }: LineChartCountProps) {
   const [sliderRange, setSliderRange] = useState<number[]>([0, 0]);
   const [minDate, setMinDate] = useState<number>(0);
   const [maxDate, setMaxDate] = useState<number>(0);
   const activeUsers = users.filter(
     (user: TempUser) => user.status === "ACTIVE"
+  );
+  const riderRequests = requests.filter(
+    (request) => request.fromUser.role === "RIDER"
+  );
+
+  const driverRequests = requests.filter(
+    (request) => request.fromUser.role === "DRIVER"
   );
   const inactiveUsers = _.differenceBy(users, activeUsers);
   useEffect(() => {
@@ -53,6 +61,7 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
       const allTimestamps = [
         ...users.map((user) => user.dateCreated.getTime()),
         ...groups.map((group) => group.dateCreated.getTime()),
+        ...requests.map((request) => request.dateCreated.getTime()),
       ];
 
       if (allTimestamps.length > 0) {
@@ -67,7 +76,7 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
         ]);
       }
     }
-  }, [users, groups]);
+  }, [users, groups, requests]);
 
   const onSliderChange = (value: number[]) => {
     setSliderRange(value);
@@ -89,11 +98,27 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
     sliderRange[0],
     sliderRange[1]
   );
+  const filteredRequests = filterItemsByDate(
+    requests,
+    sliderRange[0],
+    sliderRange[1]
+  );
+  const filteredDriverRequests = filterItemsByDate(
+    driverRequests,
+    sliderRange[0],
+    sliderRange[1]
+  );
+  const filteredRiderRequests = filterItemsByDate(
+    riderRequests,
+    sliderRange[0],
+    sliderRange[1]
+  );
 
   // Generate week labels
   const allDates = [
     ...users.map((user) => user.dateCreated),
     ...filteredGroups.map((group) => group.dateCreated),
+    ...filteredRequests.map((request) => request.dateCreated),
   ];
 
   let weekLabels: Date[] = [];
@@ -121,8 +146,20 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
     filteredInactiveUsers,
     weekLabels
   );
-
+  const driverRequestCount = countCumulativeItemsPerWeek(
+    filteredDriverRequests,
+    weekLabels
+  );
+  const riderRequestCount = countCumulativeItemsPerWeek(
+    filteredRiderRequests,
+    weekLabels
+  );
+  const requestCount = countCumulativeItemsPerWeek(
+    filteredRequests,
+    weekLabels
+  );
   const groupCounts = countCumulativeItemsPerWeek(filteredGroups, weekLabels);
+
   const lineData: ChartData<"line"> = {
     labels: weekLabels,
     datasets: [
@@ -130,8 +167,8 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
         label: "Active Users",
         data: activeUserCount,
         fill: false,
-        backgroundColor: "#C8102E",
-        borderColor: "#C8102E",
+        backgroundColor: "#000000",
+        borderColor: "#000000",
         tension: 0.1,
         pointRadius: 10,
         spanGaps: true,
@@ -158,6 +195,41 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
         pointRadius: 10,
         spanGaps: true,
       },
+      {
+        label: "Requests",
+        data: requestCount,
+        fill: false,
+        showLine: true,
+        backgroundColor: "#FFA9A9",
+        borderColor: "#FFA9A9",
+        tension: 0.1,
+        pointRadius: 10,
+        spanGaps: true,
+      },
+      {
+        label: "Rider Sent Requests",
+        data: riderRequestCount,
+        fill: false,
+        showLine: true,
+        hidden: true,
+        backgroundColor: "#DA7D25",
+        borderColor: "#DA7D25",
+        tension: 0.1,
+        pointRadius: 10,
+        spanGaps: true,
+      },
+      {
+        label: "Driver Sent Requests",
+        data: driverRequestCount,
+        fill: false,
+        showLine: true,
+        hidden: true,
+        backgroundColor: "#C8102E",
+        borderColor: "#C8102E",
+        tension: 0.1,
+        pointRadius: 10,
+        spanGaps: true,
+      },
     ],
   };
 
@@ -178,7 +250,7 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
       },
       title: {
         display: true,
-        text: "Cumulative Users and Current Groups Over Time",
+        text: "Users, Groups and Requests Over Time",
         font: {
           family: "Montserrat",
           size: 18,
@@ -260,7 +332,7 @@ function LineChartCount({ users, groups }: LineChartCountProps) {
   return (
     <div className="h-full w-full">
       {allDates.length > 0 ? (
-        <div className="relative h-[calc(100%-4rem)] w-full">
+        <div className="relative h-[500px] w-full">
           <Line data={lineData} options={lineOptions} />
         </div>
       ) : (

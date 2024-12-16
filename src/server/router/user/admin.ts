@@ -1,7 +1,8 @@
 import { adminRouter, router } from "../createRouter";
 import { z } from "zod";
-import { Permission, Status } from "@prisma/client";
-import { Role } from "@prisma/client";
+import { Permission, Role } from "@prisma/client";
+import { convertToPublic } from "../../../utils/publicUser";
+import { mockSession } from "next-auth/client/__tests__/helpers/mocks";
 // Router for admin dashboard queries, only Managers can edit roles
 // User must be Manager or Admin to view user data
 export const adminDataRouter = router({
@@ -20,6 +21,8 @@ export const adminDataRouter = router({
         dateCreated: true,
         role: true,
         status: true,
+        daysWorking: true,
+        carpoolId: true,
       },
     });
   }),
@@ -31,7 +34,6 @@ export const adminDataRouter = router({
             users: {
               some: {
                 role: Role.DRIVER,
-                status: Status.ACTIVE,
               },
             },
           },
@@ -39,7 +41,6 @@ export const adminDataRouter = router({
             users: {
               some: {
                 role: Role.RIDER,
-                status: Status.ACTIVE,
               },
             },
           },
@@ -51,6 +52,48 @@ export const adminDataRouter = router({
         _count: {
           select: {
             users: true,
+          },
+        },
+      },
+    });
+  }),
+  getConversationsMessageCount: adminRouter.query(async ({ ctx }) => {
+    return ctx.prisma.conversation.findMany({
+      select: {
+        id: true,
+        dateCreated: true,
+        _count: {
+          select: {
+            messages: true,
+          },
+        },
+      },
+    });
+  }),
+  getMessages: adminRouter.query(async ({ ctx }) => {
+    const messages = await ctx.prisma.message.findMany({
+      select: {
+        conversationId: true,
+        dateCreated: true,
+        content: true,
+        User: true,
+      },
+    });
+    return messages.map((message) => {
+      return {
+        ...message,
+        User: convertToPublic(message.User),
+      };
+    });
+  }),
+  getRequests: adminRouter.query(async ({ ctx }) => {
+    return ctx.prisma.request.findMany({
+      select: {
+        id: true,
+        dateCreated: true,
+        fromUser: {
+          select: {
+            role: true,
           },
         },
       },
