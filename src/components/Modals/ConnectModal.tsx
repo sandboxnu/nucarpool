@@ -150,10 +150,14 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
                   </div>
                 </div>
                 <div className="relative flex w-full flex-col justify-evenly   divide-y divide-[#EAEAEA] border-y border-[#EAEAEA] md:flex-row md:divide-x ">
-                  <div className="flex flex-col gap-2 px-12 py-7 md:w-1/2">
-                    <div className="mb-2 text-lg font-bold">About:</div>
-                    <div className="wrap text-base">{props.otherUser.bio}</div>
-                  </div>
+                  {props.otherUser.bio !== "" && (
+                    <div className="flex flex-col gap-2 px-12 py-7 md:w-1/2">
+                      <div className="mb-2 text-lg font-bold">About:</div>
+                      <div className="wrap text-base">
+                        {props.otherUser.bio}
+                      </div>
+                    </div>
+                  )}
                   <div className="flex flex-col gap-3 py-7 pl-12 md:w-1/2">
                     {/*start location*/}
                     <div className="flex  items-center">
