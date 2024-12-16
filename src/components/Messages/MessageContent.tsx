@@ -117,7 +117,12 @@ const MessageContent = ({ selectedUser }: MessageContentProps) => {
   const currentUserId = user?.id;
 
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      const container = messagesEndRef.current.closest('.overflow-y-auto');
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -126,20 +131,26 @@ const MessageContent = ({ selectedUser }: MessageContentProps) => {
 
   return (
     <div className="flex h-full flex-1 flex-col overflow-y-auto overflow-x-hidden bg-white p-4">
-      {messagesByDate.map(({ date, messages }) => (
+      {messagesByDate.map(({ date, messages }, dateIndex) => (
         <div key={date}>
           <div className="text-md my-2 text-center text-gray-500">
             {date ? format(date, "EEEE, MMMM d, yyyy") : ""}
           </div>
-          {messages.map((message) => {
+          {messages.map((message, messageIndex) => {
             const isFromCurrentUser = message.userId === currentUserId;
             const messageTime = message.dateCreated
               ? format(new Date(message.dateCreated), "h:mm aa")
               : "";
+            
+            // Add ref to the last message of the last date group
+            const isLastMessage = 
+              dateIndex === messagesByDate.length - 1 && 
+              messageIndex === messages.length - 1;
 
             return (
               <div
                 key={message.id}
+                ref={isLastMessage ? messagesEndRef : null}
                 className={`mb-4 flex flex-col ${
                   isFromCurrentUser ? "items-end pr-10" : "items-start pl-10"
                 }`}
@@ -149,14 +160,14 @@ const MessageContent = ({ selectedUser }: MessageContentProps) => {
                 </span>
                 <div
                   className={`max-w-[50%] rounded-lg px-4 py-2 text-base
-    sm:max-w-[50%] sm:text-sm
-    md:max-w-[50%] md:text-base
-    lg:max-w-[50%] lg:text-xl
-    ${
-      isFromCurrentUser
-        ? "bg-northeastern-red text-white"
-        : "bg-gray-200 text-black"
-    }`}
+                    sm:max-w-[50%] sm:text-sm
+                    md:max-w-[50%] md:text-base
+                    lg:max-w-[50%] lg:text-xl
+                    ${
+                      isFromCurrentUser
+                        ? "bg-northeastern-red text-white"
+                        : "bg-gray-200 text-black"
+                    }`}
                 >
                   {message.content}
                 </div>
@@ -165,7 +176,6 @@ const MessageContent = ({ selectedUser }: MessageContentProps) => {
           })}
         </div>
       ))}
-      <div ref={messagesEndRef} />
     </div>
   );
 };
