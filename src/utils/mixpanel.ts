@@ -36,15 +36,15 @@ export const trackProfileCompletion = (role: string, status: string) => {
 };
 
 // Add this new function
-export const trackViewRoute = () => {
+export const trackViewRoute = (role: string) => {
   trackEvent("View Route Clicked", {
-    timestamp: new Date().toISOString(),
+    role
   });
 };
 
-export const trackRequestResponse = (action: "accept" | "decline") => {
+export const trackRequestResponse = (action: "accept" | "decline", role: string) => {
   trackEvent("Request Response", {
     action,
-    timestamp: new Date().toISOString(),
+    role
   });
 };

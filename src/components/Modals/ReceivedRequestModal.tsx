@@ -61,7 +61,6 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
   };
 
   const handleRejectClick = () => {
-    trackRequestResponse('decline');
     handleDelete();
     onClose();
     addToast(
@@ -130,7 +129,6 @@ const ReceivedRequestModal = (props: ReceivedModalProps): JSX.Element => {
 
   const handleAcceptClick = () => {
     if (validateRequestAcceptance()) {
-      trackRequestResponse('accept');
       initiateGroup();
       handleDelete();
       onClose();
