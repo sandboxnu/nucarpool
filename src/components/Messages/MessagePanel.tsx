@@ -8,6 +8,7 @@ import { createRequestHandlers } from "../../utils/requestHandlers";
 import { UserContext } from "../../utils/userContext";
 import { User } from "@prisma/client";
 import { toast } from "react-toastify";
+import { trackRequestResponse } from "../../utils/mixpanel";
 
 interface MessagePanelProps {
   selectedUser: EnhancedPublicUser;
@@ -85,6 +86,8 @@ const MessagePanel = ({
     const request = selectedUser.incomingRequest;
     if (!request) return;
 
+    trackRequestResponse('accept', user.role);
+    
     await handleAcceptRequest(user, selectedUser, request);
 
     // Send acceptance notification email
@@ -111,6 +114,8 @@ const MessagePanel = ({
     const request =
       selectedUser.incomingRequest || selectedUser.outgoingRequest;
     if (!request) return;
+
+    trackRequestResponse('decline', user.role);
 
     await handleRejectRequest(user, selectedUser, request);
   };

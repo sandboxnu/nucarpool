@@ -42,9 +42,11 @@ export const trackViewRoute = () => {
   });
 };
 
-export const trackRequestResponse = (action: "accept" | "decline") => {
+export const trackRequestResponse = (action: "accept" | "decline", role: string) => {
+  console.log('Tracking request response:', { action, role, timestamp: new Date().toISOString() });
   trackEvent("Request Response", {
     action,
+    role,
     timestamp: new Date().toISOString(),
   });
 };
