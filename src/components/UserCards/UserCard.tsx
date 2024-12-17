@@ -239,7 +239,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
             onClick={() => {
               props.onViewRouteClick &&
                 props.onViewRouteClick(user, props.otherUser);
-              trackViewRoute();
+              trackViewRoute(user.role);
             }}
             className="my-1 w-1/2 rounded-md border border-black p-1 text-center hover:bg-stone-200 disabled:hover:bg-transparent"
           >
@@ -248,7 +248,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
           <button
             onClick={() => {
               if (props.rightButton?.onPress) {
-                trackViewRoute();
+                trackViewRoute(user.role);
                 props.rightButton.onPress(props.otherUser);
               }
             }}
