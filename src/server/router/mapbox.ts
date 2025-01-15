@@ -5,7 +5,7 @@ import { Feature, FeatureCollection } from "geojson";
 import { serverEnv } from "../../utils/env/server";
 import { Role, Status } from "@prisma/client";
 import { DirectionsResponse } from "../../utils/types";
-import { roundCoord } from "../../utils/publicUser";
+import { convertToPublic, roundCoord } from "../../utils/publicUser";
 import _ from "lodash";
 import { calculateScore } from "../../utils/recommendation";
 
@@ -113,8 +113,10 @@ export const mapboxRouter = router({
       const finalUsers =
         calcUser.role === Role.VIEWER ? sortedUsers : sortedUsers.slice(0, 150);
 
+      const finalUsersasPublic = finalUsers.map(user => convertToPublic(user))
+
       // creates points for each user with coordinates at company location
-      const features: Feature[] = finalUsers.map((u) => {
+      const features: Feature[] = finalUsersasPublic.map((u) => {
         return {
           type: "Feature" as "Feature",
           geometry: {

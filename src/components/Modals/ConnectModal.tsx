@@ -170,7 +170,7 @@ const ConnectModal = (props: ConnectModalProps): JSX.Element => {
                         />
                       </div>
                       <p className="ml-1.5  font-semibold">
-                        {props.otherUser.startPOILocation}
+                        {props.otherUser.startAddress}
                       </p>
                     </div>
 

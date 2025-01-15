@@ -79,8 +79,8 @@ export const viewRoute = (props: ViewRouteProps) => {
       element: otherRole === "Rider" ? orangeStart : redStart,
     })
       .setLngLat([
-        props.otherUser.startPOICoordLng,
-        props.otherUser.startPOICoordLat,
+        props.otherUser.startCoordLng,
+        props.otherUser.startCoordLat,
       ])
       .setPopup(otherUserStartPopup)
       .addTo(props.map);
@@ -97,19 +97,19 @@ export const viewRoute = (props: ViewRouteProps) => {
     previousMarkers.push(otherUserStartMarker);
     previousMarkers.push(otherUserEndPopup);
     minLng = Math.min(
-      props.otherUser.startPOICoordLng,
+      props.otherUser.startCoordLng,
       props.otherUser.companyCoordLng
     );
     minLat = Math.min(
-      props.otherUser.startPOICoordLat,
+      props.otherUser.startCoordLat,
       props.otherUser.companyCoordLat
     );
     maxLng = Math.max(
-      props.otherUser.startPOICoordLng,
+      props.otherUser.startCoordLng,
       props.otherUser.companyCoordLng
     );
     maxLat = Math.max(
-      props.otherUser.startPOICoordLat,
+      props.otherUser.startCoordLat,
       props.otherUser.companyCoordLat
     );
   }

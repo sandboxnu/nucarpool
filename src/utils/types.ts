@@ -117,9 +117,9 @@ export type PublicUser = {
   status: Status;
   seatAvail: number;
   companyName: string;
-  startPOILocation: string;
-  startPOICoordLng: number;
-  startPOICoordLat: number;
+  startAddress: string;
+  startCoordLng: number;
+  startCoordLat: number;
   companyAddress: string;
   companyCoordLng: number;
   companyCoordLat: number;

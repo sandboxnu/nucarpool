@@ -161,7 +161,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
           <Image src={StartIcon} width={25} height={25} alt="Start icon" />
         </div>
         <p className="ml-2 text-sm font-semibold">
-          {props.otherUser.startPOILocation}
+          {props.otherUser.startAddress}
         </p>
       </div>
 
