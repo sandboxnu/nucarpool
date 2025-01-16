@@ -2,7 +2,6 @@ import { User } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { serverEnv } from "./env/server";
 import { PublicUser, PoiData } from "./types";
-import { start } from "repl";
 
 /**
  * Converts the given ``User`` to a ``PublicUser``, as to hide sensitive data.
@@ -13,7 +12,7 @@ import { start } from "repl";
 export const convertToPublic = (user: User): PublicUser => {
   const cleanAddress = (address: string) => {
     const startAddressAsList = user.startAddress.split(', ');
-    const cleanedAddress = startAddressAsList.length == 4 ? startAddressAsList[1] : start.length === 3 ? startAddressAsList[0] : "Exact Location Unavailable";
+    const cleanedAddress = startAddressAsList.length == 4 ? startAddressAsList[1] : startAddressAsList.length === 3 ? startAddressAsList[0] : "Exact Location Unavailable";
     return cleanedAddress;
 
   }
