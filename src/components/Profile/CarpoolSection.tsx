@@ -4,7 +4,6 @@ import { EntryLabel } from "../EntryLabel";
 import { TextField } from "../TextField";
 import {
   Control,
-  Controller,
   FieldError,
   FieldErrors,
   UseFormHandleSubmit,
@@ -14,10 +13,9 @@ import {
 } from "react-hook-form";
 import { OnboardingFormInputs } from "../../utils/types";
 import ControlledAddressCombobox from "./ControlledAddressCombobox";
-import Checkbox from "@mui/material/Checkbox";
-import DayBox from "./DayBox";
-import ControlledTimePicker from "./ControlledTimePicker";
 import { useAddressSelection } from "../../utils/useAddressSelection";
+import SelectDays from "../Shared/Schedule/SelectDays";
+import SelectTimeRange from "../Shared/Schedule/SelectTimeRange";
 interface CarpoolSectionProps {
   register: UseFormRegister<OnboardingFormInputs>;
   errors: FieldErrors<OnboardingFormInputs>;
@@ -41,11 +39,10 @@ const CarpoolSection = ({
   user,
 }: CarpoolSectionProps) => {
   const isViewer = watch("role") === Role.VIEWER;
-  const daysOfWeek = ["Su", "M", "Tu", "W", "Th", "F", "S"];
 
   return (
-    <div className="relative  flex h-full  flex-col  justify-start">
-      <ProfileHeader className={"w-[700px] !text-4xl"}>
+    <div className="flex flex-col space-y-4">
+      <ProfileHeader className={"!text-4xl"}>
         Carpool Details
       </ProfileHeader>
 
@@ -56,70 +53,31 @@ const CarpoolSection = ({
         className={"!text-2xl"}
       />
 
-      <div className="mb-2  w-full max-w-[360px] md:my-4 lg:pl-20">
-        <div className="flex  w-full items-center justify-evenly ">
-          {daysOfWeek.map((day, index) => (
-            <Controller
-              key={day + index.toString()}
-              name={`daysWorking.${index}`}
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Checkbox
-                  key={day + index.toString()}
-                  sx={{
-                    input: { width: 1, height: 1 },
-                    aspectRatio: 1,
-                    width: 1,
-                    height: 1,
-                    padding: 0,
-                  }}
-                  disabled={isViewer}
-                  checked={value}
-                  onChange={onChange}
-                  checkedIcon={<DayBox day={day} isSelected={true} />}
-                  icon={<DayBox day={day} isSelected={false} />}
-                />
-              )}
-            />
-          ))}
-        </div>
+      <div className="mb-2 w-full max-w-[360px] md:my-4 lg:pl-20">
+        <SelectDays
+          control={control}
+          disabled={isViewer}
+          error={errors.daysWorking}
+        />
       </div>
       {errors.daysWorking && (
         <ErrorDisplay>{errors.daysWorking.message}</ErrorDisplay>
       )}
-      <div className="relative mt-4 flex w-full justify-between gap-6 pb-4 md:w-96">
-        <div className="flex flex-1 flex-col gap-2">
-          <EntryLabel
-            required={!isViewer}
-            error={errors.startTime}
-            label="Start Time"
-          />
-          <ControlledTimePicker
-            isDisabled={isViewer}
-            control={control}
-            name={"startTime"}
-            value={user?.startTime ? user.startTime : undefined}
-          />
-        </div>
-        <div className="flex flex-1 flex-col gap-2">
-          <EntryLabel
-            required={!isViewer}
-            error={errors.endTime}
-            label="End Time"
-          />
-          <ControlledTimePicker
-            isDisabled={isViewer}
-            control={control}
-            name={"endTime"}
-            value={user?.endTime ? user.endTime : undefined}
-          />
-        </div>
-      </div>
-      <Note className="py-4 md:w-96">
-        Please input the start and end times of your work, rather than your
-        departure times. If your work hours are flexible, coordinate directly
-        with potential riders or drivers to inform them.
-      </Note>
+      <SelectTimeRange
+        control={control}
+        errors={{
+          startTime: errors.startTime,
+          endTime: errors.endTime,
+        }}
+        isDisabled={isViewer}
+        noteText="Please input the start and end times of your work, rather than your departure times. If your work hours are flexible, coordinate directly with potential riders or drivers to inform them."
+        noteClassName="py-4 md:w-96"
+        containerClassName="relative mt-4 flex w-full justify-between gap-6 pb-4 md:w-96"
+        timePickerValues={{
+          startTime: user?.startTime ? user.startTime : undefined,
+          endTime: user?.endTime ? user.endTime : undefined,
+        }}
+      />
       <EntryLabel label="Locations" className={"!text-2xl"} />
       <EntryLabel
         required={!isViewer}
@@ -127,7 +85,7 @@ const CarpoolSection = ({
         className={"my-2 !text-lg"}
         label="Home Address"
       />
-      <div>
+      <div className="z-10">
         <ControlledAddressCombobox
           isDisabled={isViewer}
           control={control}
@@ -172,16 +130,16 @@ const CarpoolSection = ({
       <Note className={"mb-2"}>
         Note: Select the autocomplete results, even if you typed the address out
       </Note>
-      <ControlledAddressCombobox
-        isDisabled={isViewer}
-        control={control}
-        name={"companyAddress"}
-        addressSelected={companyAddressHook.selectedAddress}
-        addressSetter={companyAddressHook.setSelectedAddress}
-        addressSuggestions={companyAddressHook.suggestions}
-        error={errors.companyAddress}
-        addressUpdater={companyAddressHook.updateAddress}
-      />
+        <ControlledAddressCombobox
+          isDisabled={isViewer}
+          control={control}
+          name={"companyAddress"}
+          addressSelected={companyAddressHook.selectedAddress}
+          addressSetter={companyAddressHook.setSelectedAddress}
+          addressSuggestions={companyAddressHook.suggestions}
+          error={errors.companyAddress}
+          addressUpdater={companyAddressHook.updateAddress}
+        />
       {errors.companyAddress && (
         <ErrorDisplay>{errors.companyAddress.message}</ErrorDisplay>
       )}

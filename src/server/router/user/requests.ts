@@ -85,10 +85,11 @@ export const requestsRouter = router({
       };
     });
     const sentGoodRole = sent.filter(
-      (req) => req.toUser.role !== user.role && req.toUser.role !== "VIEWER"
+      (req) => req.toUser.role !== user.role && req.toUser.role !== "VIEWER",
     );
     const recGoodRole = received.filter(
-      (req) => req.fromUser.role !== user.role && req.fromUser.role !== "VIEWER"
+      (req) =>
+        req.fromUser.role !== user.role && req.fromUser.role !== "VIEWER",
     );
     return { sent: sentGoodRole, received: recGoodRole };
   }),
@@ -99,7 +100,7 @@ export const requestsRouter = router({
         fromId: z.string(),
         toId: z.string(),
         message: z.string(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user?.id;
@@ -174,7 +175,7 @@ export const requestsRouter = router({
     .input(
       z.object({
         invitationId: z.string(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const invitation = await ctx.prisma.request.findUnique({
@@ -199,7 +200,7 @@ export const requestsRouter = router({
       z.object({
         invitationId: z.string(),
         message: z.string(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       return await ctx.prisma.request.update({

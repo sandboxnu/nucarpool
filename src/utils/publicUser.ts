@@ -27,9 +27,12 @@ export const convertToPublic = (user: User): PublicUser => {
     endTime: user.endTime,
     coopEndDate: user.coopEndDate,
     coopStartDate: user.coopStartDate,
-    startPOILocation: user.startPOILocation,
-    startPOICoordLng: user.startPOICoordLng,
-    startPOICoordLat: user.startPOICoordLat,
+    startAddress:
+      user.startCity && user.startState
+        ? `${user.startCity}, ${user.startState}`
+        : user.startAddress || "Exact Location Unavailable",
+    startCoordLng: user.startCoordLng,
+    startCoordLat: user.startCoordLat,
     companyAddress: user.companyAddress,
     companyCoordLng: user.companyCoordLng,
     companyCoordLat: user.companyCoordLat,
@@ -50,7 +53,7 @@ export const roundCoord = (coord: number) => {
  */
 export const generatePoiData = async (
   longitude: number,
-  latitude: number
+  latitude: number,
 ): Promise<PoiData> => {
   const endpoint = [
     "https://api.mapbox.com/geocoding/v5/mapbox.places/",

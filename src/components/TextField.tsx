@@ -32,7 +32,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
       inputClassName,
       ...rest
     },
-    forwardedRef
+    forwardedRef,
   ) => (
     <div className={classNames(`flex w-full flex-col space-y-2`, className)}>
       <div className="relative w-full">
@@ -48,7 +48,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
             `form-input w-full  rounded-md px-3  py-2 font-montserrat shadow-sm ${
               isDisabled ? "bg-gray-100 text-gray-400" + " border-gray-200" : ""
             } ${error ? "border-northeastern-red" : "border-black"}`,
-            inputClassName
+            inputClassName,
           )}
         />
         {type === "month" && (
@@ -59,7 +59,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
       </div>
       {error && <ErrorDisplay>{error.message}</ErrorDisplay>}
     </div>
-  )
+  ),
 );
 
 TextField.displayName = "TextField";

@@ -8,6 +8,7 @@ import { createRequestHandlers } from "../../utils/requestHandlers";
 import { UserContext } from "../../utils/userContext";
 import { User } from "@prisma/client";
 import { toast } from "react-toastify";
+import { trackRequestResponse } from "../../utils/mixpanel";
 
 interface MessagePanelProps {
   selectedUser: EnhancedPublicUser;
@@ -25,6 +26,7 @@ const MessagePanel = ({
   const [activeTab, setActiveTab] = useState<"message" | "map">("message");
   const utils = trpc.useContext();
   const user = useContext(UserContext);
+  const [hasCalculatedRoute, setHasCalculatedRoute] = useState(false);
 
   // Create request handlers
   const { handleAcceptRequest, handleRejectRequest } =
@@ -47,11 +49,32 @@ const MessagePanel = ({
     });
 
   const handleSendMessage = (content: string) => {
-    const requestId =
-      selectedUser.incomingRequest?.id || selectedUser.outgoingRequest?.id;
+    const request =
+      selectedUser.incomingRequest || selectedUser.outgoingRequest;
+    const requestId = request?.id;
     if (!requestId) return;
 
     sendMessage.mutate({ requestId, content });
+
+    const converstationMessages = request.conversation?.messages;
+
+    // If the last message from the recipient is less than 5 mins old, don't send email notification
+    if (converstationMessages && converstationMessages.length > 0) {
+      const recipientMessages = converstationMessages.filter(
+        (msg) => msg.userId === selectedUser.id,
+      );
+      const lastMessageFromRecipient =
+        recipientMessages[recipientMessages.length - 1];
+      if (lastMessageFromRecipient) {
+        const lastMsgTime = new Date(
+          lastMessageFromRecipient.dateCreated,
+        ).getTime();
+        const minsDiff = (Date.now() - lastMsgTime) / (1000 * 60);
+        if (minsDiff < 5) {
+          return;
+        }
+      }
+    }
 
     // Send email notification
     if (user && user.email && selectedUser.email) {
@@ -64,7 +87,7 @@ const MessagePanel = ({
       });
     } else {
       console.error(
-        "Unable to send message notification: Missing email address"
+        "Unable to send message notification: Missing email address",
       );
     }
   };
@@ -85,6 +108,8 @@ const MessagePanel = ({
     const request = selectedUser.incomingRequest;
     if (!request) return;
 
+    trackRequestResponse("accept", user.role);
+
     await handleAcceptRequest(user, selectedUser, request);
 
     // Send acceptance notification email
@@ -98,7 +123,7 @@ const MessagePanel = ({
       });
     } else {
       console.error(
-        "Unable to send acceptance notification: Missing email address"
+        "Unable to send acceptance notification: Missing email address",
       );
     }
 
@@ -112,16 +137,26 @@ const MessagePanel = ({
       selectedUser.incomingRequest || selectedUser.outgoingRequest;
     if (!request) return;
 
+    trackRequestResponse("decline", user.role);
+
     await handleRejectRequest(user, selectedUser, request);
   };
   const handleMapSwitch = () => {
     setActiveTab("map");
+    setHasCalculatedRoute(false);
   };
   useEffect(() => {
-    if (user && selectedUser && activeTab === "map") {
-      onViewRouteClick(user, selectedUser);
+    if (activeTab === "map" && user && selectedUser && !hasCalculatedRoute) {
+      try {
+        onViewRouteClick(user, selectedUser);
+        setHasCalculatedRoute(true);
+      } catch (error) {
+        console.error('Error calculating route:', error);
+        // do not set hasCalculatedRoute to true so we can retry
+      }
     }
-  }, [user, selectedUser, activeTab, onViewRouteClick]);
+  }, [activeTab, user, selectedUser, onViewRouteClick, hasCalculatedRoute]);
+
 
   return (
     <div className="flex h-full w-full flex-col">

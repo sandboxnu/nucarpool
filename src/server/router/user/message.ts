@@ -1,6 +1,17 @@
 import { TRPCError } from "@trpc/server";
 import { protectedRouter, router } from "../createRouter";
 import { z } from "zod";
+import Pusher from "pusher";
+import { serverEnv } from "../../../utils/env/server";
+import { message } from "antd";
+
+const pusher = new Pusher({
+  appId: serverEnv.PUSHER_APP_ID,
+  key: serverEnv.NEXT_PUBLIC_PUSHER_KEY,
+  secret: serverEnv.PUSHER_SECRET,
+  cluster: serverEnv.NEXT_PUBLIC_PUSHER_CLUSTER,
+  useTLS: true,
+});
 
 export const messageRouter = router({
   getUnreadMessageCount: protectedRouter.query(async ({ ctx }) => {
@@ -83,7 +94,7 @@ export const messageRouter = router({
       z.object({
         requestId: z.string(),
         content: z.string(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user?.id;
@@ -98,6 +109,33 @@ export const messageRouter = router({
         where: { requestId: input.requestId },
       });
 
+      // notify the frontend in real time
+      if (conversation) {
+        const newMessage = await ctx.prisma.message.create({
+          data: {
+            conversationId: conversation.id,
+            content: input.content,
+            userId: userId,
+          },
+        });
+
+        const request = await ctx.prisma.request.findUnique({
+          where: { id: conversation.requestId },
+        });
+
+        pusher.trigger(`conversation-${input.requestId}`, "sendMessage", {
+          newMessage: newMessage,
+        });
+
+        pusher.trigger(
+          `notification-${request?.toUserId}`,
+          "sendNotification",
+          {
+            newMessage: newMessage,
+          },
+        );
+      }
+
       if (!conversation) {
         conversation = await ctx.prisma.conversation.create({
           data: { requestId: input.requestId },
@@ -108,21 +146,13 @@ export const messageRouter = router({
           data: { conversationId: conversation.id },
         });
       }
-
-      return ctx.prisma.message.create({
-        data: {
-          conversationId: conversation.id,
-          content: input.content,
-          userId: userId,
-        },
-      });
     }),
 
   markMessagesAsRead: protectedRouter
     .input(
       z.object({
         messageIds: z.array(z.string()),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user?.id;

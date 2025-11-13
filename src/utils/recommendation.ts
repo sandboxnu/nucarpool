@@ -83,7 +83,7 @@ const dayConversion = (user: CommonUser) => {
 export const calculateScore = <T extends CommonUser>(
   currentUser: T,
   inputs: FInputs,
-  sort: string
+  sort: string,
 ): ((user: T) => Recommendation | undefined) => {
   const currentUserDays = inputs.daysWorking
     .split(",")
@@ -103,15 +103,15 @@ export const calculateScore = <T extends CommonUser>(
     const startDistance = coordToMile(
       Math.sqrt(
         Math.pow(currentUser.startCoordLat - user.startCoordLat, 2) +
-          Math.pow(currentUser.startCoordLng - user.startCoordLng, 2)
-      )
+          Math.pow(currentUser.startCoordLng - user.startCoordLng, 2),
+      ),
     );
 
     const endDistance = coordToMile(
       Math.sqrt(
         Math.pow(currentUser.companyCoordLat - user.companyCoordLat, 2) +
-          Math.pow(currentUser.companyCoordLng - user.companyCoordLng, 2)
-      )
+          Math.pow(currentUser.companyCoordLng - user.companyCoordLng, 2),
+      ),
     );
     const userDays = dayConversion(user);
     // check number of days users both go in, also count number of days current user goes in
@@ -126,7 +126,7 @@ export const calculateScore = <T extends CommonUser>(
         }
         return acc;
       },
-      { currentUserDays: 0, bothUsersDays: 0 }
+      { currentUserDays: 0, bothUsersDays: 0 },
     );
     let startTime: number | undefined;
     let endTime: number | undefined;
@@ -140,7 +140,7 @@ export const calculateScore = <T extends CommonUser>(
         Math.abs(currentUser.startTime.getHours() - user.startTime.getHours()) *
           60 +
         Math.abs(
-          currentUser.startTime.getMinutes() - user.startTime.getMinutes()
+          currentUser.startTime.getMinutes() - user.startTime.getMinutes(),
         );
       endTime =
         Math.abs(currentUser.endTime.getHours() - user.endTime.getHours()) *
@@ -255,19 +255,23 @@ export type GenerateUserInput = {
   role: Role;
   seatAvail?: number;
   companyCoordLng: number;
-  companyPOICoordLng: number;
   companyCoordLat: number;
-  companyPOICoordLat: number;
   startCoordLng: number;
-  startPOICoordLng: number;
   startCoordLat: number;
-  startPOICoordLat: number;
   daysWorking: string; // Format: S,M,T,W,R,F,S
   startTime: string;
   endTime: string;
   carpoolId?: string;
   coopStartDate: Date | null;
   coopEndDate: Date | null;
+  companyAddress?: string;
+  startAddress?: string;
+  companyStreet?: string;
+  companyCity?: string;
+  companyState?: string;
+  startStreet?: string;
+  startCity?: string;
+  startState?: string;
 };
 
 /**
@@ -289,6 +293,14 @@ export const generateUser = ({
   endTime,
   coopStartDate,
   coopEndDate,
+  companyAddress,
+  startAddress,
+  companyStreet,
+  companyCity,
+  companyState,
+  startStreet,
+  startCity,
+  startState,
 }: GenerateUserInput & { id: string }) => {
   if (daysWorking.length != 13) {
     throw new Error("Given an invalid string for daysWorking");
@@ -313,18 +325,12 @@ export const generateUser = ({
     status: "ACTIVE" as Status,
     seatAvail: seatAvail || 0,
     companyName: "Sandbox Inc.",
-    companyAddress: "360 Huntington Ave",
+    companyAddress: companyAddress || "",
     companyCoordLng: companyCoordLng,
     companyCoordLat: companyCoordLat,
-    startAddress: "Roxbury",
+    startAddress: startAddress || "",
     startCoordLng: startCoordLng,
     startCoordLat: startCoordLat,
-    companyPOIAddress: "Northeastern University",
-    companyPOICoordLng: companyCoordLng,
-    companyPOICoordLat: companyCoordLat,
-    startPOILocation: "Greenfield Commons",
-    startPOICoordLng: startCoordLng,
-    startPOICoordLat: startCoordLat,
     isOnboarded: true,
     daysWorking: daysWorking,
     startTime: startTime,
@@ -335,6 +341,12 @@ export const generateUser = ({
     licenseSigned: true,
     dateCreated: new Date(),
     dateModified: new Date(),
+    companyStreet: companyStreet || "",
+    companyCity: companyCity || "",
+    companyState: companyState || "",
+    startStreet: startStreet || "",
+    startCity: startCity || "",
+    startState: startState || "",
   };
   return {
     where: { id: id },

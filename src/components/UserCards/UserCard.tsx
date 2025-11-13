@@ -16,6 +16,7 @@ import Image from "next/image";
 import { trackViewRoute } from "../../utils/mixpanel";
 import useProfileImage from "../../utils/useProfileImage";
 import { AiOutlineUser } from "react-icons/ai";
+import useIsMobile from "../../utils/useIsMobile";
 
 interface UserCardProps {
   otherUser: EnhancedPublicUser;
@@ -24,17 +25,20 @@ interface UserCardProps {
   message?: string;
   isUnread?: boolean;
   classname?: string;
+  onClick?: () => void;
+  isMobileCondensedLayout?: boolean;
 }
 
 const getButtonClassName = (button: ButtonInfo): string => {
   const bColor = button.color;
   return classNames(
-    `${bColor} w-1/2 hover:bg-red-700 rounded-md p-1 my-1 text-center text-white`
+    `${bColor} w-1/2 hover:bg-red-700 rounded-md p-1 my-1 text-center text-white`,
   );
 };
 
-export const UserCard = (props: UserCardProps): JSX.Element => {
+export const UserCard = (props: UserCardProps): React.JSX.Element => {
   const trpcUtils = trpc.useContext();
+  const isMobile = useIsMobile();
   const { mutate: mutateFavorites } = trpc.user.favorites.edit.useMutation({
     onError: (error: any) => {
       toast.error(`Something went wrong: ${error.message}`);
@@ -44,7 +48,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
     },
   });
   const { profileImageUrl, imageLoadError } = useProfileImage(
-    props.otherUser.id
+    props.otherUser.id,
   );
 
   const user = useContext(UserContext);
@@ -61,11 +65,27 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
 
-  /** Creates a div with 7 boxes, each representing a day of the week.
+  const est = "America/New_York";
+
+  const formatTime = (time: Date | null, starttime?: Date | null) => {
+    let timeInEST = dayjs.tz(time, est);
+    const hour = starttime ? dayjs.tz(starttime, est).hour() : timeInEST.hour();
+
+    if (hour >= 1 && hour < 5) {
+      timeInEST = dayjs.tz(time, "UTC");
+    }
+
+    return timeInEST.format("h:mm A");
+  };
+
+  <q></q>; /** Creates a div with 7 boxes, each representing a day of the week.
    *  Background color is red if the user is working on that day.
    */
   const DaysWorkingDisplay = (daysWorking: string) => {
-    const boxes: JSX.Element[] = [];
+    if (!daysWorking || typeof daysWorking !== 'string') {
+      return <div className="flex w-11/12 justify-between">No days set</div>;
+    }
+    const boxes: React.JSX.Element[] = [];
     const days: string[] = ["S", "M", "Tu", "W", "Th", "F", "Sa"];
     for (let i = 0; i < daysWorking.length; i = i + 2) {
       let backgroundColor = "";
@@ -85,7 +105,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
           }
         >
           {days[dayIndex]}
-        </div>
+        </div>,
       );
     }
     return <div className="flex w-11/12 justify-between">{boxes}</div>;
@@ -97,10 +117,12 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
   return (
     <div
       className={classNames(
-        "align-center relative m-3.5 flex flex-col gap-2 rounded-xl bg-stone-100 px-4 py-4 text-left shadow-md",
-        "border-l-[13px] border-l-busy-red font-montserrat ",
-        props.classname
+        "align-center relative flex flex-col rounded-xl bg-stone-100 text-left shadow-md",
+        "border-l-[13px] border-l-busy-red font-montserrat",
+        isMobile ? "mx-1 my-2 px-3 py-3 gap-1" : "m-3.5 px-4 py-4 gap-2",
+        props.classname,
       )}
+      onClick={props.onClick}
     >
       <div className={"-ml-2 mb-1 flex flex-row items-center"}>
         {/* Profile Image */}
@@ -161,7 +183,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
           <Image src={StartIcon} width={25} height={25} alt="Start icon" />
         </div>
         <p className="ml-2 text-sm font-semibold">
-          {props.otherUser.startPOILocation}
+          {props.otherUser.startAddress}
         </p>
       </div>
 
@@ -176,7 +198,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
       </div>
 
       {/* Fourth row - messaging bubble */}
-      {props.message && (
+      {props.message && !(isMobile && props.isMobileCondensedLayout) && (
         <div
           className={`mt-2 inline-block max-w-full break-words rounded-lg bg-white p-2 text-sm ${
             props.isUnread ? "font-bold" : ""
@@ -186,60 +208,65 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
         </div>
       )}
 
-      <div className="flex w-full items-center gap-4">
-        {DaysWorkingDisplay(props.otherUser.daysWorking)}
-      </div>
+      {!(isMobile && props.isMobileCondensedLayout) && (
+        <div className="flex w-full items-center gap-4">
+          {DaysWorkingDisplay(props.otherUser.daysWorking)}
+        </div>
+      )}
 
       {/* Fifth row - Start and end times */}
-
-      <div className="m-0 flex w-full justify-between align-middle">
-        <div className="flex text-sm ">
-          <p className="pr-1">Start:</p>
-          <p className="font-semibold">
-            {dayjs.tz(props.otherUser.startTime, "UTC").format("h:mm")} am
-          </p>
-          <p className="px-2 font-semibold">|</p>
-          <p className="pr-1">End:</p>
-          <p className="font-semibold">
-            {dayjs.tz(props.otherUser.endTime, "UTC").format("h:mm")} pm
-          </p>
-        </div>
-      </div>
-      {/* Sixth row - coop Start and end dates */}
-      {props.otherUser.coopStartDate && props.otherUser.coopEndDate && (
+      {!(isMobile && props.isMobileCondensedLayout) && (
         <div className="m-0 flex w-full justify-between align-middle">
           <div className="flex text-sm ">
-            <p className="pr-1">From:</p>
+            <p className="pr-1">Start:</p>
             <p className="font-semibold">
-              {dayjs(props.otherUser.coopStartDate).format("MMMM")}
+              {formatTime(props.otherUser.startTime)}
             </p>
             <p className="px-2 font-semibold">|</p>
-            <p className="pr-1">To:</p>
+            <p className="pr-1">End:</p>
             <p className="font-semibold">
-              {dayjs(props.otherUser.coopEndDate).format("MMMM")}
+              {formatTime(props.otherUser.endTime, props.otherUser.startTime)}
             </p>
           </div>
         </div>
       )}
+      {/* Sixth row - coop Start and end dates */}
+      {props.otherUser.coopStartDate &&
+        props.otherUser.coopEndDate &&
+        !(isMobile && props.isMobileCondensedLayout) && (
+          <div className="m-0 flex w-full justify-between align-middle">
+            <div className="flex text-sm ">
+              <p className="pr-1">From:</p>
+              <p className="font-semibold">
+                {dayjs(props.otherUser.coopStartDate).format("MMMM")}
+              </p>
+              <p className="px-2 font-semibold">|</p>
+              <p className="pr-1">To:</p>
+              <p className="font-semibold">
+                {dayjs(props.otherUser.coopEndDate).format("MMMM")}
+              </p>
+            </div>
+          </div>
+        )}
 
       {/* Seventh row - Seats avaliable*/}
-
-      {props.otherUser.role === "DRIVER" && (
-        <div className="flex flex-row text-sm">
-          <div className="mr-1">Seats Available:</div>
-          <div className="font-semibold">{props.otherUser.seatAvail}</div>
-        </div>
-      )}
+      {props.otherUser.role === "DRIVER" &&
+        !(isMobile && props.isMobileCondensedLayout) && (
+          <div className="flex flex-row text-sm">
+            <div className="mr-1">Seats Available:</div>
+            <div className="font-semibold">{props.otherUser.seatAvail}</div>
+          </div>
+        )}
 
       {/* 8th row - Buttons*/}
-      {props.onViewRouteClick && props.rightButton ? (
+      {props.onViewRouteClick && props.rightButton && !isMobile ? (
         <div className="flex flex-row justify-between gap-2">
           <button
             disabled={user.status === "INACTIVE" && user.role !== "VIEWER"}
             onClick={() => {
               props.onViewRouteClick &&
                 props.onViewRouteClick(user, props.otherUser);
-              trackViewRoute();
+              trackViewRoute(user.role);
             }}
             className="my-1 w-1/2 rounded-md border border-black p-1 text-center hover:bg-stone-200 disabled:hover:bg-transparent"
           >
@@ -248,7 +275,7 @@ export const UserCard = (props: UserCardProps): JSX.Element => {
           <button
             onClick={() => {
               if (props.rightButton?.onPress) {
-                trackViewRoute();
+                trackViewRoute(user.role);
                 props.rightButton.onPress(props.otherUser);
               }
             }}

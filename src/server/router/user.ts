@@ -3,7 +3,6 @@ import { z } from "zod";
 import { protectedRouter, router } from "./createRouter";
 import { Role } from "@prisma/client";
 import { Status } from "@prisma/client";
-import { generatePoiData } from "../../utils/publicUser";
 import _ from "lodash";
 import { favoritesRouter } from "./user/favorites";
 import { groupsRouter } from "./user/groups";
@@ -42,7 +41,7 @@ export const userRouter = router({
       z.object({
         role: z.nativeEnum(Role),
         status: z.nativeEnum(Status),
-        seatAvail: z.number().int().min(0),
+        seatAvail: z.number().int().min(0).max(6),
         companyName: z.string(),
         companyAddress: z.string(),
         companyCoordLng: z.number(),
@@ -60,7 +59,13 @@ export const userRouter = router({
         coopEndDate: z.date().nullable(),
         bio: z.string(),
         licenseSigned: z.boolean(),
-      })
+        startStreet: z.string(),
+        startCity: z.string(),
+        startState: z.string(),
+        companyStreet: z.string(),
+        companyCity: z.string(),
+        companyState: z.string(),
+      }),
     )
     .mutation(async ({ input, ctx }) => {
       const startTimeDate = input.startTime
@@ -69,11 +74,6 @@ export const userRouter = router({
       const endTimeDate = input.endTime
         ? new Date(Date.parse(input.endTime))
         : undefined;
-
-      const [startPOIData, endPOIData] = await Promise.all([
-        generatePoiData(input.startCoordLng, input.startCoordLat),
-        generatePoiData(input.companyCoordLng, input.companyCoordLat),
-      ]);
 
       const id = ctx.session.user?.id;
       const user = await ctx.prisma.user.update({
@@ -89,12 +89,12 @@ export const userRouter = router({
           startAddress: input.startAddress,
           startCoordLng: input.startCoordLng,
           startCoordLat: input.startCoordLat,
-          startPOILocation: startPOIData.location,
-          startPOICoordLng: startPOIData.coordLng,
-          startPOICoordLat: startPOIData.coordLat,
-          companyPOIAddress: endPOIData.location,
-          companyPOICoordLng: endPOIData.coordLng,
-          companyPOICoordLat: endPOIData.coordLat,
+          companyStreet: input.companyStreet,
+          companyCity: input.companyCity,
+          companyState: input.companyState,
+          startStreet: input.startStreet,
+          startCity: input.startCity,
+          startState: input.startState,
           preferredName: input.preferredName,
           pronouns: input.pronouns,
           isOnboarded: input.isOnboarded,
@@ -115,7 +115,7 @@ export const userRouter = router({
     .input(
       z.object({
         contentType: z.string(),
-      })
+      }),
     )
     .query(async ({ ctx, input }) => {
       const { contentType } = input;

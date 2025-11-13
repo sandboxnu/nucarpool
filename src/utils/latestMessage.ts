@@ -2,7 +2,7 @@ import { Message, Request } from "./types";
 
 export const getLatestMessageForRequest = (
   request: Request,
-  currentUserId: string
+  currentUserId: string,
 ): Message | null => {
   if (!request) return null;
 
@@ -21,7 +21,7 @@ export const getLatestMessageForRequest = (
 
   allMessages.sort(
     (a, b) =>
-      new Date(b.dateCreated).getTime() - new Date(a.dateCreated).getTime()
+      new Date(b.dateCreated).getTime() - new Date(a.dateCreated).getTime(),
   );
 
   return allMessages[0];
@@ -29,7 +29,7 @@ export const getLatestMessageForRequest = (
 export const getCardSortingData = (
   userId: string,
   request: Request,
-  latestMessage: Message | null
+  latestMessage: Message | null,
 ) => {
   const isUnread = latestMessage
     ? !latestMessage.isRead && userId !== latestMessage.userId

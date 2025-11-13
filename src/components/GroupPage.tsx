@@ -6,9 +6,11 @@ import { UserContext } from "../utils/userContext";
 import { Role, User } from "@prisma/client";
 import Spinner from "./Spinner";
 import { toast } from "react-toastify";
+import { PublicUser } from "../utils/types";
 
 interface GroupPageProps {
   onClose: () => void;
+  onViewGroupRoute: (driver: PublicUser, riders: PublicUser[]) => void;
 }
 
 export const GroupPage = (props: GroupPageProps) => {
@@ -28,12 +30,15 @@ export const GroupPage = (props: GroupPageProps) => {
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
       <div className="fixed inset-0 backdrop-blur-sm" aria-hidden="true">
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          {/* dialog panel container  */}
-          <Dialog.Panel className="flex h-4/6 w-4/6 flex-col content-center justify-center gap-4 overflow-hidden  rounded-md bg-white py-9 shadow-md">
+          <Dialog.Panel className="flex h-4/6 w-4/6 flex-col content-center justify-center gap-4 overflow-hidden rounded-md bg-white py-9 shadow-md">
             <Dialog.Title className="text-center text-3xl font-bold">
               Group Page
             </Dialog.Title>
-            <GroupBody curUser={curUser} onClose={onClose} />
+            <GroupBody 
+              curUser={curUser} 
+              onClose={onClose} 
+              onViewGroupRoute={props.onViewGroupRoute}
+            />
           </Dialog.Panel>
         </div>
       </div>
@@ -44,14 +49,16 @@ export const GroupPage = (props: GroupPageProps) => {
 const GroupBody = ({
   curUser,
   onClose,
+  onViewGroupRoute,
 }: {
   curUser: User;
   onClose: () => void;
+  onViewGroupRoute: (driver: PublicUser, riders: PublicUser[]) => void;
 }) => {
   return !curUser?.carpoolId ? (
     <NoGroupInfo role={curUser.role} onClose={onClose} />
   ) : (
-    <GroupInfo curUser={curUser} onClose={onClose} />
+    <GroupInfo curUser={curUser} onClose={onClose} onViewGroupRoute={onViewGroupRoute} />
   );
 };
 
@@ -145,14 +152,20 @@ const NoGroupInfo = ({ role }: NoGroupInfoProps) => {
 const GroupInfo = ({
   curUser,
   onClose,
+  onViewGroupRoute,
 }: {
   curUser: User;
   onClose: () => void;
+  onViewGroupRoute: (driver: PublicUser, riders: PublicUser[]) => void;
 }) => {
-  const utils = trpc.useContext();
+  const utils = trpc.useUtils();
   const { data: group } = trpc.user.groups.me.useQuery();
   const users = group?.users ?? [];
   const [groupMessage, setGroupMessage] = useState(group?.message ?? "");
+
+  const driver = users.find(user => user.role === Role.DRIVER);
+  const riders = users.filter(user => user.role === Role.RIDER);
+
   const { mutate: updateMessage } = trpc.user.groups.updateMessage.useMutation({
     onSuccess: () => {
       // Invalidate and refetch the groups.me query
@@ -180,10 +193,17 @@ const GroupInfo = ({
     }
   };
 
+  const handleViewCombinedRoute = () => {
+    if (driver && riders.length > 0) {
+      onViewGroupRoute(driver, riders);
+      onClose(); // close modal after showing the route
+    }
+  };
+
   return (
-    <>
+    <div className="flex flex-col h-full">
       {curUser?.role === "DRIVER" ? (
-        <div className="mx-20 flex flex-col py-1">
+        <div className="mx-20 flex flex-col py-1 flex-shrink-0">
           <div className="my-1 text-xs italic text-slate-400">
             Use this text box to share important communication with your riders!
           </div>
@@ -206,7 +226,7 @@ const GroupInfo = ({
           </div>
         </div>
       ) : (
-        <div className="mx-16 flex flex-col py-1">
+        <div className="mx-16 flex flex-col py-1 flex-shrink-0">
           <div className="text-center">Carpool Information from Driver</div>
           <br />
           <p className="flex-1 justify-center rounded-md border px-3 py-2 text-center text-sm shadow-sm">
@@ -216,9 +236,29 @@ const GroupInfo = ({
           </p>
         </div>
       )}
-      <div className="mx-16 mt-2 flex flex-grow flex-col divide-y-2 rounded-md border px-2">
-        <GroupMembers users={users} onClose={onClose} />
+      
+      <div className="mx-16 mt-2 flex flex-col flex-grow min-h-0">
+        <div className="flex flex-col divide-y-2 rounded-md border px-2 h-full overflow-y-auto">
+          <GroupMembers users={users} onClose={onClose} />
+        </div>
       </div>
-    </>
+
+      {/* combined route button */}
+      {driver && riders.length > 0 && (
+        <div className="mt-4 px-4 pb-4 flex-shrink-0">
+          <div className="flex flex-col items-center">
+            <button
+              onClick={handleViewCombinedRoute}
+              className="w-1/2 rounded-md bg-northeastern-red py-3 px-4 text-white font-medium hover:bg-red-700 transition-colors"
+            >
+              Preview Group Route
+            </button>
+            <p className="mt-2 text-xs text-gray-500 text-center max-w-xs mx-auto">
+              Preview a combined route between the driver and all riders in your group
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };

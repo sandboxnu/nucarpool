@@ -17,7 +17,7 @@ export const GroupMembers = (props: GroupMembersProps) => {
   const curUser = useContext(UserContext);
   const driver = props.users.find((user) => user.role === Role.DRIVER);
   const riders = props.users.filter(
-    (user) => user.id !== driver?.id && user.id !== curUser?.id
+    (user) => user.id !== driver?.id && user.id !== curUser?.id,
   );
   const utils = trpc.useContext();
   const { addToast } = useToasts();

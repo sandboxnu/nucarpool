@@ -77,6 +77,7 @@ const ControlledTimePicker = (props: ControlledTimePickerProps) => {
                 minuteStep={15}
                 use12Hours={true}
                 value={fieldProps.value ? dayjs(fieldProps.value) : null}
+                inputReadOnly={true}
                 onChange={(date) => {
                   fieldProps.onChange(date ? date.toDate() : null);
                 }}

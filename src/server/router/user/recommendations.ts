@@ -26,7 +26,7 @@ export const recommendationsRouter = router({
           favorites: z.boolean(), // if true, only show users user has favorited
           messaged: z.boolean(), // if false, hide users user has messaged
         }),
-      })
+      }),
     )
     .query(async ({ input, ctx }) => {
       const id = ctx.session.user?.id;
@@ -73,11 +73,11 @@ export const recommendationsRouter = router({
         where: userQuery,
       });
       const recs = _.compact(
-        users.map(calculateScore(calcUser, input.filters, input.sort))
+        users.map(calculateScore(calcUser, input.filters, input.sort)),
       );
       recs.sort((a, b) => a.score - b.score);
       const sortedUsers = recs.map((rec) =>
-        users.find((user) => user.id === rec.id)
+        users.find((user) => user.id === rec.id),
       );
       const finalUsers = sortedUsers.slice(0, 50);
 

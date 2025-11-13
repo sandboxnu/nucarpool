@@ -4,7 +4,13 @@ import useSearch from "../utils/search";
 import { CarpoolAddress, CarpoolFeature } from "./types";
 
 export const useAddressSelection = (
-  initialAddress: CarpoolAddress = { place_name: "", center: [0, 0] }
+  initialAddress: CarpoolAddress = {
+    place_name: "",
+    center: [0, 0],
+    street: "",
+    city: "",
+    state: ""
+  },
 ) => {
   const [selectedAddress, setSelectedAddress] =
     useState<CarpoolAddress>(initialAddress);

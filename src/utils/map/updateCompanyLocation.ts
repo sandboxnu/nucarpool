@@ -1,10 +1,12 @@
-import mapboxgl from "mapbox-gl";
+import mapboxgl, { MapLayerMouseEvent } from "mapbox-gl";
 import BlueEnd from "../../../public/user-dest.png";
 import BlueDriverEnd from "../../../public/user-dest-driver.png";
 import RedDriverEnd from "../../../public/driver-dest.png";
 import OrangeRiderEnd from "../../../public/rider-dest.png";
 import { Role } from "@prisma/client";
 import { GeoJSON } from "geojson";
+import { PublicUser } from "../types";
+import { getPointClickHandler } from "./handlers";
 
 const updateCompanyLocation = (
   map: mapboxgl.Map,
@@ -12,8 +14,9 @@ const updateCompanyLocation = (
   companyLatitude: number,
   role: Role,
   userId: string,
+  userData?: PublicUser,
   isCurrent: boolean = false,
-  remove: boolean = false
+  remove: boolean = false,
 ): void => {
   let img, sourceId: string, layerId: string;
 
@@ -53,7 +56,10 @@ const updateCompanyLocation = (
         type: "Point",
         coordinates: [companyLongitude, companyLatitude],
       },
-      properties: {},
+      properties: userData || {
+        id: userId,
+        role: role,
+      }
     };
 
     // Create source if it doesn't exist
@@ -77,7 +83,15 @@ const updateCompanyLocation = (
           "icon-allow-overlap": true,
           "icon-size": 0.33,
         },
-      });
+      }, "waterway-label");
+      if (!isCurrent) {
+        // click event for request user markers
+        const handlePointClick = getPointClickHandler();
+        map.on("click", layerId, (e) => {
+          if (!e.features) return;
+          handlePointClick!(e as MapLayerMouseEvent);
+        });
+      }
     }
   });
 };

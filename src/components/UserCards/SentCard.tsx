@@ -1,14 +1,11 @@
 import { useContext, useState } from "react";
-import {
-  EnhancedPublicUser,
-  Message,
-  PublicUser,
-} from "../../utils/types";
+import { EnhancedPublicUser, Message, PublicUser } from "../../utils/types";
 import { UserContext } from "../../utils/userContext";
 import { UserCard } from "./UserCard";
 import SentRequestModal from "../Modals/SentRequestModal";
 import { createPortal } from "react-dom";
 import { User } from "@prisma/client";
+import React from 'react';
 
 interface SentCardProps {
   otherUser: EnhancedPublicUser;
@@ -19,10 +16,9 @@ interface SentCardProps {
   latestMessage?: Message;
 }
 
-export const SentCard = (props: SentCardProps): JSX.Element => {
+export const SentCard = (props: SentCardProps): React.JSX.Element => {
   const user = useContext(UserContext);
   const [showModal, setShowModal] = useState(false);
-
 
   return (
     <>
@@ -48,7 +44,7 @@ export const SentCard = (props: SentCardProps): JSX.Element => {
             onClose={() => setShowModal(false)}
             req={props.otherUser.outgoingRequest}
           />,
-          document.body
+          document.body,
         )}
     </>
   );

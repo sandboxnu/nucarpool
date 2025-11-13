@@ -74,7 +74,7 @@ const StepFour = ({
               // Reset cursor
               const adjustedCursor = Math.min(
                 cursorPosition + 1,
-                displayValue.length - 1
+                displayValue.length - 1,
               );
               input.setSelectionRange(adjustedCursor, adjustedCursor);
             }}

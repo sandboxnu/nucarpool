@@ -28,7 +28,7 @@ export const favoritesRouter = router({
       (favorite) =>
         favorite.role !== userRole &&
         favorite.role !== "VIEWER" &&
-        favorite.status !== Status.INACTIVE
+        favorite.status !== Status.INACTIVE,
     );
     return filteredFavorites.map(convertToPublic);
   }),
@@ -38,7 +38,7 @@ export const favoritesRouter = router({
         userId: z.string(),
         favoriteId: z.string(),
         add: z.boolean(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       await ctx.prisma.user.update({

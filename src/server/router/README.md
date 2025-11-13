@@ -66,6 +66,6 @@ trpc.useQuery(
     onError: (error) => {
       toast.error(`Something went wrong: ${error}`);
     },
-  }
+  },
 );
 ```

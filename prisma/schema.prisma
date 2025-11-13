@@ -148,12 +148,12 @@ model User {
   startAddress       String        @default("") @map("start_address")
   startCoordLng      Float         @default(0) @map("start_coord_lng")
   startCoordLat      Float         @default(0) @map("start_coord_lat")
-  companyPOIAddress  String        @default("") @map("company_poi_address")
-  companyPOICoordLng Float         @default(0) @map("company_poi_coord_lng")
-  companyPOICoordLat Float         @default(0) @map("company_poi_coord_lat")
-  startPOILocation   String        @default("") @map("start_poi_location")
-  startPOICoordLng   Float         @default(0) @map("start_poi_coord_lng")
-  startPOICoordLat   Float         @default(0) @map("start_poi_coord_lat")
+  companyStreet      String        @default("") @map("company_street")
+  companyCity        String        @default("") @map("company_city")
+  companyState       String        @default("") @map("company_state")
+  startStreet        String        @default("") @map("start_street")
+  startCity          String        @default("") @map("start_city")
+  startState         String        @default("") @map("start_state")
   isOnboarded        Boolean       @default(false) @map("is_onboarded")
   licenseSigned      Boolean       @default(false) @map("license_signed")
   daysWorking        String        @default("") @map("days_working")
@@ -167,7 +167,7 @@ model User {
   receivedRequests   Request[]     @relation("receivedRequests")
   carpool            CarpoolGroup? @relation(fields: [carpoolId], references: [id])
   carpoolId          String?
-  Message            Message[]
+  message            Message[]
   dateCreated        DateTime      @default(now())
   dateModified       DateTime      @default(now()) @updatedAt
   groupMessage       String?       @map("group_message") @db.Text

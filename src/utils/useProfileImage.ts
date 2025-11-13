@@ -12,7 +12,7 @@ const useProfileImage = (userId?: string) => {
     refetch,
   } = trpc.user.getPresignedDownloadUrl.useQuery(
     { userId },
-    { enabled: !profileImageUrl }
+    { enabled: !profileImageUrl },
   );
   useEffect(() => {
     setProfileImageUrl(null);

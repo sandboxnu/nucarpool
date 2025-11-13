@@ -30,6 +30,8 @@ interface SidebarProps {
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
   onUserSelect: (userId: string) => void;
   selectedUser: EnhancedPublicUser | null;
+  mobileSelectedUser: string | null;
+  handleMobileExpand: (userId?: string) => void;
 }
 
 export const SidebarPage = (props: SidebarProps) => {
@@ -50,6 +52,8 @@ export const SidebarPage = (props: SidebarProps) => {
         disabled={disabled}
         viewRoute={props.onViewRouteClick}
         onViewRequest={props.onUserSelect}
+        mobileSelectedUser={props.mobileSelectedUser}
+        handleMobileExpand={props.handleMobileExpand}
       />
     );
   } else {

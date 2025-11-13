@@ -8,13 +8,13 @@ import {
 } from "react-hook-form";
 
 import { User } from "@prisma/client";
-import Checkbox from "@mui/material/Checkbox";
 import { ErrorDisplay, Note } from "../../styles/profile";
 import { EntryLabel } from "../EntryLabel";
-import ControlledTimePicker from "../Profile/ControlledTimePicker";
-import { TextField } from "../TextField";
-import { formatDateToMonth, handleMonthChange } from "../../utils/dateUtils";
-import StaticDayBox from "../Sidebar/StaticDayBox";
+import { DatePicker } from "antd";
+import dayjs, { Dayjs } from "dayjs";
+import useIsMobile from "../../utils/useIsMobile";
+import SelectDays from "../Shared/Schedule/SelectDays";
+import SelectTimeRange from "../Shared/Schedule/SelectTimeRange";
 
 interface StepThreeProps {
   errors: FieldErrors<OnboardingFormInputs>;
@@ -23,6 +23,7 @@ interface StepThreeProps {
   setValue: UseFormSetValue<OnboardingFormInputs>;
   user?: User;
 }
+
 const StepThree = ({
   errors,
   watch,
@@ -30,22 +31,20 @@ const StepThree = ({
   control,
   setValue,
 }: StepThreeProps) => {
-  const daysOfWeek = ["Su", "M", "Tu", "W", "Th", "F", "S"];
+  const isMobile = useIsMobile();
+
   return (
-    <div className="flex flex-col items-center  justify-center bg-white px-4 ">
-      <div className="mb-8 text-center font-montserrat text-3xl font-bold">
+    <div className="flex flex-col items-center justify-center bg-white px-2">
+      <div
+        className={`mb-4 text-center font-montserrat ${isMobile ? "text-2xl" : "text-3xl"} font-bold`}
+      >
         <span>When are you&nbsp;</span>
         <span className="text-northeastern-red">carpooling?</span>
       </div>
-      <div
-        className={`flex flex-col items-start  ${
-          (errors.startTime || errors.endTime) &&
-          (errors.coopStartDate || errors.coopEndDate)
-            ? "space-y-0"
-            : "space-y-4"
-        } `}
-      >
-        <div className="flex flex-col space-y-2 ">
+
+      <div className="flex flex-col items-start space-y-2 w-full">
+        {/* Days of the Week */}
+        <div className="flex flex-col space-y-1 w-full">
           <EntryLabel
             required={true}
             error={
@@ -58,143 +57,97 @@ const StepThree = ({
             }
             label="Days of the Week"
           />
-          <div className="flex flex-row items-center ">
-            {daysOfWeek.map((day, index) => (
-              <Controller
-                key={day + index.toString()}
-                name={`daysWorking.${index}`}
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <Checkbox
-                    key={day + index.toString()}
-                    sx={{ padding: 0 }}
-                    disabled={false}
-                    checked={value}
-                    onChange={onChange}
-                    checkedIcon={
-                      <StaticDayBox
-                        className={"!h-12 !w-12"}
-                        day={day}
-                        isSelected={true}
-                      />
-                    }
-                    icon={
-                      <StaticDayBox
-                        className={"!h-12 !w-12"}
-                        day={day}
-                        isSelected={false}
-                      />
-                    }
-                  />
-                )}
-              />
-            ))}
+          <div className="flex flex-row items-center justify-center w-full">
+            <SelectDays
+              control={control}
+              disabled={false}
+              useStaticDayBox={true}
+              dayBoxClassName={isMobile ? "!h-8 !w-8" : "!h-10 !w-10"}
+              error={errors.daysWorking}
+            />
           </div>
           {errors.daysWorking && (
-            <ErrorDisplay>{errors.daysWorking.message}</ErrorDisplay>
+            <ErrorDisplay className="text-xs">
+              {errors.daysWorking.message}
+            </ErrorDisplay>
           )}
         </div>
 
-        <div className="flex w-full  flex-col ">
-          <div className="flex w-3/4 gap-8">
-            {/* Start Time */}
-            <div className="flex flex-1  flex-col ">
-              <EntryLabel
-                required={true}
-                error={errors.startTime}
-                label="Start Time"
-              />
-              <ControlledTimePicker
-                isDisabled={false}
-                control={control}
-                name="startTime"
-                error={errors.startTime}
-                value={watch("startTime") || user?.startTime || undefined}
-              />
-            </div>
+        {/* Time Section */}
+        <SelectTimeRange
+          control={control}
+          errors={{
+            startTime: errors.startTime,
+            endTime: errors.endTime,
+          }}
+          isDisabled={false}
+          noteText="Please input the start and end times of your work, rather than your departure times."
+          noteClassName={`py-1 ${isMobile ? "text-xs" : "text-sm"}`}
+          containerClassName={`flex w-full flex-col ${isMobile ? "mt-2" : "mt-3"}`}
+          timePickerValues={{
+            startTime: watch("startTime") || user?.startTime || undefined,
+            endTime: watch("endTime") || user?.endTime || undefined,
+          }}
+        />
 
-            {/* End Time */}
-            <div className="flex flex-1 flex-col ">
-              <EntryLabel
-                required={true}
-                error={errors.endTime}
-                label="End Time"
-              />
-              <ControlledTimePicker
-                isDisabled={false}
-                control={control}
-                name="endTime"
-                error={errors.endTime}
-                value={watch("endTime") || user?.endTime || undefined}
-              />
-            </div>
+        {/* Date Section */}
+        <div className={`flex w-full gap-4 ${isMobile ? "mt-1" : "mt-2"}`}>
+          {/* Start Date */}
+          <div className="flex flex-col w-1/2">
+            <EntryLabel
+              required={true}
+              error={errors.coopStartDate}
+              label="Start Date"
+              className="w-full"
+            />
+            <DatePicker<Dayjs>
+              id="coopStartDate"
+              picker="month"
+              onChange={(date: Dayjs, dateString) =>
+                setValue("coopStartDate", date ? date.toDate() : null)
+              }
+              format="YYYY-MM"
+              inputReadOnly={true}
+              className={`${isMobile ? "h-10 text-base" : "h-12 text-lg"} w-full border rounded-md p-2`}
+            />
           </div>
 
-          {/* Note for Time Section */}
-          <div className="w-full">
-            <Note className="py-2">
-              Please input the start and end times of your work, rather than
-              your departure times. If your work hours are flexible, coordinate
-              directly with potential riders or drivers.
-            </Note>
-          </div>
-
-          <div
-            className={`flex w-3/4 ${
-              !errors.startTime && !errors.endTime
-                ? "pt-4"
-                : errors.daysWorking && "!-mt-2"
-            } gap-8`}
-          >
-            {/* Start Date */}
-            <div className="flex flex-1  flex-col  ">
-              <EntryLabel
-                required={true}
-                error={errors.coopStartDate}
-                label="Start Date"
-              />
-              <TextField
-                type="month"
-                isDisabled={false}
-                inputClassName={" !px-0 !pr-0 !pl-2"}
-                id="coopStartDate"
-                error={errors.coopStartDate}
-                onChange={handleMonthChange("coopStartDate", setValue)}
-                defaultValue={
-                  formatDateToMonth(watch("coopStartDate")) || undefined
-                }
-              />
-            </div>
-
-            {/* End Date */}
-            <div className="flex flex-1 flex-grow-0 flex-col ">
-              <EntryLabel
-                required={true}
-                error={errors.coopEndDate}
-                label="End Date"
-              />
-              <TextField
-                type="month"
-                isDisabled={false}
-                inputClassName={"!pr-0 !pl-2"}
-                id="coopEndDate"
-                error={errors.coopEndDate}
-                onChange={handleMonthChange("coopEndDate", setValue)}
-                defaultValue={
-                  formatDateToMonth(watch("coopEndDate")) || undefined
-                }
-              />
-            </div>
-          </div>
-          {/* Note for Date Section */}
-          <div className="w-full">
-            <Note className="py-2">
-              Please indicate the start and the end dates of your co-op. If you
-              don&apos;t know exact dates, you can use approximate dates.
-            </Note>
+          {/* End Date */}
+          <div className="flex flex-grow-0 flex-col w-1/2">
+            <EntryLabel
+              required={true}
+              error={errors.coopEndDate}
+              label="End Date"
+            />
+            <DatePicker<Dayjs>
+              id="coopEndDate"
+              picker="month"
+              onChange={(date: Dayjs, dateString) =>
+                setValue("coopEndDate", date ? date.toDate() : null)
+              }
+              format="YYYY-MM"
+              inputReadOnly={true}
+              className={`${isMobile ? "h-10 text-base" : "h-12 text-lg"} w-full border rounded-md p-2`}
+            />
           </div>
         </div>
+
+        {/* Note for Date Section */}
+        <div className="w-full">
+          <Note className={`py-1 ${isMobile ? "text-xs" : "text-sm"}`}>
+            Please indicate the start and end dates of your co-op. Approximate
+            dates are acceptable.
+          </Note>
+        </div>
       </div>
+
+      {isMobile && (
+        <div className="mt-2 w-full rounded-md bg-amber-50 p-1 text-center">
+          <p className="text-xs font-medium text-amber-800">
+            ⚠️ Mobile version is currently under development.
+          </p>
+        </div>
+      )}
     </div>
   );
 };
