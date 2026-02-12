@@ -1,9 +1,9 @@
 import { TRPCError } from "@trpc/server";
 import { protectedRouter, router } from "../createRouter";
 import _ from "lodash";
-import { convertToPublic } from "../../../utils/publicUser";
-import { Status } from "@prisma/client";
-import { calculateScore } from "../../../utils/recommendation";
+import { convertCarpoolSearchToPublic } from "../../../utils/publicUser";
+import { Status, CarpoolSearch, Location, User } from "@prisma/client";
+import { calculateScore, Recommendation } from "../../../utils/recommendation";
 import { z } from "zod";
 
 // use this router to manage invitations
@@ -26,61 +26,115 @@ export const recommendationsRouter = router({
           favorites: z.boolean(), // if true, only show users user has favorited
           messaged: z.boolean(), // if false, hide users user has messaged
         }),
-      })
+      }),
     )
     .query(async ({ input, ctx }) => {
-      const id = ctx.session.user?.id;
-      const currentUser = await ctx.prisma.user.findUnique({
-        where: {
-          id: id,
-        },
-        include: {
-          favorites: input.filters.favorites,
-          sentRequests: !input.filters.messaged,
-          receivedRequests: !input.filters.messaged,
-        },
-      });
-      if (!currentUser) {
+      const userId = ctx.session.user?.id;
+      
+      if (!userId) {
         throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `No user with id ${id}.`,
+          code: "UNAUTHORIZED",
+          message: "User not authenticated.",
         });
       }
-      const { favorites, sentRequests, receivedRequests, ...calcUser } =
-        currentUser;
+      
+      // Get current user's CarpoolSearch for comparison
+      const currentUserSearch: (CarpoolSearch & {
+        user: User & {
+          favorites: User[];
+          sentRequests: any[];
+          receivedRequests: any[];
+        };
+        homeLocation: Location | null;
+        companyLocation: Location | null;
+      }) | null = await ctx.prisma.carpoolSearch.findFirst({
+        where: { userId },
+        include: {
+          user: {
+            include: {
+              favorites: input.filters.favorites,
+              sentRequests: !input.filters.messaged,
+              receivedRequests: !input.filters.messaged,
+            }
+          },
+          homeLocation: true,
+          companyLocation: true,
+        },
+      });
+      
+      if (!currentUserSearch) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `No carpool search found for user ${userId}.`,
+        });
+      }
 
-      let userQuery: { id: any; isOnboarded: boolean; status: Status } = {
-        id: { not: id },
-        isOnboarded: true,
+      const { favorites, sentRequests, receivedRequests } = currentUserSearch.user;
+
+      let excludedUserIds: string[] = [userId];
+      if (!input.filters.messaged) {
+        excludedUserIds.push(
+          ...sentRequests.map((r) => r.toUserId),
+          ...receivedRequests.map((r) => r.fromUserId)
+        );
+      }
+
+      // build CarpoolSearch query
+      let carpoolSearchQuery: any = {
+        userId: { notIn: excludedUserIds },
         status: Status.ACTIVE,
+        user: {
+          isOnboarded: true,
+        }
       };
 
-      // Hide users user has messaged
-      if (!input.filters.messaged) {
-        userQuery.id["notIn"] = [
-          ...sentRequests.map((r) => r.toUserId),
-          ...receivedRequests.map((r) => r.fromUserId),
-        ];
-      }
-
-      // Favorites filter
+      // favorites filter
       if (input.filters.favorites) {
-        userQuery.id["in"] = favorites.map((f) => f.id);
+        carpoolSearchQuery.userId = {
+          ...carpoolSearchQuery.userId,
+          in: favorites.map((f: User) => f.id)
+        };
       }
 
-      // Construct Query with Filters
-      const users = await ctx.prisma.user.findMany({
-        where: userQuery,
+      // query CarpoolSearches with all necessary relations
+      const carpoolSearches = await ctx.prisma.carpoolSearch.findMany({
+        where: carpoolSearchQuery,
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+              bio: true,
+              preferredName: true,
+              pronouns: true,
+              isOnboarded: true,
+            }
+          },
+          homeLocation: true,
+          companyLocation: true,
+        },
       });
-      const recs = _.compact(
-        users.map(calculateScore(calcUser, input.filters, input.sort))
-      );
-      recs.sort((a, b) => a.score - b.score);
-      const sortedUsers = recs.map((rec) =>
-        users.find((user) => user.id === rec.id)
-      );
-      const finalUsers = sortedUsers.slice(0, 50);
 
-      return Promise.all(finalUsers.map((user) => convertToPublic(user!)));
+      // calculate scores
+      const recs: Recommendation[] = _.compact(
+        carpoolSearches.map(calculateScore(currentUserSearch, input.filters, input.sort))
+      );
+      
+      // sort by score
+      recs.sort((a: Recommendation, b: Recommendation) => a.score - b.score);
+      
+      // map back to full CarpoolSearch objects
+      const sortedSearches = recs.map((rec) =>
+        carpoolSearches.find((search) => search.user.id === rec.id)
+      );
+      
+      const finalSearches = sortedSearches.slice(0, 50);
+
+      // convert to public format
+      return Promise.all(
+        finalSearches.map((search) => convertCarpoolSearchToPublic(search!))
+      );
     }),
 });

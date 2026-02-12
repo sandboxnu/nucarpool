@@ -57,7 +57,7 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
       role,
       ...rest
     },
-    forwardedRef
+    forwardedRef,
   ): React.ReactElement => {
     const [isActive, setIsActive] = useState<boolean>(false);
 
@@ -103,7 +103,7 @@ const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
         </StyledInactiveRadioButton>
       );
     }
-  }
+  },
 );
 
 Radio.displayName = "Radio";

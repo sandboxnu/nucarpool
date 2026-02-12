@@ -4,7 +4,7 @@ import PulsingDot from "./PulsingDot";
 const updateUserLocation = (
   map: Map,
   userLongitude: number,
-  userLatitude: number
+  userLatitude: number,
 ) => {
   if (map.getSource("dot-point")) {
     const source = map.getSource("dot-point") as mapboxgl.GeoJSONSource;

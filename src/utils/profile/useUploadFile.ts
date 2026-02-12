@@ -5,7 +5,7 @@ export const useUploadFile = (selectedFile: File | null) => {
     {
       contentType: selectedFile?.type || "",
     },
-    { enabled: !!selectedFile }
+    { enabled: !!selectedFile },
   );
   const uploadFile = async () => {
     if (presignedData?.url && selectedFile) {

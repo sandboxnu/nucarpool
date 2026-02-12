@@ -5,6 +5,7 @@ import { EnhancedPublicUser, User } from "../../utils/types";
 import { toast } from "react-toastify";
 import { trpc } from "../../utils/trpc";
 import { Request } from "@prisma/client";
+import React from 'react';
 
 interface SentModalProps {
   user: User;
@@ -13,7 +14,7 @@ interface SentModalProps {
   onClose: () => void;
 }
 
-const SentRequestModal = (props: SentModalProps): JSX.Element => {
+const SentRequestModal = (props: SentModalProps): React.JSX.Element => {
   const { addToast } = useToasts();
   const [isOpen, setIsOpen] = useState(true);
 
@@ -46,7 +47,7 @@ const SentRequestModal = (props: SentModalProps): JSX.Element => {
       "Your request to carpool with " +
         props.otherUser.preferredName +
         " has been withdrawn.",
-      { appearance: "success" }
+      { appearance: "success" },
     );
   };
 

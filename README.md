@@ -1,5 +1,7 @@
 # NU Carpool
 
+##
+
 This is a web app for Northeastern University's students to assists them in finding groups for carpooling while on co-op.
 
 ## Get Started

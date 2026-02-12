@@ -32,7 +32,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
 const SignIn: NextPage = () => {
   const handleOnNortheasternSignInClick = (
-    e: React.MouseEvent<HTMLButtonElement>
+    e: React.MouseEvent<HTMLButtonElement>,
   ) => {
     e.preventDefault();
     trackEvent("Sign In Attempt", { provider: "Northeastern" });
@@ -42,7 +42,7 @@ const SignIn: NextPage = () => {
   };
 
   const handleOnGoogleSignInClick = (
-    e: React.MouseEvent<HTMLButtonElement>
+    e: React.MouseEvent<HTMLButtonElement>,
   ) => {
     e.preventDefault();
     trackEvent("Sign In Attempt", { provider: "Google" });

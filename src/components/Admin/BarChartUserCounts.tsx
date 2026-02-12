@@ -4,6 +4,7 @@ import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
+  ChartTypeRegistry,
   BarElement,
   Title,
   Tooltip,
@@ -11,70 +12,114 @@ import {
   ChartData,
   ChartOptions,
 } from "chart.js";
+const totalLabelPlugin = {
+  id: "totalLabelPlugin",
+  afterDatasetsDraw: (chart: ChartJS<keyof ChartTypeRegistry, any, any>) => {
+    const {
+      ctx,
+      scales: { x, y },
+    } = chart;
+    const datasets = chart.data.datasets;
 
+    chart.data.labels?.forEach((label, index) => {
+      const total = datasets.reduce((sum, dataset, datasetIndex) => {
+        if (!chart.isDatasetVisible(datasetIndex)) {
+          return sum;
+        }
+        const value = (dataset.data[index] as number) || 0;
+        return sum + value;
+      }, 0);
+
+      if (total > 0) {
+        const xPos = x.getPixelForValue(label);
+        const yPos = y.getPixelForValue(total) - 10;
+
+        ctx.save();
+        ctx.font = "bold 12px Montserrat";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "black";
+        ctx.fillText(total.toString(), xPos, yPos);
+        ctx.restore();
+      }
+    });
+  },
+};
 ChartJS.register(
   CategoryScale,
+  totalLabelPlugin,
   LinearScale,
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
 );
 
-import { TempUser } from "../../utils/types";
-
 interface BarChartOnboardingProps {
-  users: TempUser[];
+  totalAO: number;
+  totalANO: number;
+  totalIO: number;
+  totalINO: number;
+
+  driverAO: number;
+  driverANO: number;
+  driverIO: number;
+  driverINO: number;
+
+  riderAO: number;
+  riderANO: number;
+  riderIO: number;
+  riderINO: number;
+
+  viewerAO: number;
+  viewerANO: number;
+  viewerIO: number;
+  viewerINO: number;
 }
 
-function BarChartUserCounts({ users }: BarChartOnboardingProps) {
-  const activeUsers = users.filter((user) => user.status === "ACTIVE");
-  const totalCount = activeUsers.length;
-  const inactiveCount = users.length - totalCount;
-  const countOnboarded = activeUsers.filter((user) => user.isOnboarded).length;
-  const countNotOnboarded = totalCount - countOnboarded;
-  const driverCount = activeUsers.filter(
-    (user) => user.role === "DRIVER"
-  ).length;
-  const riderCount = activeUsers.filter((user) => user.role === "RIDER").length;
+function BarChartUserCounts({
+  totalAO,
+  totalANO,
+  totalIO,
+  totalINO,
+  driverAO,
+  driverANO,
+  driverIO,
+  driverINO,
 
-  const viewerCount = totalCount - (driverCount + riderCount);
-  const dataPoints = [
-    totalCount,
-    countOnboarded,
-    countNotOnboarded,
-    driverCount,
-    riderCount,
-    viewerCount,
-    inactiveCount,
-  ];
-  const barColors = [
-    "#000000",
-    "#FFA9A9",
-    "#808080",
-    "#C8102E",
-    "#DA7D25",
-    "#2454DD",
-    "#808080",
-  ];
-  const labels = [
-    "Total",
-    "Onboarded",
-    "Not Onboarded",
-    "Driver",
-    "Rider",
-    "Viewer",
-    "Inactive",
-  ];
+  riderAO,
+  riderANO,
+  riderIO,
+  riderINO,
+
+  viewerAO,
+  viewerANO,
+  viewerIO,
+  viewerINO,
+}: BarChartOnboardingProps) {
+  const labels = ["Total", "Driver", "Rider", "Viewer"];
 
   const barData: ChartData<"bar"> = {
     labels,
-
     datasets: [
       {
-        label: "Active User Counts",
-        data: dataPoints,
-        backgroundColor: barColors,
+        label: "Active Onboarded",
+        data: [totalAO, driverAO, riderAO, viewerAO],
+        backgroundColor: "#C8102E",
+      },
+      {
+        label: "Active Not Onboarded",
+        data: [totalANO, driverANO, riderANO, viewerANO],
+        backgroundColor: "#FFA9A9",
+      },
+      {
+        label: "Inactive Onboarded",
+        data: [totalIO, driverIO, riderIO, viewerIO],
+        backgroundColor: "#808080",
+      },
+      {
+        label: "Inactive Not Onboarded",
+        data: [totalINO, driverINO, riderINO, viewerINO],
+        backgroundColor: "#000000",
       },
     ],
   };
@@ -82,13 +127,23 @@ function BarChartUserCounts({ users }: BarChartOnboardingProps) {
   const barOptions: ChartOptions<"bar"> = {
     responsive: true,
     maintainAspectRatio: false,
+
     plugins: {
       legend: {
-        display: false,
+        display: true,
+        position: "top",
+        labels: {
+          font: {
+            family: "Montserrat",
+            size: 14,
+            style: "normal",
+            weight: "bold",
+          },
+        },
       },
       title: {
         display: true,
-        text: "User Counts",
+        text: "User Counts by Status and Onboarding",
         font: {
           family: "Montserrat",
           size: 18,
@@ -100,6 +155,10 @@ function BarChartUserCounts({ users }: BarChartOnboardingProps) {
     },
     scales: {
       x: {
+        grid: {
+          display: false,
+        },
+        stacked: true,
         ticks: {
           font: {
             family: "Montserrat",
@@ -110,7 +169,15 @@ function BarChartUserCounts({ users }: BarChartOnboardingProps) {
         },
       },
       y: {
+        grid: {
+          display: false,
+        },
+        ticks: {
+          stepSize: 100,
+        },
+        stacked: true,
         beginAtZero: true,
+        grace: 50,
         title: {
           display: true,
           text: "Number of Users",
@@ -126,14 +193,8 @@ function BarChartUserCounts({ users }: BarChartOnboardingProps) {
   };
 
   return (
-    <div className="h-full w-full ">
-      <div className="relative flex h-full flex-col">
-        <Bar data={barData} options={barOptions} />
-        <span className="w-full text-center font-lato text-sm text-gray-400">
-          All bars currently only include active users aside from
-          &quot;Inactive&quot;
-        </span>
-      </div>
+    <div className="relative min-h-[600px] w-full">
+      <Bar data={barData} options={barOptions} />
     </div>
   );
 }

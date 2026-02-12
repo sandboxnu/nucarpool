@@ -19,7 +19,7 @@ const s3Client = new S3Client({
 
 export async function generatePresignedUrl(
   fileName: string,
-  contentType: string
+  contentType: string,
 ) {
   const build = process.env.NEXT_PUBLIC_ENV;
   const command = new PutObjectCommand({
@@ -45,7 +45,7 @@ export async function getPresignedImageUrl(fileName: string) {
   try {
     // Check if the object exists
     await s3Client.send(
-      new HeadObjectCommand({ Bucket: "carpoolnubucket", Key: key })
+      new HeadObjectCommand({ Bucket: "carpoolnubucket", Key: key }),
     );
 
     // If the object exists, generate a pre-signed URL

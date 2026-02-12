@@ -117,63 +117,86 @@ model Message {
 
 // Represents a group of users
 model CarpoolGroup {
-  id          String   @id @default(cuid()) // primary key
-  message     String
-  users       User[]
-  dateCreated DateTime @default(now())
+  id              String          @id @default(cuid()) // primary key
+  message         String
+  dateCreated     DateTime        @default(now())
+  carpoolSearches CarpoolSearch[]
 
   @@map(name: "group")
 }
 
 // Represents a User--need this for NextAuth and the data it stores.
 model User {
-  id                 String        @id @default(cuid()) // primary key
-  name               String?
-  email              String?       @unique
-  emailVerified      DateTime?     @map(name: "email_verified")
-  image              String?       @db.MediumText
-  bio                String        @default("")
-  preferredName      String        @default("")
-  pronouns           String        @default("")
-  accounts           Account[] // can have multiple accounts
-  sessions           Session[] // can have multiple settings
-  role               Role          @default(VIEWER)
-  permission         Permission    @default(USER)
-  status             Status        @default(ACTIVE)
-  seatAvail          Int           @default(0) @map("seat_avail")
-  companyName        String        @default("") @map("company_name")
-  companyAddress     String        @default("") @map("company_address")
-  companyCoordLng    Float         @default(0) @map("company_coord_lng")
-  companyCoordLat    Float         @default(0) @map("company_coord_lat")
-  startAddress       String        @default("") @map("start_address")
-  startCoordLng      Float         @default(0) @map("start_coord_lng")
-  startCoordLat      Float         @default(0) @map("start_coord_lat")
-  companyPOIAddress  String        @default("") @map("company_poi_address")
-  companyPOICoordLng Float         @default(0) @map("company_poi_coord_lng")
-  companyPOICoordLat Float         @default(0) @map("company_poi_coord_lat")
-  startPOILocation   String        @default("") @map("start_poi_location")
-  startPOICoordLng   Float         @default(0) @map("start_poi_coord_lng")
-  startPOICoordLat   Float         @default(0) @map("start_poi_coord_lat")
-  isOnboarded        Boolean       @default(false) @map("is_onboarded")
-  licenseSigned      Boolean       @default(false) @map("license_signed")
-  daysWorking        String        @default("") @map("days_working")
-  startTime          DateTime?     @map("start_time") @db.Time(0)
-  endTime            DateTime?     @map("end_time") @db.Time(0)
-  coopStartDate      DateTime?     @map("coop_start_date") @db.Date
-  coopEndDate        DateTime?     @map("coop_end_date") @db.Date
-  favoritedBy        User[]        @relation("Favorites")
-  favorites          User[]        @relation("Favorites")
-  sentRequests       Request[]     @relation("sentRequests")
-  receivedRequests   Request[]     @relation("receivedRequests")
-  carpool            CarpoolGroup? @relation(fields: [carpoolId], references: [id])
-  carpoolId          String?
-  Message            Message[]
-  dateCreated        DateTime      @default(now())
-  dateModified       DateTime      @default(now()) @updatedAt
-  groupMessage       String?       @map("group_message") @db.Text
+  id               String          @id @default(cuid()) // primary key
+  name             String?
+  email            String?         @unique
+  emailVerified    DateTime?       @map(name: "email_verified")
+  image            String?         @db.MediumText
+  bio              String          @default("")
+  preferredName    String          @default("")
+  pronouns         String          @default("")
+  accounts         Account[] // can have multiple accounts
+  sessions         Session[] // can have multiple settings
+  permission       Permission      @default(USER)
+  isOnboarded      Boolean         @default(false) @map("is_onboarded")
+  licenseSigned    Boolean         @default(false) @map("license_signed")
+  favoritedBy      User[]          @relation("Favorites")
+  favorites        User[]          @relation("Favorites")
+  sentRequests     Request[]       @relation("sentRequests")
+  receivedRequests Request[]       @relation("receivedRequests")
+  message          Message[]
+  dateCreated      DateTime        @default(now())
+  dateModified     DateTime        @default(now()) @updatedAt
+  carpoolSearches  CarpoolSearch[]
 
-  @@index([carpoolId])
   @@map(name: "user")
+}
+
+// Represents a Location on the map
+model Location {
+  id                     String          @id @default(cuid())
+  city                   String          @default("") @map("city")
+  state                  String          @default("") @map("state")
+  street                 String          @default("") @map("street")
+  streetAddress          String          @default("") @map("street_address")
+  coordLng               Float           @default(0) @map("coord_lng")
+  coordLat               Float           @default(0) @map("coord_lat")
+  companyCarpoolSearches CarpoolSearch[] @relation("companyLocation")
+  homeCarpoolSearches    CarpoolSearch[] @relation("homeLocation")
+  dateCreated            DateTime        @default(now())
+  dateModified           DateTime        @default(now()) @updatedAt
+
+  @@map(name: "location")
+}
+
+model CarpoolSearch {
+  id                String        @id @default(cuid())
+  userId            String
+  role              Role          @default(VIEWER)
+  companyName       String        @default("") @map("company_name")
+  companyLocationId String
+  homeLocationId    String
+  startTime         DateTime?     @map("start_time") @db.Time(0)
+  endTime           DateTime?     @map("end_time") @db.Time(0)
+  startDate         DateTime?     @map("start_date") @db.Date
+  endDate           DateTime?     @map("end_date") @db.Date
+  daysWorking       String        @default("") @map("days_working")
+  seatsAvail        Int           @default(0) @map("seats_avail")
+  status            Status        @default(ACTIVE)
+  carpoolId         String?
+  groupMessage      String?       @map("group_message") @db.Text
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyLocation   Location      @relation("companyLocation", fields: [companyLocationId], references: [id])
+  homeLocation      Location      @relation("homeLocation", fields: [homeLocationId], references: [id])
+  carpool           CarpoolGroup? @relation(fields: [carpoolId], references: [id])
+  dateCreated       DateTime      @default(now()) @map("date_created")
+  dateModified      DateTime      @default(now()) @updatedAt @map("date_modified")
+
+  @@index([userId])
+  @@index([companyLocationId])
+  @@index([homeLocationId])
+  @@index([carpoolId])
+  @@map("carpool_search")
 }
 
 // Represents a VerificationToken--need this for NextAuth.

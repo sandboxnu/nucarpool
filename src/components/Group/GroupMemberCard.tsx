@@ -17,7 +17,7 @@ export const GroupMembers = (props: GroupMembersProps) => {
   const curUser = useContext(UserContext);
   const driver = props.users.find((user) => user.role === Role.DRIVER);
   const riders = props.users.filter(
-    (user) => user.id !== driver?.id && user.id !== curUser?.id
+    (user) => user.id !== driver?.id && user.id !== curUser?.id,
   );
   const utils = trpc.useContext();
   const { addToast } = useToasts();
@@ -137,7 +137,7 @@ export const GroupMemberCard = (props: GroupMemberCardProps) => {
       </div>
       {props.buttonText && props.buttonFunc && (
         <button
-          className="mx-2 h-full w-[150px] rounded-md bg-red-700 text-white"
+          className="mx-2 h-full w-[150px] rounded-md bg-red-700 text-xs sm:text-sm md:text-base text-white"
           onClick={() => props.buttonFunc && props.buttonFunc(props.user.id)}
         >
           {props.buttonText}

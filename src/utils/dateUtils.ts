@@ -5,7 +5,7 @@ import { OnboardingFormInputs } from "./types";
 const handleMonthChange =
   (
     field: "coopStartDate" | "coopEndDate",
-    setValue: UseFormSetValue<OnboardingFormInputs>
+    setValue: UseFormSetValue<OnboardingFormInputs>,
   ) =>
   (event: React.ChangeEvent<HTMLInputElement>): void => {
     const [year, month] = event.target.value.split("-").map(Number);

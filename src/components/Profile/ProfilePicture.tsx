@@ -27,7 +27,7 @@ const ProfilePicture = ({ onFileSelected }: ProfilePictureProps) => {
       setCroppedArea(croppedAreaPercentage);
       setCroppedAreaPixels(croppedAreaPixels);
     },
-    []
+    [],
   );
 
   const handleCancel = () => {
@@ -41,7 +41,7 @@ const ProfilePicture = ({ onFileSelected }: ProfilePictureProps) => {
   };
 
   const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -92,7 +92,7 @@ const ProfilePicture = ({ onFileSelected }: ProfilePictureProps) => {
 
       setCrop({ x: 0, y: 0 }); // ReCenter
     },
-    []
+    [],
   );
   const onCropChange = useCallback(
     (newCrop: Point) => {
@@ -108,26 +108,26 @@ const ProfilePicture = ({ onFileSelected }: ProfilePictureProps) => {
 
       boundedCrop.x = Math.min(
         Math.max(boundedCrop.x, -maxHorizontalMovement),
-        maxHorizontalMovement
+        maxHorizontalMovement,
       );
 
       boundedCrop.y = Math.min(
         Math.max(boundedCrop.y, -maxVerticalMovement),
-        maxVerticalMovement
+        maxVerticalMovement,
       );
 
       setCrop(boundedCrop);
     },
-    [zoom, minZoom]
+    [zoom, minZoom],
   );
 
   return (
-    <div>
+    <>
       {showModal &&
         imageSrc &&
         createPortal(
-          <div className="fixed inset-0 z-50 flex items-center justify-center  backdrop-blur-sm ">
-            <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border-8 border-gray-400 bg-white  ">
+          <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
+            <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border-8 border-gray-400 bg-white">
               <div className="relative h-96 w-full">
                 <Cropper
                   image={imageSrc}
@@ -165,22 +165,21 @@ const ProfilePicture = ({ onFileSelected }: ProfilePictureProps) => {
               </div>
             </div>
           </div>,
-          document.body
+          document.body,
         )}
 
       <div className="mt-2 flex items-center">
         {croppedImageUrl ? (
-          <div className="h-40 w-40 overflow-hidden rounded-full">
+          <div className="relative h-40 w-40 overflow-hidden rounded-full flex-shrink-0">
             <Image
               src={croppedImageUrl}
               alt="Cropped Image"
-              width={160}
-              height={160}
+              layout="fill"
               objectFit="cover"
             />
           </div>
         ) : profileImageUrl && !imageLoadError ? (
-          <div className="relative h-40 w-40 items-center justify-center overflow-hidden rounded-full">
+          <div className="relative h-40 w-40 items-center justify-center overflow-hidden rounded-full flex-shrink-0">
             <Image
               src={profileImageUrl}
               alt="Profile Picture"
@@ -189,7 +188,9 @@ const ProfilePicture = ({ onFileSelected }: ProfilePictureProps) => {
             />
           </div>
         ) : (
-          <AiOutlineUser className="h-40 w-40 rounded-full bg-gray-400" />
+          <div className="flex items-center justify-center h-40 w-40 rounded-full bg-gray-400 overflow-hidden flex-shrink-0">
+            <AiOutlineUser className="h-28 w-28 text-white" />
+          </div>
         )}
 
         <div className="ml-4">
@@ -208,7 +209,7 @@ const ProfilePicture = ({ onFileSelected }: ProfilePictureProps) => {
           />
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
