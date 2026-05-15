@@ -3,7 +3,7 @@ import { browserEnv } from "./browser";
 
 if (typeof window !== "undefined") {
   throw new Error(
-    "This should only be included on the client (but the env vars wont be exposed)"
+    "This should only be included on the client (but the env vars wont be exposed)",
   );
 }
 
@@ -40,6 +40,12 @@ export const serverEnv = {
     }),
     GOOGLE_CLIENT_SECRET: str({
       input: process.env.GOOGLE_CLIENT_SECRET,
+    }),
+    PUSHER_APP_ID: str({
+      input: process.env.PUSHER_APP_ID,
+    }),
+    PUSHER_SECRET: str({
+      input: process.env.PUSHER_SECRET,
     }),
   }),
 };

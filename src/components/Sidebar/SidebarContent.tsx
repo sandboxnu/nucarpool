@@ -14,6 +14,7 @@ import {
   getLatestMessageForRequest,
 } from "../../utils/latestMessage";
 import { UserContext } from "../../utils/userContext";
+import useIsMobile from "../../utils/useIsMobile";
 
 interface SidebarContentProps {
   subType: string;
@@ -23,6 +24,8 @@ interface SidebarContentProps {
   onCardClick: (userId: string) => void;
   selectedUser: EnhancedPublicUser | null;
   onViewRequest: (userId: string) => void;
+  mobileSelectedUser?: string | null;
+  handleMobileExpand?: (userId?: string) => void;
 }
 
 const emptyMessages = {
@@ -66,8 +69,10 @@ const renderUserCard = (
   selectedUser: EnhancedPublicUser | null,
   onViewRequest: (userId: string) => void,
   isUnread: boolean,
-  latestMessage: Message | undefined
-): JSX.Element => {
+  latestMessage: Message | undefined,
+  handleMobileExpand?: (userId?: string) => void,
+  mobileSelectedUser?: string | null,
+): React.JSX.Element => {
   const handleClick = () => onCardClick(otherUser.id);
   switch (subType) {
     case "recommendations":
@@ -77,6 +82,8 @@ const renderUserCard = (
           otherUser={otherUser}
           onViewRouteClick={onViewRouteClick}
           onViewRequest={onViewRequest}
+          handleMobileExpand={handleMobileExpand}
+          mobileSelectedUser={mobileSelectedUser}
         />
       );
     case "favorites":
@@ -86,6 +93,8 @@ const renderUserCard = (
           otherUser={otherUser}
           onViewRouteClick={onViewRouteClick}
           onViewRequest={onViewRequest}
+          handleMobileExpand={handleMobileExpand}
+          mobileSelectedUser={mobileSelectedUser}
         />
       );
     case "sent":
@@ -149,6 +158,7 @@ const renderUserCard = (
 
 export const SidebarContent = (props: SidebarContentProps) => {
   const user = useContext(UserContext);
+  const isMobile = useIsMobile();
   if (!user) return null;
 
   const sortedUserCards = props.userCardList
@@ -163,7 +173,7 @@ export const SidebarContent = (props: SidebarContentProps) => {
       const { isUnread, latestActivityDate } = getCardSortingData(
         user.id,
         request,
-        latestMessage
+        latestMessage,
       );
 
       return { otherUser, isUnread, latestActivityDate, latestMessage };
@@ -171,27 +181,42 @@ export const SidebarContent = (props: SidebarContentProps) => {
     .sort((a, b) => {
       return b.latestActivityDate.getTime() - a.latestActivityDate.getTime();
     });
+
+  const filteredSortedUserCards =
+    isMobile && props.mobileSelectedUser
+      ? sortedUserCards.filter(
+          ({ otherUser }) => otherUser.id === props.mobileSelectedUser,
+        )
+      : sortedUserCards;
+
+  const renderedUserCards = filteredSortedUserCards.map(
+    ({ otherUser, isUnread, latestMessage }) =>
+      renderUserCard(
+        props.subType,
+        otherUser,
+        props.onViewRouteClick,
+        props.onCardClick,
+        props.selectedUser,
+        props.onViewRequest,
+        isUnread,
+        !latestMessage ? undefined : latestMessage,
+        props.handleMobileExpand,
+        props.mobileSelectedUser,
+      ),
+  );
+
   return (
     <div className="relative h-full px-3.5">
-      <div className="relative h-full overflow-y-scroll pb-32  scrollbar scrollbar-track-stone-100 scrollbar-thumb-busy-red scrollbar-track-rounded-full scrollbar-thumb-rounded-full">
+      <div
+        className={`relative h-full ${isMobile && props.mobileSelectedUser === null ? "overflow-y-scroll" : isMobile && props.mobileSelectedUser !== null ? "overflow-hidden" : "overflow-y-scroll"} pb-32 scrollbar scrollbar-track-stone-100 scrollbar-thumb-busy-red scrollbar-track-rounded-full scrollbar-thumb-rounded-full`}
+      >
         {props.userCardList.length === 0 ||
         (props.disabled && props.subType !== "favorites") ? (
           <div className="m-4 text-center text-lg font-light">
             {emptyMessage(props.subType, props.disabled)}
           </div>
         ) : (
-          sortedUserCards.map(({ otherUser, isUnread, latestMessage }) =>
-            renderUserCard(
-              props.subType,
-              otherUser,
-              props.onViewRouteClick,
-              props.onCardClick,
-              props.selectedUser,
-              props.onViewRequest,
-              isUnread,
-              !latestMessage ? undefined : latestMessage
-            )
-          )
+          renderedUserCards
         )}
       </div>
     </div>

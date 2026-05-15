@@ -38,11 +38,11 @@ export default function useSearch({
         toast.error(`Something went wrong: ${error}`);
       },
       enabled: false,
-    }
+    },
   );
   useEffect(() => {
     if (value) {
       query.refetch();
     }
-  }, [value]);
+  }, [value, query]);
 }

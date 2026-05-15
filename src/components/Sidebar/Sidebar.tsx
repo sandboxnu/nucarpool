@@ -1,5 +1,6 @@
 import ExploreSidebar from "./ExploreSidebar";
 import RequestSidebar from "./RequestSidebar";
+import { GroupPage } from "../GroupPage";
 import {
   EnhancedPublicUser,
   FiltersState,
@@ -30,6 +31,10 @@ interface SidebarProps {
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
   onUserSelect: (userId: string) => void;
   selectedUser: EnhancedPublicUser | null;
+  mobileSelectedUser: string | null;
+  handleMobileExpand: (userId?: string) => void;
+  onViewGroupRoute?: (driver: PublicUser, riders: PublicUser[]) => void;
+  collapseSidebar: (collapsed: boolean) => void;
 }
 
 export const SidebarPage = (props: SidebarProps) => {
@@ -50,9 +55,11 @@ export const SidebarPage = (props: SidebarProps) => {
         disabled={disabled}
         viewRoute={props.onViewRouteClick}
         onViewRequest={props.onUserSelect}
+        mobileSelectedUser={props.mobileSelectedUser}
+        handleMobileExpand={props.handleMobileExpand}
       />
     );
-  } else {
+  } else if (props.sidebarType === "requests") {
     return (
       <RequestSidebar
         received={props.received.reverse()}
@@ -61,6 +68,14 @@ export const SidebarPage = (props: SidebarProps) => {
         viewRoute={props.onViewRouteClick}
         onUserSelect={props.onUserSelect}
         selectedUser={props.selectedUser}
+      />
+    );
+  } else if (props.sidebarType === "mygroup") {
+    return (
+      <GroupPage
+        onClose={() => props.collapseSidebar(true)}
+        onViewGroupRoute={props.onViewGroupRoute || (() => {})}
+        isMobile={true}
       />
     );
   }

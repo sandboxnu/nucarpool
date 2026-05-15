@@ -1,4 +1,4 @@
-import { Role, Status, User } from "@prisma/client";
+import { Role, Status, CarpoolSearch, Location } from "@prisma/client";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -61,6 +61,35 @@ interface CommonUser {
   endTime?: Date | null;
   daysWorking: string;
 }
+
+// Type for CarpoolSearch with relations
+type CarpoolSearchWithLocations = CarpoolSearch & {
+  user: { id: string };
+  homeLocation: Location | null;
+  companyLocation: Location | null;
+};
+
+/**
+ * Converts a CarpoolSearch to the CommonUser interface for scoring
+ */
+const carpoolSearchToCommonUser = (search: CarpoolSearchWithLocations): CommonUser => {
+  return {
+    id: search.user.id,
+    role: search.role,
+    seatAvail: search.seatsAvail,
+    coopStartDate: search.startDate,
+    coopEndDate: search.endDate,
+    startCoordLat: search.homeLocation?.coordLat ?? 0,
+    startCoordLng: search.homeLocation?.coordLng ?? 0,
+    companyCoordLat: search.companyLocation?.coordLat ?? 0,
+    companyCoordLng: search.companyLocation?.coordLng ?? 0,
+    carpoolId: search.carpoolId,
+    startTime: search.startTime,
+    endTime: search.endTime,
+    daysWorking: search.daysWorking,
+  };
+};
+
 /**
  * Converts a comma separated string representing user's days working to a boolean array
  * @param user The user to calculate days for
@@ -80,16 +109,19 @@ const dayConversion = (user: CommonUser) => {
  * @param sort The parameter to score by
  * @returns A function that takes in a user and returns their score relative to `currentUser`
  */
-export const calculateScore = <T extends CommonUser>(
-  currentUser: T,
+export const calculateScore = (
+  currentUserSearch: CarpoolSearchWithLocations,
   inputs: FInputs,
-  sort: string
-): ((user: T) => Recommendation | undefined) => {
+  sort: string,
+): ((userSearch: CarpoolSearchWithLocations) => Recommendation | undefined) => {
+  const currentUser = carpoolSearchToCommonUser(currentUserSearch);
   const currentUserDays = inputs.daysWorking
     .split(",")
     .map((str) => str === "1");
 
-  return (user: T) => {
+  return (userSearch: CarpoolSearchWithLocations) => {
+    const user = carpoolSearchToCommonUser(userSearch);
+    
     if (
       (currentUser.role === "RIDER" &&
         (user.role === "RIDER" || user.seatAvail === 0)) ||
@@ -103,15 +135,15 @@ export const calculateScore = <T extends CommonUser>(
     const startDistance = coordToMile(
       Math.sqrt(
         Math.pow(currentUser.startCoordLat - user.startCoordLat, 2) +
-          Math.pow(currentUser.startCoordLng - user.startCoordLng, 2)
-      )
+          Math.pow(currentUser.startCoordLng - user.startCoordLng, 2),
+      ),
     );
 
     const endDistance = coordToMile(
       Math.sqrt(
         Math.pow(currentUser.companyCoordLat - user.companyCoordLat, 2) +
-          Math.pow(currentUser.companyCoordLng - user.companyCoordLng, 2)
-      )
+          Math.pow(currentUser.companyCoordLng - user.companyCoordLng, 2),
+      ),
     );
     const userDays = dayConversion(user);
     // check number of days users both go in, also count number of days current user goes in
@@ -126,7 +158,7 @@ export const calculateScore = <T extends CommonUser>(
         }
         return acc;
       },
-      { currentUserDays: 0, bothUsersDays: 0 }
+      { currentUserDays: 0, bothUsersDays: 0 },
     );
     let startTime: number | undefined;
     let endTime: number | undefined;
@@ -140,7 +172,7 @@ export const calculateScore = <T extends CommonUser>(
         Math.abs(currentUser.startTime.getHours() - user.startTime.getHours()) *
           60 +
         Math.abs(
-          currentUser.startTime.getMinutes() - user.startTime.getMinutes()
+          currentUser.startTime.getMinutes() - user.startTime.getMinutes(),
         );
       endTime =
         Math.abs(currentUser.endTime.getHours() - user.endTime.getHours()) *
@@ -255,19 +287,23 @@ export type GenerateUserInput = {
   role: Role;
   seatAvail?: number;
   companyCoordLng: number;
-  companyPOICoordLng: number;
   companyCoordLat: number;
-  companyPOICoordLat: number;
   startCoordLng: number;
-  startPOICoordLng: number;
   startCoordLat: number;
-  startPOICoordLat: number;
   daysWorking: string; // Format: S,M,T,W,R,F,S
   startTime: string;
   endTime: string;
   carpoolId?: string;
   coopStartDate: Date | null;
   coopEndDate: Date | null;
+  companyAddress?: string;
+  startAddress?: string;
+  companyStreet?: string;
+  companyCity?: string;
+  companyState?: string;
+  startStreet?: string;
+  startCity?: string;
+  startState?: string;
 };
 
 /**
@@ -278,28 +314,7 @@ export type GenerateUserInput = {
  */
 export const generateUser = ({
   id,
-  role,
-  seatAvail = undefined,
-  companyCoordLng,
-  companyCoordLat,
-  startCoordLng,
-  startCoordLat,
-  daysWorking,
-  startTime,
-  endTime,
-  coopStartDate,
-  coopEndDate,
 }: GenerateUserInput & { id: string }) => {
-  if (daysWorking.length != 13) {
-    throw new Error("Given an invalid string for daysWorking");
-  }
-
-  dayjs.extend(utc);
-  dayjs.extend(timezone);
-  const [startHours, startMinutes] = startTime
-    .split(":")
-    .map((s) => _.toInteger(s));
-
   const updated_obj = {
     id: id,
     name: `User ${id}`,
@@ -309,29 +324,7 @@ export const generateUser = ({
     bio: `My name is User ${id}. I like to drive`,
     pronouns: "they/them",
     preferredName: `User ${id}`,
-    role: role,
-    status: "ACTIVE" as Status,
-    seatAvail: seatAvail || 0,
-    companyName: "Sandbox Inc.",
-    companyAddress: "360 Huntington Ave",
-    companyCoordLng: companyCoordLng,
-    companyCoordLat: companyCoordLat,
-    startAddress: "Roxbury",
-    startCoordLng: startCoordLng,
-    startCoordLat: startCoordLat,
-    companyPOIAddress: "Northeastern University",
-    companyPOICoordLng: companyCoordLng,
-    companyPOICoordLat: companyCoordLat,
-    startPOILocation: "Greenfield Commons",
-    startPOICoordLng: startCoordLng,
-    startPOICoordLat: startCoordLat,
     isOnboarded: true,
-    daysWorking: daysWorking,
-    startTime: startTime,
-    endTime: endTime,
-    coopEndDate: coopEndDate,
-    coopStartDate: coopStartDate,
-    carpoolId: null,
     licenseSigned: true,
     dateCreated: new Date(),
     dateModified: new Date(),

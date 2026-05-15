@@ -12,11 +12,33 @@ import DriverEnd from "../../../public/driver-dest.png";
 import RiderEnd from "../../../public/rider-dest.png";
 
 const previousMarkers: (mapboxgl.Marker | mapboxgl.Popup)[] = [];
-export const clearMarkers = () => {
+
+// Updated clearMarkers to also remove text label layers created by updateStartLocation and updateCompanyLocation
+export const clearMarkers = (map?: mapboxgl.Map) => {
+  // Clear the original popup/marker system
   previousMarkers.forEach((element) => {
     element.remove();
   });
   previousMarkers.length = 0;
+
+  // clear text label layers created by the custom label system
+  if (map) {
+    const layers = map.getStyle().layers;
+    if (layers) {
+      // find and remove all text layers that match our naming pattern
+      layers.forEach((layer) => {
+        if (layer.id.includes("-text-layer")) {
+          try {
+            if (map.getLayer(layer.id)) {
+              map.removeLayer(layer.id);
+            }
+          } catch (e) {
+            console.warn(`Could not remove layer ${layer.id}:`, e);
+          }
+        }
+      });
+    }
+  }
 };
 
 export const clearDirections = (map: mapboxgl.Map) => {
@@ -56,11 +78,18 @@ interface ViewRouteProps {
         endLng: number;
       }
     | undefined;
+  isMobile?: boolean;
 }
 
 // Creates MapBox markers showing user's start address and the start area of the other user.
 export const viewRoute = (props: ViewRouteProps) => {
-  clearMarkers();
+  // First validate that all required inputs are valid
+  if (!props.map || !props.user) {
+    console.error("viewRoute called with invalid map or user");
+    return;
+  }
+
+  clearMarkers(props.map);
   clearDirections(props.map);
   const redCircle = createMarkerEl(DriverStart);
   const selfStartPopup = createPopup("My Start");
@@ -69,93 +98,241 @@ export const viewRoute = (props: ViewRouteProps) => {
   const redStart = createMarkerEl(redCircle);
   let minLng, minLat, maxLng, maxLat;
 
+  // Validate otherUser coordinates
   if (props.otherUser !== undefined) {
+    // Check if otherUser has all the required properties
+    if (
+      !Object.prototype.hasOwnProperty.call(props.otherUser, "startCoordLng") ||
+      !Object.prototype.hasOwnProperty.call(props.otherUser, "startCoordLat") ||
+      !Object.prototype.hasOwnProperty.call(
+        props.otherUser,
+        "companyCoordLng",
+      ) ||
+      !Object.prototype.hasOwnProperty.call(props.otherUser, "companyCoordLat")
+    ) {
+      console.error("otherUser missing required coordinate properties");
+      return;
+    }
+
+    const otherStartLng = props.otherUser.startCoordLng;
+    const otherStartLat = props.otherUser.startCoordLat;
+    const otherCompanyLng = props.otherUser.companyCoordLng;
+    const otherCompanyLat = props.otherUser.companyCoordLat;
+
+    // Check if any otherUser coordinates are NaN, null, undefined, or not finite
+    if (
+      otherStartLng === null ||
+      otherStartLat === null ||
+      otherCompanyLng === null ||
+      otherCompanyLat === null ||
+      otherStartLng === undefined ||
+      otherStartLat === undefined ||
+      otherCompanyLng === undefined ||
+      otherCompanyLat === undefined ||
+      isNaN(otherStartLng) ||
+      isNaN(otherStartLat) ||
+      isNaN(otherCompanyLng) ||
+      isNaN(otherCompanyLat) ||
+      !isFinite(otherStartLng) ||
+      !isFinite(otherStartLat) ||
+      !isFinite(otherCompanyLng) ||
+      !isFinite(otherCompanyLat)
+    ) {
+      console.error("Invalid coordinates in otherUser", {
+        otherStartLng,
+        otherStartLat,
+        otherCompanyLng,
+        otherCompanyLat,
+      });
+      return;
+    }
+
     const otherRole =
       props.otherUser.role.charAt(0).toUpperCase() +
       props.otherUser.role.slice(1).toLowerCase();
 
-    const otherUserStartPopup = createPopup(`${otherRole} Start`);
-    const otherUserStartMarker = new mapboxgl.Marker({
-      element: otherRole === "Rider" ? orangeStart : redStart,
-    })
-      .setLngLat([
-        props.otherUser.startPOICoordLng,
-        props.otherUser.startPOICoordLat,
-      ])
-      .setPopup(otherUserStartPopup)
-      .addTo(props.map);
+    try {
+      const otherUserStartPopup = createPopup(`${otherRole} Start`);
+      const otherUserStartMarker = new mapboxgl.Marker({
+        element: otherRole === "Rider" ? orangeStart : redStart,
+      })
+        .setLngLat([otherStartLng, otherStartLat])
+        .setPopup(otherUserStartPopup)
+        .addTo(props.map);
 
-    const otherUserEndPopup = createPopup(`${otherRole} Dest.`);
-    otherUserEndPopup
-      .setLngLat([
-        props.otherUser.companyCoordLng,
-        props.otherUser.companyCoordLat,
-      ])
-      .addTo(props.map);
+      const otherUserEndPopup = createPopup(`${otherRole} Dest.`);
+      otherUserEndPopup
+        .setLngLat([otherCompanyLng, otherCompanyLat])
+        .addTo(props.map);
 
-    otherUserStartMarker.togglePopup();
-    previousMarkers.push(otherUserStartMarker);
-    previousMarkers.push(otherUserEndPopup);
-    minLng = Math.min(
-      props.otherUser.startPOICoordLng,
-      props.otherUser.companyCoordLng
-    );
-    minLat = Math.min(
-      props.otherUser.startPOICoordLat,
-      props.otherUser.companyCoordLat
-    );
-    maxLng = Math.max(
-      props.otherUser.startPOICoordLng,
-      props.otherUser.companyCoordLng
-    );
-    maxLat = Math.max(
-      props.otherUser.startPOICoordLat,
-      props.otherUser.companyCoordLat
-    );
+      otherUserStartMarker.togglePopup();
+      previousMarkers.push(otherUserStartMarker);
+      previousMarkers.push(otherUserEndPopup);
+    } catch (error) {
+      console.error("Error creating markers for otherUser", error);
+      return;
+    }
+
+    minLng = Math.min(otherStartLng, otherCompanyLng);
+    minLat = Math.min(otherStartLat, otherCompanyLat);
+    maxLng = Math.max(otherStartLng, otherCompanyLng);
+    maxLat = Math.max(otherStartLat, otherCompanyLat);
   }
+
+  // Validate userCoord coordinates
   if (props.userCoord !== undefined) {
-    selfStartPopup
-      .setLngLat([props.userCoord.startLng, props.userCoord.startLat])
-      .addTo(props.map);
+    // Check if userCoord has all the required properties
+    if (
+      !Object.prototype.hasOwnProperty.call(props.userCoord, "startLng") ||
+      !Object.prototype.hasOwnProperty.call(props.userCoord, "startLat") ||
+      !Object.prototype.hasOwnProperty.call(props.userCoord, "endLng") ||
+      !Object.prototype.hasOwnProperty.call(props.userCoord, "endLat")
+    ) {
+      console.error("userCoord missing required coordinate properties");
+      return;
+    }
 
-    selfEndPopup
-      .setLngLat([props.userCoord.endLng, props.userCoord.endLat])
-      .addTo(props.map);
-    previousMarkers.push(selfStartPopup);
-    previousMarkers.push(selfEndPopup);
-    minLng =
-      minLng !== undefined
-        ? Math.min(minLng, props.userCoord.startLng, props.userCoord.endLng)
-        : Math.min(props.userCoord.startLng, props.userCoord.endLng);
-    minLat =
-      minLat !== undefined
-        ? Math.min(minLat, props.userCoord.startLat, props.userCoord.endLat)
-        : Math.min(props.userCoord.startLat, props.userCoord.endLat);
-    maxLng =
-      maxLng !== undefined
-        ? Math.max(maxLng, props.userCoord.startLng, props.userCoord.endLng)
-        : Math.max(props.userCoord.startLng, props.userCoord.endLng);
-    maxLat =
-      maxLat !== undefined
-        ? Math.max(maxLat, props.userCoord.startLat, props.userCoord.endLat)
-        : Math.max(props.userCoord.startLat, props.userCoord.endLat);
+    const userStartLng = props.userCoord.startLng;
+    const userStartLat = props.userCoord.startLat;
+    const userEndLng = props.userCoord.endLng;
+    const userEndLat = props.userCoord.endLat;
+
+    // Check if any userCoord coordinates are NaN, null, undefined, or not finite
+    if (
+      userStartLng === null ||
+      userStartLat === null ||
+      userEndLng === null ||
+      userEndLat === null ||
+      userStartLng === undefined ||
+      userStartLat === undefined ||
+      userEndLng === undefined ||
+      userEndLat === undefined ||
+      isNaN(userStartLng) ||
+      isNaN(userStartLat) ||
+      isNaN(userEndLng) ||
+      isNaN(userEndLat) ||
+      !isFinite(userStartLng) ||
+      !isFinite(userStartLat) ||
+      !isFinite(userEndLng) ||
+      !isFinite(userEndLat)
+    ) {
+      console.error("Invalid coordinates in userCoord", {
+        userStartLng,
+        userStartLat,
+        userEndLng,
+        userEndLat,
+      });
+      // If we have no valid coordinates at all, just return
+      if (minLng === undefined) {
+        return;
+      }
+    } else {
+      try {
+        selfStartPopup.setLngLat([userStartLng, userStartLat]).addTo(props.map);
+
+        selfEndPopup.setLngLat([userEndLng, userEndLat]).addTo(props.map);
+        previousMarkers.push(selfStartPopup);
+        previousMarkers.push(selfEndPopup);
+      } catch (error) {
+        console.error("Error creating markers for userCoord", error);
+        if (minLng === undefined) {
+          return;
+        }
+      }
+
+      minLng =
+        minLng !== undefined
+          ? Math.min(minLng, userStartLng, userEndLng)
+          : Math.min(userStartLng, userEndLng);
+      minLat =
+        minLat !== undefined
+          ? Math.min(minLat, userStartLat, userEndLat)
+          : Math.min(userStartLat, userEndLat);
+      maxLng =
+        maxLng !== undefined
+          ? Math.max(maxLng, userStartLng, userEndLng)
+          : Math.max(userStartLng, userEndLng);
+      maxLat =
+        maxLat !== undefined
+          ? Math.max(maxLat, userStartLat, userEndLat)
+          : Math.max(userStartLat, userEndLat);
+    }
   }
+
+  // Final validation before fitting bounds - early return if no valid coordinates
   if (
     minLng === undefined ||
     minLat === undefined ||
     maxLng === undefined ||
     maxLat === undefined
   ) {
+    console.warn(
+      "No valid coordinates available for fitBounds - skipping map bounds adjustment",
+    );
     return;
   }
 
-  props.map.fitBounds(
-    [
-      [minLng - 0.0075, minLat - 0.0075],
-      [maxLng + 0.0075, maxLat + 0.0075],
-    ],
-    { padding: 20 }
-  );
+  if (
+    isNaN(minLng) ||
+    isNaN(minLat) ||
+    isNaN(maxLng) ||
+    isNaN(maxLat) ||
+    !isFinite(minLng) ||
+    !isFinite(minLat) ||
+    !isFinite(maxLng) ||
+    !isFinite(maxLat)
+  ) {
+    console.error("Invalid bounds for fitBounds", {
+      minLng,
+      minLat,
+      maxLng,
+      maxLat,
+    });
+    return;
+  }
+
+  try {
+    // Add padding to ensure coordinates are valid
+    const padding = 0.0075;
+    const bounds: mapboxgl.LngLatBoundsLike = [
+      [minLng - padding, minLat - padding],
+      [maxLng + padding, maxLat + padding],
+    ];
+
+    // Validate each coordinate in the bounds array
+    if (
+      bounds.some(
+        (coord) =>
+          Array.isArray(coord) &&
+          coord.some(
+            (value) =>
+              value === null ||
+              value === undefined ||
+              isNaN(value) ||
+              !isFinite(value),
+          ),
+      )
+    ) {
+      console.error("Invalid values in bounds array", bounds);
+      return;
+    }
+
+    // If on mobile, use a large bottom padding to push the route up to the upper part of the map
+    if (props.isMobile) {
+      props.map.fitBounds(bounds, {
+        padding: {
+          top: 60,
+          bottom: 300, // Large bottom padding to push content up
+          left: 40,
+          right: 40,
+        },
+      });
+    } else {
+      props.map.fitBounds(bounds, { padding: 20 });
+    }
+  } catch (error) {
+    console.error("Error fitting bounds:", error);
+  }
 };
 
 export function useGetDirections({
@@ -199,12 +376,30 @@ export function useGetDirections({
           const source = map.getSource("route") as mapboxgl.GeoJSONSource;
           source.setData(lineStringFeature);
         } else {
+          // Try different layer positions - let's find one that works
           let beforeLayerId = "";
 
-          if (map.getLayer("riders")) {
-            beforeLayerId = "riders";
-          } else if (map.getLayer("drivers")) {
-            beforeLayerId = "drivers";
+          // Try to find a good layer to place the route above
+          const layerIds = [
+            "road-label", // Above road labels
+            "waterway-label", // Above water labels
+            "natural-label", // Above natural feature labels
+            "poi-label", // Above point of interest labels
+            "transit-label", // Above transit labels
+          ];
+
+          // Find the first existing layer to place the route above
+          for (const layerId of layerIds) {
+            if (map.getLayer(layerId)) {
+              beforeLayerId = layerId;
+              break;
+            }
+          }
+
+          // If no specific layer found, use a safe default
+          if (!beforeLayerId) {
+            // Place above base map layers but below markers
+            beforeLayerId = "background";
           }
 
           map.addLayer(
@@ -220,11 +415,11 @@ export function useGetDirections({
                 "line-cap": "round",
               },
               paint: {
-                "line-color": "#4a89f3 ",
+                "line-color": "#4a89f3",
                 "line-width": 6,
               },
             },
-            beforeLayerId
+            beforeLayerId,
           );
         }
       },
@@ -233,7 +428,7 @@ export function useGetDirections({
       },
       enabled: false,
       retry: false,
-    }
+    },
   );
   useEffect(() => {
     // ensures that we don't run on page load

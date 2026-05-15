@@ -33,3 +33,70 @@ input[type="month"]::-webkit-calendar-picker-indicator {
   opacity: 0.6;
   pointer-events: none;
 }
+
+.welcome-tutorial-popover {
+  background-color: #d5706a !important;
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.welcome-tutorial-popover .driver-popover-content {
+  color: white;
+  font-family: "Montserrat", sans-serif !important;
+}
+
+.welcome-tutorial-popover .driver-popover-title {
+  color: white !important;
+  font-weight: bold;
+  font-family: "Montserrat", sans-serif !important;
+}
+
+.welcome-tutorial-popover .driver-popover-description {
+  color: white !important;
+  font-family: "Montserrat", sans-serif !important;
+}
+
+.welcome-tutorial-popover .driver-popover-progress-text {
+  color: white !important;
+  font-family: "Montserrat", sans-serif !important;
+}
+
+.welcome-tutorial-popover .driver-popover-next-btn {
+  background-color: white !important;
+  border: none;
+  font-weight: bold !important;
+  /* color: transparent; */
+  font-family: "Montserrat", sans-serif !important;
+  transition: all 0.3s ease;
+}
+
+.welcome-tutorial-popover .driver-popover-next-btn:hover {
+  background-color: #f0f0f0 !important;
+  color: #333 !important;
+  transform: translateY(-1px);
+  box-shadow: 1x 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-tutorial-popover .driver-popover-prev-btn {
+  background-color: white !important;
+  border: none;
+  font-weight: bold !important;
+  font-family: "Montserrat", sans-serif !important;
+  transition: all 0.3s ease;
+}
+
+.welcome-tutorial-popover .driver-popover-prev-btn:hover {
+  background-color: #f0f0f0 !important;
+  color: #333 !important;
+  transform: translateY(-1px);
+  box-shadow: 1x 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-tutorial-popover .driver-popover-close-btn {
+  color: white !important;
+}
+
+.welcome-tutorial-popover .driver-popover-close-btn:hover {
+  color: gray !important;
+}

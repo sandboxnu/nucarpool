@@ -12,8 +12,8 @@ const ProgressBar = ({ step }: ProgressBarProps) => {
             i < step
               ? "bg-northeastern-red"
               : i === step
-              ? "bg-busy-red"
-              : "bg-white"
+                ? "bg-busy-red"
+                : "bg-white"
           }`}
         />
       ))}

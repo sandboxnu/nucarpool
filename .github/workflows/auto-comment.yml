@@ -13,4 +13,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           pullRequestOpened: |
             👋 @{{ author }}
-            Looks like your PR might contain changes to the schema.prisma file. Please open a deploy request on PlanetScale before merging. If you have any questions, ping @lukejianu on Slack.
+            Looks like your PR might contain changes to the schema.prisma file. Please open a deploy request on PlanetScale before merging. 

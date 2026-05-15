@@ -17,7 +17,7 @@ const RadioButton = React.forwardRef<
 >(
   (
     { label, id, value, currentlySelected, error, className, ...rest },
-    forwardedRef
+    forwardedRef,
   ) => {
     return (
       <label
@@ -42,7 +42,7 @@ const RadioButton = React.forwardRef<
         {error && <p className="mt-2 text-sm text-red-500">{error.message}</p>}
       </label>
     );
-  }
+  },
 );
 
 RadioButton.displayName = "RadioButton";

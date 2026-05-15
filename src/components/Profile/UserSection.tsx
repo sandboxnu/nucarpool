@@ -12,6 +12,9 @@ import {
 } from "react-hook-form";
 import { OnboardingFormInputs } from "../../utils/types";
 import ProfilePicture from "./ProfilePicture";
+import useIsMobile from "../../utils/useIsMobile";
+import { signOut } from "next-auth/react";
+
 interface UserSectionProps {
   register: UseFormRegister<OnboardingFormInputs>;
   errors: FieldErrors<OnboardingFormInputs>;
@@ -21,6 +24,7 @@ interface UserSectionProps {
 
   onFileSelect: (file: File | null) => void;
 }
+
 const UserSection = ({
   errors,
   watch,
@@ -29,44 +33,63 @@ const UserSection = ({
   setValue,
   onFileSelect,
 }: UserSectionProps) => {
+  const isMobile = useIsMobile();
   const isViewer = watch("role") === Role.VIEWER;
+
+  const logout = () => {
+    signOut();
+  };
+
   return (
-    <div className="relative z-10   flex h-full  flex-col  justify-start">
-      <ProfileHeader className={"!text-4xl "}>User Profile</ProfileHeader>
-      <div className="flex font-montserrat text-2xl  font-bold">
+    <div className="relative z-10 flex h-full flex-col justify-start">
+      <ProfileHeader className={isMobile ? "!text-2xl" : "!text-4xl"}>
+        User Profile
+      </ProfileHeader>
+
+      <div className="flex font-montserrat text-2xl font-bold">
         I am a... <span className="text-northeastern-red">*</span>
       </div>
-      <div className="flex h-24 w-[700px] max-w-full  items-end gap-8 ">
-        <Radio
-          label="Viewer"
-          id="viewer"
-          error={errors.role}
-          role={Role.VIEWER}
-          value={Role.VIEWER}
-          currentlySelected={watch("role")}
-          {...register("role")}
-        />
-        <Radio
-          label="Rider"
-          id="rider"
-          error={errors.role}
-          role={Role.RIDER}
-          value={Role.RIDER}
-          currentlySelected={watch("role")}
-          {...register("role")}
-        />
-        <Radio
-          label="Driver"
-          id="driver"
-          error={errors.role}
-          role={Role.DRIVER}
-          value={Role.DRIVER}
-          currentlySelected={watch("role")}
-          {...register("role")}
-        />
 
+      {/* Fixed layout issues */}
+      <div
+        className={`${isMobile ? "flex-col" : "flex h-24 w-[700px]"} max-w-full items-end`}
+      >
+        {/* Radio buttons always in a row */}
+        <div className="flex gap-8">
+          <Radio
+            label="Viewer"
+            id="viewer"
+            error={errors.role}
+            role={Role.VIEWER}
+            value={Role.VIEWER}
+            currentlySelected={watch("role")}
+            {...register("role")}
+          />
+          <Radio
+            label="Rider"
+            id="rider"
+            error={errors.role}
+            role={Role.RIDER}
+            value={Role.RIDER}
+            currentlySelected={watch("role")}
+            {...register("role")}
+          />
+          <Radio
+            label="Driver"
+            id="driver"
+            error={errors.role}
+            role={Role.DRIVER}
+            value={Role.DRIVER}
+            currentlySelected={watch("role")}
+            {...register("role")}
+          />
+        </div>
+
+        {/* Reduced gap between radio buttons and seat availability */}
         {watch("role") == Role.DRIVER && (
-          <div className="flex  flex-1 flex-col">
+          <div
+            className={`${isMobile ? "w-full mt-2" : "flex-1"} flex flex-col`}
+          >
             <EntryLabel
               required={true}
               error={errors.seatAvail}
@@ -74,7 +97,7 @@ const UserSection = ({
             />
             <div className="flex flex-col gap-1">
               <TextField
-                inputClassName=" h-14 text-lg "
+                inputClassName="h-14 text-lg"
                 className="w-full self-end"
                 label="Seat Availability"
                 id="seatAvail"
@@ -86,6 +109,7 @@ const UserSection = ({
           </div>
         )}
       </div>
+
       <div className="my-2 flex w-full justify-between">
         <Note>
           {watch("role") === Role.DRIVER && (
@@ -105,19 +129,25 @@ const UserSection = ({
           <ErrorDisplay>{errors.seatAvail.message}</ErrorDisplay>
         )}
       </div>
+
       <EntryLabel label="Personal Info" className="mb-4 mt-6 !text-2xl" />
-      <div className=" mb-12 ml-10 w-full ">
+
+      {/* Profile picture section */}
+      <div
+        className={`mb-12 ${isMobile ? "flex flex-col items-start" : "ml-10"} w-full`}
+      >
         <ProfilePicture onFileSelected={onFileSelect} />
       </div>
 
-      <div className="flex w-full flex-row  space-x-6">
-        <div className="flex w-3/5 flex-col">
+      <div
+        className={`flex w-full ${isMobile ? "flex-col space-y-4" : "flex-row space-x-6"}`}
+      >
+        <div className={`${isMobile ? "w-full" : "w-3/5"} flex flex-col`}>
           <EntryLabel
             error={errors.preferredName}
             label="Preferred Name"
             className={"!text-lg"}
           />
-
           <TextField
             id="preferredName"
             error={errors.preferredName}
@@ -128,7 +158,7 @@ const UserSection = ({
           />
         </div>
 
-        <div className="w-2/6 flex-1">
+        <div className={`${isMobile ? "w-full" : "w-2/6 flex-1"}`}>
           <EntryLabel
             error={errors.pronouns}
             label="Pronouns"
@@ -153,7 +183,7 @@ const UserSection = ({
               input.value = displayValue;
               const adjustedCursor = Math.min(
                 cursorPosition + 1,
-                displayValue.length - 1
+                displayValue.length - 1,
               );
               input.setSelectionRange(adjustedCursor, adjustedCursor);
             }}
@@ -182,16 +212,27 @@ const UserSection = ({
           This intro will be shared with people you choose to connect with.
         </Note>
       </div>
-      <div className="py-8 font-montserrat">
+
+      <div className="flex flex-col gap-5 py-8 font-montserrat">
         <button
           type="button"
-          className="w-full rounded-lg bg-northeastern-red py-3 text-lg text-white hover:bg-red-700 "
+          className="w-full rounded-lg bg-northeastern-red py-3 text-lg text-white hover:bg-red-700"
           onClick={onSubmit}
+          aria-label="Save Changes"
         >
           Save Changes
+        </button>
+        <button
+          type="button"
+          onClick={logout}
+          className="w-full rounded-lg bg-gray-600 py-3 text-lg text-white hover:bg-gray-900"
+          aria-label="Sign Out"
+        >
+          Sign Out
         </button>
       </div>
     </div>
   );
 };
+
 export default UserSection;

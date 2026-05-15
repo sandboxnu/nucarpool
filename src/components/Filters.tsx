@@ -48,14 +48,14 @@ const Filters = ({
   resetFilters: externalResetFilters,
 }: FiltersProps) => {
   const [distanceOpen, setDistanceOpen] = useState(
-    activeFilters.startDistance || activeFilters.endDistance
+    activeFilters.startDistance || activeFilters.endDistance,
   );
   const [checkedOpen, setCheckedOpen] = useState(
-    activeFilters.favorites || activeFilters.messaged
+    activeFilters.favorites || activeFilters.messaged,
   );
   const [daysMatchOpen, setDaysMatchOpen] = useState(activeFilters.days);
   const [startTimeOpen, setStartTimeOpen] = useState(
-    activeFilters.startTime || activeFilters.endTime
+    activeFilters.startTime || activeFilters.endTime,
   );
   const [termDatesOpen, setTermDatesOpen] = useState(activeFilters.dateOverlap);
   const daysOfWeek = ["Su", "M", "Tu", "W", "Th", "F", "S"];
@@ -88,7 +88,7 @@ const Filters = ({
   };
   const handleRangeChange = (
     field: keyof FiltersState,
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = parseInt(event.target.value, 10);
     setFilters((prev) => ({
@@ -120,11 +120,11 @@ const Filters = ({
   };
   const startMonthInputClassName = `h-14 text-md ${getMonthInputClassName(
     filters.startDate,
-    filters.dateOverlap
+    filters.dateOverlap,
   )}`;
   const endMonthInputClassName = `h-14 text-md ${getMonthInputClassName(
     filters.endDate,
-    filters.dateOverlap
+    filters.dateOverlap,
   )}`;
 
   return (
@@ -330,8 +330,8 @@ const Filters = ({
                         1,
                         Math.min(
                           selectedDaysCount,
-                          parseInt(e.target.value, 10)
-                        )
+                          parseInt(e.target.value, 10),
+                        ),
                       );
                       if (!isNaN(newFlexDays)) {
                         setFilters((prevFilters) => ({

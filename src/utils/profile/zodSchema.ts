@@ -18,6 +18,7 @@ export const onboardSchema = z
     endTime: z.date().nullable().optional(),
     coopStartDate: z.date().nullable().optional(),
     coopEndDate: z.date().nullable().optional(),
+    profilePicture: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.role !== Role.VIEWER) {

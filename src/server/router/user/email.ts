@@ -18,7 +18,7 @@ const gmailEmailSchema = z
     {
       message:
         "Only gmail.com email addresses are accepted in the staging environment",
-    }
+    },
   );
 
 export const emailsRouter = router({
@@ -31,16 +31,16 @@ export const emailsRouter = router({
         receiverEmail: gmailEmailSchema,
         isDriver: z.boolean(),
         messagePreview: z.string(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const emailParams = generateEmailParams(input, "request", false);
       try {
         const response = await ctx.sesClient.send(
-          new SendTemplatedEmailCommand(emailParams)
+          new SendTemplatedEmailCommand(emailParams),
         );
         console.log(
-          `Request email sent successfully to ${input.receiverEmail}.`
+          `Request email sent successfully to ${input.receiverEmail}.`,
         );
         console.log("SES Response:", JSON.stringify(response, null, 2));
         return response;
@@ -58,16 +58,16 @@ export const emailsRouter = router({
         receiverName: z.string(),
         receiverEmail: gmailEmailSchema,
         messageText: z.string(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const emailParams = generateEmailParams(input, "message", false);
       try {
         const response = await ctx.sesClient.send(
-          new SendTemplatedEmailCommand(emailParams)
+          new SendTemplatedEmailCommand(emailParams),
         );
         console.log(
-          `Message notification sent successfully to ${input.receiverEmail}`
+          `Message notification sent successfully to ${input.receiverEmail}`,
         );
         console.log("SES Response:", JSON.stringify(response, null, 2));
         return response;
@@ -85,16 +85,16 @@ export const emailsRouter = router({
         receiverName: z.string(),
         receiverEmail: gmailEmailSchema,
         isDriver: z.boolean(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const emailParams = generateEmailParams(input, "acceptance", true);
       try {
         const response = await ctx.sesClient.send(
-          new SendTemplatedEmailCommand(emailParams)
+          new SendTemplatedEmailCommand(emailParams),
         );
         console.log(
-          `Acceptance notification sent successfully to ${input.receiverEmail}. CC: ${input.senderEmail}`
+          `Acceptance notification sent successfully to ${input.receiverEmail}. CC: ${input.senderEmail}`,
         );
         console.log("SES Response:", JSON.stringify(response, null, 2));
         return response;
@@ -113,7 +113,7 @@ export const emailsRouter = router({
         receivingUserName: z.string(),
         receivingUserEmail: gmailEmailSchema,
         body: z.string(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const emailParams = generateEmailParams(
@@ -125,14 +125,14 @@ export const emailsRouter = router({
           messageText: input.body,
         },
         "message",
-        false
+        false,
       );
       try {
         const response = await ctx.sesClient.send(
-          new SendTemplatedEmailCommand(emailParams)
+          new SendTemplatedEmailCommand(emailParams),
         );
         console.log(
-          `Connect email sent successfully to ${input.receivingUserEmail}. CC: ${input.sendingUserEmail}`
+          `Connect email sent successfully to ${input.receivingUserEmail}. CC: ${input.sendingUserEmail}`,
         );
         console.log("SES Response:", JSON.stringify(response, null, 2));
         return response;

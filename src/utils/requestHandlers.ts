@@ -7,18 +7,18 @@ interface RequestHandlers {
   handleAcceptRequest: (
     user: User,
     otherUser: EnhancedPublicUser,
-    request: Request
+    request: Request,
   ) => Promise<void>;
   handleRejectRequest: (
     user: User,
     otherUser: EnhancedPublicUser,
-    request: Request
+    request: Request,
   ) => Promise<void>;
 }
 
 // Function to create the handlers
 export const createRequestHandlers = (
-  utils: ReturnType<typeof trpc.useContext>
+  utils: ReturnType<typeof trpc.useContext>,
 ): RequestHandlers => {
   const deleteRequest = trpc.user.requests.delete.useMutation({
     onError: (error: any) => {
@@ -58,18 +58,18 @@ export const createRequestHandlers = (
 
   const validateRequestAcceptance = (
     user: User,
-    otherUser: EnhancedPublicUser
+    otherUser: EnhancedPublicUser,
   ): boolean => {
     if (user.role === "DRIVER") {
       if (user.seatAvail === 0) {
         toast.error(
-          `You do not have any space in your car to accept ${otherUser.preferredName}.`
+          `You do not have any space in your car to accept ${otherUser.preferredName}.`,
         );
         return false;
       }
       if (otherUser.carpoolId) {
         toast.error(
-          `${otherUser.preferredName} is already in an existing carpool group. Ask them to leave that group before attempting to join yours.`
+          `${otherUser.preferredName} is already in an existing carpool group. Ask them to leave that group before attempting to join yours.`,
         );
         return false;
       }
@@ -77,7 +77,7 @@ export const createRequestHandlers = (
     } else {
       if (user.carpoolId) {
         toast.error(
-          `You cannot join ${otherUser.preferredName}'s group until leaving your current carpool group.`
+          `You cannot join ${otherUser.preferredName}'s group until leaving your current carpool group.`,
         );
         return false;
       }
@@ -120,12 +120,12 @@ export const createRequestHandlers = (
   const handleAcceptRequest = async (
     user: User,
     otherUser: EnhancedPublicUser,
-    request: Request
+    request: Request,
   ) => {
     if (validateRequestAcceptance(user, otherUser)) {
       await initiateGroup(user, otherUser);
       toast.success(
-        `${otherUser.preferredName}'s request to carpool with you has been accepted.`
+        `${otherUser.preferredName}'s request to carpool with you has been accepted.`,
       );
     }
   };
@@ -133,11 +133,11 @@ export const createRequestHandlers = (
   const handleRejectRequest = async (
     user: User,
     otherUser: EnhancedPublicUser,
-    request: Request
+    request: Request,
   ) => {
     await handleDelete(request.id);
     toast.success(
-      `${otherUser.preferredName}'s request to carpool with you has been deleted.`
+      `${otherUser.preferredName}'s request to carpool with you has been deleted.`,
     );
   };
 

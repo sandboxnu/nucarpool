@@ -9,12 +9,14 @@ declare module "next-auth" {
     user?: {
       id?: string;
       isOnboarded: boolean;
+      tutorialCompleted: boolean;
       permission: Permission;
     } & DefaultSession["user"];
   }
 
   interface User extends DefaultUser {
     isOnboarded: boolean;
+    tutorialCompleted: boolean;
     permission: Permission;
   }
 }

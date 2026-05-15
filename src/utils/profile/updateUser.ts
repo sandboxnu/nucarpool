@@ -7,7 +7,14 @@ export const updateUser = async ({
   sessionName,
   mutation,
 }: {
-  userInfo: UserInfo;
+  userInfo: UserInfo & {
+    startStreet: string;
+    startCity: string;
+    startState: string;
+    companyStreet: string;
+    companyCity: string;
+    companyState: string;
+  };
   sessionName: string;
   mutation: ReturnType<typeof useEditUserMutation>;
 }) => {
@@ -41,12 +48,18 @@ export const updateUser = async ({
     coopStartDate: userInfo.coopStartDate!,
     coopEndDate: userInfo.coopEndDate!,
     licenseSigned: true,
+    startStreet: userInfo.startStreet,
+    startCity: userInfo.startCity,
+    startState: userInfo.startState,
+    companyStreet: userInfo.companyStreet,
+    companyCity: userInfo.companyCity,
+    companyState: userInfo.companyState,
   });
 };
 export const useEditUserMutation = (
   router: NextRouter,
   onComplete: () => void,
-  pushMap: boolean = true
+  pushMap: boolean = true,
 ) => {
   const utils = trpc.useContext();
 

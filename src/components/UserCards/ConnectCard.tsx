@@ -12,25 +12,30 @@ import ConnectModal from "../Modals/ConnectModal";
 import { UserContext } from "../../utils/userContext";
 import { Role } from "@prisma/client";
 import { trackEvent } from "../../utils/mixpanel";
+import useIsMobile from "../../utils/useIsMobile";
+import React from 'react';
 
 interface ConnectCardProps {
   otherUser: EnhancedPublicUser;
   onViewRouteClick: (user: User, otherUser: PublicUser) => void;
   onClose?: (action: string) => void;
   onViewRequest: (userId: string) => void;
+  mobileSelectedUser?: string | null;
+  handleMobileExpand?: (userId?: string) => void;
 }
 
-export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
+export const ConnectCard = (props: ConnectCardProps): React.JSX.Element => {
   const user = useContext(UserContext);
   const [showModal, setShowModal] = useState(false);
   const { addToast } = useToasts();
+  const isMobile = useIsMobile();
 
   const handleExistingReceivedRequest = () => {
     addToast(
       "You already have an incoming carpool request from " +
         props.otherUser.preferredName +
         ". Navigate to the received requests tab to connect with them!",
-      { appearance: "info" }
+      { appearance: "info" },
     );
   };
 
@@ -39,7 +44,7 @@ export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
       "You already have an outgoing carpool request to " +
         props.otherUser.preferredName +
         ". Please wait for them to respond to your request!",
-      { appearance: "info" }
+      { appearance: "info" },
     );
   };
 
@@ -48,7 +53,7 @@ export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
       "You do not have any seats available in your car to connect with " +
         props.otherUser.preferredName +
         ".",
-      { appearance: "info" }
+      { appearance: "info" },
     );
   };
 
@@ -86,7 +91,24 @@ export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
         otherUser={props.otherUser}
         rightButton={connectButtonInfo}
         onViewRouteClick={props.onViewRouteClick}
+        onClick={() => {
+          if (isMobile) {
+            props.handleMobileExpand?.(props.otherUser.id);
+          }
+        }}
+        isMobileCondensedLayout={isMobile && props.mobileSelectedUser !== null}
       />
+      {props.mobileSelectedUser !== null && isMobile && (
+        <div className="mx-3.5 mb-4 mt-2">
+          <button
+            onClick={() => handleConnect(props.otherUser)}
+            disabled={user?.role === "VIEWER" || user?.status === "INACTIVE"}
+            className="w-full rounded-md bg-northeastern-red p-3 text-center text-white font-semibold hover:bg-red-700 disabled:bg-gray-300"
+          >
+            Connect!
+          </button>
+        </div>
+      )}
       {showModal &&
         user &&
         createPortal(
@@ -96,7 +118,7 @@ export const ConnectCard = (props: ConnectCardProps): JSX.Element => {
             onViewRequest={props.onViewRequest}
             onClose={onClose}
           />,
-          document.body
+          document.body,
         )}
     </>
   );

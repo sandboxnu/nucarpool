@@ -13,13 +13,35 @@ export type TempUser = {
   dateCreated: Date;
   role: Role;
   status: Status;
+  carpoolId: string;
+  daysWorking: string;
 };
 export type TempGroup = {
   id: string;
   dateCreated: Date;
   _count: {
-    users: number;
+    carpoolSearches: number;
   };
+};
+export type TempRequest = {
+  id: string;
+  dateCreated: Date;
+  fromUser: {
+    role: Role;
+  };
+};
+export type TempConversation = {
+  id: string;
+  dateCreated: Date;
+  _count: {
+    messages: number;
+  };
+};
+export type TempMessage = {
+  conversationId: string;
+  dateCreated: Date;
+  content: string;
+  User: PublicUser;
 };
 export type PoiData = {
   location: string;
@@ -29,19 +51,19 @@ export type PoiData = {
 export type OnboardingFormInputs = {
   role: Role;
   status: Status;
-  seatAvail: number;
-  companyName: string;
-  profilePicture: string;
-  companyAddress: string;
-  startAddress: string;
-  preferredName: string;
-  pronouns: string;
-  daysWorking: boolean[];
-  startTime: Date | null;
-  endTime: Date | null;
-  coopStartDate: Date | null;
-  coopEndDate: Date | null;
-  bio: string;
+  seatAvail?: number;
+  companyName?: string;
+  profilePicture?: string;
+  companyAddress?: string;
+  startAddress?: string;
+  preferredName?: string;
+  pronouns?: string;
+  daysWorking?: boolean[];
+  startTime?: Date | null;
+  endTime?: Date | null;
+  coopStartDate?: Date | null;
+  coopEndDate?: Date | null;
+  bio?: string;
 };
 export type UserInfo = {
   role: Role;
@@ -63,6 +85,12 @@ export type UserInfo = {
   startCoordLat: number;
   companyAddress: string;
   daysWorking: boolean[];
+  startStreet: string;
+  startCity: string;
+  startState: string;
+  companyStreet: string;
+  companyCity: string;
+  companyState: string;
 };
 export type FiltersState = {
   days: number;
@@ -93,9 +121,6 @@ export type MapUser = {
   coopStartDate: Date | null;
   coopEndDate: Date | null;
   preferredName: string;
-  startPOILocation: string;
-  startPOICoordLng: number;
-  startPOICoordLat: number;
   companyAddress: string;
   companyCoordLng: number;
   companyCoordLat: number;
@@ -104,7 +129,8 @@ export type MapUser = {
   carpoolId: string | null;
 };
 
-// describes a user's public data along with their POIs
+// PublicUser - describes a user's public data
+// This represents merged data from User + CarpoolSearch + Location
 export type PublicUser = {
   id: string;
   name: string | null;
@@ -117,9 +143,9 @@ export type PublicUser = {
   status: Status;
   seatAvail: number;
   companyName: string;
-  startPOILocation: string;
-  startPOICoordLng: number;
-  startPOICoordLat: number;
+  startAddress: string;
+  startCoordLng: number;
+  startCoordLat: number;
   companyAddress: string;
   companyCoordLng: number;
   companyCoordLat: number;
@@ -131,20 +157,103 @@ export type PublicUser = {
   carpoolId: string | null;
 };
 
-export type EnhancedPublicUser = PublicUser & {
-  isFavorited: boolean;
-  incomingRequest?: Request;
-  outgoingRequest?: Request;
+export type Request = {
+  id: string;
+  message: string;
+  fromUserId: string;
+  toUserId: string;
+  fromUser: PublicUser | null;
+  toUser: PublicUser | null;
+  conversation?: Conversation | null;
+  conversationId: string | null;
+  dateCreated: Date;
 };
 
-export type User = RouterOutput["user"]["me"];
+export type ValidRequest = Omit<Request, 'fromUser' | 'toUser'> & {
+  fromUser: PublicUser;
+  toUser: PublicUser;
+};
+
+export type EnhancedPublicUser = PublicUser & {
+  isFavorited: boolean;
+  incomingRequest?: ValidRequest;
+  outgoingRequest?: ValidRequest;
+};
+
+/**
+ * User type returned from user.me query
+ * This represents a User with CarpoolSearch and Location data merged in
+ * via the adapter pattern in the backend
+ */
+export type User = {
+  id: string;
+  name: string | null;
+  email: string | null;
+  emailVerified: Date | null;
+  image: string | null;
+  bio: string;
+  preferredName: string;
+  pronouns: string;
+  permission: Permission;
+  isOnboarded: boolean;
+  licenseSigned: boolean;
+  dateCreated: Date;
+  dateModified: Date;
+  // Fields merged from CarpoolSearch
+  role: Role;
+  status: Status;
+  seatAvail: number;
+  companyName: string;
+  daysWorking: string;
+  startTime: Date | null;
+  endTime: Date | null;
+  coopStartDate: Date | null;
+  coopEndDate: Date | null;
+  carpoolId: string | null;
+  groupMessage: string | null;
+  // Fields merged from Location (homeLocation)
+  startCoordLng: number;
+  startCoordLat: number;
+  startStreet: string;
+  startCity: string;
+  startState: string;
+  startAddress: string;
+  // Fields merged from Location (companyLocation)
+  companyCoordLng: number;
+  companyCoordLat: number;
+  companyStreet: string;
+  companyCity: string;
+  companyState: string;
+  companyAddress: string;
+  companyPOIAddress: string;
+  companyPOICoordLng: number;
+  companyPOICoordLat: number;
+  startPOILocation: string;
+  startPOICoordLng: number;
+  startPOICoordLat: number;
+};
+
 export type GeoJsonUsers = RouterOutput["mapbox"]["geoJsonUserList"];
 
 export type CarpoolAddress = {
   place_name: string;
   center: [longitude: number, latitude: number];
+  street?: string;
+  city?: string;
+  state?: string;
 };
-export type CarpoolFeature = Feature & CarpoolAddress;
+export type CarpoolFeature = {
+  id: string;
+  place_name: string;
+  center: [number, number];
+  street?: string;
+  city?: string;
+  state?: string;
+  // feature properties
+  geometry?: any;
+  properties?: any;
+  type?: string;
+};
 
 export type ButtonInfo = {
   text: string;
@@ -155,18 +264,6 @@ export type ButtonInfo = {
 type Admin = {
   iso_3166_1_alpha3: string;
   iso_3166_1: string;
-};
-
-export type Request = {
-  id: string;
-  message: string;
-  fromUserId: string;
-  toUserId: string;
-  fromUser: User | PublicUser;
-  toUser: User | PublicUser;
-  conversation?: Conversation | null;
-  conversationId: string | null;
-  dateCreated: Date;
 };
 
 export type Conversation = {

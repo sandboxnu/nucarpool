@@ -1,6 +1,6 @@
 export default function getCroppedImg(
   imageSrc: string,
-  croppedAreaPixels: any
+  croppedAreaPixels: any,
 ) {
   return new Promise<{ file: File; url: string }>((resolve, reject) => {
     const image = new Image();
@@ -25,7 +25,7 @@ export default function getCroppedImg(
         0,
         0,
         croppedAreaPixels.width,
-        croppedAreaPixels.height
+        croppedAreaPixels.height,
       );
 
       canvas.toBlob(
@@ -41,7 +41,7 @@ export default function getCroppedImg(
           }
         },
         "image/jpeg",
-        0.7
+        0.7,
       );
     };
 

@@ -16,7 +16,7 @@ interface Option<T> {
 }
 const RequestSidebar = (props: RequestSidebarProps) => {
   const [curOption, setCurOption] = useState<"received" | "sent" | "all">(
-    "all"
+    "all",
   );
   const options: Option<"received" | "sent" | "all">[] = [
     { value: "all", label: "All" },
@@ -44,8 +44,8 @@ const RequestSidebar = (props: RequestSidebarProps) => {
           curOption === "all"
             ? [...props.received, ...props.sent]
             : curOption === "sent"
-            ? props.sent
-            : props.received
+              ? props.sent
+              : props.received
         }
         subType={curOption}
         disabled={props.disabled}
